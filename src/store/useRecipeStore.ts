@@ -6,6 +6,7 @@ import { SEED_RECIPES } from './seedRecipes'
 interface RecipeStore {
   recipes: Recipe[]
   addRecipe: (recipe: Recipe) => void
+  addRecipes: (recipes: Recipe[]) => void
   updateRecipe: (id: string, updates: Partial<Recipe>) => void
   deleteRecipe: (id: string) => void
   getRecipe: (id: string) => Recipe | undefined
@@ -18,6 +19,13 @@ export const useRecipeStore = create<RecipeStore>()(
 
       addRecipe: (recipe) =>
         set((s) => ({ recipes: [...s.recipes, recipe] })),
+
+      addRecipes: (incoming) =>
+        set((s) => {
+          const existingIds = new Set(s.recipes.map((r) => r.id))
+          const newOnes = incoming.filter((r) => !existingIds.has(r.id))
+          return newOnes.length ? { recipes: [...s.recipes, ...newOnes] } : {}
+        }),
 
       updateRecipe: (id, updates) =>
         set((s) => ({
