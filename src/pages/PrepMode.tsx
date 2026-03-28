@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Play, Pause, RotateCcw, ChevronRight, ChevronLeft, Check, Timer, Zap, Trophy } from 'lucide-react'
+import { Play, Pause, RotateCcw, ChevronRight, ChevronLeft, Check, Timer, Zap } from 'lucide-react'
 import { useRecipeStore } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
 import type { Recipe, PrepStep } from '../types'
@@ -257,8 +257,6 @@ export default function PrepMode() {
       </div>
     )
   }
-
-  const stepsWithTimers = selectedRecipe.steps.filter((s) => s.timerSeconds > 0)
 
   return (
     <div className="flex-1 overflow-y-auto">

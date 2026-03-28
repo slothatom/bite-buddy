@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, Flame, Zap, Trophy, RefreshCw, Target } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Flame, Zap, Trophy, Target } from 'lucide-react'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { useRecipeStore } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
