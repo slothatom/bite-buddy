@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { DayPlan, GroceryItem, PlannedMeal, MealType } from '../types'
+import type { DayPlan, GroceryItem, PlannedMeal } from '../types'
 import { useRecipeStore } from './useRecipeStore'
 
 function getWeekDates(referenceDate: Date = new Date()): string[] {
