@@ -2,9 +2,21 @@
 
 export interface Macros {
   calories: number
-  protein: number  // grams
-  carbs: number    // grams
-  fat: number      // grams
+  protein: number  // g
+  carbs: number    // g
+  fat: number      // g
+}
+
+export interface Micros {
+  fiber?: number        // g
+  sugar?: number        // g
+  sodium?: number       // mg
+  calcium?: number      // mg
+  iron?: number         // mg
+  vitaminC?: number     // mg
+  vitaminD?: number     // mcg
+  potassium?: number    // mg
+  saturatedFat?: number // g
 }
 
 // ─── Recipes ─────────────────────────────────────────────────────────────────
@@ -14,7 +26,9 @@ export interface Ingredient {
   name: string
   amount: number
   unit: string
-  macros: Macros // per stated amount
+  macros: Macros      // per stated amount
+  micros?: Micros     // per stated amount
+  per100g?: Macros    // raw API data — used to recalculate when amount changes
 }
 
 export interface PrepStep {
@@ -24,17 +38,9 @@ export interface PrepStep {
 }
 
 export type RecipeTag =
-  | 'high-protein'
-  | 'low-carb'
-  | 'vegan'
-  | 'vegetarian'
-  | 'quick'
-  | 'bulk'
-  | 'breakfast'
-  | 'lunch'
-  | 'dinner'
-  | 'snack'
-  | 'dessert'
+  | 'high-protein' | 'low-carb' | 'vegan' | 'vegetarian'
+  | 'quick' | 'bulk' | 'breakfast' | 'lunch' | 'dinner'
+  | 'snack' | 'dessert'
 
 export interface Recipe {
   id: string
@@ -48,12 +54,13 @@ export interface Recipe {
   steps: PrepStep[]
   tags: RecipeTag[]
   macrosPerServing: Macros
+  microsPerServing?: Micros
   createdAt: string
 }
 
 // ─── Meal Plan ────────────────────────────────────────────────────────────────
 
-export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack'
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack1' | 'snack2'
 
 export interface PlannedMeal {
   id: string
@@ -67,6 +74,17 @@ export interface DayPlan {
   meals: PlannedMeal[]
 }
 
+// ─── Cook Schedule ────────────────────────────────────────────────────────────
+
+export interface CookSession {
+  id: string
+  date: string        // 'YYYY-MM-DD'
+  time: string        // 'HH:MM'
+  recipeIds: string[]
+  label: string
+  completed: boolean
+}
+
 // ─── Grocery ─────────────────────────────────────────────────────────────────
 
 export interface GroceryItem {
@@ -78,18 +96,35 @@ export interface GroceryItem {
   fromRecipeIds: string[]
 }
 
+// ─── Weight & Body ───────────────────────────────────────────────────────────
+
+export interface WeightEntry {
+  id: string
+  date: string   // 'YYYY-MM-DD'
+  weight: number
+  unit: 'kg' | 'lbs'
+  notes?: string
+}
+
+export interface BodyMeasurement {
+  id: string
+  date: string
+  measurements: {
+    waist?: number
+    hips?: number
+    chest?: number
+    arms?: number
+    thighs?: number
+  }
+  unit: 'cm' | 'in'
+}
+
 // ─── Gamification ─────────────────────────────────────────────────────────────
 
 export type AchievementId =
-  | 'first_recipe'
-  | 'five_recipes'
-  | 'first_plan'
-  | 'week_complete'
-  | 'grocery_master'
-  | 'prep_master'
-  | 'streak_3'
-  | 'streak_7'
-  | 'macro_goal'
+  | 'first_recipe' | 'five_recipes' | 'first_plan'
+  | 'week_complete' | 'grocery_master' | 'prep_master'
+  | 'streak_3' | 'streak_7' | 'macro_goal' | 'weight_logged'
 
 export interface Achievement {
   id: AchievementId
@@ -107,5 +142,15 @@ export interface UserProfile {
   streak: number
   lastActiveDate?: string
   macroTargets: Macros
+  weightUnit: 'kg' | 'lbs'
   achievements: Achievement[]
+}
+
+// ─── Release Notes ────────────────────────────────────────────────────────────
+
+export interface ReleaseNote {
+  version: string
+  date: string
+  title: string
+  changes: { type: 'feature' | 'fix' | 'improvement'; text: string }[]
 }

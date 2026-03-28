@@ -137,4 +137,3 @@ export const useMealPlanStore = create<MealPlanStore>()(
 )
 
 export { getWeekDates }
-export type { MealType }

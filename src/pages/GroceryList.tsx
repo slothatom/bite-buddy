@@ -34,7 +34,7 @@ export default function GroceryList() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
       <div className="max-w-2xl mx-auto px-6 py-6 space-y-5">
         <div className="flex items-center justify-between">
           <h1 className="page-title">Grocery List</h1>
