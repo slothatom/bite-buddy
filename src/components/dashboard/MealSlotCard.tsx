@@ -11,9 +11,10 @@ interface Props {
 
 const MEAL_COLORS: Record<string, string> = {
   breakfast: 'text-amber-600 bg-amber-50 border-amber-200',
+  snack1:    'text-xp-700 bg-xp-50 border-xp-200',
   lunch:     'text-brand-700 bg-brand-50 border-brand-200',
+  snack2:    'text-purple-700 bg-purple-50 border-purple-200',
   dinner:    'text-blue-700 bg-blue-50 border-blue-200',
-  snack:     'text-xp-700 bg-xp-50 border-xp-200',
 }
 
 export default function MealSlotCard({ meal, recipe, mealType, onAdd, onRemove }: Props) {

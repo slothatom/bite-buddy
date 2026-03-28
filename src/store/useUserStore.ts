@@ -26,12 +26,16 @@ function xpForNextLevel(xp: number): { current: number; needed: number; progress
   return { current: inLevel, needed: XP_PER_LEVEL, progress: inLevel / XP_PER_LEVEL }
 }
 
+export interface XpToast { amount: number; label?: string }
+
 interface UserStore {
   profile: UserProfile
+  toast: XpToast | null
   setName: (name: string) => void
   setMacroTargets: (targets: UserProfile['macroTargets']) => void
-  addXp: (amount: number) => void
-  unlockAchievement: (id: AchievementId) => boolean // returns true if newly unlocked
+  addXp: (amount: number, label?: string) => void
+  clearToast: () => void
+  unlockAchievement: (id: AchievementId) => boolean
   checkStreak: () => void
   xpProgress: () => { current: number; needed: number; progress: number }
   allAchievements: Achievement[]
@@ -50,6 +54,7 @@ export const useUserStore = create<UserStore>()(
         achievements: [],
       },
 
+      toast: null,
       allAchievements: ALL_ACHIEVEMENTS,
 
       setName: (name) =>
@@ -58,11 +63,16 @@ export const useUserStore = create<UserStore>()(
       setMacroTargets: (targets) =>
         set((s) => ({ profile: { ...s.profile, macroTargets: targets } })),
 
-      addXp: (amount) =>
+      addXp: (amount, label) =>
         set((s) => {
           const newXp = s.profile.xp + amount
-          return { profile: { ...s.profile, xp: newXp, level: computeLevel(newXp) } }
+          return {
+            profile: { ...s.profile, xp: newXp, level: computeLevel(newXp) },
+            toast: { amount, label },
+          }
         }),
+
+      clearToast: () => set({ toast: null }),
 
       unlockAchievement: (id) => {
         const { profile, addXp } = get()
@@ -79,7 +89,7 @@ export const useUserStore = create<UserStore>()(
             ],
           },
         }))
-        addXp(achievement.xpReward)
+        addXp(achievement.xpReward, achievement.name)
         return true
       },
 
@@ -113,7 +123,10 @@ export const useUserStore = create<UserStore>()(
 
       xpProgress: () => xpForNextLevel(get().profile.xp),
     }),
-    { name: 'bite-buddy-user' }
+    {
+      name: 'bite-buddy-user',
+      partialize: (s) => ({ profile: s.profile }), // don't persist toast
+    }
   )
 )
 

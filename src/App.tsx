@@ -8,6 +8,14 @@ import PrepMode from './pages/PrepMode'
 import Analytics from './pages/Analytics'
 import Schedule from './pages/Schedule'
 import Changelog from './pages/Changelog'
+import XpToast from './components/layout/XpToast'
+import { useUserStore } from './store/useUserStore'
+
+function ToastLayer() {
+  const { toast, clearToast } = useUserStore()
+  if (!toast) return null
+  return <XpToast key={`${toast.amount}-${toast.label}-${Date.now()}`} amount={toast.amount} label={toast.label} onDone={clearToast} />
+}
 
 export default function App() {
   return (
@@ -27,6 +35,7 @@ export default function App() {
         </main>
         <BottomNav />
       </div>
+      <ToastLayer />
     </HashRouter>
   )
 }

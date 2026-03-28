@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   Plus, Search, X, Pencil, Trash2, Clock, Users,
-  ChevronDown, ChevronUp, Zap, ScanBarcode, Loader2,
+  ChevronDown, ChevronUp, Zap, ScanBarcode, Loader2, Star,
 } from 'lucide-react'
 import { useRecipeStore } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
@@ -333,8 +333,8 @@ function RecipeForm({ initial, onSave, onCancel }: {
 
 // ── RecipeCard ──────────────────────────────────────────────────────────────
 
-function RecipeCard({ recipe, onEdit, onDelete, onPrepMode }: {
-  recipe: Recipe; onEdit: () => void; onDelete: () => void; onPrepMode: () => void
+function RecipeCard({ recipe, isFavorite, onEdit, onDelete, onPrepMode, onToggleFavorite }: {
+  recipe: Recipe; isFavorite: boolean; onEdit: () => void; onDelete: () => void; onPrepMode: () => void; onToggleFavorite: () => void
 }) {
   const [expanded, setExpanded] = useState(false)
   const total = recipe.prepMinutes + recipe.cookMinutes
@@ -351,6 +351,10 @@ function RecipeCard({ recipe, onEdit, onDelete, onPrepMode }: {
             </div>
           </div>
           <div className="flex gap-1 shrink-0">
+            <button className={`btn-ghost btn-icon transition-colors ${isFavorite ? 'text-amber-400 hover:text-amber-500' : 'text-gray-300 hover:text-amber-400'}`}
+              onClick={onToggleFavorite} title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}>
+              <Star size={14} fill={isFavorite ? 'currentColor' : 'none'} />
+            </button>
             <button className="btn-ghost btn-icon text-gray-400 hover:text-brand-600" onClick={onEdit}><Pencil size={14} /></button>
             <button className="btn-ghost btn-icon text-gray-400 hover:text-red-500" onClick={onDelete}><Trash2 size={14} /></button>
           </div>
@@ -435,10 +439,11 @@ function RecipeCard({ recipe, onEdit, onDelete, onPrepMode }: {
 // ── Page ────────────────────────────────────────────────────────────────────
 
 export default function Recipes() {
-  const { recipes, addRecipe, updateRecipe, deleteRecipe } = useRecipeStore()
+  const { recipes, favoriteIds, addRecipe, updateRecipe, deleteRecipe, toggleFavorite } = useRecipeStore()
   const { unlockAchievement, addXp } = useUserStore()
   const [search, setSearch] = useState('')
   const [tagFilter, setTagFilter] = useState<RecipeTag | null>(null)
+  const [favOnly, setFavOnly] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Recipe | null>(null)
 
@@ -446,7 +451,8 @@ export default function Recipes() {
     const matchSearch = r.name.toLowerCase().includes(search.toLowerCase()) ||
       r.description.toLowerCase().includes(search.toLowerCase())
     const matchTag = !tagFilter || r.tags.includes(tagFilter)
-    return matchSearch && matchTag
+    const matchFav = !favOnly || favoriteIds.includes(r.id)
+    return matchSearch && matchTag && matchFav
   })
 
   function handleSave(recipe: Recipe) {
@@ -476,6 +482,11 @@ export default function Recipes() {
             <input className="input pl-9 text-sm" placeholder="Search recipes…"
               value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
+          <button
+            onClick={() => setFavOnly((v) => !v)}
+            className={`flex items-center gap-1.5 tag transition-all ${favOnly ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-400' : 'hover:bg-gray-200'}`}>
+            <Star size={12} fill={favOnly ? 'currentColor' : 'none'} /> Favorites
+          </button>
           <div className="flex gap-1 flex-wrap">
             {ALL_TAGS.slice(0, 5).map((tag) => (
               <button key={tag}
@@ -486,14 +497,16 @@ export default function Recipes() {
           </div>
         </div>
 
-        <p className="text-xs text-gray-400">{filtered.length} of {recipes.length} recipes</p>
+        <p className="text-xs text-gray-400">{filtered.length} of {recipes.length} recipes{favOnly ? ` · ${favoriteIds.length} favorited` : ''}</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {filtered.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe}
+              isFavorite={favoriteIds.includes(recipe.id)}
               onEdit={() => { setEditing(recipe); setFormOpen(true) }}
               onDelete={() => deleteRecipe(recipe.id)}
               onPrepMode={() => { window.location.hash = `/prep?recipe=${recipe.id}` }}
+              onToggleFavorite={() => toggleFavorite(recipe.id)}
             />
           ))}
         </div>
