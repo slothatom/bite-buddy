@@ -15,7 +15,7 @@ function groupByFirstLetter(items: { name: string }[]) {
 
 export default function GroceryList() {
   const { groceryItems, generateGroceryList, toggleGroceryItem, clearCheckedItems, clearGroceryList } = useMealPlanStore()
-  const { recipes } = useRecipeStore()
+  useRecipeStore()
   const { unlockAchievement, addXp } = useUserStore()
 
   const checked = groceryItems.filter((i) => i.checked)

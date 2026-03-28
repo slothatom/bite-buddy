@@ -224,7 +224,7 @@ export default function Dashboard() {
                   {mealType}
                 </span>
               </div>
-              {weekDates.map((date, di) => {
+              {weekDates.map((date, _di) => {
                 const dayPlan = plan.find((d) => d.date === date)
                 const meal = dayPlan?.meals.find((m) => m.mealType === mealType)
                 const recipe = meal ? recipes.find((r) => r.id === meal.recipeId) : undefined
