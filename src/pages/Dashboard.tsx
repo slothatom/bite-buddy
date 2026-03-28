@@ -295,7 +295,7 @@ export default function Dashboard() {
                   <span className="text-brand-700 font-medium flex-1">
                     Paste meals from {DAYS[weekDates.indexOf(copyingFrom)]} to…
                   </span>
-                  {weekDates.filter((d) => d !== copyingFrom).map((d, i) => (
+                  {weekDates.filter((d) => d !== copyingFrom).map((d) => (
                     <button key={d} onClick={() => { copyDay(copyingFrom, d); setCopyingFrom(null); setSelectedDate(d) }}
                       className="px-2 py-0.5 rounded-lg bg-white border border-brand-200 text-brand-700 font-semibold hover:bg-brand-100 transition-colors">
                       {DAYS[weekDates.indexOf(d)]}
