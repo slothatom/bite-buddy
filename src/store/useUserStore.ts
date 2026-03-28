@@ -46,6 +46,7 @@ export const useUserStore = create<UserStore>()(
         level: 1,
         streak: 0,
         macroTargets: { calories: 2000, protein: 150, carbs: 200, fat: 65 },
+        weightUnit: 'kg' as const,
         achievements: [],
       },
 
