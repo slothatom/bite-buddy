@@ -6,6 +6,7 @@ import Recipes from './pages/Recipes'
 import GroceryList from './pages/GroceryList'
 import PrepMode from './pages/PrepMode'
 import Analytics from './pages/Analytics'
+import Schedule from './pages/Schedule'
 import Changelog from './pages/Changelog'
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
             <Route path="/recipes"    element={<Recipes />} />
             <Route path="/grocery"    element={<GroceryList />} />
             <Route path="/prep"       element={<PrepMode />} />
+            <Route path="/schedule"   element={<Schedule />} />
             <Route path="/analytics"  element={<Analytics />} />
             <Route path="/changelog"  element={<Changelog />} />
           </Routes>

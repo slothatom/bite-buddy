@@ -45,8 +45,9 @@ export default function IngredientSearch({ value, onChange, placeholder }: Props
 
   function handleSelect(r: NutritionResult) {
     setQuery(r.name)
-    onChange(r.name, r.per100g, r.micros)
+    setResults([])
     setOpen(false)
+    onChange(r.name, r.per100g, r.micros)
   }
 
   return (

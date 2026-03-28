@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { LayoutDashboard, BookOpen, ShoppingCart, Timer, Zap, Flame, BarChart2, ScrollText } from 'lucide-react'
+import { LayoutDashboard, BookOpen, ShoppingCart, Timer, CalendarClock, Zap, Flame, BarChart2, ScrollText } from 'lucide-react'
 import { useUserStore } from '../../store/useUserStore'
 
 const NAV = [
@@ -7,6 +7,7 @@ const NAV = [
   { to: '/recipes',    label: 'Recipes',      icon: BookOpen },
   { to: '/grocery',    label: 'Grocery List', icon: ShoppingCart },
   { to: '/prep',       label: 'Prep Mode',    icon: Timer },
+  { to: '/schedule',   label: 'Schedule',     icon: CalendarClock },
   { to: '/analytics',  label: 'Analytics',    icon: BarChart2 },
   { to: '/changelog',  label: "What's New",   icon: ScrollText },
 ]

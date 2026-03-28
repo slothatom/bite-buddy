@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, Flame, Zap, Trophy, Target, ArrowUpDown } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Flame, Zap, Trophy, Target, ArrowUpDown, LayoutGrid, CalendarDays, Info } from 'lucide-react'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { useRecipeStore } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
@@ -7,13 +7,13 @@ import MealSlotCard from '../components/dashboard/MealSlotCard'
 import AddMealModal from '../components/dashboard/AddMealModal'
 import MacroBar from '../components/dashboard/MacroBar'
 import ImportExportModal from '../components/dashboard/ImportExportModal'
+import ProgressInfoModal from '../components/dashboard/ProgressInfoModal'
 import type { MealType, PlannedMeal, Macros } from '../types'
 
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
-const MEAL_TYPES: MealType[] = ['breakfast','lunch','dinner','snack1','snack2']
+const MEAL_TYPES: MealType[] = ['breakfast','snack1','lunch','snack2','dinner']
 const MEAL_LABELS: Record<MealType, string> = {
-  breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner',
-  snack1: 'Snack 1', snack2: 'Snack 2',
+  breakfast: 'Breakfast', snack1: 'Snack 1', lunch: 'Lunch', snack2: 'Snack 2', dinner: 'Dinner',
 }
 
 interface ModalState { date: string; mealType: MealType }
@@ -35,6 +35,8 @@ export default function Dashboard() {
   const { profile, unlockAchievement, addXp, checkStreak } = useUserStore()
   const [modal, setModal] = useState<ModalState | null>(null)
   const [showImportExport, setShowImportExport] = useState(false)
+  const [showProgressInfo, setShowProgressInfo] = useState(false)
+  const [viewMode, setViewMode] = useState<'week' | 'day'>('week')
   const today = new Date().toISOString().split('T')[0]
   const [selectedDate, setSelectedDate] = useState(weekDates.includes(today) ? today : weekDates[0])
 
@@ -89,6 +91,14 @@ export default function Dashboard() {
             <button className="btn-secondary btn-icon" onClick={handlePrevWeek}><ChevronLeft size={16} /></button>
             <button className="btn-secondary text-xs font-semibold px-2.5" onClick={() => goToWeek(new Date())}>Today</button>
             <button className="btn-secondary btn-icon" onClick={handleNextWeek}><ChevronRight size={16} /></button>
+            <div className="hidden md:flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+              <button onClick={() => setViewMode('week')}
+                className={`btn-icon rounded-lg transition-colors ${viewMode === 'week' ? 'bg-white shadow-sm text-brand-600' : 'text-gray-400 hover:text-gray-600'}`}
+                title="Week view"><LayoutGrid size={15} /></button>
+              <button onClick={() => setViewMode('day')}
+                className={`btn-icon rounded-lg transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-brand-600' : 'text-gray-400 hover:text-gray-600'}`}
+                title="Day view"><CalendarDays size={15} /></button>
+            </div>
             <button className="btn-secondary btn-icon" onClick={() => setShowImportExport(true)} title="Import / Export plan">
               <ArrowUpDown size={16} />
             </button>
@@ -107,10 +117,15 @@ export default function Dashboard() {
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${color}`}>
                 <Icon size={16} />
               </div>
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className={`text-xl font-extrabold font-mono leading-none ${text}`}>{val}</p>
                 <p className="text-xs text-gray-400">{label}</p>
               </div>
+              {(label === 'total XP' || label === 'achievements') && (
+                <button onClick={() => setShowProgressInfo(true)} className="text-gray-300 hover:text-gray-400 transition-colors">
+                  <Info size={13} />
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -169,42 +184,85 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ─── Desktop: full week grid ─── */}
-        <div className="hidden md:block card overflow-hidden">
-          <div className="grid border-b border-gray-100" style={{ gridTemplateColumns: '80px repeat(7, 1fr)' }}>
-            <div className="px-3 py-2.5" />
-            {weekDates.map((date, i) => {
-              const isToday = date === today
-              return (
-                <div key={date} className={`px-2 py-2.5 text-center border-l border-gray-100 ${isToday ? 'bg-brand-50' : ''}`}>
-                  <p className={`text-xs font-bold uppercase tracking-wide ${isToday ? 'text-brand-600' : 'text-gray-500'}`}>{DAYS[i]}</p>
-                  <p className={`text-sm font-semibold mt-0.5 ${isToday ? 'text-brand-700' : 'text-gray-700'}`}>{formatDate(date).split(' ')[1]}</p>
-                </div>
-              )
-            })}
-          </div>
-
-          {MEAL_TYPES.map((mealType) => (
-            <div key={mealType} className="grid border-b border-gray-100 last:border-0" style={{ gridTemplateColumns: '80px repeat(7, 1fr)' }}>
-              <div className="px-3 py-2 flex items-start pt-3">
-                <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">{MEAL_LABELS[mealType]}</span>
-              </div>
-              {weekDates.map((date) => {
-                const dayPlan = plan.find((d) => d.date === date)
-                const meal = dayPlan?.meals.find((m) => m.mealType === mealType)
-                const recipe = meal ? recipes.find((r) => r.id === meal.recipeId) : undefined
+        {/* ─── Desktop: week grid ─── */}
+        {viewMode === 'week' && (
+          <div className="hidden md:block card overflow-hidden">
+            <div className="grid border-b border-gray-100" style={{ gridTemplateColumns: '80px repeat(7, 1fr)' }}>
+              <div className="px-3 py-2.5" />
+              {weekDates.map((date, i) => {
                 const isToday = date === today
                 return (
-                  <div key={`${date}-${mealType}`} className={`px-1 py-1 border-l border-gray-100 ${isToday ? 'bg-brand-50/50' : ''}`}>
-                    <MealSlotCard meal={meal} recipe={recipe} mealType={mealType}
-                      onAdd={() => setModal({ date, mealType })}
-                      onRemove={() => meal && removeMeal(date, meal.id)} />
+                  <button key={date} onClick={() => { setSelectedDate(date); setViewMode('day') }}
+                    className={`px-2 py-2.5 text-center border-l border-gray-100 hover:bg-gray-50 transition-colors ${isToday ? 'bg-brand-50 hover:bg-brand-50' : ''}`}>
+                    <p className={`text-xs font-bold uppercase tracking-wide ${isToday ? 'text-brand-600' : 'text-gray-500'}`}>{DAYS[i]}</p>
+                    <p className={`text-sm font-semibold mt-0.5 ${isToday ? 'text-brand-700' : 'text-gray-700'}`}>{formatDate(date).split(' ')[1]}</p>
+                  </button>
+                )
+              })}
+            </div>
+
+            {MEAL_TYPES.map((mealType) => (
+              <div key={mealType} className="grid border-b border-gray-100 last:border-0" style={{ gridTemplateColumns: '80px repeat(7, 1fr)' }}>
+                <div className="px-3 py-2 flex items-start pt-3">
+                  <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">{MEAL_LABELS[mealType]}</span>
+                </div>
+                {weekDates.map((date) => {
+                  const dayPlan = plan.find((d) => d.date === date)
+                  const meal = dayPlan?.meals.find((m) => m.mealType === mealType)
+                  const recipe = meal ? recipes.find((r) => r.id === meal.recipeId) : undefined
+                  const isToday = date === today
+                  return (
+                    <div key={`${date}-${mealType}`} className={`px-1 py-1 border-l border-gray-100 ${isToday ? 'bg-brand-50/50' : ''}`}>
+                      <MealSlotCard meal={meal} recipe={recipe} mealType={mealType}
+                        onAdd={() => setModal({ date, mealType })}
+                        onRemove={() => meal && removeMeal(date, meal.id)} />
+                    </div>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ─── Desktop: day view ─── */}
+        {viewMode === 'day' && (
+          <div className="hidden md:block space-y-3">
+            {/* Day selector */}
+            <div className="flex gap-1.5">
+              {weekDates.map((date, i) => {
+                const isToday = date === today
+                const isSelected = date === selectedDate
+                const dayMeals = plan.find((d) => d.date === date)?.meals.length ?? 0
+                return (
+                  <button key={date} onClick={() => setSelectedDate(date)}
+                    className={`flex-1 flex flex-col items-center py-2 rounded-xl text-xs font-semibold transition-all
+                      ${isSelected ? 'bg-brand-600 text-white' : isToday ? 'bg-brand-100 text-brand-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                    <span>{DAYS[i]}</span>
+                    <span className="text-sm font-bold">{formatDate(date).split(' ')[1]}</span>
+                    {dayMeals > 0 && <span className={`text-[9px] mt-0.5 ${isSelected ? 'text-white/70' : 'text-gray-400'}`}>{dayMeals} meals</span>}
+                  </button>
+                )
+              })}
+            </div>
+            <div className="card px-4 py-3 space-y-2">
+              {MEAL_TYPES.map((mealType) => {
+                const dayPlan = plan.find((d) => d.date === selectedDate)
+                const meal = dayPlan?.meals.find((m) => m.mealType === mealType)
+                const recipe = meal ? recipes.find((r) => r.id === meal.recipeId) : undefined
+                return (
+                  <div key={mealType} className="flex items-center gap-3">
+                    <span className="text-xs font-semibold text-gray-400 w-20 text-right shrink-0">{MEAL_LABELS[mealType]}</span>
+                    <div className="flex-1">
+                      <MealSlotCard meal={meal} recipe={recipe} mealType={mealType}
+                        onAdd={() => setModal({ date: selectedDate, mealType })}
+                        onRemove={() => meal && removeMeal(selectedDate, meal.id)} />
+                    </div>
                   </div>
                 )
               })}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
 
         {/* Achievements */}
         {profile.achievements.length > 0 && (
@@ -230,6 +288,7 @@ export default function Dashboard() {
           onAdd={handleConfirmAdd} onClose={() => setModal(null)} />
       )}
       {showImportExport && <ImportExportModal onClose={() => setShowImportExport(false)} />}
+      {showProgressInfo && <ProgressInfoModal onClose={() => setShowProgressInfo(false)} />}
     </div>
   )
 }

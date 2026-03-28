@@ -1,11 +1,11 @@
 import { useLocation, NavLink } from 'react-router-dom'
-import { LayoutDashboard, BookOpen, ShoppingCart, Timer, BarChart2 } from 'lucide-react'
+import { LayoutDashboard, BookOpen, ShoppingCart, CalendarClock, BarChart2 } from 'lucide-react'
 
 const NAV = [
   { to: '/',          label: 'Plan',     icon: LayoutDashboard },
   { to: '/recipes',   label: 'Recipes',  icon: BookOpen },
   { to: '/grocery',   label: 'Grocery',  icon: ShoppingCart },
-  { to: '/prep',      label: 'Prep',     icon: Timer },
+  { to: '/schedule',  label: 'Schedule', icon: CalendarClock },
   { to: '/analytics', label: 'Stats',    icon: BarChart2 },
 ]
 

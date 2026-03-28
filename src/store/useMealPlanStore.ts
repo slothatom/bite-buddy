@@ -39,7 +39,7 @@ interface MealPlanStore {
   goToWeek: (referenceDate: Date) => void
   importWeek: (data: MealPlanExport) => void
 
-  generateGroceryList: () => void
+  generateGroceryList: (recipeIds?: string[]) => void
   toggleGroceryItem: (id: string) => void
   clearCheckedItems: () => void
   clearGroceryList: () => void
@@ -104,13 +104,15 @@ export const useMealPlanStore = create<MealPlanStore>()(
           set({ weekDates: newDates, plan: newPlan, groceryItems: [] })
         },
 
-        generateGroceryList: () => {
+        generateGroceryList: (recipeIds?: string[]) => {
           const { plan } = get()
           const { recipes } = useRecipeStore.getState()
           const map = new Map<string, GroceryItem>()
+          const filter = recipeIds ? new Set(recipeIds) : null
 
           plan.forEach((day) => {
             day.meals.forEach((meal) => {
+              if (filter && !filter.has(meal.recipeId)) return
               const recipe = recipes.find((r) => r.id === meal.recipeId)
               if (!recipe) return
               const scale = meal.servings / recipe.servings
