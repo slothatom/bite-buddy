@@ -266,100 +266,8 @@ function WeeklyNutrition() {
   )
 }
 
-// ── Cook Schedule ─────────────────────────────────────────────────────────────
-function CookSchedule() {
-  const { sessions, addSession, toggleComplete, removeSession } = useCookStore()
-  const { recipes } = useRecipeStore()
-  const [form, setForm] = useState({ date: new Date().toISOString().split('T')[0], time: '10:00', label: '', recipeIds: [] as string[] })
-
-  function handleAdd() {
-    if (!form.label.trim()) return
-    addSession({ id: newId(), ...form, completed: false })
-    setForm((f) => ({ ...f, label: '', recipeIds: [] }))
-  }
-
-  function toggleRecipe(id: string) {
-    setForm((f) => ({
-      ...f,
-      recipeIds: f.recipeIds.includes(id) ? f.recipeIds.filter((r) => r !== id) : [...f.recipeIds, id],
-    }))
-  }
-
-  const upcoming = sessions.filter((s) => !s.completed).sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`))
-  const done = sessions.filter((s) => s.completed)
-
-  return (
-    <div className="card p-5 space-y-4">
-      <h2 className="section-title">🍳 Cook Schedule</h2>
-
-      <div className="space-y-2">
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="label">Date</label>
-            <input type="date" className="input text-sm" value={form.date} onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} />
-          </div>
-          <div>
-            <label className="label">Time</label>
-            <input type="time" className="input text-sm" value={form.time} onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))} />
-          </div>
-        </div>
-        <div>
-          <label className="label">Label</label>
-          <input className="input text-sm" placeholder="e.g. Sunday meal prep" value={form.label} onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))} />
-        </div>
-        <div>
-          <label className="label">Recipes to cook</label>
-          <div className="flex flex-wrap gap-1.5 mt-1">
-            {recipes.map((r) => (
-              <button key={r.id} type="button"
-                className={`flex items-center gap-1 tag transition-all ${form.recipeIds.includes(r.id) ? 'bg-brand-100 text-brand-700 ring-1 ring-brand-400' : 'hover:bg-gray-200'}`}
-                onClick={() => toggleRecipe(r.id)}
-              >
-                {r.emoji} {r.name}
-              </button>
-            ))}
-          </div>
-        </div>
-        <button className="btn-primary w-full" onClick={handleAdd} disabled={!form.label.trim()}>
-          <Plus size={15} /> Schedule Cook Session
-        </button>
-      </div>
-
-      {upcoming.length > 0 && (
-        <div>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Upcoming</p>
-          <div className="space-y-2">
-            {upcoming.map((s) => (
-              <div key={s.id} className="flex items-center gap-3 p-3 rounded-xl bg-brand-50 border border-brand-100">
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-gray-900">{s.label}</p>
-                  <p className="text-xs text-gray-400">{formatDate(s.date)} at {s.time}</p>
-                  {s.recipeIds.length > 0 && (
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {s.recipeIds.map((id) => recipes.find((r) => r.id === id)?.name).filter(Boolean).join(', ')}
-                    </p>
-                  )}
-                </div>
-                <button className="btn-primary text-xs px-3" onClick={() => toggleComplete(s.id)}>Done</button>
-                <button className="text-gray-300 hover:text-red-400" onClick={() => removeSession(s.id)}><Trash2 size={14} /></button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {done.length > 0 && (
-        <p className="text-xs text-gray-400">{done.length} sessions completed</p>
-      )}
-    </div>
-  )
-}
-
-// Need to import useCookStore here
-import { useCookStore } from '../store/useCookStore'
-
 // ── Page ────────────────────────────────────────────────────────────────────
-export type AnalyticsTab = 'nutrition' | 'weight' | 'schedule'
+type AnalyticsTab = 'nutrition' | 'weight'
 
 export default function Analytics() {
   const [tab, setTab] = useState<AnalyticsTab>('nutrition')
@@ -370,7 +278,7 @@ export default function Analytics() {
         <h1 className="page-title">Analytics</h1>
 
         <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
-          {(['nutrition','weight','schedule'] as AnalyticsTab[]).map((t) => (
+          {(['nutrition','weight'] as AnalyticsTab[]).map((t) => (
             <button key={t} onClick={() => setTab(t)}
               className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize
                 ${tab === t ? 'bg-white shadow-sm text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}>
@@ -386,7 +294,6 @@ export default function Analytics() {
             <BodyMeasurements />
           </div>
         )}
-        {tab === 'schedule'  && <CookSchedule />}
       </div>
     </div>
   )

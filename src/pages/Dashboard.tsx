@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, Flame, Zap, Trophy, Target, ArrowUpDown, LayoutGrid, CalendarDays, Info } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Flame, Zap, Trophy, Target, ArrowUpDown, LayoutGrid, CalendarDays, Info, Copy } from 'lucide-react'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { useRecipeStore } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
@@ -30,13 +30,14 @@ function formatDate(d: string) {
 }
 
 export default function Dashboard() {
-  const { plan, weekDates, addMeal, removeMeal, goToWeek } = useMealPlanStore()
+  const { plan, weekDates, addMeal, removeMeal, goToWeek, copyDay } = useMealPlanStore()
   const { recipes } = useRecipeStore()
   const { profile, unlockAchievement, addXp, checkStreak } = useUserStore()
   const [modal, setModal] = useState<ModalState | null>(null)
   const [showImportExport, setShowImportExport] = useState(false)
   const [showProgressInfo, setShowProgressInfo] = useState(false)
   const [viewMode, setViewMode] = useState<'week' | 'day'>('week')
+  const [copyingFrom, setCopyingFrom] = useState<string | null>(null)
   const today = new Date().toISOString().split('T')[0]
   const [selectedDate, setSelectedDate] = useState(weekDates.includes(today) ? today : weekDates[0])
 
@@ -55,8 +56,29 @@ export default function Dashboard() {
     }
     addMeal(modal.date, meal)
     checkStreak()
+
+    // first_plan: plan had 0 meals before this add
     const totalMeals = plan.reduce((acc, d) => acc + d.meals.length, 0)
     if (totalMeals === 0) { unlockAchievement('first_plan'); addXp(50) }
+
+    // week_complete: all 7 days will have at least one meal after this add
+    const updatedPlan = plan.map((d) =>
+      d.date === modal.date ? { ...d, meals: [...d.meals, meal] } : d
+    )
+    const allDaysHaveMeals = updatedPlan.every((d) => d.meals.length > 0)
+    if (allDaysHaveMeals) unlockAchievement('week_complete')
+
+    // macro_goal: check if today hits calorie target after adding
+    if (modal.date === today) {
+      const addedRecipe = recipes.find((r) => r.id === recipeId)
+      if (addedRecipe) {
+        const newCalories = todayMacros.calories + addedRecipe.macrosPerServing.calories * servings
+        if (newCalories >= profile.macroTargets.calories * 0.95 &&
+            newCalories <= profile.macroTargets.calories * 1.1) {
+          unlockAchievement('macro_goal')
+        }
+      }
+    }
   }
 
   // Today's macros
@@ -167,6 +189,27 @@ export default function Dashboard() {
           </div>
 
           <div className="mt-3 space-y-2">
+            {/* Mobile copy-day */}
+            {mobileDayPlan && mobileDayPlan.meals.length > 0 && (
+              copyingFrom ? (
+                <div className="flex items-center gap-1.5 flex-wrap text-xs bg-brand-50 rounded-xl px-3 py-2 border border-brand-200">
+                  <Copy size={11} className="text-brand-500" />
+                  <span className="text-brand-700 font-medium">Paste to:</span>
+                  {weekDates.filter((d) => d !== copyingFrom).map((d) => (
+                    <button key={d} onClick={() => { copyDay(copyingFrom, d); setCopyingFrom(null); setSelectedDate(d) }}
+                      className="px-2 py-0.5 rounded-lg bg-white border border-brand-200 text-brand-700 font-semibold">
+                      {DAYS[weekDates.indexOf(d)]}
+                    </button>
+                  ))}
+                  <button onClick={() => setCopyingFrom(null)} className="text-brand-400 font-bold ml-auto">✕</button>
+                </div>
+              ) : (
+                <button onClick={() => setCopyingFrom(selectedDate)}
+                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-brand-600 transition-colors">
+                  <Copy size={11} /> Copy meals to another day
+                </button>
+              )
+            )}
             {MEAL_TYPES.map((mealType) => {
               const meal = mobileDayPlan?.meals.find((m) => m.mealType === mealType)
               const recipe = meal ? recipes.find((r) => r.id === meal.recipeId) : undefined
@@ -245,6 +288,29 @@ export default function Dashboard() {
               })}
             </div>
             <div className="card px-4 py-3 space-y-2">
+              {/* Copy-day toolbar */}
+              {copyingFrom ? (
+                <div className="flex items-center gap-2 py-1.5 px-2 bg-brand-50 rounded-xl border border-brand-200 text-xs">
+                  <Copy size={12} className="text-brand-500 shrink-0" />
+                  <span className="text-brand-700 font-medium flex-1">
+                    Paste meals from {DAYS[weekDates.indexOf(copyingFrom)]} to…
+                  </span>
+                  {weekDates.filter((d) => d !== copyingFrom).map((d, i) => (
+                    <button key={d} onClick={() => { copyDay(copyingFrom, d); setCopyingFrom(null); setSelectedDate(d) }}
+                      className="px-2 py-0.5 rounded-lg bg-white border border-brand-200 text-brand-700 font-semibold hover:bg-brand-100 transition-colors">
+                      {DAYS[weekDates.indexOf(d)]}
+                    </button>
+                  ))}
+                  <button onClick={() => setCopyingFrom(null)} className="text-brand-400 hover:text-brand-600 font-semibold ml-1">✕</button>
+                </div>
+              ) : (
+                plan.find((d) => d.date === selectedDate)?.meals.length ? (
+                  <button onClick={() => setCopyingFrom(selectedDate)}
+                    className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-brand-600 transition-colors py-0.5">
+                    <Copy size={12} /> Copy this day's meals
+                  </button>
+                ) : null
+              )}
               {MEAL_TYPES.map((mealType) => {
                 const dayPlan = plan.find((d) => d.date === selectedDate)
                 const meal = dayPlan?.meals.find((m) => m.mealType === mealType)

@@ -36,6 +36,7 @@ interface MealPlanStore {
   addMeal: (date: string, meal: PlannedMeal) => void
   removeMeal: (date: string, mealId: string) => void
   clearDay: (date: string) => void
+  copyDay: (fromDate: string, toDate: string) => void
   goToWeek: (referenceDate: Date) => void
   importWeek: (data: MealPlanExport) => void
 
@@ -77,6 +78,21 @@ export const useMealPlanStore = create<MealPlanStore>()(
               day.date === date ? { ...day, meals: [] } : day
             ),
           })),
+
+        copyDay: (fromDate, toDate) =>
+          set((s) => {
+            const source = s.plan.find((d) => d.date === fromDate)
+            if (!source || source.meals.length === 0) return {}
+            const newMeals = source.meals.map((m) => ({
+              ...m,
+              id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+            }))
+            return {
+              plan: s.plan.map((day) =>
+                day.date === toDate ? { ...day, meals: newMeals } : day
+              ),
+            }
+          }),
 
         goToWeek: (referenceDate) => {
           const newDates = getWeekDates(referenceDate)
