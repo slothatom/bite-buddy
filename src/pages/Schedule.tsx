@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { CalendarClock, Plus, Trash2, Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { useCookStore } from '../store/useCookStore'
 import { useRecipeStore } from '../store/useRecipeStore'
-import type { CookSession } from '../types'
+import type { CookSession, Recipe } from '../types'
 
 function newId() { return `${Date.now()}-${Math.random().toString(36).slice(2)}` }
 
@@ -156,11 +156,11 @@ export default function Schedule() {
 
 function SessionCard({ session, recipes, onToggle, onRemove }: {
   session: CookSession
-  recipes: ReturnType<typeof useRecipeStore>['recipes']
+  recipes: Recipe[]
   onToggle: () => void
   onRemove: () => void
 }) {
-  const sessionRecipes = session.recipeIds.map((id) => recipes.find((r) => r.id === id)).filter(Boolean) as typeof recipes
+  const sessionRecipes = session.recipeIds.map((id) => recipes.find((r) => r.id === id)).filter((r): r is Recipe => r !== undefined)
 
   return (
     <div className={`card px-4 py-3 flex items-start gap-3 transition-opacity ${session.completed ? 'opacity-60' : ''}`}>
