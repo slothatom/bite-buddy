@@ -14,6 +14,7 @@ const ALL_ACHIEVEMENTS: Achievement[] = [
   { id: 'streak_3',       name: '3-Day Streak',      description: 'Log meals 3 days in a row',          emoji: '🔥', xpReward: 75 },
   { id: 'streak_7',       name: 'Week Warrior',      description: 'Log meals 7 days in a row',          emoji: '⚡', xpReward: 200 },
   { id: 'macro_goal',     name: 'Macro Tracker',     description: 'Hit your macro goal for a day',      emoji: '🎯', xpReward: 100 },
+  { id: 'weight_logged',  name: 'Body Tracker',      description: 'Log your first weight entry',         emoji: '⚖️', xpReward: 50 },
 ]
 
 function computeLevel(xp: number): number {
