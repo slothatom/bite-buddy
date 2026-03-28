@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, Flame, Zap, Trophy, Target } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Flame, Zap, Trophy, Target, ArrowUpDown } from 'lucide-react'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { useRecipeStore } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
 import MealSlotCard from '../components/dashboard/MealSlotCard'
 import AddMealModal from '../components/dashboard/AddMealModal'
 import MacroBar from '../components/dashboard/MacroBar'
+import ImportExportModal from '../components/dashboard/ImportExportModal'
 import type { MealType, PlannedMeal, Macros } from '../types'
 
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
@@ -33,6 +34,7 @@ export default function Dashboard() {
   const { recipes } = useRecipeStore()
   const { profile, unlockAchievement, addXp, checkStreak } = useUserStore()
   const [modal, setModal] = useState<ModalState | null>(null)
+  const [showImportExport, setShowImportExport] = useState(false)
   const today = new Date().toISOString().split('T')[0]
   const [selectedDate, setSelectedDate] = useState(weekDates.includes(today) ? today : weekDates[0])
 
@@ -87,6 +89,9 @@ export default function Dashboard() {
             <button className="btn-secondary btn-icon" onClick={handlePrevWeek}><ChevronLeft size={16} /></button>
             <button className="btn-secondary text-xs font-semibold px-2.5" onClick={() => goToWeek(new Date())}>Today</button>
             <button className="btn-secondary btn-icon" onClick={handleNextWeek}><ChevronRight size={16} /></button>
+            <button className="btn-secondary btn-icon" onClick={() => setShowImportExport(true)} title="Import / Export plan">
+              <ArrowUpDown size={16} />
+            </button>
           </div>
         </div>
 
@@ -224,6 +229,7 @@ export default function Dashboard() {
         <AddMealModal date={modal.date} mealType={modal.mealType} recipes={recipes}
           onAdd={handleConfirmAdd} onClose={() => setModal(null)} />
       )}
+      {showImportExport && <ImportExportModal onClose={() => setShowImportExport(false)} />}
     </div>
   )
 }

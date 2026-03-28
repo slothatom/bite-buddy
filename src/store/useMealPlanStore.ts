@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { DayPlan, GroceryItem, PlannedMeal } from '../types'
+import type { DayPlan, GroceryItem, PlannedMeal, Recipe } from '../types'
 import { useRecipeStore } from './useRecipeStore'
 
 function getWeekDates(referenceDate: Date = new Date()): string[] {
@@ -20,6 +20,14 @@ function buildEmptyWeek(dates: string[]): DayPlan[] {
   return dates.map((date) => ({ date, meals: [] }))
 }
 
+export interface MealPlanExport {
+  version: 1
+  exportedAt: string
+  weekStart: string
+  plan: DayPlan[]
+  recipes: Recipe[]
+}
+
 interface MealPlanStore {
   weekDates: string[]
   plan: DayPlan[]
@@ -29,6 +37,7 @@ interface MealPlanStore {
   removeMeal: (date: string, mealId: string) => void
   clearDay: (date: string) => void
   goToWeek: (referenceDate: Date) => void
+  importWeek: (data: MealPlanExport) => void
 
   generateGroceryList: () => void
   toggleGroceryItem: (id: string) => void
@@ -79,6 +88,20 @@ export const useMealPlanStore = create<MealPlanStore>()(
             )
             return { weekDates: newDates, plan: newPlan }
           })
+        },
+
+        importWeek: (data) => {
+          // Add any recipes that don't exist yet
+          useRecipeStore.getState().addRecipes(data.recipes)
+          // Navigate to the imported week
+          const weekStart = new Date(data.weekStart + 'T12:00:00')
+          const newDates = getWeekDates(weekStart)
+          // Merge imported plan with the week's dates
+          const importedByDate = new Map(data.plan.map((d) => [d.date, d]))
+          const newPlan = newDates.map((date) =>
+            importedByDate.get(date) ?? { date, meals: [] }
+          )
+          set({ weekDates: newDates, plan: newPlan, groceryItems: [] })
         },
 
         generateGroceryList: () => {
