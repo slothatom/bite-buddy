@@ -81,8 +81,8 @@ export function readDocxParagraphs(path: string): string[] {
     for (const m of body.matchAll(/<w:t(?:\s[^>]*)?>([\s\S]*?)<\/w:t>/g)) {
       text += decodeEntities(m[1])
     }
-    // Word writes explicit line breaks as <w:br/> inside a paragraph.
-    text = text.replace(/ /g, ' ').trim()
+    // Word encodes non-breaking spaces literally; normalise them to plain spaces.
+    text = text.replace(/\u00a0/g, ' ').trim()
     if (text) paragraphs.push(text)
   }
 

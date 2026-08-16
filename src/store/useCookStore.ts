@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { discardOlderThan, safeStorage, SCHEMA_VERSION } from './persist'
 import type { CookSession } from '../types'
 
 interface CookStore {
@@ -37,6 +38,11 @@ export const useCookStore = create<CookStore>()(
         return get().sessions.filter((s) => s.date >= today && !s.completed)
       },
     }),
-    { name: 'bite-buddy-cook' }
+    {
+      name: 'bite-buddy-cook',
+      version: SCHEMA_VERSION,
+      storage: safeStorage<CookStore>(),
+      migrate: discardOlderThan<CookStore>(SCHEMA_VERSION),
+    }
   )
 )

@@ -129,7 +129,7 @@ const ARTICLE = /^(o|un|una|el|la|de|un|egy|az|a)\s+/i
  */
 export function parseFragment(fragment: string): ParsedQuantity {
   const raw = fragment.trim()
-  let text = raw.replace(/\s+/g, ' ').trim()
+  const text = raw.replace(/\s+/g, ' ').trim()
   if (!text) return { term: '', estimated: true, raw }
 
   const state = detectState(text)
