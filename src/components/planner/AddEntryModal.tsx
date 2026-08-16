@@ -54,10 +54,11 @@ export default function AddEntryModal({
   const matchedFoods = useMemo(() => searchFoods(query, foodIndex, 40), [query, foodIndex])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/30 backdrop-blur-sm p-0 sm:p-4"
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/30 backdrop-blur-xs p-0 sm:p-4"
       onClick={onClose}>
       <div
         className="bg-white w-full sm:max-w-2xl sm:rounded-2xl rounded-t-2xl max-h-[88vh] flex flex-col shadow-xl"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-center justify-between px-5 py-4 border-b border-sand-200">
@@ -84,8 +85,7 @@ export default function AddEntryModal({
               <button
                 key={t}
                 onClick={() => setTab(t)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-semibold capitalize transition-colors ${
-                  tab === t ? 'bg-white text-stone-800 shadow-sm' : 'text-stone-500'}`}
+                className={`capitalize ${tab === t ? 'tab-on' : 'tab-off'}`}
               >
                 {t}
               </button>
@@ -122,28 +122,38 @@ export default function AddEntryModal({
             const g = grams[f.id] ?? f.units[0]?.grams ?? 100
             const n = componentsNutrients([{ kind: 'food', foodId: f.id, grams: g }], ctx)
             return (
-              <div key={f.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-sand-100 transition-colors">
-                <span className="flex-1 min-w-0">
-                  <span className="block text-sm font-semibold text-stone-800 truncate">{f.names.en}</span>
-                  <span className="block text-xs text-stone-400 truncate">
-                    {[f.names.ro, f.names.hu].filter(Boolean).join(' · ')}
-                  </span>
-                </span>
-                <input
-                  type="number"
-                  min={0}
-                  value={g}
-                  onChange={(e) => setGrams((s) => ({ ...s, [f.id]: Number(e.target.value) }))}
-                  className="input w-20 text-right py-1.5"
-                  aria-label={`Grams of ${f.names.en}`}
-                />
-                <span className="text-xs text-stone-400 w-16 text-right font-mono">{Math.round(n.calories)} kcal</span>
-                <button
-                  className="btn-primary py-1.5 px-3"
-                  onClick={() => { onAdd({ kind: 'food', foodId: f.id, grams: g }); onClose() }}
-                >
-                  Add
-                </button>
+              // Name on its own row, then controls beneath: on a phone the
+              // one-line version squeezed the food name down to a few characters.
+              <div key={f.id} className="p-3 rounded-xl hover:bg-sand-100 transition-colors">
+                <div className="min-w-0 mb-2">
+                  <p className="text-sm font-semibold text-stone-800 truncate">{f.names.en}</p>
+                  {f.names.ro || f.names.hu ? (
+                    <p className="text-xs text-stone-400 truncate">
+                      {[f.names.ro, f.names.hu].filter(Boolean).join(' · ')}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      value={g}
+                      onChange={(e) => setGrams((s) => ({ ...s, [f.id]: Number(e.target.value) }))}
+                      className="input w-24 pr-7 text-right"
+                      aria-label={`Grams of ${f.names.en}`}
+                    />
+                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-stone-400 pointer-events-none">g</span>
+                  </div>
+                  <span className="flex-1 text-xs text-stone-400 font-mono">{Math.round(n.calories)} kcal</span>
+                  <button
+                    className="btn-primary shrink-0"
+                    onClick={() => { onAdd({ kind: 'food', foodId: f.id, grams: g }); onClose() }}
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
             )
           })}

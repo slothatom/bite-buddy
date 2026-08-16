@@ -1,6 +1,253 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-50: #f6f7ee;
+  --color-brand-100: #e9edd3;
+  --color-brand-200: #d5dcac;
+  --color-brand-300: #bcc77f;
+  --color-brand-400: #a3b25b;
+  --color-brand-500: #87973f;
+  --color-brand-600: #69782f;
+  --color-brand-700: #515c28;
+  --color-brand-800: #414a25;
+  --color-brand-900: #383f23;
+
+  --color-clay-50: #fdf5f3;
+  --color-clay-100: #fbe8e3;
+  --color-clay-200: #f8d5cc;
+  --color-clay-300: #f1b7a8;
+  --color-clay-400: #e78e76;
+  --color-clay-500: #d96a4c;
+  --color-clay-600: #c5502f;
+  --color-clay-700: #a44026;
+  --color-clay-800: #883824;
+  --color-clay-900: #723324;
+
+  --color-sand-50: #fbf9f5;
+  --color-sand-100: #f5f1e8;
+  --color-sand-200: #ebe4d5;
+  --color-sand-300: #ddd2ba;
+  --color-sand-400: #c9b995;
+  --color-sand-500: #b8a37a;
+
+  --color-xp-50: #faf5ff;
+  --color-xp-100: #f3e8ff;
+  --color-xp-200: #e9d5ff;
+  --color-xp-300: #d8b4fe;
+  --color-xp-400: #c084fc;
+  --color-xp-500: #a855f7;
+  --color-xp-600: #9333ea;
+  --color-xp-700: #7e22ce;
+  --color-xp-800: #6b21a8;
+  --color-xp-900: #581c87;
+
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: JetBrains Mono, monospace;
+
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-bar-fill: barFill 1s ease-out forwards;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+  @keyframes barFill {
+    from {
+      width: 0%;
+    }
+    to {
+      width: var(--bar-width);
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-150 cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+@utility btn-primary {
+  @apply btn bg-brand-600 text-white hover:bg-brand-700 active:scale-95 shadow-xs;
+}
+
+@utility btn-secondary {
+  @apply btn bg-white text-stone-700 border border-sand-300 hover:bg-gray-50 active:scale-95 shadow-xs;
+}
+
+@utility btn-xp {
+  @apply btn bg-xp-600 text-white hover:bg-xp-700 active:scale-95 shadow-xs;
+}
+
+@utility btn-ghost {
+  @apply btn text-gray-600 hover:bg-gray-100 active:scale-95;
+}
+
+@utility btn-danger {
+  @apply btn bg-red-500 text-white hover:bg-red-600 active:scale-95;
+}
+
+@utility btn-icon {
+  @apply btn p-2 rounded-lg;
+}
+
+
+/*
+ * Interactive filter pill.
+ *
+ * Distinct from `badge`, which is a non-interactive label: anything tappable
+ * needs a real target size, and a 22px-tall badge is not one.
+ */
+@utility chip {
+  @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap
+         px-3 h-9 rounded-full text-xs font-semibold cursor-pointer select-none
+         transition-colors duration-150;
+}
+
+@utility chip-off {
+  @apply chip bg-white border border-sand-300 text-stone-600 hover:border-brand-400;
+}
+
+@utility chip-on {
+  @apply chip bg-brand-600 text-white border border-brand-600;
+}
+
+
+/* Segmented control button. Sized for a thumb, not just a cursor. */
+@utility tab {
+  @apply px-3.5 h-9 rounded-lg text-sm font-semibold transition-colors duration-150
+         inline-flex items-center justify-center cursor-pointer;
+}
+
+@utility tab-on {
+  @apply tab bg-white text-stone-800 shadow-xs;
+}
+
+@utility tab-off {
+  @apply tab text-stone-500 hover:text-stone-700;
+}
+
+@utility card {
+  @apply bg-white rounded-2xl border border-sand-200/70 shadow-[0_1px_2px_rgba(74,60,40,0.04),0_8px_24px_-12px_rgba(74,60,40,0.10)];
+}
+
+@utility card-soft {
+  @apply bg-sand-100/60 rounded-2xl border border-sand-200/60;
+}
+
+@utility input {
+  @apply w-full px-3 py-2 rounded-xl border border-sand-300 text-sm text-gray-900 bg-white placeholder-gray-400
+           focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all;
+}
+
+@utility label {
+  @apply block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1;
+}
+
+@utility badge {
+  @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold;
+}
+
+@utility badge-green {
+  @apply badge bg-brand-100 text-brand-700;
+}
+
+@utility badge-purple {
+  @apply badge bg-xp-100 text-xp-700;
+}
+
+@utility badge-gold {
+  @apply badge bg-amber-100 text-amber-700;
+}
+
+@utility badge-gray {
+  @apply badge bg-gray-100 text-gray-600;
+}
+
+@utility badge-red {
+  @apply badge bg-red-100 text-red-600;
+}
+
+@utility xp-bar {
+  @apply relative h-2.5 rounded-full bg-gray-100 overflow-hidden;
+}
+
+@utility xp-bar-fill {
+  @apply h-full rounded-full bg-linear-to-r from-xp-400 to-xp-600 transition-all duration-700 ease-out;
+}
+
+@utility macro-ring-label {
+  @apply text-xs font-semibold text-gray-500;
+}
+
+@utility nav-item {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600
+           hover:bg-gray-100 hover:text-gray-900 transition-all duration-150 cursor-pointer;
+}
+
+@utility nav-item-active {
+  @apply nav-item bg-brand-50 text-brand-700 hover:bg-brand-100 hover:text-brand-800;
+}
+
+@utility meal-slot {
+  @apply rounded-xl border-2 border-dashed border-sand-300 p-2 min-h-[64px] flex items-center justify-center
+           hover:border-brand-400 hover:bg-brand-50 transition-all duration-150 cursor-pointer;
+}
+
+@utility meal-slot-filled {
+  @apply rounded-xl border border-sand-200 bg-white p-2 min-h-[64px] cursor-pointer
+           hover:border-brand-400 transition-all duration-150;
+}
+
+@utility tag {
+  @apply inline-flex items-center px-2 py-0.5 rounded-lg bg-gray-100 text-gray-600 text-xs font-medium;
+}
+
+@utility section-title {
+  @apply text-lg font-bold text-gray-900;
+}
+
+@utility page-title {
+  @apply text-2xl font-extrabold text-gray-900;
+}
+
+@utility stat-number {
+  @apply text-3xl font-extrabold font-mono;
+}
+
+@utility glow-green {
+  box-shadow: 0 0 16px var(--color-brand-300);
+}
+
+@utility glow-purple {
+  box-shadow: 0 0 16px var(--color-xp-300);
+}
 
 @layer base {
   * {
@@ -26,102 +273,58 @@
   }
 }
 
-@layer components {
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-150 cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-  .btn-primary {
-    @apply btn bg-brand-600 text-white hover:bg-brand-700 active:scale-95 shadow-sm;
-  }
-  .btn-secondary {
-    @apply btn bg-white text-stone-700 border border-sand-300 hover:bg-gray-50 active:scale-95 shadow-sm;
-  }
-  .btn-xp {
-    @apply btn bg-xp-600 text-white hover:bg-xp-700 active:scale-95 shadow-sm;
-  }
-  .btn-ghost {
-    @apply btn text-gray-600 hover:bg-gray-100 active:scale-95;
-  }
-  .btn-danger {
-    @apply btn bg-red-500 text-white hover:bg-red-600 active:scale-95;
-  }
-  .btn-icon {
-    @apply btn p-2 rounded-lg;
-  }
-
-  .card {
-    @apply bg-white rounded-2xl border border-sand-200/70 shadow-[0_1px_2px_rgba(74,60,40,0.04),0_8px_24px_-12px_rgba(74,60,40,0.10)];
-  }
-  .card-soft {
-    @apply bg-sand-100/60 rounded-2xl border border-sand-200/60;
-  }
-
-  .input {
-    @apply w-full px-3 py-2 rounded-xl border border-sand-300 text-sm text-gray-900 bg-white placeholder-gray-400
-           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all;
-  }
-
-  .label {
-    @apply block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1;
-  }
-
-  .badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold;
-  }
-  .badge-green  { @apply badge bg-brand-100 text-brand-700; }
-  .badge-purple { @apply badge bg-xp-100 text-xp-700; }
-  .badge-gold   { @apply badge bg-amber-100 text-amber-700; }
-  .badge-gray   { @apply badge bg-gray-100 text-gray-600; }
-  .badge-red    { @apply badge bg-red-100 text-red-600; }
-
-  .xp-bar {
-    @apply relative h-2.5 rounded-full bg-gray-100 overflow-hidden;
-  }
-  .xp-bar-fill {
-    @apply h-full rounded-full bg-gradient-to-r from-xp-400 to-xp-600 transition-all duration-700 ease-out;
-  }
-
-  .macro-ring-label {
-    @apply text-xs font-semibold text-gray-500;
-  }
-
+/*
+ * Touch targets.
+ *
+ * Applied only where the pointer is coarse, so phones and tablets get the 44px
+ * minimum that fingers need while mouse users keep the more compact desktop
+ * proportions. These rules sit outside `@layer` deliberately, so they take
+ * precedence over the utilities they are widening.
+ */
+@media (pointer: coarse) {
+  /*
+   * These list every button variant rather than just `.btn`, because Tailwind's
+   * `@utility` composition inlines the base styles instead of adding the base
+   * class to the element — so `.btn` alone matches nothing in the markup.
+   */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-xp,
+  .btn-ghost,
+  .btn-danger,
+  .tab,
+  .tab-on,
+  .tab-off,
+  .chip,
+  .chip-on,
+  .chip-off,
+  .input,
+  select.input,
   .nav-item {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-600
-           hover:bg-gray-100 hover:text-gray-900 transition-all duration-150 cursor-pointer;
-  }
-  .nav-item-active {
-    @apply nav-item bg-brand-50 text-brand-700 hover:bg-brand-100 hover:text-brand-800;
+    min-height: 44px;
   }
 
-  .meal-slot {
-    @apply rounded-xl border-2 border-dashed border-sand-300 p-2 min-h-[64px] flex items-center justify-center
-           hover:border-brand-400 hover:bg-brand-50 transition-all duration-150 cursor-pointer;
-  }
-  .meal-slot-filled {
-    @apply rounded-xl border border-sand-200 bg-white p-2 min-h-[64px] cursor-pointer
-           hover:border-brand-400 transition-all duration-150;
+  .btn-icon {
+    min-width: 44px;
+    min-height: 44px;
   }
 
-  .tag {
-    @apply inline-flex items-center px-2 py-0.5 rounded-lg bg-gray-100 text-gray-600 text-xs font-medium;
+  /* Checkboxes are tapped one-handed in a shop; the default 16px is not enough. */
+  input[type='checkbox'] {
+    width: 1.35rem;
+    height: 1.35rem;
   }
+}
 
-  .section-title {
-    @apply text-lg font-bold text-gray-900;
-  }
-
-  .page-title {
-    @apply text-2xl font-extrabold text-gray-900;
-  }
-
-  .stat-number {
-    @apply text-3xl font-extrabold font-mono;
-  }
-
-  .glow-green {
-    box-shadow: 0 0 16px theme('colors.brand.300');
-  }
-  .glow-purple {
-    box-shadow: 0 0 16px theme('colors.xp.300');
+/* Respect a user's reduced-motion preference rather than animating regardless. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

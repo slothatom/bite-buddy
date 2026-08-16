@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { discardOlderThan, safeStorage, SCHEMA_VERSION } from './persist'
 import type { Food } from '../types'
 import { FOODS } from '../data'
 
@@ -44,7 +45,12 @@ export const useFoodStore = create<FoodStore>()(
 
       restoreFood: (id) => set((s) => ({ hidden: s.hidden.filter((h) => h !== id) })),
     }),
-    { name: 'bite-buddy-foods-v2' },
+    {
+      name: 'bite-buddy-foods-v2',
+      version: SCHEMA_VERSION,
+      storage: safeStorage<FoodStore>(),
+      migrate: discardOlderThan<FoodStore>(SCHEMA_VERSION),
+    },
   ),
 )
 

@@ -3,14 +3,9 @@ import { Search, Plus, X, Loader2 } from 'lucide-react'
 import type { Food, MedCategory, MedTier } from '../types'
 import { useFoods, useFoodStore } from '../store/useFoodStore'
 import { searchFoods, buildFoodIndex } from '../lib/foodSearch'
-import { CATEGORY_EMOJI, CATEGORY_LABELS, TierBadge, EmptyState } from '../components/ui'
+import { TierBadge, EmptyState } from '../components/ui'
+import { CATEGORY_EMOJI, CATEGORY_LABELS, CATEGORY_ORDER } from '../lib/categories'
 import { searchFoods as lookupOnline, type NutritionResult } from '../services/nutritionApi'
-
-const CATEGORY_ORDER: MedCategory[] = [
-  'vegetables', 'legumes', 'fruits', 'grains', 'nuts-seeds', 'herbs-spices',
-  'fats-vinegars', 'dairy', 'fish-seafood', 'poultry', 'eggs', 'red-meat',
-  'pantry', 'spreads-sauces', 'treats', 'sweeteners', 'beverages',
-]
 
 /**
  * The food database.
@@ -73,8 +68,7 @@ export default function Foods() {
               <button
                 key={c}
                 onClick={() => setCategory(category === c ? null : c)}
-                className={`badge shrink-0 whitespace-nowrap ${
-                  category === c ? 'bg-brand-600 text-white' : 'bg-white border border-sand-300 text-stone-600'}`}
+                className={category === c ? 'chip-on' : 'chip-off'}
               >
                 {CATEGORY_EMOJI[c]} {CATEGORY_LABELS[c]}
               </button>
@@ -178,8 +172,9 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/30 backdrop-blur-sm sm:p-4" onClick={onClose}>
-      <div className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/30 backdrop-blur-xs sm:p-4" onClick={onClose}>
+      <div className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} onClick={(e) => e.stopPropagation()}>
         <header className="flex items-center justify-between px-5 py-4 border-b border-sand-200">
           <h2 className="font-bold text-stone-800">Add a food</h2>
           <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
@@ -189,8 +184,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
           <div className="flex gap-1 p-1 bg-sand-100 rounded-xl w-fit">
             {(['manual', 'lookup'] as const).map((t) => (
               <button key={t} onClick={() => setTab(t)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-semibold capitalize ${
-                  tab === t ? 'bg-white text-stone-800 shadow-sm' : 'text-stone-500'}`}>
+                className={tab === t ? 'tab-on' : 'tab-off'}>
                 {t === 'manual' ? 'Type it in' : 'Look it up'}
               </button>
             ))}

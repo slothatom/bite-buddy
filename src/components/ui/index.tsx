@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { Macros, MedCategory, MedTier, Nutrients } from '../../types'
+import type { Macros, MedTier, Nutrients } from '../../types'
 
 /** Shared display pieces. Kept together because each is a handful of lines. */
 
@@ -68,21 +68,6 @@ export function NutrientSummary({ n, targets }: { n: Nutrients; targets?: Macros
       <MacroBar label="Fibre" value={n.fiber ?? 0} target={targets?.fiber} />
     </div>
   )
-}
-
-export const CATEGORY_LABELS: Record<MedCategory, string> = {
-  vegetables: 'Vegetables', legumes: 'Legumes', fruits: 'Fruits', grains: 'Whole grains',
-  'nuts-seeds': 'Nuts & seeds', 'herbs-spices': 'Herbs & spices', 'fats-vinegars': 'Fats & vinegars',
-  dairy: 'Dairy', 'fish-seafood': 'Fish & seafood', poultry: 'Poultry', eggs: 'Eggs',
-  'red-meat': 'Red meat', pantry: 'Pantry', 'spreads-sauces': 'Spreads & sauces',
-  treats: 'Treats', sweeteners: 'Sweeteners', beverages: 'Drinks',
-}
-
-export const CATEGORY_EMOJI: Record<MedCategory, string> = {
-  vegetables: '🥬', legumes: '🫘', fruits: '🍑', grains: '🌾', 'nuts-seeds': '🥜',
-  'herbs-spices': '🌿', 'fats-vinegars': '🫒', dairy: '🧀', 'fish-seafood': '🐟',
-  poultry: '🍗', eggs: '🥚', 'red-meat': '🥩', pantry: '🥣', 'spreads-sauces': '🧴',
-  treats: '🍫', sweeteners: '🍯', beverages: '💧',
 }
 
 /** How often the Mediterranean guide says to eat this group. */

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { discardOlderThan, safeStorage, SCHEMA_VERSION } from './persist'
 import type { Recipe } from '../types'
 import { ALL_RECIPES } from '../data'
 
@@ -49,7 +50,12 @@ export const useRecipeStore = create<RecipeStore>()(
             : [...s.favouriteIds, id],
         })),
     }),
-    { name: 'bite-buddy-recipes-v2' },
+    {
+      name: 'bite-buddy-recipes-v2',
+      version: SCHEMA_VERSION,
+      storage: safeStorage<RecipeStore>(),
+      migrate: discardOlderThan<RecipeStore>(SCHEMA_VERSION),
+    },
   ),
 )
 

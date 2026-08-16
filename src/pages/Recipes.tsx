@@ -63,7 +63,7 @@ export default function Recipes() {
           <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
             <button
               onClick={() => setFavesOnly((v) => !v)}
-              className={`badge shrink-0 ${favesOnly ? 'bg-clay-500 text-white' : 'bg-white border border-sand-300 text-stone-600'}`}
+              className={favesOnly ? 'chip bg-clay-500 text-white border border-clay-500' : 'chip-off'}
             >
               <Star size={12} className={favesOnly ? 'fill-current' : ''} /> Favourites
             </button>
@@ -71,8 +71,7 @@ export default function Recipes() {
               <button
                 key={t}
                 onClick={() => setTag(tag === t ? null : t)}
-                className={`badge shrink-0 capitalize ${
-                  tag === t ? 'bg-brand-600 text-white' : 'bg-white border border-sand-300 text-stone-600'}`}
+                className={`capitalize ${tag === t ? 'chip-on' : 'chip-off'}`}
               >
                 {t.replace('-', ' ')}
               </button>
@@ -91,17 +90,17 @@ export default function Recipes() {
               return (
                 // The star is a sibling of the card button, not a child: nested
                 // buttons are invalid and lose their click handler.
-                <div key={r.id} className="card p-4 relative hover:border-brand-300 transition-colors">
+                <div key={r.id} className="card p-4 relative min-w-0 hover:border-brand-300 transition-colors">
                   <button
                     onClick={() => toggleFavourite(r.id)}
-                    className="absolute top-4 right-4 text-stone-300 hover:text-clay-500 z-10"
+                    className="absolute top-1.5 right-1.5 p-3.5 text-stone-300 hover:text-clay-500 z-10"
                     aria-label={favouriteIds.includes(r.id) ? 'Remove from favourites' : 'Add to favourites'}
                   >
                     <Star size={16} className={favouriteIds.includes(r.id) ? 'fill-clay-500 text-clay-500' : ''} />
                   </button>
-                  <button onClick={() => setOpen(r)} className="w-full text-left">
-                    <span className="flex items-start gap-3 pr-6">
-                      <span className="text-2xl leading-none">{r.emoji}</span>
+                  <button onClick={() => setOpen(r)} className="block w-full min-w-0 text-left">
+                    <span className="flex items-start gap-3 pr-10 min-w-0">
+                      <span className="text-2xl leading-none shrink-0">{r.emoji}</span>
                       <span className="flex-1 min-w-0">
                         <span className="block font-semibold text-stone-800 text-sm leading-snug">{r.name.en}</span>
                         {r.sourceLine ? (
@@ -140,9 +139,10 @@ function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/30 backdrop-blur-sm sm:p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/30 backdrop-blur-xs sm:p-4" onClick={onClose}>
       <div
         className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}
       >
         <header className="sticky top-0 bg-white flex items-start justify-between gap-3 px-5 py-4 border-b border-sand-200">

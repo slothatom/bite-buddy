@@ -14,7 +14,7 @@ export default function BottomNav() {
   const location = useLocation()
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur border-t border-sand-200 flex md:hidden z-30"
+      className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-sm border-t border-sand-200 flex md:hidden z-30"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       {NAV.map(({ to, label, icon: Icon }) => {

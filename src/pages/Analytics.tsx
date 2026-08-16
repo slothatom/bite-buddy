@@ -24,8 +24,7 @@ export default function Analytics() {
         <div className="flex gap-1 p-1 bg-sand-100 rounded-xl w-fit">
           {([['week', 'This week'], ['mediterranean', 'Mediterranean'], ['body', 'Body']] as const).map(([k, label]) => (
             <button key={k} onClick={() => setTab(k)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-semibold ${
-                tab === k ? 'bg-white text-stone-800 shadow-sm' : 'text-stone-500'}`}>
+              className={tab === k ? 'tab-on' : 'tab-off'}>
               {label}
             </button>
           ))}

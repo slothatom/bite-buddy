@@ -96,7 +96,7 @@ export default function Planner() {
                 onClick={() => setSelected(date)}
                 className={`rounded-xl p-2 sm:p-3 text-center transition-all border ${
                   isSelected
-                    ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
+                    ? 'bg-brand-600 text-white border-brand-600 shadow-xs'
                     : 'bg-white border-sand-200 hover:border-brand-300 text-stone-700'
                 }`}
               >
@@ -223,15 +223,18 @@ function SlotRow({
                 ) : null}
               </div>
               <button
-                className="btn-ghost btn-icon text-stone-300 hover:text-clay-600"
+                className="btn-ghost btn-icon shrink-0 text-stone-300 hover:text-clay-600"
                 onClick={() => onRemove(meal.id)}
                 aria-label="Remove meal"
               >
-                <X size={15} />
+                <X size={16} />
               </button>
             </div>
           ))}
-          <button onClick={onAdd} className="text-xs font-semibold text-brand-700 hover:text-brand-800 pt-1">
+          <button
+            onClick={onAdd}
+            className="inline-flex items-center min-h-11 px-1 -mx-1 text-xs font-semibold text-brand-700 hover:text-brand-800"
+          >
             + Add another
           </button>
         </div>
@@ -271,7 +274,7 @@ function CopyDayDialog({
   onPick: (to: string) => void
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/30 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/30 backdrop-blur-xs p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
         <h3 className="font-bold text-stone-800 mb-1">Copy {formatDate(from)}</h3>
         <p className="text-sm text-stone-500 mb-4">Pick the day to copy these meals into.</p>

@@ -3,7 +3,8 @@ import { RefreshCw, Trash2, ShoppingBasket } from 'lucide-react'
 import type { MedCategory } from '../types'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { useNutritionContext } from '../store/useNutrition'
-import { CATEGORY_EMOJI, CATEGORY_LABELS, EmptyState, SectionHeading } from '../components/ui'
+import { EmptyState, SectionHeading } from '../components/ui'
+import { CATEGORY_EMOJI, CATEGORY_LABELS } from '../lib/categories'
 
 /**
  * The shopping list.
