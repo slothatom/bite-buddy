@@ -48,6 +48,12 @@
   --color-butter-400: #fdca45;
   --color-butter-500: #edb122;
 
+  /*
+   * Ink — the logo's outline. A deep warm brown rather than black, so the
+   * chunky outline stays funky without going cold against the cream.
+   */
+  --color-ink: #33231c;
+
   /* Berry — for streaks and celebratory moments. */
   --color-xp-50: #fdf3f7;
   --color-xp-100: #fbe4ee;

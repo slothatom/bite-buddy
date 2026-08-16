@@ -1,4 +1,4 @@
-# 🥣 Bite Buddy
+# 🍎 Bite Buddy
 
 *Your cosy kitchen.*
 
@@ -39,11 +39,17 @@ The dietician never wrote a single calorie. Supplying them is what this app adds
 
 The app is meant to feel like a kitchen notebook, not an analytics dashboard.
 
-**Mascot.** A little bowl with a face, drawn inline as SVG in
+**Logo.** A big cheeky bite taken out of the mark itself — it draws the name
+rather than illustrating food, which is why it isn't a bowl or a plate. Bold ink
+outline, one silhouette, so it holds up at favicon size. Drawn inline as SVG in
 `src/components/brand/Mascot.tsx` so it inherits theme colours and stays crisp
-from 28px in the sidebar to 96px in an empty state. It has three moods —
+from 30px in the sidebar to 96px in an empty state. It has three moods —
 `happy`, `sleepy` and `oops` — covering the three things the app has to say:
 all is well, there's nothing here yet, and something went wrong.
+
+The bite is cut from two concentric copies rather than one masked shape: the
+dark body takes a smaller cut than the coloured body, so the bitten edge keeps
+the same outline weight as the rest of the mark.
 
 **Palette.** Cream ground rather than grey, a muted sage as the primary, peach
 for warmth, plus butter and berry accents. Defined as tokens in `src/index.css`
