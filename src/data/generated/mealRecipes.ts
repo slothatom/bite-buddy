@@ -293,7 +293,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-009",
     "name": {
-      "en": "Lentils with spinach with halloumi"
+      "en": "Lentils with spinach, halloumi"
     },
     "emoji": "🥬",
     "servings": 1,
@@ -507,7 +507,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-015",
     "name": {
-      "en": "Chia pudding with rolled oats & chia seeds"
+      "en": "Chia pudding with mango"
     },
     "emoji": "🍮",
     "servings": 1,
@@ -905,7 +905,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-027",
     "name": {
-      "en": "Chia pudding with mango"
+      "en": "Chia pudding with mango (2)"
     },
     "emoji": "🍮",
     "servings": 1,
@@ -1522,7 +1522,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-045",
     "name": {
-      "en": "Cod with mango salsa with brown rice"
+      "en": "Cod with mango salsa, brown rice"
     },
     "emoji": "🐟",
     "servings": 1,
@@ -1614,7 +1614,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-048",
     "name": {
-      "en": "Spicy chicken & vegetable pan with mixed vegetables & extra virgin olive oil"
+      "en": "Spicy chicken & vegetable pan (2)"
     },
     "emoji": "🌶️",
     "servings": 1,
@@ -1687,7 +1687,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-050",
     "name": {
-      "en": "Spicy chicken & vegetable pan with mixed vegetables & extra virgin olive oil (2)"
+      "en": "Spicy chicken & vegetable pan (3)"
     },
     "emoji": "🌶️",
     "servings": 1,
@@ -1794,7 +1794,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-053",
     "name": {
-      "en": "Bruschetta with telemea with wholemeal bread & extra virgin olive oil"
+      "en": "Bruschetta with telemea (2)"
     },
     "emoji": "🍞",
     "servings": 1,
@@ -1950,7 +1950,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-057",
     "name": {
-      "en": "Chia pudding with rolled oats & chia seeds (2)"
+      "en": "Chia pudding with strawberries"
     },
     "emoji": "🍮",
     "servings": 1,
@@ -2135,7 +2135,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-062",
     "name": {
-      "en": "Oat porridge with rolled oats & dark chocolate"
+      "en": "Oat porridge with dark chocolate & apple"
     },
     "emoji": "🥣",
     "servings": 1,
@@ -2262,7 +2262,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-065",
     "name": {
-      "en": "Mango chia pudding with rolled oats & chia seeds"
+      "en": "Mango chia pudding (2)"
     },
     "emoji": "🥭",
     "servings": 1,
@@ -2325,7 +2325,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-067",
     "name": {
-      "en": "Apple & cinnamon porridge with rolled oats & apple"
+      "en": "Apple & cinnamon porridge (2)"
     },
     "emoji": "🥣",
     "servings": 1,
@@ -2461,7 +2461,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-071",
     "name": {
-      "en": "Tuna salad with puffed rice cakes & raw vegetable salad"
+      "en": "Tuna salad with puffed rice cakes"
     },
     "emoji": "🥗",
     "servings": 1,
@@ -2500,7 +2500,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-072",
     "name": {
-      "en": "Feta salad with puffed rice cakes & raw vegetable salad"
+      "en": "Feta salad with puffed rice cakes"
     },
     "emoji": "🥗",
     "servings": 1,
@@ -2680,7 +2680,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-077",
     "name": {
-      "en": "Potatoes with egg with Telemea & yogurt"
+      "en": "Potatoes with egg, Telemea & yogurt"
     },
     "emoji": "🥔",
     "servings": 1,
@@ -2787,7 +2787,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-080",
     "name": {
-      "en": "Potatoes with egg with Telemea & yogurt (2)"
+      "en": "Potatoes with egg, Telemea & yogurt (2)"
     },
     "emoji": "🥔",
     "servings": 1,
@@ -2957,7 +2957,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-085",
     "name": {
-      "en": "Baked salmon with sweet potato with raw vegetable salad & extra virgin olive oil"
+      "en": "Baked salmon with sweet potato, raw vegetable salad & yogurt garlic sauce"
     },
     "emoji": "🐟",
     "servings": 1,
@@ -3064,7 +3064,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-088",
     "name": {
-      "en": "Baked salmon with sweet potato with raw vegetable salad & yogurt garlic sauce"
+      "en": "Baked salmon with sweet potato, raw vegetable salad & yogurt garlic sauce (2)"
     },
     "emoji": "🐟",
     "servings": 1,
@@ -3195,7 +3195,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-092",
     "name": {
-      "en": "Oat porridge with kefir & rolled oats"
+      "en": "Oat porridge with kefir"
     },
     "emoji": "🥣",
     "servings": 1,
@@ -3229,7 +3229,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-093",
     "name": {
-      "en": "Spicy chicken & vegetable pan with mixed vegetables"
+      "en": "Spicy chicken & vegetable pan (4)"
     },
     "emoji": "🌶️",
     "servings": 1,
@@ -3394,7 +3394,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-098",
     "name": {
-      "en": "Lentils with spinach with halloumi (2)"
+      "en": "Lentils with spinach, halloumi (2)"
     },
     "emoji": "🥬",
     "servings": 1,
@@ -3520,7 +3520,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-102",
     "name": {
-      "en": "Bruschetta with telemea with feta"
+      "en": "Bruschetta with telemea, feta"
     },
     "emoji": "🍞",
     "servings": 1,
@@ -3646,7 +3646,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-106",
     "name": {
-      "en": "Spicy chicken & vegetable pan with mixed vegetables & extra virgin olive oil (3)"
+      "en": "Spicy chicken & vegetable pan (5)"
     },
     "emoji": "🌶️",
     "servings": 1,
@@ -3952,7 +3952,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-115",
     "name": {
-      "en": "Bruschetta with telemea with Telemea & extra virgin olive oil"
+      "en": "Bruschetta with telemea (3)"
     },
     "emoji": "🍞",
     "servings": 1,
@@ -4137,7 +4137,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-120",
     "name": {
-      "en": "Chia pudding with rolled oats & chia seeds (3)"
+      "en": "Chia pudding with strawberries (2)"
     },
     "emoji": "🍮",
     "servings": 1,
@@ -4244,7 +4244,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-123",
     "name": {
-      "en": "Extra virgin olive oil with lentil stew & yogurt"
+      "en": "Lentil stew with yogurt"
     },
     "emoji": "🫘",
     "servings": 1,
@@ -4278,7 +4278,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-124",
     "name": {
-      "en": "Bruschetta with telemea with feta & extra virgin olive oil"
+      "en": "Bruschetta with telemea, feta (2)"
     },
     "emoji": "🍞",
     "servings": 1,
@@ -4424,7 +4424,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-128",
     "name": {
-      "en": "Oat porridge with dark chocolate & apple"
+      "en": "Oat porridge with dark chocolate & apple (2)"
     },
     "emoji": "🥣",
     "servings": 1,
@@ -4667,7 +4667,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-135",
     "name": {
-      "en": "Oat porridge with dark chocolate & apple (2)"
+      "en": "Oat porridge with dark chocolate & apple (3)"
     },
     "emoji": "🥣",
     "servings": 1,
@@ -4774,7 +4774,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-138",
     "name": {
-      "en": "Chia pudding with rolled oats & chia seeds (4)"
+      "en": "Chia pudding with strawberries (3)"
     },
     "emoji": "🍮",
     "servings": 1,
@@ -4813,7 +4813,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-139",
     "name": {
-      "en": "Healthy shaorma wrap with chicken breast & Telemea"
+      "en": "Healthy shaorma wrap with Telemea & mixed vegetables"
     },
     "emoji": "🌯",
     "servings": 1,
@@ -4896,7 +4896,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-141",
     "name": {
-      "en": "Flatbread pizza with mozzarella & onion"
+      "en": "Flatbread pizza with onion & bell pepper"
     },
     "emoji": "🍕",
     "servings": 1,
@@ -5178,7 +5178,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-149",
     "name": {
-      "en": "Chia pudding with rolled oats & chia seeds (5)"
+      "en": "Chia pudding with raspberries"
     },
     "emoji": "🍮",
     "servings": 1,
@@ -5455,7 +5455,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-157",
     "name": {
-      "en": "Apple & cinnamon porridge with apple & vanilla extract"
+      "en": "Apple & cinnamon porridge (3)"
     },
     "emoji": "🥣",
     "servings": 1,
@@ -5499,7 +5499,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-158",
     "name": {
-      "en": "Eggplant mini pizzas with bulgur & mozzarella"
+      "en": "Eggplant mini pizzas with bulgur & tomatoes"
     },
     "emoji": "🍆",
     "servings": 1,
@@ -5621,7 +5621,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-161",
     "name": {
-      "en": "Eggplant mini pizzas with mozzarella & bulgur"
+      "en": "Eggplant mini pizzas with bulgur & tomatoes (2)"
     },
     "emoji": "🍆",
     "servings": 1,
@@ -5972,7 +5972,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-170",
     "name": {
-      "en": "Quinoa & spinach salad with sautéed mushrooms & quinoa"
+      "en": "Quinoa & spinach salad with sautéed mushrooms & feta"
     },
     "emoji": "🥗",
     "servings": 1,
@@ -6011,7 +6011,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-171",
     "name": {
-      "en": "Quinoa & spinach salad with sautéed mushrooms & quinoa (2)"
+      "en": "Quinoa & spinach salad with sautéed mushrooms & feta (2)"
     },
     "emoji": "🥗",
     "servings": 1,
@@ -6808,7 +6808,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-194",
     "name": {
-      "en": "Chicken with mozzarella & tomato with bulgur & pickles"
+      "en": "Chicken with mozzarella & tomato, bulgur & pickles"
     },
     "emoji": "🍗",
     "servings": 1,
@@ -6944,7 +6944,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-198",
     "name": {
-      "en": "Tomato & mushroom bruschetta with sautéed mushrooms & tomatoes"
+      "en": "Tomato & mushroom bruschetta with sautéed mushrooms"
     },
     "emoji": "🍞",
     "servings": 1,

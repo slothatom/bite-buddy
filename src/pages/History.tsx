@@ -76,7 +76,7 @@ function PlanCard({
           inside a button is invalid, and browsers reparent it so its click
           handler never fires. */}
       <div className="flex items-center gap-3 px-4 py-3.5 hover:bg-sand-50">
-        <button onClick={onToggle} className="flex items-center gap-3 flex-1 min-w-0 text-left">
+        <button onClick={onToggle} className="flex items-center gap-3 flex-1 min-w-0 min-h-11 text-left">
           <span className="text-xl">{plan.language === 'hu' ? '🇭🇺' : '🇷🇴'}</span>
           <span className="flex-1 min-w-0">
             <span className="block font-semibold text-stone-800 text-sm">{plan.label}</span>
@@ -88,7 +88,7 @@ function PlanCard({
         </button>
         <button
           onClick={onLoad}
-          className={`badge shrink-0 ${loaded ? 'bg-brand-600 text-white' : 'bg-white border border-sand-300 text-stone-600 hover:border-brand-400'}`}
+          className={loaded ? 'chip-on' : 'chip-off'}
         >
           {loaded ? <><Check size={12} /> Loaded</> : <><CalendarPlus size={12} /> Load</>}
         </button>

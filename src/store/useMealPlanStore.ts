@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { discardOlderThan, safeStorage, SCHEMA_VERSION } from './persist'
 import type {
   Component, DayPlan, GroceryItem, MealSlot, PlannedMeal, SourcePlan, WeekStart,
 } from '../types'
@@ -221,6 +222,11 @@ export const useMealPlanStore = create<MealPlanStore>()(
         clearGroceryList: () => set({ groceryItems: [] }),
       }
     },
-    { name: 'bite-buddy-mealplan-v2' },
+    {
+      name: 'bite-buddy-mealplan-v2',
+      version: SCHEMA_VERSION,
+      storage: safeStorage<MealPlanStore>(),
+      migrate: discardOlderThan<MealPlanStore>(SCHEMA_VERSION),
+    },
   ),
 )

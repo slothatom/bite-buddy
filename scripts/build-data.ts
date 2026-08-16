@@ -6,7 +6,7 @@ import { FOODS } from '../src/data/foods.js'
 import { DISHES, DISH_ALIASES, DISH_BY_WEIGHT } from '../src/data/dishes.js'
 import { buildFoodIndex, resolveFood } from '../src/lib/foodSearch.js'
 import { normaliseTerm } from '../src/lib/units.js'
-import { buildContext, componentsNutrients, recipeTotal } from '../src/lib/nutrition.js'
+import { buildContext, componentsNutrients } from '../src/lib/nutrition.js'
 import type { Component, MealSlot, Recipe, RecipeTag, SourcePlan } from '../src/types/index.js'
 
 /**
@@ -125,7 +125,26 @@ function labelFor(c: Component): string {
  * than "Wholemeal bread with lentils", even when the bread carries more calories.
  */
 function nameMeal(components: Component[]): string {
+  // Anything already inside a dish in this meal must not also appear in the
+  // name: "Apple & cinnamon porridge with apple" reads as a mistake, because
+  // it is one.
+  const insideADish = new Set<string>()
+  for (const c of components) {
+    if (c.kind !== 'recipe') continue
+    for (const part of dishById.get(c.recipeId)?.components ?? []) {
+      if (part.kind === 'food') insideADish.add(part.foodId)
+    }
+  }
+
   const ranked = components
+    .filter((c) => {
+      if (c.kind !== 'food') return true
+      if (insideADish.has(c.foodId)) return false
+      // Seasonings are never what a meal is called after, however
+      // calorie-dense they are per 100 g.
+      const category = foodIndex.all.find((f) => f.id === c.foodId)?.category
+      return category !== 'herbs-spices'
+    })
     .map((c) => ({
       c,
       label: labelFor(c),
@@ -148,8 +167,11 @@ function nameMeal(components: Component[]): string {
   const head = parts[0]
   const rest = parts.slice(1)
   if (!rest.length) return head
-  if (rest.length === 1) return `${head} with ${lower(rest[0])}`
-  return `${head} with ${lower(rest[0])} & ${lower(rest[1])}`
+  // A dish whose own name contains "with" would otherwise read
+  // "Lentils with spinach with halloumi".
+  const join = /\bwith\b/i.test(head) ? ',' : ' with'
+  if (rest.length === 1) return `${head}${join} ${lower(rest[0])}`
+  return `${head}${join} ${lower(rest[0])} & ${lower(rest[1])}`
 }
 
 /** Place names and personal names stay capitalised mid-sentence. */

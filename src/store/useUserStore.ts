@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { discardOlderThan, safeStorage, SCHEMA_VERSION } from './persist'
 import type {
   Achievement, AchievementId, Targets, TdeeProfile, UserProfile, WeekStart,
 } from '../types'
@@ -121,8 +122,10 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: 'bite-buddy-user-v2',
-      // Older versions stored `macroTargets` and no week start; a fresh key
-      // avoids a migration path for data that predates the rebuild.
+      version: SCHEMA_VERSION,
+      storage: safeStorage<{ profile: UserProfile }>(),
+      migrate: discardOlderThan<{ profile: UserProfile }>(SCHEMA_VERSION),
+      // Only the profile is worth keeping; toasts are transient.
       partialize: (s) => ({ profile: s.profile }),
     },
   ),

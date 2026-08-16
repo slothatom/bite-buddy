@@ -3,7 +3,7 @@ import { DISHES } from '../src/data/dishes.js'
 import { MEAL_RECIPES } from '../src/data/generated/mealRecipes.js'
 import { SOURCE_PLANS } from '../src/data/generated/sourcePlans.js'
 import { atwaterCalories, buildContext, calorieDrift, calorieGap, recipePerServing } from '../src/lib/nutrition.js'
-import type { Component, Recipe } from '../src/types/index.js'
+import type { Recipe } from '../src/types/index.js'
 
 /**
  * Data integrity checks.

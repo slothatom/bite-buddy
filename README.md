@@ -101,7 +101,16 @@ npm run build
 npm run preview
 ```
 
-Node 18+.
+Node 20+.
+
+### Checks
+
+```bash
+npm run verify     # lint + typecheck + unit tests + data integrity + build
+npm run test:e2e   # drives the real app in a browser, desktop and phone
+```
+
+Both run in CI on every push (`.github/workflows/ci.yml`).
 
 ### Optional
 
@@ -145,14 +154,19 @@ plain 4/4/9 makes every vegetable look mis-keyed.
 
 | Layer | |
 |---|---|
-| UI | React 18 + TypeScript |
-| Styling | Tailwind CSS v3 |
-| Routing | React Router v6, hash-based so it works offline |
+| UI | React 19 + TypeScript 6 |
+| Styling | Tailwind CSS v4 (CSS-first `@theme`, no config file) |
+| Routing | React Router v7, hash-based so it works offline |
 | State | Zustand + `persist` (localStorage) |
-| Build | Vite · `vite-plugin-pwa` (Workbox) |
+| Build | Vite 8 · `vite-plugin-pwa` (Workbox) |
+| Quality | ESLint 10 · Vitest · Playwright |
 | Nutrition lookup | USDA FoodData Central · Open Food Facts |
 | Barcodes | `@zxing/browser` |
 | Data pipeline | `tsx` scripts, run on demand |
+
+TypeScript is held at 6 deliberately: 7.0 works for `tsc` and the build, but
+typescript-eslint does not support it yet, and losing the linter costs more than
+the upgrade gains. Revisit when typescript-eslint ships TS 7 support.
 
 ```
 src/
@@ -169,6 +183,48 @@ src/
 ├── pages/                # Planner, Recipes, Foods, Grocery, History, Prep, Schedule, Progress, Settings
 └── store/                # zustand stores
 ```
+
+---
+
+## Guardrails
+
+Everything here exists because of a failure that actually happened, or one that
+would be silent if it did.
+
+**Data invariants** (`npm run data:check`) — every component resolves to a real
+food or recipe, no recipe nests itself, all 481 plan lines map to something,
+recipe names are unique, and each food's stated calories agree with its own
+macros. Calorie agreement uses fibre-aware Atwater (fibre at 2 kcal/g); plain
+4/4/9 flags every vegetable as mis-keyed. Foods whose energy genuinely isn't in
+the macros — vanilla extract is mostly ethanol — are listed explicitly rather
+than silently tolerated.
+
+**Unit tests** cover the parsing vocabulary and the nutrition maths, the two
+places where a mistake produces a plausible wrong number instead of an error:
+raw-vs-dry detection, spoon measures, decimal commas, nested-recipe scaling,
+cycle safety, and the Wednesday week boundary across daylight saving.
+
+**Lint rules** include a custom one banning a `<button>` inside a `<button>`.
+That bug shipped twice here — browsers reparent the inner element and its click
+handler silently stops firing — so it is now caught mechanically.
+
+**End-to-end tests** run at desktop and phone sizes and assert three things per
+screen: it renders with no console errors, it does not scroll horizontally, and
+every control is at least 40x32px. The tap-target check is what keeps the mobile
+work from regressing.
+
+**Storage safety** — writes go through a wrapper that degrades instead of
+throwing. A full or blocked localStorage shows a banner rather than losing data
+quietly, and corrupt JSON falls back to defaults. Every store is schema-versioned:
+bump `SCHEMA_VERSION` in `src/store/persist.ts` when a persisted shape changes
+and old state is discarded rather than misread.
+
+**Error boundary** — a render error shows a recovery screen with the message,
+not a blank white page. On a phone with no console, those are indistinguishable.
+
+**Accessibility** — 44px minimum touch targets under `(pointer: coarse)` only,
+so phones get thumb-sized controls while desktop keeps compact ones, and
+animations are disabled under `prefers-reduced-motion`.
 
 ---
 
