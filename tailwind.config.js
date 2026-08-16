@@ -4,17 +4,41 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Olive — the Mediterranean guide's own colour, and calmer than the
+        // signal-green the app used to run on.
         brand: {
-          50:  '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
+          50:  '#f6f7ee',
+          100: '#e9edd3',
+          200: '#d5dcac',
+          300: '#bcc77f',
+          400: '#a3b25b',
+          500: '#87973f',
+          600: '#69782f',
+          700: '#515c28',
+          800: '#414a25',
+          900: '#383f23',
+        },
+        // Warm terracotta, for accents and anything that needs to feel alive.
+        clay: {
+          50:  '#fdf5f3',
+          100: '#fbe8e3',
+          200: '#f8d5cc',
+          300: '#f1b7a8',
+          400: '#e78e76',
+          500: '#d96a4c',
+          600: '#c5502f',
+          700: '#a44026',
+          800: '#883824',
+          900: '#723324',
+        },
+        // Page and card grounds — paper rather than clinical grey.
+        sand: {
+          50:  '#fbf9f5',
+          100: '#f5f1e8',
+          200: '#ebe4d5',
+          300: '#ddd2ba',
+          400: '#c9b995',
+          500: '#b8a37a',
         },
         xp: {
           50:  '#faf5ff',
