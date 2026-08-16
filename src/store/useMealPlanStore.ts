@@ -1,31 +1,44 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { DayPlan, GroceryItem, PlannedMeal, Recipe } from '../types'
-import { useRecipeStore } from './useRecipeStore'
+import type {
+  Component, DayPlan, GroceryItem, MealSlot, PlannedMeal, SourcePlan, WeekStart,
+} from '../types'
+import { DEFAULT_WEEK_START } from '../types'
+import type { NutritionContext } from '../lib/nutrition'
 
-function getWeekDates(referenceDate: Date = new Date()): string[] {
-  const dates: string[] = []
-  const day = referenceDate.getDay() // 0=Sun
-  const monday = new Date(referenceDate)
-  monday.setDate(referenceDate.getDate() - ((day + 6) % 7)) // shift to Monday
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday)
-    d.setDate(monday.getDate() + i)
-    dates.push(d.toISOString().split('T')[0])
-  }
-  return dates
+/**
+ * Returns the seven dates of the week containing `reference`.
+ *
+ * The week does not necessarily start on Monday: the dietician issued plans on
+ * Wednesdays and every document runs Wednesday → Tuesday, so the planner
+ * defaults to a Wednesday start and the day is configurable.
+ */
+export function getWeekDates(reference: Date = new Date(), weekStartsOn: WeekStart = DEFAULT_WEEK_START): string[] {
+  const start = new Date(reference)
+  start.setHours(12, 0, 0, 0)
+  const shift = (start.getDay() - weekStartsOn + 7) % 7
+  start.setDate(start.getDate() - shift)
+
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(start)
+    d.setDate(start.getDate() + i)
+    return d.toISOString().slice(0, 10)
+  })
 }
 
-function buildEmptyWeek(dates: string[]): DayPlan[] {
+function emptyWeek(dates: string[]): DayPlan[] {
   return dates.map((date) => ({ date, meals: [] }))
 }
 
+function newId(): string {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+}
+
 export interface MealPlanExport {
-  version: 1
+  version: 2
   exportedAt: string
   weekStart: string
   plan: DayPlan[]
-  recipes: Recipe[]
 }
 
 interface MealPlanStore {
@@ -33,14 +46,17 @@ interface MealPlanStore {
   plan: DayPlan[]
   groceryItems: GroceryItem[]
 
-  addMeal: (date: string, meal: PlannedMeal) => void
+  setMeal: (date: string, slot: MealSlot, entries: Component[], note?: string) => void
+  addEntry: (date: string, slot: MealSlot, entry: Component) => void
   removeMeal: (date: string, mealId: string) => void
   clearDay: (date: string) => void
   copyDay: (fromDate: string, toDate: string) => void
-  goToWeek: (referenceDate: Date) => void
+  goToWeek: (reference: Date, weekStartsOn: WeekStart) => void
+  /** Drops one of the dietician's weeks onto the current week's dates. */
+  loadSourcePlan: (source: SourcePlan) => void
   importWeek: (data: MealPlanExport) => void
 
-  generateGroceryList: (recipeIds?: string[]) => void
+  generateGroceryList: (ctx: NutritionContext, recipeIds?: string[]) => void
   toggleGroceryItem: (id: string) => void
   clearCheckedItems: () => void
   clearGroceryList: () => void
@@ -49,132 +65,162 @@ interface MealPlanStore {
 export const useMealPlanStore = create<MealPlanStore>()(
   persist(
     (set, get) => {
-      const today = new Date()
-      const weekDates = getWeekDates(today)
+      const weekDates = getWeekDates(new Date(), DEFAULT_WEEK_START)
       return {
         weekDates,
-        plan: buildEmptyWeek(weekDates),
+        plan: emptyWeek(weekDates),
         groceryItems: [],
 
-        addMeal: (date, meal) =>
+        setMeal: (date, slot, entries, note) =>
           set((s) => ({
-            plan: s.plan.map((day) =>
-              day.date === date ? { ...day, meals: [...day.meals, meal] } : day
-            ),
+            plan: s.plan.map((day) => {
+              if (day.date !== date) return day
+              const others = day.meals.filter((m) => m.slot !== slot)
+              if (!entries.length) return { ...day, meals: others }
+              return { ...day, meals: [...others, { id: newId(), slot, entries, note }] }
+            }),
+          })),
+
+        addEntry: (date, slot, entry) =>
+          set((s) => ({
+            plan: s.plan.map((day) => {
+              if (day.date !== date) return day
+              const existing = day.meals.find((m) => m.slot === slot)
+              if (existing) {
+                return {
+                  ...day,
+                  meals: day.meals.map((m) =>
+                    m.slot === slot ? { ...m, entries: [...m.entries, entry] } : m),
+                }
+              }
+              return { ...day, meals: [...day.meals, { id: newId(), slot, entries: [entry] }] }
+            }),
           })),
 
         removeMeal: (date, mealId) =>
           set((s) => ({
             plan: s.plan.map((day) =>
-              day.date === date
-                ? { ...day, meals: day.meals.filter((m) => m.id !== mealId) }
-                : day
-            ),
+              day.date === date ? { ...day, meals: day.meals.filter((m) => m.id !== mealId) } : day),
           })),
 
         clearDay: (date) =>
           set((s) => ({
-            plan: s.plan.map((day) =>
-              day.date === date ? { ...day, meals: [] } : day
-            ),
+            plan: s.plan.map((day) => (day.date === date ? { ...day, meals: [] } : day)),
           })),
 
         copyDay: (fromDate, toDate) =>
           set((s) => {
             const source = s.plan.find((d) => d.date === fromDate)
-            if (!source || source.meals.length === 0) return {}
-            const newMeals = source.meals.map((m) => ({
-              ...m,
-              id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-            }))
+            if (!source?.meals.length) return {}
+            const meals: PlannedMeal[] = source.meals.map((m) => ({ ...m, id: newId() }))
+            return { plan: s.plan.map((day) => (day.date === toDate ? { ...day, meals } : day)) }
+          }),
+
+        goToWeek: (reference, weekStartsOn) => {
+          const dates = getWeekDates(reference, weekStartsOn)
+          set((s) => {
+            const existing = new Map(s.plan.map((d) => [d.date, d]))
+            return { weekDates: dates, plan: dates.map((date) => existing.get(date) ?? { date, meals: [] }) }
+          })
+        },
+
+        loadSourcePlan: (source) =>
+          set((s) => {
+            // Source days carry a weekday, not a date. Line them up with the
+            // matching weekday in the week currently on screen.
+            const byWeekday = new Map(source.days.map((d) => [d.weekday, d]))
             return {
-              plan: s.plan.map((day) =>
-                day.date === toDate ? { ...day, meals: newMeals } : day
-              ),
+              plan: s.weekDates.map((date) => {
+                const weekday = new Date(date + 'T12:00:00').getDay()
+                const day = byWeekday.get(weekday)
+                if (!day) return { date, meals: [] }
+                return {
+                  date,
+                  meals: day.meals
+                    .filter((m) => m.entries.length)
+                    .map((m) => ({ id: newId(), slot: m.slot, entries: m.entries, note: m.text })),
+                }
+              }),
+              groceryItems: [],
             }
           }),
 
-        goToWeek: (referenceDate) => {
-          const newDates = getWeekDates(referenceDate)
-          set((s) => {
-            // preserve existing meals for dates that overlap
-            const existing = new Map(s.plan.map((d) => [d.date, d]))
-            const newPlan = newDates.map((date) =>
-              existing.get(date) ?? { date, meals: [] }
-            )
-            return { weekDates: newDates, plan: newPlan }
+        importWeek: (data) => {
+          const dates = getWeekDates(new Date(data.weekStart + 'T12:00:00'), DEFAULT_WEEK_START)
+          const imported = new Map(data.plan.map((d) => [d.date, d]))
+          set({
+            weekDates: dates,
+            plan: dates.map((date) => imported.get(date) ?? { date, meals: [] }),
+            groceryItems: [],
           })
         },
 
-        importWeek: (data) => {
-          // Add any recipes that don't exist yet
-          useRecipeStore.getState().addRecipes(data.recipes)
-          // Navigate to the imported week
-          const weekStart = new Date(data.weekStart + 'T12:00:00')
-          const newDates = getWeekDates(weekStart)
-          // Merge imported plan with the week's dates
-          const importedByDate = new Map(data.plan.map((d) => [d.date, d]))
-          const newPlan = newDates.map((date) =>
-            importedByDate.get(date) ?? { date, meals: [] }
-          )
-          set({ weekDates: newDates, plan: newPlan, groceryItems: [] })
-        },
-
-        generateGroceryList: (recipeIds?: string[]) => {
+        generateGroceryList: (ctx, recipeIds) => {
           const { plan } = get()
-          const { recipes } = useRecipeStore.getState()
-          const map = new Map<string, GroceryItem>()
           const filter = recipeIds ? new Set(recipeIds) : null
+          const items = new Map<string, GroceryItem>()
 
-          plan.forEach((day) => {
-            day.meals.forEach((meal) => {
-              if (filter && !filter.has(meal.recipeId)) return
-              const recipe = recipes.find((r) => r.id === meal.recipeId)
-              if (!recipe) return
-              const scale = meal.servings / recipe.servings
-              recipe.ingredients.forEach((ing) => {
-                const key = `${ing.name.toLowerCase()}-${ing.unit}`
-                if (map.has(key)) {
-                  const existing = map.get(key)!
-                  map.set(key, {
-                    ...existing,
-                    amount: Math.round((existing.amount + ing.amount * scale) * 10) / 10,
-                    fromRecipeIds: [...new Set([...existing.fromRecipeIds, recipe.id])],
-                  })
+          /** Walks nested recipes down to the foods that actually get bought. */
+          const collect = (components: Component[], scale: number, fromRecipe: string | null, depth = 0) => {
+            if (depth > 6) return
+            for (const c of components) {
+              if (c.kind === 'food') {
+                const existing = items.get(c.foodId)
+                const grams = c.grams * scale
+                const food = ctx.foods.get(c.foodId)
+                if (!food) continue
+                // Water and seasonings are not shopping-list material.
+                if (food.id === 'water') continue
+                if (existing) {
+                  existing.grams += grams
+                  if (fromRecipe && !existing.fromRecipeIds.includes(fromRecipe)) {
+                    existing.fromRecipeIds.push(fromRecipe)
+                  }
                 } else {
-                  map.set(key, {
-                    id: key,
-                    name: ing.name,
-                    amount: Math.round(ing.amount * scale * 10) / 10,
-                    unit: ing.unit,
+                  items.set(c.foodId, {
+                    id: c.foodId,
+                    foodId: c.foodId,
+                    name: food.names.en,
+                    grams,
+                    category: food.category,
                     checked: false,
-                    fromRecipeIds: [recipe.id],
+                    fromRecipeIds: fromRecipe ? [fromRecipe] : [],
                   })
                 }
-              })
-            })
-          })
+              } else {
+                const recipe = ctx.recipes.get(c.recipeId)
+                if (!recipe) continue
+                const perServing = c.servings / Math.max(1, recipe.servings)
+                collect(recipe.components, scale * perServing, fromRecipe ?? recipe.id, depth + 1)
+              }
+            }
+          }
 
-          set({ groceryItems: Array.from(map.values()) })
+          for (const day of plan) {
+            for (const meal of day.meals) {
+              const entries = filter
+                ? meal.entries.filter((e) => e.kind === 'recipe' && filter.has(e.recipeId))
+                : meal.entries
+              collect(entries, 1, null)
+            }
+          }
+
+          set({
+            groceryItems: [...items.values()].map((i) => ({ ...i, grams: Math.round(i.grams) })),
+          })
         },
 
         toggleGroceryItem: (id) =>
           set((s) => ({
-            groceryItems: s.groceryItems.map((item) =>
-              item.id === id ? { ...item, checked: !item.checked } : item
-            ),
+            groceryItems: s.groceryItems.map((i) => (i.id === id ? { ...i, checked: !i.checked } : i)),
           })),
 
         clearCheckedItems: () =>
-          set((s) => ({
-            groceryItems: s.groceryItems.filter((item) => !item.checked),
-          })),
+          set((s) => ({ groceryItems: s.groceryItems.filter((i) => !i.checked) })),
 
         clearGroceryList: () => set({ groceryItems: [] }),
       }
     },
-    { name: 'bite-buddy-mealplan' }
-  )
+    { name: 'bite-buddy-mealplan-v2' },
+  ),
 )
-
-export { getWeekDates }

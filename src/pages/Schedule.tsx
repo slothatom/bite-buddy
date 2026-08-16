@@ -1,197 +1,154 @@
 import { useState } from 'react'
-import { CalendarClock, Plus, Trash2, Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Check, Trash2 } from 'lucide-react'
 import { useCookStore } from '../store/useCookStore'
-import { useRecipeStore } from '../store/useRecipeStore'
-import type { CookSession, Recipe } from '../types'
+import { useRecipes } from '../store/useRecipeStore'
+import { EmptyState } from '../components/ui'
 
-function newId() { return `${Date.now()}-${Math.random().toString(36).slice(2)}` }
-
-function formatDateTime(date: string, time: string) {
-  const d = new Date(`${date}T${time}`)
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
-    ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-}
-
+/**
+ * Batch-cook sessions.
+ *
+ * The dietician's plans repeat a dish across several days on purpose — one pot
+ * of lentil stew covers Friday and Saturday — so the useful unit here is a
+ * cooking session with several recipes attached, not one meal at a time.
+ */
 export default function Schedule() {
-  const { sessions, addSession, toggleComplete, removeSession, upcomingSessions } = useCookStore()
-  const { recipes } = useRecipeStore()
-  const [showForm, setShowForm] = useState(false)
-  const [showPast, setShowPast] = useState(false)
+  const { sessions, addSession, toggleComplete, removeSession } = useCookStore()
+  const recipes = useRecipes()
+  const [adding, setAdding] = useState(false)
 
-  const upcoming = upcomingSessions()
-  const today = new Date().toISOString().split('T')[0]
-  const past = sessions.filter((s) => s.date < today || s.completed).reverse()
-
-  const [form, setForm] = useState({
-    date: today,
-    time: '10:00',
-    label: '',
-    recipeIds: [] as string[],
-  })
-
-  function toggleFormRecipe(id: string) {
-    setForm((f) => ({
-      ...f,
-      recipeIds: f.recipeIds.includes(id)
-        ? f.recipeIds.filter((r) => r !== id)
-        : [...f.recipeIds, id],
-    }))
-  }
-
-  function handleAdd() {
-    if (!form.label.trim() && form.recipeIds.length === 0) return
-    const session: CookSession = {
-      id: newId(),
-      date: form.date,
-      time: form.time,
-      label: form.label.trim() || 'Prep session',
-      recipeIds: form.recipeIds,
-      completed: false,
-    }
-    addSession(session)
-    setForm({ date: today, time: '10:00', label: '', recipeIds: [] })
-    setShowForm(false)
-  }
+  const batchable = recipes.filter((r) => r.steps.length > 0)
 
   return (
-    <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
-      <div className="max-w-2xl mx-auto px-6 py-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <h1 className="page-title">Cook Schedule</h1>
-          <button className="btn-primary" onClick={() => setShowForm((v) => !v)}>
-            <Plus size={15} /> Add session
-          </button>
-        </div>
-
-        {/* Add form */}
-        {showForm && (
-          <div className="card px-5 py-4 space-y-3">
-            <h2 className="section-title">New cook session</h2>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-semibold text-gray-500 mb-1 block">Date</label>
-                <input type="date" className="input text-sm w-full" value={form.date}
-                  onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-500 mb-1 block">Time</label>
-                <input type="time" className="input text-sm w-full" value={form.time}
-                  onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))} />
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-gray-500 mb-1 block">Label</label>
-              <input type="text" className="input text-sm w-full" placeholder="e.g. Sunday batch cook"
-                value={form.label} onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))} />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-gray-500 mb-1.5 block">Recipes to cook</label>
-              <div className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto">
-                {recipes.map((r) => (
-                  <label key={r.id}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-colors text-xs font-medium
-                      ${form.recipeIds.includes(r.id) ? 'bg-brand-50 border-brand-300 text-brand-700' : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'}`}>
-                    <input type="checkbox" className="hidden" checked={form.recipeIds.includes(r.id)}
-                      onChange={() => toggleFormRecipe(r.id)} />
-                    <span className="text-base">{r.emoji}</span>
-                    <span className="truncate">{r.name}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div className="flex gap-2 pt-1">
-              <button className="btn-ghost flex-1" onClick={() => setShowForm(false)}>Cancel</button>
-              <button className="btn-primary flex-1" onClick={handleAdd}
-                disabled={!form.label.trim() && form.recipeIds.length === 0}>
-                Add session
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Upcoming sessions */}
-        {upcoming.length === 0 && !showForm ? (
-          <div className="card px-6 py-16 text-center">
-            <div className="text-5xl mb-4">📅</div>
-            <p className="font-semibold text-gray-700 text-lg">No upcoming sessions</p>
-            <p className="text-sm text-gray-400 mt-2 mb-6">Schedule your cook sessions to stay on track.</p>
-            <button className="btn-primary mx-auto" onClick={() => setShowForm(true)}>
-              <Plus size={15} /> Add first session
-            </button>
-          </div>
-        ) : (
-          upcoming.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Upcoming ({upcoming.length})</p>
-              {upcoming.map((s) => (
-                <SessionCard key={s.id} session={s} recipes={recipes}
-                  onToggle={() => toggleComplete(s.id)} onRemove={() => removeSession(s.id)} />
-              ))}
-            </div>
-          )
-        )}
-
-        {/* Past / completed */}
-        {past.length > 0 && (
+    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+        <header className="flex items-start justify-between gap-3">
           <div>
-            <button className="flex items-center gap-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-2"
-              onClick={() => setShowPast((v) => !v)}>
-              {showPast ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-              Past & completed ({past.length})
-            </button>
-            {showPast && (
-              <div className="space-y-2">
-                {past.map((s) => (
-                  <SessionCard key={s.id} session={s} recipes={recipes}
-                    onToggle={() => toggleComplete(s.id)} onRemove={() => removeSession(s.id)} />
-                ))}
+            <h1 className="text-2xl font-extrabold text-stone-800">Cook schedule</h1>
+            <p className="text-sm text-stone-500">When you're actually cooking, and what.</p>
+          </div>
+          <button className="btn-primary shrink-0" onClick={() => setAdding(true)}>
+            <Plus size={16} /> Session
+          </button>
+        </header>
+
+        {sessions.length === 0 ? (
+          <EmptyState emoji="🍳" title="No cook sessions planned">
+            Schedule one and pick the dishes you'll batch together.
+          </EmptyState>
+        ) : (
+          <div className="space-y-2.5">
+            {sessions.map((s) => (
+              <div key={s.id} className={`card p-4 ${s.completed ? 'opacity-60' : ''}`}>
+                <div className="flex items-start gap-3">
+                  <button
+                    onClick={() => toggleComplete(s.id)}
+                    className={`shrink-0 w-6 h-6 rounded-full border-2 grid place-items-center transition-colors ${
+                      s.completed ? 'bg-brand-600 border-brand-600 text-white' : 'border-sand-300 text-transparent'}`}
+                    aria-label={s.completed ? 'Mark as not done' : 'Mark as done'}
+                  >
+                    <Check size={13} />
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-semibold text-sm text-stone-800 ${s.completed ? 'line-through' : ''}`}>
+                      {s.label || 'Cook session'}
+                    </p>
+                    <p className="text-xs text-stone-400">
+                      {new Date(s.date + 'T12:00:00').toLocaleDateString('en-GB', {
+                        weekday: 'long', day: 'numeric', month: 'long' })} · {s.time}
+                    </p>
+                    {s.recipeIds.length > 0 && (
+                      <ul className="mt-2 flex flex-wrap gap-1.5">
+                        {s.recipeIds.map((id) => {
+                          const r = recipes.find((x) => x.id === id)
+                          return r ? <li key={id} className="tag">{r.emoji} {r.name.en}</li> : null
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                  <button className="btn-ghost btn-icon text-stone-300 hover:text-clay-600"
+                    onClick={() => removeSession(s.id)} aria-label="Remove session">
+                    <Trash2 size={15} />
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function SessionCard({ session, recipes, onToggle, onRemove }: {
-  session: CookSession
-  recipes: Recipe[]
-  onToggle: () => void
-  onRemove: () => void
-}) {
-  const sessionRecipes = session.recipeIds.map((id) => recipes.find((r) => r.id === id)).filter((r): r is Recipe => r !== undefined)
-
-  return (
-    <div className={`card px-4 py-3 flex items-start gap-3 transition-opacity ${session.completed ? 'opacity-60' : ''}`}>
-      <button onClick={onToggle}
-        className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors
-          ${session.completed ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 hover:border-brand-400'}`}>
-        {session.completed && <Check size={11} />}
-      </button>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className={`text-sm font-semibold ${session.completed ? 'line-through text-gray-400' : 'text-gray-900'}`}>
-            {session.label}
-          </p>
-          <div className="flex items-center gap-1 text-[11px] text-gray-400">
-            <CalendarClock size={11} />
-            {formatDateTime(session.date, session.time)}
-          </div>
-        </div>
-        {sessionRecipes.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {sessionRecipes.map((r) => (
-              <span key={r.id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-100 text-xs text-gray-600 font-medium">
-                {r.emoji} {r.name}
-              </span>
             ))}
           </div>
         )}
       </div>
-      <button onClick={onRemove} className="btn-ghost btn-icon text-red-400 hover:bg-red-50 shrink-0">
-        <Trash2 size={14} />
-      </button>
+
+      {adding && (
+        <SessionDialog
+          recipes={batchable}
+          onClose={() => setAdding(false)}
+          onSave={(session) => { addSession(session); setAdding(false) }}
+        />
+      )}
+    </div>
+  )
+}
+
+function SessionDialog({
+  recipes, onClose, onSave,
+}: {
+  recipes: ReturnType<typeof useRecipes>
+  onClose: () => void
+  onSave: (s: { id: string; date: string; time: string; recipeIds: string[]; label: string; completed: boolean }) => void
+}) {
+  const [label, setLabel] = useState('')
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [time, setTime] = useState('18:00')
+  const [picked, setPicked] = useState<string[]>([])
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/30 backdrop-blur-sm sm:p-4" onClick={onClose}>
+      <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl p-5 space-y-4"
+        onClick={(e) => e.stopPropagation()}>
+        <h2 className="font-bold text-stone-800">New cook session</h2>
+
+        <div>
+          <label className="label">What is it for</label>
+          <input className="input" placeholder="Sunday batch cook" value={label} onChange={(e) => setLabel(e.target.value)} />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="label">Date</label>
+            <input type="date" className="input" value={date} onChange={(e) => setDate(e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Time</label>
+            <input type="time" className="input" value={time} onChange={(e) => setTime(e.target.value)} />
+          </div>
+        </div>
+
+        <div>
+          <label className="label">Dishes ({picked.length} picked)</label>
+          <div className="max-h-52 overflow-y-auto card-soft divide-y divide-sand-200">
+            {recipes.map((r) => (
+              <label key={r.id} className="flex items-center gap-2.5 px-3 py-2 cursor-pointer text-sm">
+                <input
+                  type="checkbox" className="w-4 h-4 accent-brand-600"
+                  checked={picked.includes(r.id)}
+                  onChange={() => setPicked((p) => p.includes(r.id) ? p.filter((x) => x !== r.id) : [...p, r.id])}
+                />
+                <span className="text-stone-700">{r.emoji} {r.name.en}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <button className="btn-secondary flex-1" onClick={onClose}>Cancel</button>
+          <button
+            className="btn-primary flex-1"
+            onClick={() => onSave({
+              id: `${Date.now()}`, date, time, recipeIds: picked,
+              label: label.trim() || 'Cook session', completed: false,
+            })}
+          >
+            Save
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

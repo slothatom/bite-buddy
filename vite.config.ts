@@ -1,7 +1,57 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  plugins: [react()],
   base: '/bite-buddy/',
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg'],
+      manifest: {
+        name: 'Bite Buddy',
+        short_name: 'Bite Buddy',
+        description: 'Your recipes, meals and Mediterranean plan — offline, on any device.',
+        theme_color: '#69782f',
+        background_color: '#fbf9f5',
+        display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/bite-buddy/',
+        scope: '/bite-buddy/',
+        icons: [
+          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        runtimeCaching: [
+          {
+            // Fonts are the only third-party asset the app loads.
+            urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\//,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts',
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // Nutrition lookups are a convenience; a stale answer beats none,
+            // but the app must still work with no network at all.
+            urlPattern: /^https:\/\/(api\.nal\.usda\.gov|world\.openfoodfacts\.org)\//,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'nutrition-api',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+      },
+    }),
+  ],
 })
