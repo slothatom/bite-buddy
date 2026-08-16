@@ -1,348 +1,168 @@
-import { useState, useEffect, useRef } from 'react'
-import { useSearchParams } from 'react-router-dom'
-import { Play, Pause, RotateCcw, ChevronRight, ChevronLeft, Check, Timer, Zap } from 'lucide-react'
-import { useRecipeStore } from '../store/useRecipeStore'
+import { useEffect, useMemo, useState } from 'react'
+import { Play, Pause, RotateCcw, Check, ChevronLeft } from 'lucide-react'
+import type { Recipe } from '../types'
+import { useRecipes } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
-import type { Recipe, PrepStep } from '../types'
+import { useNutritionContext } from '../store/useNutrition'
+import { EmptyState } from '../components/ui'
 
-// ── Countdown Timer ──────────────────────────────────────────────────────────
-
-function CountdownTimer({ seconds, onComplete }: { seconds: number; onComplete?: () => void }) {
-  const [remaining, setRemaining] = useState(seconds)
-  const [running, setRunning] = useState(false)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    setRemaining(seconds)
-    setRunning(false)
-  }, [seconds])
-
-  useEffect(() => {
-    if (running && remaining > 0) {
-      intervalRef.current = setInterval(() => {
-        setRemaining((r) => {
-          if (r <= 1) {
-            clearInterval(intervalRef.current!)
-            setRunning(false)
-            onComplete?.()
-            return 0
-          }
-          return r - 1
-        })
-      }, 1000)
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [running, remaining, onComplete])
-
-  const mins = Math.floor(remaining / 60)
-  const secs = remaining % 60
-  const pct = ((seconds - remaining) / seconds) * 100
-
-  return (
-    <div className="flex flex-col items-center gap-4">
-      {/* Circular progress */}
-      <div className="relative w-32 h-32">
-        <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="52" fill="none" stroke="#f3f4f6" strokeWidth="8" />
-          <circle
-            cx="60" cy="60" r="52"
-            fill="none"
-            stroke={remaining === 0 ? '#22c55e' : '#a855f7'}
-            strokeWidth="8"
-            strokeLinecap="round"
-            strokeDasharray={`${2 * Math.PI * 52}`}
-            strokeDashoffset={`${2 * Math.PI * 52 * (1 - pct / 100)}`}
-            className="transition-all duration-1000"
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-mono font-bold text-2xl text-gray-900">
-            {String(mins).padStart(2, '0')}:{String(secs).padStart(2, '0')}
-          </span>
-          {remaining === 0 && <span className="text-xs text-brand-600 font-semibold mt-0.5">Done!</span>}
-        </div>
-      </div>
-
-      <div className="flex gap-2">
-        <button
-          className="btn-secondary btn-icon"
-          onClick={() => { setRemaining(seconds); setRunning(false) }}
-        >
-          <RotateCcw size={16} />
-        </button>
-        <button
-          className={`btn ${remaining === 0 ? 'btn-secondary' : running ? 'btn-danger' : 'btn-xp'} px-6`}
-          onClick={() => setRunning((r) => !r)}
-          disabled={remaining === 0}
-        >
-          {running ? <><Pause size={15} /> Pause</> : <><Play size={15} /> Start</>}
-        </button>
-      </div>
-    </div>
-  )
-}
-
-// ── Step Card ────────────────────────────────────────────────────────────────
-
-function StepCard({ step, index, total, completed, onComplete }: {
-  step: PrepStep
-  index: number
-  total: number
-  completed: boolean
-  onComplete: () => void
-}) {
-  const [timerDone, setTimerDone] = useState(false)
-
-  return (
-    <div className={`card p-6 transition-all duration-300 ${completed ? 'opacity-50' : ''}`}>
-      <div className="flex items-start gap-4">
-        <div className={`w-9 h-9 shrink-0 rounded-xl flex items-center justify-center font-bold text-sm
-          ${completed ? 'bg-brand-100 text-brand-600' : 'bg-xp-100 text-xp-700'}`}>
-          {completed ? <Check size={16} /> : index + 1}
-        </div>
-        <div className="flex-1">
-          <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1">
-            Step {index + 1} of {total}
-          </p>
-          <p className={`text-base font-medium leading-relaxed ${completed ? 'line-through text-gray-400' : 'text-gray-900'}`}>
-            {step.instruction}
-          </p>
-
-          {step.timerSeconds > 0 && !completed && (
-            <div className="mt-5 p-4 rounded-xl bg-xp-50 border border-xp-100 flex flex-col items-center">
-              <div className="flex items-center gap-2 mb-3">
-                <Timer size={15} className="text-xp-600" />
-                <p className="text-sm font-semibold text-xp-700">
-                  Timer: {Math.floor(step.timerSeconds / 60)}m {step.timerSeconds % 60 > 0 ? `${step.timerSeconds % 60}s` : ''}
-                </p>
-              </div>
-              <CountdownTimer seconds={step.timerSeconds} onComplete={() => setTimerDone(true)} />
-            </div>
-          )}
-
-          {!completed && (
-            <button
-              className="btn-primary mt-4 w-full"
-              onClick={onComplete}
-            >
-              <Check size={15} />
-              {step.timerSeconds > 0 && !timerDone ? 'Mark done (skip timer)' : 'Mark complete'}
-              <ChevronRight size={15} />
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ── Recipe Picker ────────────────────────────────────────────────────────────
-
-function RecipePicker({ recipes, onSelect }: { recipes: Recipe[]; onSelect: (r: Recipe) => void }) {
-  return (
-    <div className="max-w-2xl mx-auto px-6 py-6 space-y-5">
-      <h1 className="page-title">Prep Mode</h1>
-      <p className="text-gray-500">Choose a recipe to start a guided prep session.</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {recipes.map((recipe) => (
-          <button
-            key={recipe.id}
-            className="card p-4 text-left hover:shadow-md transition-shadow hover:border-brand-200 border border-transparent"
-            onClick={() => onSelect(recipe)}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-3xl">{recipe.emoji}</span>
-              <div>
-                <p className="font-bold text-gray-900">{recipe.name}</p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {recipe.steps.length} steps · {recipe.prepMinutes + recipe.cookMinutes}min
-                </p>
-              </div>
-              <ChevronRight size={16} className="ml-auto text-gray-300" />
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ── Completion Screen ────────────────────────────────────────────────────────
-
-function CompletionScreen({ recipe, onReset, xpEarned }: { recipe: Recipe; onReset: () => void; xpEarned: number }) {
-  return (
-    <div className="max-w-md mx-auto px-6 py-16 text-center space-y-6">
-      <div className="text-7xl animate-float">{recipe.emoji}</div>
-      <div>
-        <h2 className="text-2xl font-extrabold text-gray-900">Prep Complete!</h2>
-        <p className="text-gray-500 mt-1">You finished prepping <span className="font-semibold text-gray-700">{recipe.name}</span></p>
-      </div>
-      <div className="card p-4 inline-flex items-center gap-3 glow-purple">
-        <Zap size={20} className="text-xp-500" />
-        <div className="text-left">
-          <p className="font-bold text-gray-900 text-lg">+{xpEarned} XP earned!</p>
-          <p className="text-xs text-gray-400">Prep Master progress</p>
-        </div>
-      </div>
-      <div className="flex gap-3 justify-center">
-        <button className="btn-secondary" onClick={onReset}>Pick another recipe</button>
-        <button className="btn-primary" onClick={() => window.location.hash = '/'}>Back to planner</button>
-      </div>
-    </div>
-  )
-}
-
-// ── Page ─────────────────────────────────────────────────────────────────────
-
+/**
+ * Step-by-step cooking, with a timer on the steps that need one.
+ *
+ * Only recipes that actually carry a method are offered: the meals imported
+ * from the plans have components but no steps, so walking through them would
+ * be an empty screen.
+ */
 export default function PrepMode() {
-  const [searchParams] = useSearchParams()
-  const { recipes } = useRecipeStore()
-  const { unlockAchievement, addXp } = useUserStore()
+  const recipes = useRecipes()
+  const [active, setActive] = useState<Recipe | null>(null)
 
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(() => {
-    const id = searchParams.get('recipe')
-    return id ? recipes.find((r) => r.id === id) ?? null : null
-  })
-  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set())
-  const [done, setDone] = useState(false)
-  const [xpEarned, setXpEarned] = useState(0)
-  const [currentStep, setCurrentStep] = useState(0)
+  const cookable = useMemo(
+    () => recipes.filter((r) => r.steps.length > 0).sort((a, b) => a.name.en.localeCompare(b.name.en)),
+    [recipes],
+  )
 
-  function handleSelectRecipe(recipe: Recipe) {
-    setSelectedRecipe(recipe)
-    setCompletedSteps(new Set())
-    setCurrentStep(0)
-    setDone(false)
-  }
-
-  function handleStepComplete(stepId: string, stepIndex: number) {
-    const newCompleted = new Set(completedSteps)
-    newCompleted.add(stepId)
-    setCompletedSteps(newCompleted)
-
-    if (selectedRecipe && newCompleted.size === selectedRecipe.steps.length) {
-      // All steps done
-      const earned = 100
-      addXp(earned)
-      const isNew = unlockAchievement('prep_master')
-      setXpEarned(earned + (isNew ? 100 : 0))
-      setDone(true)
-    } else {
-      setCurrentStep(stepIndex + 1)
-    }
-  }
-
-  function handleReset() {
-    setSelectedRecipe(null)
-    setCompletedSteps(new Set())
-    setCurrentStep(0)
-    setDone(false)
-    setXpEarned(0)
-  }
-
-  if (!selectedRecipe) {
-    return (
-      <div className="flex-1 overflow-y-auto">
-        <RecipePicker recipes={recipes} onSelect={handleSelectRecipe} />
-      </div>
-    )
-  }
-
-  if (done) {
-    return (
-      <div className="flex-1 overflow-y-auto">
-        <CompletionScreen recipe={selectedRecipe} onReset={handleReset} xpEarned={xpEarned} />
-      </div>
-    )
-  }
+  if (active) return <PrepSession recipe={active} onExit={() => setActive(null)} />
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="max-w-2xl mx-auto px-6 py-6 space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <button className="btn-ghost btn-icon" onClick={handleReset}><ChevronLeft size={18} /></button>
-          <div className="text-center">
-            <h1 className="font-bold text-gray-900 flex items-center gap-2 justify-center">
-              <span>{selectedRecipe.emoji}</span>
-              {selectedRecipe.name}
-            </h1>
-            <p className="text-xs text-gray-400">
-              {completedSteps.size} / {selectedRecipe.steps.length} steps complete
-            </p>
-          </div>
-          <div className="w-10" />
-        </div>
+    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+        <header>
+          <h1 className="text-2xl font-extrabold text-stone-800">Prep mode</h1>
+          <p className="text-sm text-stone-500">Cook along, one step at a time.</p>
+        </header>
 
-        {/* Overall progress */}
-        <div className="xp-bar">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-600 transition-all duration-500"
-            style={{ width: `${(completedSteps.size / selectedRecipe.steps.length) * 100}%` }}
-          />
-        </div>
-
-        {/* Ingredients reminder */}
-        {selectedRecipe.ingredients.length > 0 && (
-          <details className="card overflow-hidden">
-            <summary className="px-4 py-3 cursor-pointer text-sm font-semibold text-gray-700 hover:bg-gray-50 list-none flex items-center justify-between">
-              <span>📋 Ingredients ({selectedRecipe.ingredients.length})</span>
-              <ChevronRight size={14} className="text-gray-400" />
-            </summary>
-            <div className="px-4 pb-3 pt-1 border-t border-gray-100">
-              <ul className="space-y-1">
-                {selectedRecipe.ingredients.map((ing) => (
-                  <li key={ing.id} className="flex justify-between text-sm">
-                    <span className="text-gray-700">{ing.name}</span>
-                    <span className="text-gray-400 font-mono text-xs">{ing.amount} {ing.unit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </details>
-        )}
-
-        {/* Steps */}
-        <div className="space-y-3">
-          {selectedRecipe.steps.map((step, idx) => {
-            const isCurrent = idx === currentStep
-            const isCompleted = completedSteps.has(step.id)
-            if (!isCurrent && !isCompleted) return null // only show current + done
-            return (
-              <StepCard
-                key={step.id}
-                step={step}
-                index={idx}
-                total={selectedRecipe.steps.length}
-                completed={isCompleted}
-                onComplete={() => handleStepComplete(step.id, idx)}
-              />
-            )
-          })}
-        </div>
-
-        {/* Upcoming steps preview */}
-        {currentStep < selectedRecipe.steps.length && (
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">Up next</p>
-            {selectedRecipe.steps.slice(currentStep + 1, currentStep + 3).map((step, i) => (
-              <div key={step.id} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 border border-gray-100">
-                <span className="w-6 h-6 rounded-full bg-gray-200 text-gray-500 text-xs font-bold flex items-center justify-center shrink-0">
-                  {currentStep + i + 2}
-                </span>
-                <p className="text-sm text-gray-400 line-clamp-1">{step.instruction}</p>
-                {step.timerSeconds > 0 && (
-                  <span className="badge-gold ml-auto shrink-0">
-                    <Timer size={10} /> {Math.round(step.timerSeconds / 60)}m
+        {cookable.length === 0 ? (
+          <EmptyState emoji="👩‍🍳" title="No recipes with a method yet" />
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {cookable.map((r) => (
+              <button key={r.id} onClick={() => setActive(r)}
+                className="card p-4 text-left hover:border-brand-300 transition-colors flex items-center gap-3">
+                <span className="text-2xl">{r.emoji}</span>
+                <span className="flex-1 min-w-0">
+                  <span className="block font-semibold text-stone-800 text-sm">{r.name.en}</span>
+                  <span className="block text-xs text-stone-400">
+                    {r.steps.length} steps · {r.prepMinutes + r.cookMinutes} min
                   </span>
-                )}
-              </div>
+                </span>
+              </button>
             ))}
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void }) {
+  const ctx = useNutritionContext()
+  const { addXp, unlockAchievement } = useUserStore()
+  const [index, setIndex] = useState(0)
+  const [done, setDone] = useState(false)
+
+  const step = recipe.steps[index]
+  const isLast = index === recipe.steps.length - 1
+
+  function finish() {
+    setDone(true)
+    unlockAchievement('prep_master')
+    addXp(100, 'Prep complete')
+  }
+
+  if (done) {
+    return (
+      <div className="flex-1 grid place-items-center px-6 pb-24">
+        <div className="text-center max-w-sm">
+          <div className="text-5xl mb-4">🎉</div>
+          <h2 className="text-xl font-extrabold text-stone-800">{recipe.name.en} is done</h2>
+          <p className="text-sm text-stone-500 mt-1 mb-6">Makes {recipe.servings} servings.</p>
+          <button className="btn-primary w-full" onClick={onExit}>Back to prep mode</button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+        <button className="btn-ghost -ml-2" onClick={onExit}><ChevronLeft size={16} /> All recipes</button>
+
+        <header>
+          <h1 className="text-xl font-extrabold text-stone-800">{recipe.emoji} {recipe.name.en}</h1>
+          <p className="text-sm text-stone-500">Step {index + 1} of {recipe.steps.length}</p>
+          <div className="h-1.5 rounded-full bg-sand-200 overflow-hidden mt-2">
+            <div className="h-full bg-brand-500 rounded-full transition-all duration-300"
+              style={{ width: `${((index + 1) / recipe.steps.length) * 100}%` }} />
+          </div>
+        </header>
+
+        <div className="card p-6">
+          <p className="text-lg text-stone-800 leading-relaxed">{step.instruction}</p>
+          {step.timerSeconds > 0 && <StepTimer key={step.id} seconds={step.timerSeconds} />}
+        </div>
+
+        <div className="flex gap-2">
+          <button className="btn-secondary flex-1" disabled={index === 0} onClick={() => setIndex(index - 1)}>
+            Back
+          </button>
+          <button className="btn-primary flex-1" onClick={() => (isLast ? finish() : setIndex(index + 1))}>
+            {isLast ? <><Check size={16} /> Finish</> : 'Next step'}
+          </button>
+        </div>
+
+        <details className="card p-4">
+          <summary className="text-sm font-semibold text-stone-700 cursor-pointer">Ingredients</summary>
+          <ul className="mt-3 space-y-1">
+            {recipe.components.map((c, i) => (
+              <li key={i} className="flex justify-between text-sm text-stone-600">
+                <span>
+                  {c.kind === 'food'
+                    ? ctx.foods.get(c.foodId)?.names.en ?? c.foodId
+                    : ctx.recipes.get(c.recipeId)?.name.en ?? c.recipeId}
+                </span>
+                <span className="font-mono text-stone-400">
+                  {c.kind === 'food' ? `${Math.round(c.grams)} g` : `${c.servings}×`}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      </div>
+    </div>
+  )
+}
+
+function StepTimer({ seconds }: { seconds: number }) {
+  const [remaining, setRemaining] = useState(seconds)
+  const [running, setRunning] = useState(false)
+
+  useEffect(() => {
+    if (!running || remaining <= 0) return
+    const id = setInterval(() => setRemaining((r) => Math.max(0, r - 1)), 1000)
+    return () => clearInterval(id)
+  }, [running, remaining])
+
+  const finished = remaining === 0
+  const mm = String(Math.floor(remaining / 60)).padStart(2, '0')
+  const ss = String(remaining % 60).padStart(2, '0')
+
+  return (
+    <div className="mt-5 pt-5 border-t border-sand-200 flex items-center gap-4">
+      <span className={`text-3xl font-extrabold font-mono ${finished ? 'text-brand-700' : 'text-stone-800'}`}>
+        {mm}:{ss}
+      </span>
+      <div className="flex gap-2">
+        <button className="btn-secondary btn-icon" onClick={() => setRunning((r) => !r)}
+          disabled={finished} aria-label={running ? 'Pause' : 'Start'}>
+          {running ? <Pause size={16} /> : <Play size={16} />}
+        </button>
+        <button className="btn-ghost btn-icon" onClick={() => { setRemaining(seconds); setRunning(false) }}
+          aria-label="Reset timer">
+          <RotateCcw size={16} />
+        </button>
+      </div>
+      {finished && <span className="text-sm font-semibold text-brand-700">Time's up</span>}
     </div>
   )
 }
