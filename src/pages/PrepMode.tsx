@@ -28,12 +28,12 @@ export default function PrepMode() {
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header>
-          <h1 className="text-2xl font-extrabold text-stone-800">Prep mode</h1>
-          <p className="text-sm text-stone-500">Cook along, one step at a time.</p>
+          <h1 className="text-2xl font-display font-semibold text-stone-700">Let’s cook</h1>
+          <p className="text-sm text-stone-500">One step at a time, timers included.</p>
         </header>
 
         {cookable.length === 0 ? (
-          <EmptyState emoji="👩‍🍳" title="No recipes with a method yet" />
+          <EmptyState title="No recipes with a method yet" />
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {cookable.map((r) => (
@@ -75,9 +75,9 @@ function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void })
       <div className="flex-1 grid place-items-center px-6 pb-24">
         <div className="text-center max-w-sm">
           <div className="text-5xl mb-4">🎉</div>
-          <h2 className="text-xl font-extrabold text-stone-800">{recipe.name.en} is done</h2>
+          <h2 className="text-xl font-display font-semibold text-stone-700">{recipe.name.en} is done</h2>
           <p className="text-sm text-stone-500 mt-1 mb-6">Makes {recipe.servings} servings.</p>
-          <button className="btn-primary w-full" onClick={onExit}>Back to prep mode</button>
+          <button className="btn-primary w-full" onClick={onExit}>Cook something else</button>
         </div>
       </div>
     )

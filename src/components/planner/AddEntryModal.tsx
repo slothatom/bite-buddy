@@ -63,7 +63,7 @@ export default function AddEntryModal({
       >
         <header className="flex items-center justify-between px-5 py-4 border-b border-sand-200">
           <div>
-            <h2 className="font-bold text-stone-800">Add to {SLOT_LABELS[slot]}</h2>
+            <h2 className="font-display font-semibold text-stone-700">Add to {SLOT_LABELS[slot]}</h2>
             <p className="text-xs text-stone-400">{new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
           </div>
           <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
@@ -75,7 +75,7 @@ export default function AddEntryModal({
             <input
               className="input pl-9"
               autoFocus
-              placeholder="Search recipes and foods…"
+              placeholder="What are we having?"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />

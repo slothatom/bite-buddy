@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Macros, MedTier, Nutrients } from '../../types'
+import Mascot, { type MascotMood } from '../brand/Mascot'
 
 /** Shared display pieces. Kept together because each is a handful of lines. */
 
@@ -12,9 +13,16 @@ export function MacroBar({
   unit?: string
   tone?: 'brand' | 'clay' | 'stone'
 }) {
-  const pct = target && target > 0 ? Math.min(1, value / target) : 0
-  const over = target ? value > target * 1.05 : false
-  const fill = over ? 'bg-clay-500' : tone === 'clay' ? 'bg-clay-400' : tone === 'stone' ? 'bg-stone-400' : 'bg-brand-500'
+  const ratio = target && target > 0 ? value / target : 0
+  const pct = Math.min(1, ratio)
+  // Being a little over is normal, not an alarm: it warms to peach first and
+  // only deepens when the day is well past target.
+  const fill =
+    ratio > 1.3 ? 'bg-clay-400'
+    : ratio > 1.05 ? 'bg-clay-300'
+    : tone === 'clay' ? 'bg-butter-400'
+    : tone === 'stone' ? 'bg-brand-300'
+    : 'bg-brand-500'
 
   return (
     <div>
@@ -37,7 +45,7 @@ export function CalorieRing({ value, target, size = 116 }: { value: number; targ
   const pct = target > 0 ? Math.min(1.25, value / target) : 0
   const r = size / 2 - 9
   const circumference = 2 * Math.PI * r
-  const over = pct > 1.05
+  const over = pct > 1.3
 
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
@@ -45,7 +53,7 @@ export function CalorieRing({ value, target, size = 116 }: { value: number; targ
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={9} className="stroke-sand-200" />
         <circle
           cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={9} strokeLinecap="round"
-          className={over ? 'stroke-clay-500' : 'stroke-brand-500'}
+          className={over ? 'stroke-clay-400' : 'stroke-brand-500'}
           strokeDasharray={circumference}
           strokeDashoffset={circumference * (1 - Math.min(1, pct))}
           style={{ transition: 'stroke-dashoffset 600ms ease-out' }}
@@ -82,12 +90,22 @@ export function TierBadge({ tier }: { tier: MedTier }) {
   return <span className={`badge ${className}`}>{label}</span>
 }
 
-export function EmptyState({ emoji, title, children }: { emoji: string; title: string; children?: ReactNode }) {
+export function EmptyState({
+  emoji, title, children, mood = 'sleepy',
+}: {
+  /** Kept for callers that want a specific food icon rather than the mascot. */
+  emoji?: string
+  title: string
+  children?: ReactNode
+  mood?: MascotMood
+}) {
   return (
     <div className="card p-10 text-center">
-      <div className="text-4xl mb-3">{emoji}</div>
-      <p className="font-semibold text-stone-700">{title}</p>
-      {children ? <div className="text-sm text-stone-500 mt-2">{children}</div> : null}
+      {emoji
+        ? <div className="text-4xl mb-3">{emoji}</div>
+        : <Mascot size={72} mood={mood} className="mx-auto mb-3" />}
+      <p className="font-display font-semibold text-stone-700">{title}</p>
+      {children ? <div className="text-sm text-stone-500 mt-1.5">{children}</div> : null}
     </div>
   )
 }
