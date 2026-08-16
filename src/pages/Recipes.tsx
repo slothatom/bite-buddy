@@ -43,9 +43,9 @@ export default function Recipes() {
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header>
-          <h1 className="text-2xl font-extrabold text-stone-800">Recipes</h1>
+          <h1 className="text-2xl font-display font-semibold text-stone-700">Recipes</h1>
           <p className="text-sm text-stone-500">
-            {recipes.length} recipes — every meal from your dietician plans, plus the dishes behind them.
+            Every meal from your dietician plans, plus the dishes behind them — {recipes.length} in all.
           </p>
         </header>
 
@@ -80,8 +80,8 @@ export default function Recipes() {
         </div>
 
         {filtered.length === 0 ? (
-          <EmptyState emoji="🔍" title="Nothing matches that">
-            Try a different word, or clear the filters.
+          <EmptyState title="Nothing matching that just yet">
+            Try another word, or clear the filters.
           </EmptyState>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -149,7 +149,7 @@ function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void
           <div className="flex items-start gap-3 min-w-0">
             <span className="text-2xl leading-none">{recipe.emoji}</span>
             <div className="min-w-0">
-              <h2 className="font-bold text-stone-800 leading-snug">{recipe.name.en}</h2>
+              <h2 className="font-display font-semibold text-stone-700 leading-snug">{recipe.name.en}</h2>
               {recipe.name.ro || recipe.name.hu ? (
                 <p className="text-xs text-stone-400">{[recipe.name.ro, recipe.name.hu].filter(Boolean).join(' · ')}</p>
               ) : null}
@@ -161,7 +161,7 @@ function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void
         <div className="p-5 space-y-5">
           {recipe.sourceLine ? (
             <div className="card-soft p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400 mb-1">As your dietician wrote it</p>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-stone-400 mb-1">How your dietician wrote it</p>
               <p className="text-sm text-stone-600 italic">{recipe.sourceLine}</p>
             </div>
           ) : null}
@@ -180,7 +180,7 @@ function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void
           </div>
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-stone-400 mb-2">What's in it</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-stone-400 mb-2">What goes in</p>
             <ul className="space-y-1">
               {recipe.components.map((c, i) => {
                 const label = c.kind === 'food'
@@ -219,7 +219,7 @@ function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void
           {recipe.steps.length === 0 && (
             <p className="flex items-start gap-2 text-xs text-stone-400">
               <ChefHat size={14} className="shrink-0 mt-0.5" />
-              This meal came straight from a plan, so it has components but no method.
+              This one came straight from a plan, so it lists what goes in but not how.
             </p>
           )}
         </div>

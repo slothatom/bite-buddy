@@ -43,9 +43,9 @@ export default function Foods() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-extrabold text-stone-800">Foods</h1>
+            <h1 className="text-2xl font-display font-semibold text-stone-700">Foods</h1>
             <p className="text-sm text-stone-500">
-              {foods.length} foods with calories and macros per 100 g.
+              Everything the recipes are built from — {foods.length} foods, with calories per 100 g.
             </p>
           </div>
           <button className="btn-primary shrink-0" onClick={() => setAdding(true)}>
@@ -77,8 +77,8 @@ export default function Foods() {
         </div>
 
         {grouped.length === 0 ? (
-          <EmptyState emoji="🥬" title="No foods match that">
-            Try another spelling, or add it yourself.
+          <EmptyState title="No foods matching that">
+            Try another spelling, or add it yourself below.
           </EmptyState>
         ) : (
           grouped.map(([cat, list]) => (
@@ -176,7 +176,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
       <div className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} onClick={(e) => e.stopPropagation()}>
         <header className="flex items-center justify-between px-5 py-4 border-b border-sand-200">
-          <h2 className="font-bold text-stone-800">Add a food</h2>
+          <h2 className="font-display font-semibold text-stone-700">Add a food</h2>
           <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
         </header>
 
@@ -223,7 +223,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                 ))}
                 {!searching && !results.length && (
                   <p className="text-sm text-stone-400 text-center py-4">
-                    Nothing yet — search above, or type the food in by hand.
+                    Nothing yet — search above, or just type it in by hand.
                   </p>
                 )}
               </div>

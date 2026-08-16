@@ -1,4 +1,6 @@
-# 🫒 Bite Buddy
+# 🥣 Bite Buddy
+
+*Your cosy kitchen.*
 
 A meal planner built around one person's actual dietician plans and the Mediterranean diet.
 
@@ -30,6 +32,33 @@ Three things about that source data shape the whole app:
   configurable in Settings.
 
 The dietician never wrote a single calorie. Supplying them is what this app adds.
+
+---
+
+## Look and feel
+
+The app is meant to feel like a kitchen notebook, not an analytics dashboard.
+
+**Mascot.** A little bowl with a face, drawn inline as SVG in
+`src/components/brand/Mascot.tsx` so it inherits theme colours and stays crisp
+from 28px in the sidebar to 96px in an empty state. It has three moods —
+`happy`, `sleepy` and `oops` — covering the three things the app has to say:
+all is well, there's nothing here yet, and something went wrong.
+
+**Palette.** Cream ground rather than grey, a muted sage as the primary, peach
+for warmth, plus butter and berry accents. Defined as tokens in `src/index.css`
+under Tailwind 4's `@theme`.
+
+**Type.** Nunito throughout for its rounded terminals, with Fredoka reserved for
+the wordmark and page titles. Both are **bundled**, not fetched from a CDN, so
+the app looks identical offline — which also cut the end-to-end suite from
+5.4 minutes to 24 seconds, since the tests no longer wait on font requests.
+
+**Shape.** Pill buttons, 24px card corners, and soft warm-toned shadows instead
+of grey ones.
+
+**Tone.** Going a little over target warms the bar to peach and only deepens
+past 130% — a normal day should never look like an alarm.
 
 ---
 

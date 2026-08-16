@@ -62,9 +62,9 @@ export default function Planner() {
         {/* Week navigation */}
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-extrabold text-stone-800">Planner</h1>
+            <h1 className="text-2xl font-display font-semibold text-stone-700">Your week</h1>
             <p className="text-sm text-stone-500">
-              {formatRange(weekDates)} · {plannedDays}/7 days planned
+              {formatRange(weekDates)} · {plannedDays} of 7 days planned
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -130,7 +130,7 @@ export default function Planner() {
               <Copy size={15} /> Copy day to…
             </button>
             {selectedDay.meals.length > 0 && (
-              <button className="btn-ghost text-clay-600" onClick={() => clearDay(selected)}>
+              <button className="btn-ghost text-stone-400 hover:text-clay-600" onClick={() => clearDay(selected)}>
                 <Trash2 size={15} /> Clear day
               </button>
             )}
@@ -157,11 +157,11 @@ export default function Planner() {
         <section className="card-soft p-4 flex items-center gap-3 text-sm text-stone-600">
           <CalendarDays size={18} className="text-stone-400 shrink-0" />
           <span>
-            This week averages{' '}
+            A cosy{' '}
             <strong className="font-mono">
               {plannedDays ? Math.round(weekTotal.calories / plannedDays) : 0}
             </strong>{' '}
-            kcal across {plannedDays} planned {plannedDays === 1 ? 'day' : 'days'}.
+            kcal a day on average, across {plannedDays} planned {plannedDays === 1 ? 'day' : 'days'}.
           </span>
         </section>
       </div>
@@ -208,7 +208,7 @@ function SlotRow({
 
       {meals.length === 0 ? (
         <button onClick={onAdd} className="meal-slot w-full text-sm text-stone-400 hover:text-brand-700">
-          <Plus size={16} className="mr-1" /> Add something
+          <Plus size={16} className="mr-1" /> Pop something in
         </button>
       ) : (
         <div className="space-y-1.5">

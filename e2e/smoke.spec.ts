@@ -92,7 +92,7 @@ test.describe('the main flow', () => {
     await expect(page.getByRole('button', { name: /Loaded/ })).toBeVisible()
 
     await goto(page, '/')
-    await expect(page.getByText('7/7 days planned')).toBeVisible()
+    await expect(page.getByText('7 of 7 days planned')).toBeVisible()
 
     // 3. The day's calories are real numbers, not zero or NaN.
     const kcal = await page.locator('text=/of \\d+ kcal/').first().textContent()
@@ -115,7 +115,7 @@ test.describe('the main flow', () => {
     // Searching a Romanian word finds meals written in Romanian.
     const first = page.locator('.card button').nth(1)
     await first.click()
-    await expect(page.getByText('As your dietician wrote it')).toBeVisible()
+    await expect(page.getByText('How your dietician wrote it')).toBeVisible()
   })
 
   test('targets can be taken from the plan history', async ({ page }) => {
@@ -139,7 +139,7 @@ test.describe('resilience', () => {
 
     // Unreadable or future-versioned state must fall back to defaults rather
     // than being interpreted under the wrong assumptions.
-    await expect(page.getByRole('heading', { name: 'Planner' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Your week' })).toBeVisible()
     expect(errors).toEqual([])
   })
 })
