@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import Mascot from '../brand/Mascot'
 
 /**
  * Stops one broken screen from taking down the whole app.
@@ -32,10 +33,10 @@ export default class ErrorBoundary extends Component<Props, State> {
     return (
       <div className="min-h-screen grid place-items-center bg-sand-50 px-6 py-10">
         <div className="card p-6 max-w-md w-full text-center">
-          <div className="text-4xl mb-3">🫗</div>
-          <h1 className="text-lg font-extrabold text-stone-800">Something spilled</h1>
+          <Mascot size={80} mood="oops" className="mx-auto mb-3" />
+          <h1 className="text-lg font-display font-semibold text-stone-700">Oops — something spilled</h1>
           <p className="text-sm text-stone-500 mt-1">
-            This screen hit an error. Your saved data is untouched.
+            This screen tripped over itself. Your recipes and plans are safe.
           </p>
 
           <pre className="mt-4 text-left text-[11px] font-mono text-stone-500 bg-sand-100 rounded-xl p-3 overflow-x-auto max-h-32">

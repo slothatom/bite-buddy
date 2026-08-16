@@ -17,8 +17,8 @@ export default function Analytics() {
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header>
-          <h1 className="text-2xl font-extrabold text-stone-800">Progress</h1>
-          <p className="text-sm text-stone-500">How the planned week measures up.</p>
+          <h1 className="text-2xl font-display font-semibold text-stone-700">Progress</h1>
+          <p className="text-sm text-stone-500">How your week is shaping up.</p>
         </header>
 
         <div className="flex gap-1 p-1 bg-sand-100 rounded-xl w-fit">
@@ -48,8 +48,8 @@ function WeekTab() {
   const peak = Math.max(profile.targets.calories, ...days.map((d) => d.n.calories), 1)
 
   if (!planned.length) {
-    return <EmptyState emoji="📊" title="Nothing planned this week">
-      Add meals in the planner and the numbers will show up here.
+    return <EmptyState title="Nothing planned yet this week">
+      Add a few meals and the numbers will appear here.
     </EmptyState>
   }
 
@@ -73,14 +73,14 @@ function WeekTab() {
           <div className="flex items-end gap-2 h-40">
             {days.map((d) => {
               const height = (d.n.calories / peak) * 100
-              const over = d.n.calories > profile.targets.calories * 1.05
+              const over = d.n.calories > profile.targets.calories * 1.3
               return (
                 <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
                   <span className="text-[10px] font-mono text-stone-400">
                     {d.n.calories > 0 ? Math.round(d.n.calories) : ''}
                   </span>
                   <div
-                    className={`w-full rounded-t-md transition-all duration-500 ${over ? 'bg-clay-400' : 'bg-brand-400'}`}
+                    className={`w-full rounded-t-xl transition-all duration-500 ${over ? 'bg-clay-300' : 'bg-brand-400'}`}
                     style={{ height: `${Math.max(height, d.n.calories > 0 ? 4 : 0)}%` }}
                   />
                   <span className="text-[10px] text-stone-400">
@@ -107,8 +107,8 @@ function MediterraneanTab() {
   const planned = plan.filter((d) => d.meals.length).length
 
   if (!planned) {
-    return <EmptyState emoji="🫒" title="Nothing planned this week">
-      The Mediterranean serving goals need a planned week to score against.
+    return <EmptyState title="Nothing to score yet">
+      The Mediterranean serving goals need a planned week to measure against.
     </EmptyState>
   }
 
@@ -187,7 +187,7 @@ function BodyTab() {
       </div>
 
       {sorted.length === 0 ? (
-        <EmptyState emoji="⚖️" title="No weight logged yet" />
+        <EmptyState title="No weight logged yet" />
       ) : (
         <>
           <div className="card p-5">

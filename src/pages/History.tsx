@@ -28,10 +28,10 @@ export default function History() {
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header>
-          <h1 className="text-2xl font-extrabold text-stone-800">Plan history</h1>
+          <h1 className="text-2xl font-display font-semibold text-stone-700">Plan history</h1>
           <p className="text-sm text-stone-500">
             {plans.length} weeks from your dietician, {plans.reduce((a, p) => a + p.days.length, 0)} days in all.
-            Load any week into the planner.
+            Drop any week straight into your planner.
           </p>
         </header>
 

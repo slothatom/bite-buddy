@@ -23,8 +23,8 @@ export default function Schedule() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-extrabold text-stone-800">Cook schedule</h1>
-            <p className="text-sm text-stone-500">When you're actually cooking, and what.</p>
+            <h1 className="text-2xl font-display font-semibold text-stone-700">Cook schedule</h1>
+            <p className="text-sm text-stone-500">When you’re cooking, and what’s going in the pot.</p>
           </div>
           <button className="btn-primary shrink-0" onClick={() => setAdding(true)}>
             <Plus size={16} /> Session
@@ -32,8 +32,8 @@ export default function Schedule() {
         </header>
 
         {sessions.length === 0 ? (
-          <EmptyState emoji="🍳" title="No cook sessions planned">
-            Schedule one and pick the dishes you'll batch together.
+          <EmptyState title="No cook sessions planned">
+            Add one and pick the dishes you'll batch together.
           </EmptyState>
         ) : (
           <div className="space-y-2.5">
@@ -104,7 +104,7 @@ function SessionDialog({
       <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl p-5 space-y-4"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}>
-        <h2 className="font-bold text-stone-800">New cook session</h2>
+        <h2 className="font-display font-semibold text-stone-700">New cook session</h2>
 
         <div>
           <label className="label">What is it for</label>

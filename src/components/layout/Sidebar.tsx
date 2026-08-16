@@ -4,6 +4,7 @@ import {
   CalendarClock, BarChart2, History, Settings as SettingsIcon, Flame,
 } from 'lucide-react'
 import { useUserStore } from '../../store/useUserStore'
+import { Wordmark } from '../brand/Mascot'
 
 const NAV = [
   { to: '/',           label: 'Planner',   icon: CalendarDays },
@@ -23,15 +24,9 @@ export default function Sidebar() {
   const progress = xpProgress()
 
   return (
-    <aside className="hidden md:flex w-56 min-h-screen bg-white border-r border-sand-200 flex-col shrink-0">
+    <aside className="hidden md:flex w-56 min-h-screen bg-sand-100/70 border-r border-sand-200 flex-col shrink-0">
       <div className="px-4 py-4 border-b border-sand-200">
-        <div className="flex items-center gap-2.5">
-          <span className="text-2xl">🫒</span>
-          <div>
-            <p className="font-extrabold text-stone-800 text-base leading-none">Bite Buddy</p>
-            <p className="text-[11px] text-stone-400 font-medium">Mediterranean kitchen</p>
-          </div>
-        </div>
+        <Wordmark />
       </div>
 
       <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
@@ -47,7 +42,7 @@ export default function Sidebar() {
       </nav>
 
       {profile.showGamification && (
-        <div className="mx-3 mb-3 p-3 rounded-xl bg-sand-100 border border-sand-200">
+        <div className="mx-3 mb-3 p-3 rounded-2xl bg-white border border-sand-200">
           <div className="flex items-center justify-between mb-2">
             <div className="min-w-0">
               <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide">

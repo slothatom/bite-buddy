@@ -43,11 +43,11 @@ export default function GroceryList() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-extrabold text-stone-800">Grocery list</h1>
+            <h1 className="text-2xl font-display font-semibold text-stone-700">Shopping list</h1>
             <p className="text-sm text-stone-500">
               {groceryItems.length
                 ? `${checked} of ${groceryItems.length} picked up`
-                : `Built from the ${plannedMeals} meals in this week's planner.`}
+                : `Ready to build from the ${plannedMeals} meals in your week.`}
             </p>
           </div>
           <button className="btn-primary shrink-0" onClick={build}>
@@ -74,9 +74,9 @@ export default function GroceryList() {
         )}
 
         {groceryItems.length === 0 ? (
-          <EmptyState emoji="🧺" title="Nothing on the list yet">
+          <EmptyState title="Nothing on the list yet">
             {plannedMeals
-              ? 'Build the list from this week’s planner.'
+              ? 'Build it from this weekâs meals whenever you’re ready.'
               : 'Plan some meals first, then build the list from them.'}
           </EmptyState>
         ) : (
@@ -112,7 +112,7 @@ export default function GroceryList() {
         {groceryItems.length > 0 && (
           <p className="flex items-start gap-2 text-xs text-stone-400">
             <ShoppingBasket size={14} className="shrink-0 mt-0.5" />
-            Weights are raw and unprepared, the way your plans are written — grains and meat before cooking.
+            Weights are raw, the way your plans are written — grains and meat before cooking.
           </p>
         )}
       </div>

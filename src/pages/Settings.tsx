@@ -29,8 +29,8 @@ export default function Settings() {
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-8">
         <header>
-          <h1 className="text-2xl font-extrabold text-stone-800">Settings</h1>
-          <p className="text-sm text-stone-500">Targets, week shape and data.</p>
+          <h1 className="text-2xl font-display font-semibold text-stone-700">Settings</h1>
+          <p className="text-sm text-stone-500">Targets, the shape of your week, and your data.</p>
         </header>
 
         {/* ─── Targets ─────────────────────────────────────────────────────── */}
