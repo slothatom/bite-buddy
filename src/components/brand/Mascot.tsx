@@ -1,9 +1,14 @@
+import { useId } from 'react'
+
 /**
- * Bite Buddy's mascot: a little bowl with a face.
+ * Bite Buddy's mark: a big cheeky bite taken out of the logo itself.
+ *
+ * It draws the name rather than illustrating food, which is why it isn't a bowl
+ * or a plate — those say "meal app", the chomp says *Bite* Buddy. It is one
+ * silhouette with a heavy outline, so it survives being shrunk to a favicon.
  *
  * Drawn inline rather than shipped as an image so it inherits the theme colours
- * and scales cleanly at any size — it appears at 28px in the sidebar and at
- * 96px in empty states.
+ * and scales cleanly at any size — 30px in the sidebar, 96px in an empty state.
  *
  * `mood` covers the three moments the app has to say something: everything is
  * fine, there is nothing here yet, and something went wrong.
@@ -19,6 +24,12 @@ export default function Mascot({
   mood?: MascotMood
   className?: string
 }) {
+  // Ids must be unique per instance, or a second copy on the page reuses the
+  // first one's masks.
+  const uid = useId().replace(/:/g, '')
+  const outerMask = `chomp-outer-${uid}`
+  const innerMask = `chomp-inner-${uid}`
+
   return (
     <svg
       width={size}
@@ -29,63 +40,75 @@ export default function Mascot({
       role="img"
       aria-label="Bite Buddy"
     >
-      {/* Steam — only when there is something in the bowl to steam. */}
-      {mood === 'happy' && (
-        <g className="text-brand-300" fill="none" strokeWidth="2.4" strokeLinecap="round">
-          <path d="M24 18c3-2 3-4 0-6s-3-4 0-5" stroke="currentColor" />
-          <path d="M32 18c3-2.5 3-5 0-7.5s-3-5 0-6.5" stroke="currentColor" />
-          <path d="M40 18c3-2 3-4 0-6s-3-4 0-5" stroke="currentColor" />
-        </g>
-      )}
+      {/*
+        The bite is cut twice, from two concentric copies: the dark body takes a
+        smaller cut than the coloured body, so the bitten edge keeps the same
+        outline weight as the rest of the mark. Masking a single stroked circle
+        would leave the bite raw and unoutlined.
+      */}
+      <mask id={outerMask} maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+        <rect width="64" height="64" fill="#fff" />
+        <circle cx="49" cy="15" r="9" fill="#000" />
+        <circle cx="56" cy="26" r="7" fill="#000" />
+        <circle cx="39" cy="8" r="7" fill="#000" />
+      </mask>
+      <mask id={innerMask} maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+        <rect width="64" height="64" fill="#fff" />
+        <circle cx="49" cy="15" r="11.6" fill="#000" />
+        <circle cx="56" cy="26" r="9.6" fill="#000" />
+        <circle cx="39" cy="8" r="9.6" fill="#000" />
+      </mask>
 
-      {/* Contents, peeking over the rim. */}
-      <circle cx="24" cy="30" r="5" className="text-clay-300" fill="currentColor" />
-      <circle cx="33" cy="28" r="6" className="text-butter-300" fill="currentColor" />
-      <circle cx="42" cy="30" r="5" className="text-brand-300" fill="currentColor" />
-
-      {/* The bowl. */}
+      {/* Leaf, tucked behind the body so the outline reads as one shape. */}
       <path
-        d="M8 32h48c0 13.255-10.745 22-24 22S8 45.255 8 32Z"
-        className="text-brand-500"
+        d="M25 11c-1.5-5-5.5-8-11-8 1 5.5 5 8.5 11 8Z"
+        className="text-brand-400"
         fill="currentColor"
+        stroke="var(--color-ink)"
+        strokeWidth="2.8"
+        strokeLinejoin="round"
       />
-      {/* Rim highlight, so the bowl reads as ceramic rather than flat. */}
-      <path d="M8 32h48" className="text-brand-600" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
 
-      {/* Face. */}
+      <g mask={`url(#${outerMask})`}>
+        <circle cx="31" cy="34" r="26" fill="var(--color-ink)" />
+      </g>
+      <g mask={`url(#${innerMask})`}>
+        <circle cx="31" cy="34" r="23.4" className="text-clay-500" fill="currentColor" />
+      </g>
+
+      {/* Blush sits under the face so the eyes stay crisp over it. */}
+      <ellipse cx="17" cy="41" rx="4.2" ry="3" className="text-clay-200" fill="currentColor" />
+
       {mood === 'sleepy' ? (
-        <>
-          <path d="M22 40.5c1.6 1.6 4.2 1.6 5.8 0" className="text-brand-800" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M36.2 40.5c1.6 1.6 4.2 1.6 5.8 0" className="text-brand-800" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-        </>
+        <g stroke="var(--color-ink)" strokeWidth="3" strokeLinecap="round">
+          <path d="M20 32c1.8 2.2 4.6 2.2 6.4 0" />
+          <path d="M36.6 32c1.8 2.2 4.6 2.2 6.4 0" />
+        </g>
       ) : (
         <>
-          <circle cx="25" cy="41" r="2.6" className="text-brand-800" fill="currentColor" />
-          <circle cx="39" cy="41" r="2.6" className="text-brand-800" fill="currentColor" />
+          <circle cx="24" cy="32" r="4.1" fill="var(--color-ink)" />
+          <circle cx="40" cy="32" r="4.1" fill="var(--color-ink)" />
+          <circle cx="25.5" cy="30.4" r="1.5" fill="#fff" />
+          <circle cx="41.5" cy="30.4" r="1.5" fill="#fff" />
         </>
       )}
 
       {mood === 'oops' ? (
-        <ellipse cx="32" cy="47" rx="3" ry="2.4" className="text-brand-800" fill="currentColor" />
+        <ellipse cx="31" cy="44" rx="3.4" ry="2.8" fill="var(--color-ink)" />
       ) : (
         <path
-          d="M28 46.5c1.2 1.4 2.6 2.1 4 2.1s2.8-.7 4-2.1"
-          className="text-brand-800"
-          stroke="currentColor"
-          strokeWidth="2.4"
+          d={mood === 'sleepy' ? 'M26 43c1.5 2 3.3 3 5 3s3.5-1 5-3' : 'M23 42c2.3 3.5 5.3 5.2 9 5.2s6.7-1.7 9-5.2'}
+          stroke="var(--color-ink)"
+          strokeWidth="3.3"
           strokeLinecap="round"
         />
       )}
-
-      {/* Cheeks. */}
-      <ellipse cx="19.5" cy="45" rx="3.2" ry="2.4" className="text-clay-300" fill="currentColor" />
-      <ellipse cx="44.5" cy="45" rx="3.2" ry="2.4" className="text-clay-300" fill="currentColor" />
     </svg>
   )
 }
 
-/** The wordmark: mascot plus name, used in the sidebar and on the install screen. */
-export function Wordmark({ size = 30 }: { size?: number }) {
+/** The wordmark: mark plus name, used in the sidebar and on the install screen. */
+export function Wordmark({ size = 34 }: { size?: number }) {
   return (
     <span className="flex items-center gap-2.5">
       <Mascot size={size} />
