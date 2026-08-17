@@ -46,9 +46,11 @@ export default defineConfig({
   ],
 
   // Tests run against the production build, so the checks cover what actually
-  // ships rather than the dev server's output.
+  // ships rather than the dev server's output. The build is part of the server
+  // command deliberately: `preview` serves whatever is in dist/, so without it
+  // a local run happily passes against a bundle that predates your changes.
   webServer: {
-    command: 'npm run preview -- --port 4173 --strictPort',
+    command: 'npm run build && npm run preview -- --port 4173 --strictPort',
     url: 'http://localhost:4173/bite-buddy/',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

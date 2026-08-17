@@ -60,9 +60,8 @@ jobs:
       - name: Install browser
         run: npx playwright install --with-deps chromium
 
-      - name: Build
-        run: npm run build
-
+      # The Playwright config builds before serving, so there is no separate
+      # build step here — one build, and it is the one under test.
       - name: End-to-end tests
         run: npm run test:e2e
 

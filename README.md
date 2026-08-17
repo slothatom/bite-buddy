@@ -97,6 +97,13 @@ verbatim. Load any week straight into the planner.
 Built from the planned week, resolving nested recipes down to what you actually buy, merged by
 food and grouped by category. Weights are raw, matching how the plans are written.
 
+### Backup
+Settings → Your data. Download or copy everything you've entered as one JSON file, and restore
+it from a file or a paste. There's no account behind the app, so this is the only copy that
+survives clearing browser data, switching phone, or a browser that won't let the page save at
+all. A backup from a different `SCHEMA_VERSION` is refused rather than merged into a shape it
+no longer fits.
+
 ### Progress
 Weekly calories against target, Mediterranean serving goals (≥3 veg/day, ≥3 legumes/week…),
 and a weight log.
@@ -275,7 +282,10 @@ work from regressing.
 throwing. A full or blocked localStorage shows a banner rather than losing data
 quietly, and corrupt JSON falls back to defaults. Every store is schema-versioned:
 bump `SCHEMA_VERSION` in `src/store/persist.ts` when a persisted shape changes
-and old state is discarded rather than misread.
+and old state is discarded rather than misread. Backups are read from the live
+stores, not from localStorage, so the case where storage never worked is still
+recoverable — and an end-to-end test wipes storage and restores from a paste to
+prove it.
 
 **Error boundary** — a render error shows a recovery screen with the message,
 not a blank white page. On a phone with no console, those are indistinguishable.
