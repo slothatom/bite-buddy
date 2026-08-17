@@ -127,6 +127,54 @@ test.describe('the main flow', () => {
   })
 })
 
+test.describe('your data survives the browser', () => {
+  test.use({ permissions: ['clipboard-read', 'clipboard-write'] })
+
+  test('a backup can be taken out and brought back', async ({ page }) => {
+    // Nothing here syncs anywhere, so a backup is the only copy of a planned
+    // week that outlives the browser storage it was written to.
+    await goto(page, '/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/')
+    await expect(page.getByText('7 of 7 days planned')).toBeVisible()
+
+    await goto(page, '/settings')
+    await page.getByRole('button', { name: 'Copy backup' }).click()
+    const backup = await page.evaluate(() => navigator.clipboard.readText())
+    expect(backup).toContain('bite-buddy-mealplan-v2')
+
+    // Lose everything, the way clearing site data would.
+    await page.evaluate(() => localStorage.clear())
+    await page.reload()
+    await goto(page, '/')
+    await expect(page.getByText('0 of 7 days planned')).toBeVisible()
+
+    await goto(page, '/settings')
+    await page.getByRole('button', { name: 'Paste a backup' }).click()
+    await page.getByPlaceholder(/Paste the contents/).fill(backup)
+    await page.getByRole('button', { name: 'Restore', exact: true }).click()
+    await expect(page.getByText(/Restored \d+ of/)).toBeVisible()
+
+    await goto(page, '/')
+    await expect(page.getByText('7 of 7 days planned')).toBeVisible()
+  })
+
+  test('a file from another version is refused, not half-applied', async ({ page }) => {
+    await goto(page, '/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    await goto(page, '/settings')
+    await page.getByRole('button', { name: 'Paste a backup' }).click()
+    await page.getByPlaceholder(/Paste the contents/)
+      .fill('{"app":"bite-buddy","schema":99,"stores":{"bite-buddy-mealplan-v2":{"plan":[]}}}')
+    await page.getByRole('button', { name: 'Restore', exact: true }).click()
+
+    await expect(page.getByText(/left alone/)).toBeVisible()
+    await goto(page, '/')
+    await expect(page.getByText('7 of 7 days planned')).toBeVisible()
+  })
+})
+
 test.describe('resilience', () => {
   test('starts cleanly when stored data is corrupt', async ({ page }) => {
     const errors = trackErrors(page)

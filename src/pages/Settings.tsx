@@ -1,11 +1,16 @@
 import { useMemo, useState } from 'react'
-import { Sparkles, Calculator, Pencil, Upload, Check } from 'lucide-react'
+import {
+  Sparkles, Calculator, Pencil, Upload, Check,
+  Download, ClipboardCopy, ClipboardPaste,
+} from 'lucide-react'
 import type { ActivityLevel, Goal, Sex, Targets, WeekStart } from '../types'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { SOURCE_PLANS } from '../data'
 import { ACTIVITY_LABELS, averagePlanDay, fromPlans, fromTdee, totalDailyEnergy } from '../lib/targets'
-import { parseMfpCsv, type MfpDiaryEntry } from '../lib/mfp'
+import { copyToClipboard, parseMfpCsv, type MfpDiaryEntry } from '../lib/mfp'
+import { backupFilename, createBackup, restoreBackup } from '../lib/backup'
+import { saveTextFile } from '../lib/download'
 import { SectionHeading } from '../components/ui'
 
 const WEEKDAYS: { value: WeekStart; label: string }[] = [
@@ -211,7 +216,125 @@ export default function Settings() {
           <SectionHeading>MyFitnessPal</SectionHeading>
           <MfpImport />
         </section>
+
+        {/* ─── Backup ──────────────────────────────────────────────────────── */}
+        <section>
+          <SectionHeading>Your data</SectionHeading>
+          <BackupPanel />
+        </section>
       </div>
+    </div>
+  )
+}
+
+/**
+ * Backup and restore.
+ *
+ * Deliberately offers three ways out and two ways back in, because the
+ * situations where you most need a backup are the ones where the browser is
+ * restricting something: a download that never lands, a clipboard that is
+ * blocked, a file picker that isn't offered. At least one path works
+ * everywhere the app runs.
+ */
+function BackupPanel() {
+  const [status, setStatus] = useState<{ tone: 'ok' | 'bad'; message: string } | null>(null)
+  const [pasted, setPasted] = useState('')
+  const [showPaste, setShowPaste] = useState(false)
+
+  const backupText = () => JSON.stringify(createBackup(), null, 2)
+
+  async function onDownload() {
+    const outcome = await saveTextFile(backupFilename(), backupText())
+    setStatus(
+      outcome === 'saved' ? { tone: 'ok', message: 'Backup saved.' }
+      : outcome === 'declined' ? { tone: 'bad', message: 'Save cancelled.' }
+      : { tone: 'bad', message: "This browser wouldn't save the file. Use Copy backup instead and paste it somewhere safe." },
+    )
+  }
+
+  async function onCopy() {
+    const ok = await copyToClipboard(backupText())
+    setStatus(ok
+      ? { tone: 'ok', message: 'Backup copied. Paste it into a note or a message to yourself.' }
+      : { tone: 'bad', message: "This browser blocked the clipboard. Try Download backup instead." })
+  }
+
+  function onRestore(text: string) {
+    const result = restoreBackup(text)
+    if (!result.ok) {
+      setStatus({ tone: 'bad', message: result.error })
+      return
+    }
+    setPasted('')
+    setShowPaste(false)
+    setStatus({
+      tone: 'ok',
+      message: `Restored ${result.restored.length} of your ${result.restored.length + result.skipped.length} saved sections.`,
+    })
+  }
+
+  return (
+    <div className="card p-4 space-y-4">
+      <p className="text-sm text-ink-700">
+        Everything you plan, log and add lives in this browser and nowhere else — there's no
+        account behind it. A backup is the only copy that survives clearing your browser data,
+        switching phone, or a browser that won't let this page save anything at all.
+      </p>
+
+      <div className="space-y-2">
+        <p className="label">Save a copy</p>
+        <div className="flex flex-wrap gap-2">
+          <button className="btn-primary" onClick={() => void onDownload()}>
+            <Download size={15} /> Download backup
+          </button>
+          <button className="btn-secondary" onClick={() => void onCopy()}>
+            <ClipboardCopy size={15} /> Copy backup
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <p className="label">Bring one back</p>
+        <div className="flex flex-wrap gap-2">
+          <label className="btn-secondary cursor-pointer">
+            <Upload size={15} /> Restore from file
+            <input
+              type="file" accept=".json,application/json" className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) void file.text().then(onRestore)
+                e.target.value = ''
+              }}
+            />
+          </label>
+          <button className="btn-secondary" onClick={() => setShowPaste((v) => !v)}>
+            <ClipboardPaste size={15} /> Paste a backup
+          </button>
+        </div>
+
+        {showPaste && (
+          <div className="space-y-2 pt-1">
+            <textarea
+              className="input h-28 font-mono text-xs"
+              placeholder="Paste the contents of a backup here…"
+              value={pasted}
+              onChange={(e) => setPasted(e.target.value)}
+            />
+            <button className="btn-primary" disabled={!pasted.trim()} onClick={() => onRestore(pasted)}>
+              Restore
+            </button>
+          </div>
+        )}
+        <p className="text-xs text-ink-500">
+          Restoring replaces what's currently in the app. Save a copy first if you're unsure.
+        </p>
+      </div>
+
+      {status && (
+        <p className={`text-sm ${status.tone === 'ok' ? 'text-bite-700' : 'text-coral-600'}`}>
+          {status.message}
+        </p>
+      )}
     </div>
   )
 }
