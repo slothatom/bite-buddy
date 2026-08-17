@@ -24,8 +24,8 @@ export default function Sidebar() {
   const progress = xpProgress()
 
   return (
-    <aside className="hidden md:flex w-56 min-h-screen bg-sand-100/70 border-r border-sand-200 flex-col shrink-0">
-      <div className="px-4 py-4 border-b border-sand-200">
+    <aside className="hidden md:flex w-56 min-h-screen bg-cream-50 border-r border-border-200 flex-col shrink-0">
+      <div className="px-4 py-4 border-b border-border-200">
         <Wordmark />
       </div>
 
@@ -42,16 +42,16 @@ export default function Sidebar() {
       </nav>
 
       {profile.showGamification && (
-        <div className="mx-3 mb-3 p-3 rounded-2xl bg-white border border-sand-200">
+        <div className="mx-3 mb-3 p-3 rounded-2xl bg-white border border-border-200">
           <div className="flex items-center justify-between mb-2">
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-wide">
+              <p className="text-[10px] font-semibold text-ink-500 uppercase tracking-wide">
                 Level {profile.level}
               </p>
-              <p className="font-bold text-stone-800 text-sm truncate">{profile.name}</p>
+              <p className="font-bold text-ink-900 text-sm truncate">{profile.name}</p>
             </div>
             {profile.streak > 0 && (
-              <span className="badge bg-clay-100 text-clay-700 shrink-0">
+              <span className="badge bg-coral-100 text-coral-700 shrink-0">
                 <Flame size={11} /> {profile.streak}
               </span>
             )}

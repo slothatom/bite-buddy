@@ -28,8 +28,8 @@ export default function PrepMode() {
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header>
-          <h1 className="text-2xl font-display font-semibold text-stone-700">Let’s cook</h1>
-          <p className="text-sm text-stone-500">One step at a time, timers included.</p>
+          <h1 className="display text-xl sm:text-2xl text-ink-900">Let’s cook</h1>
+          <p className="text-sm text-ink-700">One step at a time, timers included.</p>
         </header>
 
         {cookable.length === 0 ? (
@@ -38,11 +38,11 @@ export default function PrepMode() {
           <div className="grid gap-3 sm:grid-cols-2">
             {cookable.map((r) => (
               <button key={r.id} onClick={() => setActive(r)}
-                className="card p-4 text-left hover:border-brand-300 transition-colors flex items-center gap-3">
+                className="card p-4 text-left hover:border-bite-300 transition-colors flex items-center gap-3">
                 <span className="text-2xl">{r.emoji}</span>
                 <span className="flex-1 min-w-0">
-                  <span className="block font-semibold text-stone-800 text-sm">{r.name.en}</span>
-                  <span className="block text-xs text-stone-400">
+                  <span className="block font-semibold text-ink-900 text-sm">{r.name.en}</span>
+                  <span className="block text-xs text-ink-500">
                     {r.steps.length} steps · {r.prepMinutes + r.cookMinutes} min
                   </span>
                 </span>
@@ -75,8 +75,8 @@ function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void })
       <div className="flex-1 grid place-items-center px-6 pb-24">
         <div className="text-center max-w-sm">
           <div className="text-5xl mb-4">🎉</div>
-          <h2 className="text-xl font-display font-semibold text-stone-700">{recipe.name.en} is done</h2>
-          <p className="text-sm text-stone-500 mt-1 mb-6">Makes {recipe.servings} servings.</p>
+          <h2 className="display text-lg text-ink-900">{recipe.name.en} is done</h2>
+          <p className="text-sm text-ink-700 mt-1 mb-6">Makes {recipe.servings} servings.</p>
           <button className="btn-primary w-full" onClick={onExit}>Cook something else</button>
         </div>
       </div>
@@ -89,16 +89,16 @@ function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void })
         <button className="btn-ghost -ml-2" onClick={onExit}><ChevronLeft size={16} /> All recipes</button>
 
         <header>
-          <h1 className="text-xl font-extrabold text-stone-800">{recipe.emoji} {recipe.name.en}</h1>
-          <p className="text-sm text-stone-500">Step {index + 1} of {recipe.steps.length}</p>
-          <div className="h-1.5 rounded-full bg-sand-200 overflow-hidden mt-2">
-            <div className="h-full bg-brand-500 rounded-full transition-all duration-300"
+          <h1 className="text-xl font-extrabold text-ink-900">{recipe.emoji} {recipe.name.en}</h1>
+          <p className="text-sm text-ink-700">Step {index + 1} of {recipe.steps.length}</p>
+          <div className="h-1.5 rounded-full bg-border-100 overflow-hidden mt-2">
+            <div className="h-full bg-teal-500 rounded-full transition-all duration-300"
               style={{ width: `${((index + 1) / recipe.steps.length) * 100}%` }} />
           </div>
         </header>
 
         <div className="card p-6">
-          <p className="text-lg text-stone-800 leading-relaxed">{step.instruction}</p>
+          <p className="text-lg text-ink-900 leading-relaxed">{step.instruction}</p>
           {step.timerSeconds > 0 && <StepTimer key={step.id} seconds={step.timerSeconds} />}
         </div>
 
@@ -112,16 +112,16 @@ function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void })
         </div>
 
         <details className="card p-4">
-          <summary className="text-sm font-semibold text-stone-700 cursor-pointer">Ingredients</summary>
+          <summary className="text-sm font-semibold text-ink-900 cursor-pointer">Ingredients</summary>
           <ul className="mt-3 space-y-1">
             {recipe.components.map((c, i) => (
-              <li key={i} className="flex justify-between text-sm text-stone-600">
+              <li key={i} className="flex justify-between text-sm text-ink-700">
                 <span>
                   {c.kind === 'food'
                     ? ctx.foods.get(c.foodId)?.names.en ?? c.foodId
                     : ctx.recipes.get(c.recipeId)?.name.en ?? c.recipeId}
                 </span>
-                <span className="font-mono text-stone-400">
+                <span className="font-mono text-ink-500">
                   {c.kind === 'food' ? `${Math.round(c.grams)} g` : `${c.servings}×`}
                 </span>
               </li>
@@ -148,8 +148,8 @@ function StepTimer({ seconds }: { seconds: number }) {
   const ss = String(remaining % 60).padStart(2, '0')
 
   return (
-    <div className="mt-5 pt-5 border-t border-sand-200 flex items-center gap-4">
-      <span className={`text-3xl font-extrabold font-mono ${finished ? 'text-brand-700' : 'text-stone-800'}`}>
+    <div className="mt-5 pt-5 border-t border-border-200 flex items-center gap-4">
+      <span className={`text-3xl font-extrabold font-mono ${finished ? 'text-bite-700' : 'text-ink-900'}`}>
         {mm}:{ss}
       </span>
       <div className="flex gap-2">
@@ -162,7 +162,7 @@ function StepTimer({ seconds }: { seconds: number }) {
           <RotateCcw size={16} />
         </button>
       </div>
-      {finished && <span className="text-sm font-semibold text-brand-700">Time's up</span>}
+      {finished && <span className="text-sm font-semibold text-bite-700">Time's up</span>}
     </div>
   )
 }

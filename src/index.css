@@ -1,381 +1,292 @@
 @import 'tailwindcss';
 
-@theme {
-  /*
-   * Palette.
-   *
-   * Warmer and softer than a functional dashboard: a cream ground rather than
-   * grey, a gentle sage instead of a signal green, and a peach accent. The aim
-   * is a kitchen notebook, not an analytics tool.
-   */
-
-  /* Sage — the primary. Muted and leafy, never neon. */
-  --color-brand-50: #f2f7f1;
-  --color-brand-100: #e2eede;
-  --color-brand-200: #c6dcbf;
-  --color-brand-300: #a2c497;
-  --color-brand-400: #7faa72;
-  --color-brand-500: #628f55;
-  --color-brand-600: #4c7442;
-  --color-brand-700: #3d5c36;
-  --color-brand-800: #33492e;
-  --color-brand-900: #2b3d28;
-
-  /* Peach — warmth, highlights, and anything gently over target. */
-  --color-clay-50: #fff5f0;
-  --color-clay-100: #ffe8dc;
-  --color-clay-200: #ffd2bb;
-  --color-clay-300: #ffb492;
-  --color-clay-400: #fb9068;
-  --color-clay-500: #ef7048;
-  --color-clay-600: #d85632;
-  --color-clay-700: #b34327;
-  --color-clay-800: #923a25;
-  --color-clay-900: #793322;
-
-  /* Cream — page and card grounds. Paper, not plaster. */
-  --color-sand-50: #fffbf4;
-  --color-sand-100: #fdf4e7;
-  --color-sand-200: #f6e8d5;
-  --color-sand-300: #ecd8bd;
-  --color-sand-400: #dcc09a;
-  --color-sand-500: #c8a67b;
-
-  /* Butter — a soft third accent for gentle emphasis. */
-  --color-butter-100: #fff6d9;
-  --color-butter-200: #ffecb0;
-  --color-butter-300: #ffdd7a;
-  --color-butter-400: #fdca45;
-  --color-butter-500: #edb122;
-
-  /*
-   * Ink — the logo's outline. A deep warm brown rather than black, so the
-   * chunky outline stays funky without going cold against the cream.
-   */
-  --color-ink: #33231c;
-
-  /* Berry — for streaks and celebratory moments. */
-  --color-xp-50: #fdf3f7;
-  --color-xp-100: #fbe4ee;
-  --color-xp-200: #f8cadd;
-  --color-xp-300: #f1a1c3;
-  --color-xp-400: #e673a5;
-  --color-xp-500: #d84f88;
-  --color-xp-600: #bd376c;
-  --color-xp-700: #9c2b57;
-  --color-xp-800: #82274a;
-  --color-xp-900: #6e2440;
-
-  --color-gold-400: #ffdd7a;
-  --color-gold-500: #fdca45;
-  --color-gold-600: #edb122;
-
-  /*
-   * Type. Nunito has rounded terminals and stays legible at small sizes, so it
-   * carries the whole interface; Fredoka is reserved for the wordmark and page
-   * titles, where its extra character is a feature rather than a distraction.
-   * Both are bundled rather than fetched from a CDN, so the app looks the same
-   * offline as online.
-   */
-  --font-sans: 'Nunito Variable', ui-rounded, system-ui, sans-serif;
-  --font-display: 'Fredoka Variable', 'Nunito Variable', ui-rounded, sans-serif;
-  --font-mono: 'Nunito Variable', ui-rounded, system-ui, sans-serif;
-
-  /* Rounder than the default scale — soft corners read as friendly. */
-  --radius-xl: 0.875rem;
-  --radius-2xl: 1.25rem;
-  --radius-3xl: 1.75rem;
-
-  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --animate-float: float 3s ease-in-out infinite;
-  --animate-pop: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-4px);
-    }
-  }
-  @keyframes pop {
-    0% {
-      transform: scale(0.9);
-      opacity: 0;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-}
-
 /*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+ * Bite Buddy — Bold & Playful.
+ *
+ * Implements docs/DESIGN-SYSTEM.md. The balance the system asks for is roughly
+ * 70% calm (paper, ink, whitespace), 20% functional colour, 10% chaos — so the
+ * bold accents are concentrated in navigation, headings, empty states and
+ * moments of delight, while dense working areas stay quiet.
+ */
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+@theme {
+  /* ─── Brand ───────────────────────────────────────────────────────────────
+     Purple is the single brand primary. The 500/600/700 steps are the values
+     named in the design system; the rest of the ramp is derived from them for
+     soft surfaces and hover states. */
+  --color-bite-50: #f5f2ff;
+  --color-bite-100: #e9e4ff;
+  --color-bite-200: #c9c0f1;
+  --color-bite-300: #aa9ce8;
+  --color-bite-400: #8b7add;
+  --color-bite-500: #6d5bd0;
+  --color-bite-600: #5947be;
+  --color-bite-700: #4938a7;
+  --color-bite-800: #3b2d85;
+  --color-bite-900: #2c2166;
+
+  /* Warm accent. */
+  --color-coral-50: #fff3f3;
+  --color-coral-100: #ffe3e3;
+  --color-coral-200: #ffc8c8;
+  --color-coral-300: #ffa8a8;
+  --color-coral-400: #ff8888;
+  --color-coral-500: #ff6868;
+  --color-coral-600: #ed4f4f;
+  --color-coral-700: #ce3b3b;
+  --color-coral-800: #a93030;
+  --color-coral-900: #8a2a2a;
+
+  /* Data and positive progress. */
+  --color-teal-50: #ebfaf8;
+  --color-teal-100: #d3f5f1;
+  --color-teal-200: #a6ebe4;
+  --color-teal-300: #6adcd1;
+  --color-teal-400: #2ecbbd;
+  --color-teal-500: #00b8a9;
+  --color-teal-600: #009c90;
+  --color-teal-700: #007e75;
+  --color-teal-800: #066259;
+  --color-teal-900: #08504a;
+
+  /* Highlights and attention. */
+  --color-mustard-50: #fffcf2;
+  --color-mustard-100: #fff8e6;
+  --color-mustard-200: #fff1ce;
+  --color-mustard-300: #ffe9b3;
+  --color-mustard-400: #ffdd8c;
+  --color-mustard-500: #ffd166;
+  --color-mustard-600: #eab53f;
+  --color-mustard-700: #c9962b;
+  --color-mustard-800: #a3781f;
+  --color-mustard-900: #82601b;
+
+  /* ─── Neutrals ─────────────────────────────────────────────────────────── */
+  --color-cream-50: #faf7f0;   /* app background */
+  --color-paper: #fffdf9;      /* primary card surface */
+  --color-ink-900: #2d2320;    /* main text */
+  --color-ink-700: #514744;    /* secondary text */
+  --color-ink-500: #817774;    /* muted text */
+  --color-ink-300: #a79d9a;    /* faintest text, placeholders */
+  --color-border-100: #f0eae2;
+  --color-border-200: #e6ded5;
+
+  /* ─── Type ─────────────────────────────────────────────────────────────────
+     Bungee is a display face only — wordmark, H1, and short expressive labels.
+     It is never used for recipe names, tables or numeric data. */
+  --font-display: 'Bungee', ui-rounded, system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+  --font-mono: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
+
+  /* ─── Shape ────────────────────────────────────────────────────────────────
+     Rounded, but deliberately not a collection of pills: only chips go full
+     round. Buttons and inputs sit at 14–16px. */
+  --radius-sm: 0.5rem;    /* 8px */
+  --radius-md: 0.75rem;   /* 12px */
+  --radius-lg: 1rem;      /* 16px */
+  --radius-xl: 1.25rem;   /* 20px */
+  --radius-card: 1.5rem;  /* 24px */
+
+  /* ─── Elevation ────────────────────────────────────────────────────────────
+     Warm and diffuse, never grey SaaS shadow. */
+  --shadow-e1: 0 1px 2px rgba(45, 35, 32, .04), 0 6px 16px -10px rgba(45, 35, 32, .18);
+  --shadow-e2: 0 2px 6px rgba(45, 35, 32, .06), 0 12px 28px -14px rgba(45, 35, 32, .24);
+  --shadow-e3: 0 8px 20px rgba(45, 35, 32, .1), 0 28px 60px -24px rgba(45, 35, 32, .34);
+
+  --animate-pop: pop .35s cubic-bezier(.34, 1.56, .64, 1);
+  --animate-wiggle: wiggle .6s ease-in-out;
+
+  @keyframes pop {
+    0% { transform: scale(.92); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-6deg); }
+    75% { transform: rotate(6deg); }
   }
 }
+
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    border-color: var(--color-border-200);
+  }
+
+  body {
+    @apply bg-cream-50 text-ink-900 font-sans antialiased;
+    font-weight: 500;
+    /* Nutrition figures line up in columns on almost every screen. */
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1, h2, h3 { text-wrap: balance; }
+
+  /* One visible focus treatment everywhere, rather than the browser default. */
+  :focus-visible {
+    outline: 3px solid var(--color-bite-500);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { @apply bg-transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-border-200 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-ink-300; }
+}
+
+/* ─── Display type ─────────────────────────────────────────────────────────── */
+
+/** Bungee for big moments only. Never for long copy or data. */
+@utility display {
+  @apply font-display font-normal tracking-tight;
+}
+
+/* ─── Buttons ──────────────────────────────────────────────────────────────── */
 
 @utility btn {
-  @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-bold text-sm
-         transition-all duration-150 cursor-pointer select-none
-         disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97];
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+         font-sans font-bold text-sm leading-none cursor-pointer select-none
+         transition-all duration-150 disabled:opacity-45 disabled:cursor-not-allowed
+         disabled:pointer-events-none;
 }
 
 @utility btn-primary {
-  @apply btn bg-brand-600 text-white hover:bg-brand-700 shadow-[0_2px_0_0_var(--color-brand-800)] active:shadow-none active:translate-y-0.5;
+  @apply btn bg-bite-500 text-white hover:bg-bite-600 hover:-translate-y-px
+         active:translate-y-0 active:bg-bite-700 shadow-e1;
 }
 
 @utility btn-secondary {
-  @apply btn bg-white text-stone-600 border-2 border-sand-200 hover:border-brand-300 hover:text-brand-800;
+  @apply btn bg-paper text-bite-700 border-2 border-bite-200
+         hover:border-bite-400 hover:bg-bite-50;
 }
 
-@utility btn-xp {
-  @apply btn bg-xp-600 text-white hover:bg-xp-700 active:scale-95 shadow-xs;
-}
-
+/** Tertiary: no fill until hover. */
 @utility btn-ghost {
-  @apply btn text-stone-500 hover:bg-sand-100 hover:text-stone-700;
+  @apply btn text-ink-700 hover:bg-bite-50 hover:text-bite-700;
 }
 
 @utility btn-danger {
-  @apply btn bg-red-500 text-white hover:bg-red-600 active:scale-95;
+  @apply btn bg-coral-500 text-white hover:bg-coral-600 active:bg-coral-700 shadow-e1;
 }
 
 @utility btn-icon {
-  @apply btn p-2 rounded-full;
+  @apply btn p-2.5 rounded-lg;
 }
 
+/* ─── Chips ────────────────────────────────────────────────────────────────────
+   Filters and compact metadata. Selection is carried by border weight and a
+   check as well as by colour, so the state does not depend on hue alone. */
 
-/*
- * Interactive filter pill.
- *
- * Distinct from `badge`, which is a non-interactive label: anything tappable
- * needs a real target size, and a 22px-tall badge is not one.
- */
 @utility chip {
   @apply inline-flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap
-         px-3 h-9 rounded-full text-xs font-semibold cursor-pointer select-none
-         transition-colors duration-150;
+         px-3.5 h-9 rounded-full text-xs font-bold cursor-pointer select-none
+         transition-all duration-150;
 }
 
 @utility chip-off {
-  @apply chip bg-white border border-sand-300 text-stone-600 hover:border-brand-400;
+  @apply chip bg-paper text-ink-700 border-2 border-border-200 hover:border-bite-300;
 }
 
 @utility chip-on {
-  @apply chip bg-brand-600 text-white border border-brand-600;
+  @apply chip bg-bite-500 text-white border-2 border-bite-500 font-extrabold;
 }
 
+/* ─── Segmented control ────────────────────────────────────────────────────── */
 
-/* Segmented control button. Sized for a thumb, not just a cursor. */
 @utility tab {
-  @apply px-3.5 h-9 rounded-lg text-sm font-semibold transition-colors duration-150
-         inline-flex items-center justify-center cursor-pointer;
+  @apply px-4 h-9 rounded-md text-sm font-bold cursor-pointer
+         inline-flex items-center justify-center transition-all duration-150;
 }
 
-@utility tab-on {
-  @apply tab bg-white text-stone-800 shadow-xs;
-}
+@utility tab-on { @apply tab bg-paper text-bite-700 shadow-e1; }
+@utility tab-off { @apply tab text-ink-500 hover:text-ink-900; }
 
-@utility tab-off {
-  @apply tab text-stone-500 hover:text-stone-700;
-}
+/* ─── Surfaces ─────────────────────────────────────────────────────────────── */
 
 @utility card {
-  @apply bg-white rounded-3xl border border-sand-200
-         shadow-[0_1px_2px_rgba(120,90,55,0.04),0_10px_30px_-16px_rgba(120,90,55,0.18)];
+  @apply bg-paper rounded-card border border-border-200 shadow-e1;
 }
 
+/** Level 0 — flat, for nested panels inside a card. */
 @utility card-soft {
-  @apply bg-sand-100 rounded-3xl border border-sand-200/80;
+  @apply bg-cream-50 rounded-xl border border-border-200;
 }
+
+/* ─── Forms ────────────────────────────────────────────────────────────────── */
 
 @utility input {
-  @apply w-full px-4 py-2.5 rounded-2xl border-2 border-sand-200 text-sm font-medium text-stone-700 bg-white
-         placeholder-stone-300 focus:outline-hidden focus:border-brand-300 focus:ring-4 focus:ring-brand-100
+  @apply w-full px-3.5 py-2.5 rounded-lg border-2 border-border-200 bg-paper
+         text-sm font-semibold text-ink-900 placeholder-ink-300
+         focus:outline-none focus:border-bite-400 focus:ring-4 focus:ring-bite-100
          transition-all;
 }
 
 @utility label {
-  @apply block text-xs font-bold text-stone-400 tracking-wide mb-1.5;
+  @apply block text-xs font-bold text-ink-500 mb-1.5;
 }
+
+/* ─── Markers ──────────────────────────────────────────────────────────────── */
 
 @utility badge {
-  @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold;
-}
-
-@utility badge-green {
-  @apply badge bg-brand-100 text-brand-700;
-}
-
-@utility badge-purple {
-  @apply badge bg-xp-100 text-xp-700;
-}
-
-@utility badge-gold {
-  @apply badge bg-amber-100 text-amber-700;
-}
-
-@utility badge-gray {
-  @apply badge bg-gray-100 text-gray-600;
-}
-
-@utility badge-red {
-  @apply badge bg-red-100 text-red-600;
-}
-
-@utility xp-bar {
-  @apply relative h-2.5 rounded-full bg-gray-100 overflow-hidden;
-}
-
-@utility xp-bar-fill {
-  @apply h-full rounded-full bg-linear-to-r from-xp-400 to-xp-600 transition-all duration-700 ease-out;
-}
-
-@utility macro-ring-label {
-  @apply text-xs font-semibold text-gray-500;
-}
-
-@utility nav-item {
-  @apply flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-bold text-stone-500
-         hover:bg-sand-100 hover:text-stone-700 transition-all duration-150 cursor-pointer;
-}
-
-@utility nav-item-active {
-  @apply nav-item bg-brand-100 text-brand-800 hover:bg-brand-200 hover:text-brand-900;
-}
-
-@utility meal-slot {
-  @apply rounded-xl border-2 border-dashed border-sand-300 p-2 min-h-[64px] flex items-center justify-center
-           hover:border-brand-400 hover:bg-brand-50 transition-all duration-150 cursor-pointer;
-}
-
-@utility meal-slot-filled {
-  @apply rounded-xl border border-sand-200 bg-white p-2 min-h-[64px] cursor-pointer
-           hover:border-brand-400 transition-all duration-150;
+  @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold;
 }
 
 @utility tag {
-  @apply inline-flex items-center px-2.5 py-1 rounded-full bg-sand-100 text-stone-600 text-xs font-bold;
+  @apply inline-flex items-center px-2.5 py-1 rounded-full bg-cream-50
+         border border-border-200 text-ink-700 text-xs font-bold;
 }
 
-@utility section-title {
-  @apply text-lg font-bold text-gray-900;
+/* ─── Navigation ───────────────────────────────────────────────────────────── */
+
+@utility nav-item {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold
+         text-ink-700 hover:bg-bite-50 hover:text-bite-700
+         transition-all duration-150 cursor-pointer;
 }
 
-@utility page-title {
-  @apply text-2xl font-extrabold text-gray-900;
+@utility nav-item-active {
+  @apply nav-item bg-bite-500 text-white hover:bg-bite-600 hover:text-white shadow-e1;
 }
 
-@utility stat-number {
-  @apply text-3xl font-extrabold font-mono;
+/* ─── Planner ──────────────────────────────────────────────────────────────── */
+
+@utility meal-slot {
+  @apply rounded-lg border-2 border-dashed border-border-200 p-3 min-h-[56px]
+         flex items-center justify-center transition-all duration-150 cursor-pointer
+         hover:border-bite-300 hover:bg-bite-50;
 }
 
-@utility glow-green {
-  box-shadow: 0 0 16px var(--color-brand-300);
-}
+/* ─── Gamification (opt-in) ────────────────────────────────────────────────── */
 
-@utility glow-purple {
-  box-shadow: 0 0 16px var(--color-xp-300);
-}
+@utility xp-bar { @apply relative h-2 rounded-full bg-border-100 overflow-hidden; }
+@utility xp-bar-fill { @apply h-full rounded-full bg-bite-500 transition-all duration-700 ease-out; }
 
-@layer base {
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    @apply bg-sand-50 text-stone-700 font-sans antialiased;
-    /* Aligned numerals keep macro columns tidy in a font with no mono cut. */
-    font-variant-numeric: tabular-nums;
-  }
-
-  h1,
-  h2 {
-    @apply font-display;
-  }
-
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-sand-300 rounded-full;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-sand-400;
-  }
-}
-
-/*
- * Touch targets.
- *
- * Applied only where the pointer is coarse, so phones and tablets get the 44px
- * minimum that fingers need while mouse users keep the more compact desktop
- * proportions. These rules sit outside `@layer` deliberately, so they take
- * precedence over the utilities they are widening.
- */
+/* ─── Touch sizing ─────────────────────────────────────────────────────────────
+   Applied only where the pointer is coarse, so phones get the 44px minimum that
+   fingers need while pointer devices keep the denser desktop proportions.
+   These sit outside `@layer` deliberately so they take precedence over the
+   utilities they widen — and they list every variant because Tailwind's
+   `@utility` inlines the composed base rather than adding `.btn` to the element. */
 @media (pointer: coarse) {
-  /*
-   * These list every button variant rather than just `.btn`, because Tailwind's
-   * `@utility` composition inlines the base styles instead of adding the base
-   * class to the element — so `.btn` alone matches nothing in the markup.
-   */
-  .btn,
-  .btn-primary,
-  .btn-secondary,
-  .btn-xp,
-  .btn-ghost,
-  .btn-danger,
-  .tab,
-  .tab-on,
-  .tab-off,
-  .chip,
-  .chip-on,
-  .chip-off,
-  .input,
-  select.input,
-  .nav-item {
+  .btn, .btn-primary, .btn-secondary, .btn-ghost, .btn-danger,
+  .tab, .tab-on, .tab-off,
+  .chip, .chip-on, .chip-off,
+  .input, select.input, .nav-item {
     min-height: 44px;
   }
 
-  .btn-icon {
-    min-width: 44px;
-    min-height: 44px;
-  }
+  .btn-icon { min-width: 44px; min-height: 44px; }
 
-  /* Checkboxes are tapped one-handed in a shop; the default 16px is not enough. */
-  input[type='checkbox'] {
-    width: 1.35rem;
-    height: 1.35rem;
-  }
+  /* Tapped one-handed in a supermarket; the default 16px is not enough. */
+  input[type='checkbox'] { width: 1.4rem; height: 1.4rem; }
 }
 
-/* Respect a user's reduced-motion preference rather than animating regardless. */
+/* Personality motion is the first thing to go when it is not wanted. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: .01ms !important;
     scroll-behavior: auto !important;
   }
 }

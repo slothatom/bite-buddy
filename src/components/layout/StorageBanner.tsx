@@ -20,7 +20,7 @@ export default function StorageBanner() {
   return (
     <div
       role="alert"
-      className="fixed top-0 inset-x-0 z-50 bg-clay-600 text-white px-4 py-2.5 flex items-start gap-2.5 text-sm shadow-lg"
+      className="fixed top-0 inset-x-0 z-50 bg-coral-600 text-white px-4 py-2.5 flex items-start gap-2.5 text-sm shadow-lg"
       style={{ paddingTop: 'max(0.625rem, env(safe-area-inset-top))' }}
     >
       <AlertTriangle size={16} className="shrink-0 mt-0.5" />

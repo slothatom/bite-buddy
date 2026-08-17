@@ -21,12 +21,12 @@ export default function XpToast({ amount, label, onDone }: XpToastProps) {
   return (
     <div
       className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-2xl
-                  bg-xp-600 text-white shadow-lg shadow-xp-200 font-semibold text-sm
+                  bg-bite-500 text-white shadow-lg shadow-xp-200 font-semibold text-sm
                   transition-all duration-300 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
     >
       <Zap size={16} className="text-yellow-300" />
       <span>+{amount} XP</span>
-      {label && <span className="text-xp-200 font-normal">· {label}</span>}
+      {label && <span className="text-bite-100 font-normal">· {label}</span>}
     </div>
   )
 }

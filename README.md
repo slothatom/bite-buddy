@@ -1,6 +1,6 @@
-# 🍎 Bite Buddy
+# 🫐 Bite Buddy
 
-*Your cosy kitchen.*
+*Plan your week. Eat well. Feel good.*
 
 A meal planner built around one person's actual dietician plans and the Mediterranean diet.
 
@@ -37,34 +37,38 @@ The dietician never wrote a single calorie. Supplying them is what this app adds
 
 ## Look and feel
 
-The app is meant to feel like a kitchen notebook, not an analytics dashboard.
+Implements `docs/DESIGN-SYSTEM.md` — Bold & Playful. The balance it asks for is
+roughly 70% calm (paper, ink, whitespace), 20% functional colour, 10% chaos, so
+the bold accents concentrate in navigation, headings, empty states and moments
+of delight while dense working areas stay quiet.
 
-**Logo.** A big cheeky bite taken out of the mark itself — it draws the name
-rather than illustrating food, which is why it isn't a bowl or a plate. Bold ink
-outline, one silhouette, so it holds up at favicon size. Drawn inline as SVG in
-`src/components/brand/Mascot.tsx` so it inherits theme colours and stays crisp
-from 30px in the sidebar to 96px in an empty state. It has three moods —
-`happy`, `sleepy` and `oops` — covering the three things the app has to say:
-all is well, there's nothing here yet, and something went wrong.
+**Zig** is the mascot: an abstract bite-shaped creature, deliberately not a bowl
+or a piece of food — the silhouette is a lumpy blob with a bite out of one
+shoulder, so the name is in the shape rather than illustrated literally. Six
+moods (`happy`, `sleepy`, `oops`, `chef`, `celebrate`, `thinking`) drawn inline
+as SVG in `src/components/brand/Mascot.tsx`. He appears in empty states, errors
+and brand moments — never on every card or in dense tables.
 
-The bite is cut from two concentric copies rather than one masked shape: the
-dark body takes a smaller cut than the coloured body, so the bitten edge keeps
-the same outline weight as the rest of the mark.
+**Colour.** Purple `#6D5BD0` is the single brand primary. Teal carries data and
+positive progress, mustard means slightly over, coral means well over. Cream
+grounds, warm ink text.
 
-**Palette.** Cream ground rather than grey, a muted sage as the primary, peach
-for warmth, plus butter and berry accents. Defined as tokens in `src/index.css`
-under Tailwind 4's `@theme`.
+**Type.** Bungee for the wordmark, page titles and short expressive labels only
+— never for recipe names, tables or numeric data. Plus Jakarta Sans for
+everything else. Both bundled, not fetched from a CDN, so the app looks the same
+offline.
 
-**Type.** Nunito throughout for its rounded terminals, with Fredoka reserved for
-the wordmark and page titles. Both are **bundled**, not fetched from a CDN, so
-the app looks identical offline — which also cut the end-to-end suite from
-5.4 minutes to 24 seconds, since the tests no longer wait on font requests.
+**Status is never hue alone.** `src/lib/status.ts` returns a label, a symbol and
+a signed delta alongside the colour level, and every consumer renders at least
+one of them: bars show `+ Slightly over · +42 g`, and the target sits on the bar
+as an explicit line rather than being inferred from where the fill stops.
 
-**Shape.** Pill buttons, 24px card corners, and soft warm-toned shadows instead
-of grey ones.
+**Mediterranean tiers** use a symbol and a word (`● Daily`, `◐ Weekly`,
+`○ Moderation`, `◇ Rarely`), quiet enough to sit on 122 food rows at once.
 
-**Tone.** Going a little over target warms the bar to peach and only deepens
-past 130% — a normal day should never look like an alarm.
+**Navigation.** Nine destinations in the desktop sidebar; on a phone the bar is
+Plan · Recipes · **+** · Grocery · More, where the centre button opens the first
+empty meal slot and More holds the remaining six screens.
 
 ---
 

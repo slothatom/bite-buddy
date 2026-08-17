@@ -3,7 +3,7 @@ import { Search, Plus, X, Loader2 } from 'lucide-react'
 import type { Food, MedCategory, MedTier } from '../types'
 import { useFoods, useFoodStore } from '../store/useFoodStore'
 import { searchFoods, buildFoodIndex } from '../lib/foodSearch'
-import { TierBadge, EmptyState } from '../components/ui'
+import { TierBadge, EmptyState, SourceLine } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS, CATEGORY_ORDER } from '../lib/categories'
 import { searchFoods as lookupOnline, type NutritionResult } from '../services/nutritionApi'
 
@@ -43,8 +43,8 @@ export default function Foods() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-display font-semibold text-stone-700">Foods</h1>
-            <p className="text-sm text-stone-500">
+            <h1 className="display text-xl sm:text-2xl text-ink-900">Foods</h1>
+            <p className="text-sm text-ink-700">
               Everything the recipes are built from — {foods.length} foods, with calories per 100 g.
             </p>
           </div>
@@ -55,7 +55,7 @@ export default function Foods() {
 
         <div className="space-y-3">
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
             <input
               className="input pl-9"
               placeholder="Search — telemea, paine int, zabpehely, olive oil…"
@@ -83,26 +83,30 @@ export default function Foods() {
         ) : (
           grouped.map(([cat, list]) => (
             <section key={cat}>
-              <h2 className="text-sm font-bold text-stone-700 mb-2 flex items-center gap-2">
+              <h2 className="text-sm font-bold text-ink-900 mb-2 flex items-center gap-2">
                 <span>{CATEGORY_EMOJI[cat]}</span> {CATEGORY_LABELS[cat]}
-                <span className="text-stone-400 font-normal">({list.length})</span>
+                <span className="text-ink-500 font-normal">({list.length})</span>
               </h2>
-              <div className="card divide-y divide-sand-100">
+              <div className="card divide-y divide-border-100">
                 {list.map((f) => (
-                  <div key={f.id} className="flex items-center gap-3 px-4 py-2.5">
+                  <div key={f.id} className="flex items-center gap-3 px-4 py-2.5 md:py-2">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-stone-800 truncate">{f.names.en}</p>
-                      <p className="text-xs text-stone-400 truncate">
-                        {[f.names.ro, f.names.hu].filter(Boolean).join(' · ')}
-                        {f.state !== 'as-sold' ? ` · weighed ${f.state}` : ''}
-                      </p>
+                      <p className="text-sm font-bold text-ink-900 truncate">{f.names.en}</p>
+                      {f.names.ro || f.names.hu ? (
+                        <SourceLine
+                          text={[f.names.ro, f.names.hu].filter(Boolean).join(' · ')
+                            + (f.state !== 'as-sold' ? ` · weighed ${f.state}` : '')}
+                          lang={f.names.ro ? 'ro' : 'hu'}
+                          truncate
+                        />
+                      ) : null}
                     </div>
                     <TierBadge tier={f.medTier} />
                     <div className="text-right shrink-0 w-28">
-                      <p className="text-sm font-mono font-bold text-stone-700">
-                        {Math.round(f.per100g.calories)}<span className="text-stone-400 font-normal text-xs"> kcal</span>
+                      <p className="text-sm font-mono font-bold text-ink-900">
+                        {Math.round(f.per100g.calories)}<span className="text-ink-500 font-normal text-xs"> kcal</span>
                       </p>
-                      <p className="text-[11px] font-mono text-stone-400">
+                      <p className="text-[11px] font-mono text-ink-500">
                         {f.per100g.protein}p · {f.per100g.carbs}c · {f.per100g.fat}f
                       </p>
                     </div>
@@ -172,16 +176,16 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/30 backdrop-blur-xs sm:p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
       <div className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} onClick={(e) => e.stopPropagation()}>
-        <header className="flex items-center justify-between px-5 py-4 border-b border-sand-200">
-          <h2 className="font-display font-semibold text-stone-700">Add a food</h2>
+        <header className="flex items-center justify-between px-5 py-4 border-b border-border-200">
+          <h2 className="text-base font-extrabold text-ink-900">Add a food</h2>
           <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
         </header>
 
         <div className="p-5 space-y-4">
-          <div className="flex gap-1 p-1 bg-sand-100 rounded-xl w-fit">
+          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
             {(['manual', 'lookup'] as const).map((t) => (
               <button key={t} onClick={() => setTab(t)}
                 className={tab === t ? 'tab-on' : 'tab-off'}>
@@ -214,15 +218,15 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                       }))
                       setTab('manual')
                     }}
-                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-sand-100">
-                    <p className="text-sm text-stone-800">{r.name}</p>
-                    <p className="text-xs text-stone-400 font-mono">
+                    className="w-full text-left px-3 py-2 rounded-xl hover:bg-cream-50">
+                    <p className="text-sm text-ink-900">{r.name}</p>
+                    <p className="text-xs text-ink-500 font-mono">
                       {Math.round(r.per100g.calories)} kcal · {r.source}
                     </p>
                   </button>
                 ))}
                 {!searching && !results.length && (
-                  <p className="text-sm text-stone-400 text-center py-4">
+                  <p className="text-sm text-ink-500 text-center py-4">
                     Nothing yet — search above, or just type it in by hand.
                   </p>
                 )}
@@ -266,7 +270,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                 </div>
               </div>
 
-              <p className="text-xs font-bold uppercase tracking-wide text-stone-400 pt-1">Per 100 g</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">Per 100 g</p>
               <div className="grid grid-cols-5 gap-2">
                 {([
                   ['calories', 'kcal'], ['protein', 'P'], ['carbs', 'C'], ['fat', 'F'], ['fiber', 'Fib'],
