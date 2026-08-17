@@ -94,9 +94,10 @@ test.describe('the main flow', () => {
     await goto(page, '/')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
 
-    // 3. The day's calories are real numbers, not zero or NaN.
-    const kcal = await page.locator('text=/of \\d+ kcal/').first().textContent()
-    expect(kcal).toMatch(/of \d+ kcal/)
+    // 3. The day's calories are real numbers, not zero or NaN. Figures are
+    // thousands-separated, so the pattern has to allow a comma.
+    const kcal = await page.locator('text=/of [\\d,]+ kcal/').first().textContent()
+    expect(kcal).toMatch(/of [\d,]+ kcal/)
 
     // 4. A grocery list can be generated from that week.
     await goto(page, '/grocery')

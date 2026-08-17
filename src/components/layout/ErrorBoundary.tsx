@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import Mascot from '../brand/Mascot'
+import Zig from '../brand/Mascot'
 
 /**
  * Stops one broken screen from taking down the whole app.
@@ -31,15 +31,15 @@ export default class ErrorBoundary extends Component<Props, State> {
     if (!error) return this.props.children
 
     return (
-      <div className="min-h-screen grid place-items-center bg-sand-50 px-6 py-10">
+      <div className="min-h-screen grid place-items-center bg-cream-50 px-6 py-10">
         <div className="card p-6 max-w-md w-full text-center">
-          <Mascot size={80} mood="oops" className="mx-auto mb-3" />
-          <h1 className="text-lg font-display font-semibold text-stone-700">Oops — something spilled</h1>
-          <p className="text-sm text-stone-500 mt-1">
+          <Zig size={80} mood="oops" className="mx-auto mb-3" />
+          <h1 className="display text-lg text-ink-900">Oops — something spilled</h1>
+          <p className="text-sm text-ink-700 mt-1">
             This screen tripped over itself. Your recipes and plans are safe.
           </p>
 
-          <pre className="mt-4 text-left text-[11px] font-mono text-stone-500 bg-sand-100 rounded-xl p-3 overflow-x-auto max-h-32">
+          <pre className="mt-4 text-left text-[11px] font-mono text-ink-700 bg-cream-50 rounded-xl p-3 overflow-x-auto max-h-32">
             {error.message}
           </pre>
 
@@ -51,7 +51,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               Back to the planner
             </button>
             <button
-              className="btn-ghost w-full text-clay-600 text-xs"
+              className="btn-ghost w-full text-coral-600 text-xs"
               onClick={() => {
                 if (!confirm('Delete all locally stored plans, recipes and settings? This cannot be undone.')) return
                 for (const key of Object.keys(localStorage)) {

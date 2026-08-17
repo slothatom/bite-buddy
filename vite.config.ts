@@ -12,9 +12,9 @@ export default defineConfig({
       manifest: {
         name: 'Bite Buddy',
         short_name: 'Bite Buddy',
-        description: 'A cosy little kitchen companion for planning meals, keeping recipes and doing the shopping.',
-        theme_color: '#4c7442',
-        background_color: '#fffbf4',
+        description: 'Plan your week. Eat well. Feel good. A bold, friendly offline meal planner.',
+        theme_color: '#6D5BD0',
+        background_color: '#FAF7F0',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/bite-buddy/',

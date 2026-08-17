@@ -26,7 +26,7 @@ export default function App() {
     <ErrorBoundary>
       <HashRouter>
         <StorageBanner />
-        <div className="flex min-h-screen bg-sand-50">
+        <div className="flex min-h-screen bg-cream-50">
           <Sidebar />
           <main className="flex-1 flex flex-col min-w-0">
             <Routes>

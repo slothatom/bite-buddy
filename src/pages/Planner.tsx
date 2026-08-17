@@ -6,7 +6,8 @@ import { useMealPlanStore, getWeekDates } from '../store/useMealPlanStore'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { componentsNutrients, dayNutrients, emptyNutrients, addNutrients } from '../lib/nutrition'
-import { CalorieRing, NutrientSummary, SectionHeading } from '../components/ui'
+import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
+import { useUiStore } from '../store/useUiStore'
 import AddEntryModal from '../components/planner/AddEntryModal'
 import { dayQuickAdd, copyToClipboard } from '../lib/mfp'
 
@@ -25,6 +26,7 @@ export default function Planner() {
   const [adding, setAdding] = useState<{ date: string; slot: MealSlot } | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const { quickAdd, clearQuickAdd } = useUiStore()
 
   const byDate = useMemo(() => new Map(plan.map((d) => [d.date, d])), [plan])
   const selectedDay = byDate.get(selected) ?? { date: selected, meals: [] }
@@ -36,6 +38,19 @@ export default function Planner() {
     [plan, ctx],
   )
   const plannedDays = plan.filter((d) => d.meals.length).length
+
+  // The bottom bar's centre button lands here. Rather than syncing that intent
+  // into local state from an effect — which costs a second render — the open
+  // modal is derived from either source.
+  const filledSlots = new Set(selectedDay.meals.map((m) => m.slot))
+  const openAdd = adding ?? (quickAdd
+    ? { date: selected, slot: MEAL_SLOTS.find((s) => !filledSlots.has(s)) ?? 'breakfast' }
+    : null)
+
+  function closeAdd() {
+    setAdding(null)
+    clearQuickAdd()
+  }
 
   function shiftWeek(weeks: number) {
     const ref = new Date(weekDates[0] + 'T12:00:00')
@@ -62,8 +77,8 @@ export default function Planner() {
         {/* Week navigation */}
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-display font-semibold text-stone-700">Your week</h1>
-            <p className="text-sm text-stone-500">
+            <h1 className="display text-xl sm:text-2xl text-ink-900">Your week</h1>
+            <p className="text-sm text-ink-700">
               {formatRange(weekDates)} · {plannedDays} of 7 days planned
             </p>
           </div>
@@ -96,17 +111,17 @@ export default function Planner() {
                 onClick={() => setSelected(date)}
                 className={`rounded-xl p-2 sm:p-3 text-center transition-all border ${
                   isSelected
-                    ? 'bg-brand-600 text-white border-brand-600 shadow-xs'
-                    : 'bg-white border-sand-200 hover:border-brand-300 text-stone-700'
+                    ? 'bg-bite-500 text-white border-bite-500 shadow-xs'
+                    : 'bg-white border-border-200 hover:border-bite-300 text-ink-900'
                 }`}
               >
-                <div className={`text-[10px] sm:text-xs font-semibold uppercase tracking-wide ${isSelected ? 'text-brand-100' : 'text-stone-400'}`}>
+                <div className={`text-[10px] sm:text-xs font-semibold uppercase tracking-wide ${isSelected ? 'text-bite-100' : 'text-ink-500'}`}>
                   {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })}
                 </div>
-                <div className={`text-base sm:text-lg font-bold leading-tight ${isToday && !isSelected ? 'text-brand-700' : ''}`}>
+                <div className={`text-base sm:text-lg font-bold leading-tight ${isToday && !isSelected ? 'text-bite-700' : ''}`}>
                   {new Date(date + 'T12:00:00').getDate()}
                 </div>
-                <div className={`text-[10px] sm:text-xs font-mono ${isSelected ? 'text-brand-100' : 'text-stone-400'}`}>
+                <div className={`text-[10px] sm:text-xs font-mono ${isSelected ? 'text-bite-100' : 'text-ink-500'}`}>
                   {kcal > 0 ? Math.round(kcal) : '–'}
                 </div>
               </button>
@@ -122,7 +137,7 @@ export default function Planner() {
               <NutrientSummary n={selectedTotals} targets={targets} />
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-sand-200">
+          <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-border-200">
             <button className="btn-secondary" onClick={copyDayForMfp}>
               <ClipboardCopy size={15} /> {copied ? 'Copied' : 'Copy for MyFitnessPal'}
             </button>
@@ -130,7 +145,7 @@ export default function Planner() {
               <Copy size={15} /> Copy day to…
             </button>
             {selectedDay.meals.length > 0 && (
-              <button className="btn-ghost text-stone-400 hover:text-clay-600" onClick={() => clearDay(selected)}>
+              <button className="btn-ghost text-ink-500 hover:text-coral-600" onClick={() => clearDay(selected)}>
                 <Trash2 size={15} /> Clear day
               </button>
             )}
@@ -154,8 +169,8 @@ export default function Planner() {
         </section>
 
         {/* Week summary */}
-        <section className="card-soft p-4 flex items-center gap-3 text-sm text-stone-600">
-          <CalendarDays size={18} className="text-stone-400 shrink-0" />
+        <section className="card-soft p-4 flex items-center gap-3 text-sm text-ink-700">
+          <CalendarDays size={18} className="text-ink-500 shrink-0" />
           <span>
             A cosy{' '}
             <strong className="font-mono">
@@ -166,12 +181,12 @@ export default function Planner() {
         </section>
       </div>
 
-      {adding && (
+      {openAdd && (
         <AddEntryModal
-          date={adding.date}
-          slot={adding.slot}
-          onClose={() => setAdding(null)}
-          onAdd={(entry: Component) => addEntry(adding.date, adding.slot, entry)}
+          date={openAdd.date}
+          slot={openAdd.slot}
+          onClose={closeAdd}
+          onAdd={(entry: Component) => addEntry(openAdd.date, openAdd.slot, entry)}
         />
       )}
 
@@ -202,12 +217,12 @@ function SlotRow({
   return (
     <div className="card p-4">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-bold uppercase tracking-wide text-stone-400">{SLOT_LABELS[slot]}</span>
-        <span className="text-xs font-mono text-stone-500">{kcal > 0 ? `${Math.round(kcal)} kcal` : ''}</span>
+        <span className="text-xs font-bold uppercase tracking-wide text-ink-500">{SLOT_LABELS[slot]}</span>
+        <span className="text-xs font-mono text-ink-700">{kcal > 0 ? `${Math.round(kcal)} kcal` : ''}</span>
       </div>
 
       {meals.length === 0 ? (
-        <button onClick={onAdd} className="meal-slot w-full text-sm text-stone-400 hover:text-brand-700">
+        <button onClick={onAdd} className="meal-slot w-full text-sm text-ink-500 hover:text-bite-700">
           <Plus size={16} className="mr-1" /> Pop something in
         </button>
       ) : (
@@ -219,11 +234,13 @@ function SlotRow({
                   <EntryLine key={i} entry={entry} />
                 ))}
                 {meal.note ? (
-                  <p className="text-[11px] text-stone-400 italic truncate" title={meal.note}>{meal.note}</p>
+                  <div className="pt-0.5" title={meal.note}>
+                    <SourceLine text={meal.note} truncate />
+                  </div>
                 ) : null}
               </div>
               <button
-                className="btn-ghost btn-icon shrink-0 text-stone-300 hover:text-clay-600"
+                className="btn-ghost btn-icon shrink-0 text-ink-300 hover:text-coral-600"
                 onClick={() => onRemove(meal.id)}
                 aria-label="Remove meal"
               >
@@ -233,7 +250,7 @@ function SlotRow({
           ))}
           <button
             onClick={onAdd}
-            className="inline-flex items-center min-h-11 px-1 -mx-1 text-xs font-semibold text-brand-700 hover:text-brand-800"
+            className="inline-flex items-center min-h-11 px-1 -mx-1 text-xs font-semibold text-bite-700 hover:text-bite-800"
           >
             + Add another
           </button>
@@ -258,9 +275,9 @@ function EntryLine({ entry }: { entry: Component }) {
   return (
     <div className="flex items-baseline gap-2 text-sm">
       <span className="text-base leading-none">{emoji}</span>
-      <span className="flex-1 min-w-0 truncate text-stone-800">{label}</span>
-      {detail ? <span className="text-xs text-stone-400 font-mono shrink-0">{detail}</span> : null}
-      <span className="text-xs text-stone-500 font-mono shrink-0 w-14 text-right">{Math.round(kcal)}</span>
+      <span className="flex-1 min-w-0 truncate text-ink-900">{label}</span>
+      {detail ? <span className="text-xs text-ink-500 font-mono shrink-0">{detail}</span> : null}
+      <span className="text-xs text-ink-700 font-mono shrink-0 w-14 text-right">{Math.round(kcal)}</span>
     </div>
   )
 }
@@ -274,14 +291,14 @@ function CopyDayDialog({
   onPick: (to: string) => void
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/30 backdrop-blur-xs p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 backdrop-blur-xs p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <h3 className="font-bold text-stone-800 mb-1">Copy {formatDate(from)}</h3>
-        <p className="text-sm text-stone-500 mb-4">Pick the day to copy these meals into.</p>
+        <h3 className="font-bold text-ink-900 mb-1">Copy {formatDate(from)}</h3>
+        <p className="text-sm text-ink-700 mb-4">Pick the day to copy these meals into.</p>
         <div className="space-y-1">
           {dates.filter((d) => d !== from).map((d) => (
             <button key={d} onClick={() => onPick(d)}
-              className="w-full text-left px-3 py-2 rounded-xl hover:bg-sand-100 text-sm text-stone-700">
+              className="w-full text-left px-3 py-2 rounded-xl hover:bg-cream-50 text-sm text-ink-900">
               {formatDate(d)}
             </button>
           ))}
