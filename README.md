@@ -156,6 +156,18 @@ npm run verify     # lint + typecheck + unit tests + data integrity + build
 npm run test:e2e   # drives the real app in a browser, desktop and phone
 ```
 
+### One-file build
+
+```bash
+npm run build:single   # dist-single/bite-buddy.html — CSS, JS and fonts inlined
+npm run test:single    # asserts it makes no external request at all
+```
+
+For hosts that take a single document and refuse every subresource. It has no
+manifest, so it can't be installed to a home screen, and a page without an
+origin of its own may have nowhere to persist to — it's a preview, not a
+replacement for hosting the real build.
+
 Both run in CI on every push (`.github/workflows/ci.yml`).
 
 ### Optional
