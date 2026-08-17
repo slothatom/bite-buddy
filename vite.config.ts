@@ -2,8 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig({
-  base: '/bite-buddy/',
+export default defineConfig(({ command, isPreview }) => ({
+  // GitHub Pages serves the app from /bite-buddy/, but the dev server is the
+  // root of its own origin — keeping the sub-path locally only means
+  // http://localhost:5173/ 404s, which is a confusing first impression.
+  //
+  // `vite preview` reports command: 'serve' while serving build output, so it
+  // has to keep the sub-path or the built asset URLs point nowhere.
+  base: command === 'build' || isPreview ? '/bite-buddy/' : '/',
   plugins: [
     react(),
     VitePWA({
@@ -54,4 +60,4 @@ export default defineConfig({
       },
     }),
   ],
-})
+}))

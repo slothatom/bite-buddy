@@ -135,12 +135,19 @@ Two independent routes, because they answer different questions — and either c
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173/bite-buddy/
+npm run dev        # http://localhost:5173/
 npm run build
-npm run preview
+npm run preview    # http://localhost:4173/bite-buddy/
 ```
 
-Node 20+.
+Node 20+ (Vite 8 and React 19 both require it).
+
+The dev server is at the bare root; the production build is served from
+`/bite-buddy/` because that is where GitHub Pages puts it. `vite.config.ts`
+sets `base` per command so the two don't have to match.
+
+Run `npm install` even on an existing clone — React, Vite, Tailwind, Router and
+TypeScript all changed major versions.
 
 ### Checks
 
