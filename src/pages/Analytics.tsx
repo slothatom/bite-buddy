@@ -6,6 +6,7 @@ import { useBodyStore } from '../store/useBodyStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { dayNutrients } from '../lib/nutrition'
 import { scoreWeek } from '../lib/mediterranean'
+import { STATUS_STYLES, targetStatus } from '../lib/status'
 import { EmptyState, SectionHeading } from '../components/ui'
 
 type Tab = 'week' | 'mediterranean' | 'body'
@@ -17,11 +18,11 @@ export default function Analytics() {
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header>
-          <h1 className="text-2xl font-display font-semibold text-stone-700">Progress</h1>
-          <p className="text-sm text-stone-500">How your week is shaping up.</p>
+          <h1 className="display text-xl sm:text-2xl text-ink-900">Progress</h1>
+          <p className="text-sm text-ink-700">How your week is shaping up.</p>
         </header>
 
-        <div className="flex gap-1 p-1 bg-sand-100 rounded-xl w-fit">
+        <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
           {([['week', 'This week'], ['mediterranean', 'Mediterranean'], ['body', 'Body']] as const).map(([k, label]) => (
             <button key={k} onClick={() => setTab(k)}
               className={tab === k ? 'tab-on' : 'tab-off'}>
@@ -58,11 +59,11 @@ function WeekTab() {
   return (
     <div className="space-y-5">
       <div className="card p-5">
-        <p className="text-xs font-bold uppercase tracking-wide text-stone-400">Daily average</p>
-        <p className="text-3xl font-extrabold font-mono text-stone-800">
-          {Math.round(avg)}<span className="text-base text-stone-400 font-semibold ml-1">kcal</span>
+        <p className="text-xs font-bold uppercase tracking-wide text-ink-500">Daily average</p>
+        <p className="text-3xl font-extrabold font-mono text-ink-900">
+          {Math.round(avg)}<span className="text-base text-ink-500 font-semibold ml-1">kcal</span>
         </p>
-        <p className="text-sm text-stone-500">
+        <p className="text-sm text-ink-700">
           across {planned.length} planned {planned.length === 1 ? 'day' : 'days'} · target {profile.targets.calories}
         </p>
       </div>
@@ -70,29 +71,35 @@ function WeekTab() {
       <section>
         <SectionHeading>Calories by day</SectionHeading>
         <div className="card p-5">
-          <div className="flex items-end gap-2 h-40">
+          <div className="relative flex items-end gap-2 h-40">
+            <div
+              className="absolute inset-x-0 border-t-2 border-dashed border-ink-900/25 pointer-events-none"
+              style={{ bottom: `${Math.min(96, (profile.targets.calories / peak) * 100)}%` }}
+            >
+              <span className="absolute -top-4 right-0 text-[10px] font-bold text-ink-500 bg-paper px-1">
+                target {profile.targets.calories.toLocaleString()}
+              </span>
+            </div>
             {days.map((d) => {
               const height = (d.n.calories / peak) * 100
-              const over = d.n.calories > profile.targets.calories * 1.3
+              const status = targetStatus(d.n.calories, profile.targets.calories)
               return (
                 <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-                  <span className="text-[10px] font-mono text-stone-400">
+                  <span className="text-[10px] font-mono text-ink-500">
                     {d.n.calories > 0 ? Math.round(d.n.calories) : ''}
                   </span>
                   <div
-                    className={`w-full rounded-t-xl transition-all duration-500 ${over ? 'bg-clay-300' : 'bg-brand-400'}`}
+                    className={`w-full rounded-t-lg transition-all duration-500 ${STATUS_STYLES[status.level].fill}`}
                     style={{ height: `${Math.max(height, d.n.calories > 0 ? 4 : 0)}%` }}
                   />
-                  <span className="text-[10px] text-stone-400">
+                  <span className="text-[10px] text-ink-500">
                     {new Date(d.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'narrow' })}
                   </span>
                 </div>
               )
             })}
           </div>
-          <div className="relative mt-2 pt-2 border-t border-dashed border-sand-300">
-            <span className="text-[10px] text-stone-400">Target {profile.targets.calories} kcal</span>
-          </div>
+
         </div>
       </section>
     </div>
@@ -114,32 +121,32 @@ function MediterraneanTab() {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-stone-500">
+      <p className="text-sm text-ink-700">
         Serving goals from the Mediterranean Diet guide, scaled to the {planned}{' '}
         {planned === 1 ? 'day' : 'days'} planned so far.
       </p>
-      <div className="card divide-y divide-sand-100">
+      <div className="card divide-y divide-border-100">
         {goals.map((g) => {
           const pct = Math.min(1, g.ratio)
           const met = g.isLimit ? g.ratio <= 1 : g.ratio >= 0.9
           return (
             <div key={g.category} className="px-4 py-3">
               <div className="flex items-baseline justify-between mb-1.5">
-                <span className="text-sm font-semibold text-stone-800">
+                <span className="text-sm font-semibold text-ink-900">
                   {g.label}
-                  <span className="ml-2 text-xs font-normal text-stone-400">
+                  <span className="ml-2 text-xs font-normal text-ink-500">
                     {g.isLimit ? 'at most ' : ''}{g.target} / {g.period}
                   </span>
                 </span>
-                <span className={`text-xs font-mono ${met ? 'text-brand-700' : 'text-stone-400'}`}>
+                <span className={`text-xs font-mono ${met ? 'text-bite-700' : 'text-ink-500'}`}>
                   {g.servings.toFixed(1)} of {g.expected.toFixed(0)}
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-sand-200 overflow-hidden">
+              <div className="h-2 rounded-full bg-border-100 overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    g.isLimit ? (g.ratio > 1 ? 'bg-clay-500' : 'bg-brand-400')
-                              : (met ? 'bg-brand-500' : 'bg-sand-400')}`}
+                    g.isLimit ? (g.ratio > 1 ? 'bg-coral-500' : 'bg-teal-400')
+                              : (met ? 'bg-teal-500' : 'bg-ink-300')}`}
                   style={{ width: `${pct * 100}%` }}
                 />
               </div>
@@ -191,23 +198,23 @@ function BodyTab() {
       ) : (
         <>
           <div className="card p-5">
-            <p className="text-xs font-bold uppercase tracking-wide text-stone-400">Since you started</p>
-            <p className={`text-3xl font-extrabold font-mono ${change <= 0 ? 'text-brand-700' : 'text-clay-600'}`}>
+            <p className="text-xs font-bold uppercase tracking-wide text-ink-500">Since you started</p>
+            <p className={`text-3xl font-extrabold font-mono ${change <= 0 ? 'text-bite-700' : 'text-coral-600'}`}>
               {change > 0 ? '+' : ''}{change.toFixed(1)}
-              <span className="text-base text-stone-400 font-semibold ml-1">{profile.weightUnit}</span>
+              <span className="text-base text-ink-500 font-semibold ml-1">{profile.weightUnit}</span>
             </p>
             <Sparkline values={sorted.map((w) => w.weight)} />
           </div>
 
-          <div className="card divide-y divide-sand-100">
+          <div className="card divide-y divide-border-100">
             {[...sorted].reverse().map((w) => (
               <div key={w.id} className="flex items-center justify-between px-4 py-2.5">
-                <span className="text-sm text-stone-600">
+                <span className="text-sm text-ink-700">
                   {new Date(w.date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
                 <span className="flex items-center gap-3">
-                  <span className="text-sm font-mono font-semibold text-stone-800">{w.weight} {w.unit}</span>
-                  <button className="text-xs text-stone-300 hover:text-clay-600" onClick={() => removeWeightEntry(w.id)}>
+                  <span className="text-sm font-mono font-semibold text-ink-900">{w.weight} {w.unit}</span>
+                  <button className="text-xs text-ink-300 hover:text-coral-600" onClick={() => removeWeightEntry(w.id)}>
                     Remove
                   </button>
                 </span>
@@ -232,7 +239,7 @@ function Sparkline({ values }: { values: number[] }) {
   return (
     <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="w-full h-16 mt-3">
       <polyline points={points} fill="none" strokeWidth={1.5} vectorEffect="non-scaling-stroke"
-        className="stroke-brand-500" strokeLinejoin="round" strokeLinecap="round" />
+        className="stroke-teal-500" strokeLinejoin="round" strokeLinecap="round" />
     </svg>
   )
 }

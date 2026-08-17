@@ -28,8 +28,8 @@ export default function History() {
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header>
-          <h1 className="text-2xl font-display font-semibold text-stone-700">Plan history</h1>
-          <p className="text-sm text-stone-500">
+          <h1 className="display text-xl sm:text-2xl text-ink-900">Plan history</h1>
+          <p className="text-sm text-ink-700">
             {plans.length} weeks from your dietician, {plans.reduce((a, p) => a + p.days.length, 0)} days in all.
             Drop any week straight into your planner.
           </p>
@@ -75,12 +75,12 @@ function PlanCard({
       {/* Two sibling buttons rather than one nested inside the other: a button
           inside a button is invalid, and browsers reparent it so its click
           handler never fires. */}
-      <div className="flex items-center gap-3 px-4 py-3.5 hover:bg-sand-50">
+      <div className="flex items-center gap-3 px-4 py-3.5 hover:bg-cream-50">
         <button onClick={onToggle} className="flex items-center gap-3 flex-1 min-w-0 min-h-11 text-left">
           <span className="text-xl">{plan.language === 'hu' ? '🇭🇺' : '🇷🇴'}</span>
           <span className="flex-1 min-w-0">
-            <span className="block font-semibold text-stone-800 text-sm">{plan.label}</span>
-            <span className="block text-xs text-stone-400">
+            <span className="block font-semibold text-ink-900 text-sm">{plan.label}</span>
+            <span className="block text-xs text-ink-500">
               {plan.days.length} days · avg {average} kcal
               {plan.subject === 'other' ? ' · not your plan' : ''}
             </span>
@@ -95,19 +95,19 @@ function PlanCard({
       </div>
 
       {open && (
-        <div className="border-t border-sand-200 divide-y divide-sand-100">
+        <div className="border-t border-border-200 divide-y divide-border-100">
           {plan.days.map((day, i) => (
             <div key={i} className="px-4 py-3">
               <div className="flex items-baseline justify-between mb-1.5">
-                <h3 className="text-sm font-bold text-stone-700">{day.dayName}</h3>
-                <span className="text-xs font-mono text-stone-400">{Math.round(dayTotals[i])} kcal</span>
+                <h3 className="text-sm font-bold text-ink-900">{day.dayName}</h3>
+                <span className="text-xs font-mono text-ink-500">{Math.round(dayTotals[i])} kcal</span>
               </div>
               <dl className="space-y-1">
                 {day.meals.map((meal, j) => (
                   <div key={j} className="flex gap-3 text-xs">
-                    <dt className="w-20 shrink-0 font-semibold text-stone-400">{SLOT_LABELS[meal.slot]}</dt>
-                    <dd className="flex-1 text-stone-600">{meal.text}</dd>
-                    <dd className="w-12 text-right font-mono text-stone-400 shrink-0">
+                    <dt className="w-20 shrink-0 font-semibold text-ink-500">{SLOT_LABELS[meal.slot]}</dt>
+                    <dd className="flex-1 text-ink-700">{meal.text}</dd>
+                    <dd className="w-12 text-right font-mono text-ink-500 shrink-0">
                       {Math.round(componentsNutrients(meal.entries, ctx).calories)}
                     </dd>
                   </div>
@@ -115,7 +115,7 @@ function PlanCard({
               </dl>
             </div>
           ))}
-          <p className="px-4 py-3 text-xs text-stone-400">
+          <p className="px-4 py-3 text-xs text-ink-500">
             Loading this plan fills the week of {new Date(weekLabel + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })},
             matching each day to the same weekday.
           </p>

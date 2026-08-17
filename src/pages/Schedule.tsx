@@ -23,8 +23,8 @@ export default function Schedule() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header className="flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-display font-semibold text-stone-700">Cook schedule</h1>
-            <p className="text-sm text-stone-500">When you’re cooking, and what’s going in the pot.</p>
+            <h1 className="display text-xl sm:text-2xl text-ink-900">Cook schedule</h1>
+            <p className="text-sm text-ink-700">When you’re cooking, and what’s going in the pot.</p>
           </div>
           <button className="btn-primary shrink-0" onClick={() => setAdding(true)}>
             <Plus size={16} /> Session
@@ -43,16 +43,16 @@ export default function Schedule() {
                   <button
                     onClick={() => toggleComplete(s.id)}
                     className={`shrink-0 w-6 h-6 rounded-full border-2 grid place-items-center transition-colors ${
-                      s.completed ? 'bg-brand-600 border-brand-600 text-white' : 'border-sand-300 text-transparent'}`}
+                      s.completed ? 'bg-bite-500 border-bite-500 text-white' : 'border-border-200 text-transparent'}`}
                     aria-label={s.completed ? 'Mark as not done' : 'Mark as done'}
                   >
                     <Check size={13} />
                   </button>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-semibold text-sm text-stone-800 ${s.completed ? 'line-through' : ''}`}>
+                    <p className={`font-semibold text-sm text-ink-900 ${s.completed ? 'line-through' : ''}`}>
                       {s.label || 'Cook session'}
                     </p>
-                    <p className="text-xs text-stone-400">
+                    <p className="text-xs text-ink-500">
                       {new Date(s.date + 'T12:00:00').toLocaleDateString('en-GB', {
                         weekday: 'long', day: 'numeric', month: 'long' })} · {s.time}
                     </p>
@@ -65,7 +65,7 @@ export default function Schedule() {
                       </ul>
                     )}
                   </div>
-                  <button className="btn-ghost btn-icon text-stone-300 hover:text-clay-600"
+                  <button className="btn-ghost btn-icon text-ink-300 hover:text-coral-600"
                     onClick={() => removeSession(s.id)} aria-label="Remove session">
                     <Trash2 size={15} />
                   </button>
@@ -100,11 +100,11 @@ function SessionDialog({
   const [picked, setPicked] = useState<string[]>([])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-stone-900/30 backdrop-blur-xs sm:p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
       <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl p-5 space-y-4"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}>
-        <h2 className="font-display font-semibold text-stone-700">New cook session</h2>
+        <h2 className="text-base font-extrabold text-ink-900">New cook session</h2>
 
         <div>
           <label className="label">What is it for</label>
@@ -123,15 +123,15 @@ function SessionDialog({
 
         <div>
           <label className="label">Dishes ({picked.length} picked)</label>
-          <div className="max-h-52 overflow-y-auto card-soft divide-y divide-sand-200">
+          <div className="max-h-52 overflow-y-auto card-soft divide-y divide-border-200">
             {recipes.map((r) => (
               <label key={r.id} className="flex items-center gap-2.5 px-3 py-2 cursor-pointer text-sm">
                 <input
-                  type="checkbox" className="w-4 h-4 accent-brand-600"
+                  type="checkbox" className="w-4 h-4 accent-bite-500"
                   checked={picked.includes(r.id)}
                   onChange={() => setPicked((p) => p.includes(r.id) ? p.filter((x) => x !== r.id) : [...p, r.id])}
                 />
-                <span className="text-stone-700">{r.emoji} {r.name.en}</span>
+                <span className="text-ink-900">{r.emoji} {r.name.en}</span>
               </label>
             ))}
           </div>
