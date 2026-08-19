@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import {
   Sparkles, Calculator, Pencil, Upload, Check,
-  Download, ClipboardCopy, ClipboardPaste,
+  Download, ClipboardCopy, ClipboardPaste, LogOut,
 } from 'lucide-react'
 import type { ActivityLevel, Goal, Sex, Targets, WeekStart } from '../types'
 import { useUserStore } from '../store/useUserStore'
@@ -12,6 +12,8 @@ import { copyToClipboard, parseMfpCsv, type MfpDiaryEntry } from '../lib/mfp'
 import { backupFilename, createBackup, restoreBackup } from '../lib/backup'
 import { saveTextFile } from '../lib/download'
 import { SectionHeading } from '../components/ui'
+import { useAuthStore } from '../store/useAuth'
+import { isConfigured } from '../lib/supabase'
 
 const WEEKDAYS: { value: WeekStart; label: string }[] = [
   { value: 1, label: 'Monday' }, { value: 2, label: 'Tuesday' }, { value: 3, label: 'Wednesday' },
@@ -223,6 +225,9 @@ export default function Settings() {
           <SectionHeading>Your data</SectionHeading>
           <BackupPanel />
         </section>
+
+        {/* ─── Account ─────────────────────────────────────────────────────── */}
+        {isConfigured && <AccountPanel />}
       </div>
     </div>
   )
@@ -401,5 +406,52 @@ function MfpImport() {
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * The signed-in account.
+ *
+ * Only rendered on the deployed app; a local clone has no accounts at all.
+ * The display name is what the other person sees on the welcome screen, so it
+ * is worth being able to set it to something friendlier than an email address.
+ */
+function AccountPanel() {
+  const { user, members, setDisplayName, signOut } = useAuthStore()
+  const mine = members.find((m) => m.id === user?.id)
+  const [name, setName] = useState(mine?.display_name ?? '')
+  const [saved, setSaved] = useState(false)
+
+  return (
+    <section>
+      <SectionHeading>Account</SectionHeading>
+      <div className="card p-4 space-y-4">
+        <p className="text-sm text-ink-700">
+          Signed in as <strong className="break-all">{user?.email}</strong>. Your plans, recipes and
+          shopping list are shared with everyone else in the household.
+        </p>
+
+        <div>
+          <label className="label">What the others should call you</label>
+          <div className="flex gap-2">
+            <input
+              className="input" placeholder="e.g. Ana" value={name}
+              onChange={(e) => { setName(e.target.value); setSaved(false) }}
+            />
+            <button
+              className="btn-secondary shrink-0"
+              disabled={!name.trim()}
+              onClick={() => { void setDisplayName(name.trim()); setSaved(true) }}
+            >
+              {saved ? <><Check size={15} /> Saved</> : 'Save'}
+            </button>
+          </div>
+        </div>
+
+        <button className="btn-ghost text-ink-500 hover:text-coral-600 w-fit" onClick={() => void signOut()}>
+          <LogOut size={15} /> Sign out
+        </button>
+      </div>
+    </section>
   )
 }

@@ -10,47 +10,8 @@
  * State is read from the live stores rather than from localStorage, because
  * the case that matters most is the one where localStorage never had it.
  */
-import { useMealPlanStore } from '../store/useMealPlanStore'
-import { useUserStore } from '../store/useUserStore'
-import { useRecipeStore } from '../store/useRecipeStore'
-import { useFoodStore } from '../store/useFoodStore'
-import { useBodyStore } from '../store/useBodyStore'
-import { useCookStore } from '../store/useCookStore'
+import { STORES } from '../store/registry'
 import { SCHEMA_VERSION } from '../store/persist'
-
-/**
- * The stores hold different shapes, so they are reduced to the two operations
- * this module needs before being put in one list — otherwise every call site
- * is fighting a union of six incompatible `setState` signatures.
- */
-interface PersistedStore {
-  name: string | undefined
-  read: () => unknown
-  write: (state: object) => void
-}
-
-function persisted<T extends object>(store: {
-  getState: () => T
-  setState: (partial: Partial<T>) => void
-  persist: { getOptions: () => { name?: string; partialize?: (state: T) => unknown } }
-}): PersistedStore {
-  const { name, partialize } = store.persist.getOptions()
-  return {
-    name,
-    read: () => (partialize ? partialize(store.getState()) : store.getState()),
-    write: (state) => store.setState(state as Partial<T>),
-  }
-}
-
-/**
- * Every persisted store. Each one is keyed in the file by its own persist
- * name, so a backup stays readable if the set of stores changes: a key with
- * nowhere to go is skipped rather than failing the whole restore.
- */
-const STORES: PersistedStore[] = [
-  persisted(useMealPlanStore), persisted(useUserStore), persisted(useRecipeStore),
-  persisted(useFoodStore), persisted(useBodyStore), persisted(useCookStore),
-]
 
 export interface Backup {
   app: 'bite-buddy'

@@ -1,13 +1,14 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   CalendarDays, BookOpen, Carrot, ShoppingBasket, Timer,
-  CalendarClock, BarChart2, History, Settings as SettingsIcon, Flame,
+  CalendarClock, BarChart2, History, Settings as SettingsIcon, Flame, Home,
 } from 'lucide-react'
 import { useUserStore } from '../../store/useUserStore'
 import { Wordmark } from '../brand/Mascot'
 
 const NAV = [
-  { to: '/',           label: 'Planner',   icon: CalendarDays },
+  { to: '/',           label: 'Home',      icon: Home },
+  { to: '/plan',       label: 'Planner',   icon: CalendarDays },
   { to: '/recipes',    label: 'Recipes',   icon: BookOpen },
   { to: '/foods',      label: 'Foods',     icon: Carrot },
   { to: '/grocery',    label: 'Grocery',   icon: ShoppingBasket },

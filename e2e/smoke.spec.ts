@@ -6,7 +6,7 @@ import { test, expect, type Page } from '@playwright/test'
  */
 
 const ROUTES = [
-  '/', '/recipes', '/foods', '/grocery', '/history',
+  '/', '/plan', '/recipes', '/foods', '/grocery', '/history',
   '/prep', '/schedule', '/analytics', '/settings',
 ]
 
@@ -128,7 +128,7 @@ test.describe('the main flow', () => {
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await expect(page.getByRole('button', { name: /Loaded/ })).toBeVisible()
 
-    await goto(page, '/')
+    await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
 
     // 3. The day's calories are real numbers, not zero or NaN. Figures are
@@ -172,7 +172,7 @@ test.describe('your data survives the browser', () => {
     // week that outlives the browser storage it was written to.
     await goto(page, '/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/')
+    await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
 
     await goto(page, '/settings')
@@ -183,7 +183,7 @@ test.describe('your data survives the browser', () => {
     // Lose everything, the way clearing site data would.
     await page.evaluate(() => localStorage.clear())
     await page.reload()
-    await goto(page, '/')
+    await goto(page, '/plan')
     await expect(page.getByText('0 of 7 days planned')).toBeVisible()
 
     await goto(page, '/settings')
@@ -192,7 +192,7 @@ test.describe('your data survives the browser', () => {
     await page.getByRole('button', { name: 'Restore', exact: true }).click()
     await expect(page.getByText(/Restored \d+ of/)).toBeVisible()
 
-    await goto(page, '/')
+    await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
   })
 
@@ -207,7 +207,7 @@ test.describe('your data survives the browser', () => {
     await page.getByRole('button', { name: 'Restore', exact: true }).click()
 
     await expect(page.getByText(/left alone/)).toBeVisible()
-    await goto(page, '/')
+    await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
   })
 })
@@ -225,7 +225,7 @@ test.describe('resilience', () => {
 
     // Unreadable or future-versioned state must fall back to defaults rather
     // than being interpreted under the wrong assumptions.
-    await expect(page.getByRole('heading', { name: 'Your week' })).toBeVisible()
+    await expect(page.locator('h1').first()).toBeVisible()
     expect(errors).toEqual([])
   })
 })
