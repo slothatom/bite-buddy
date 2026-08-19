@@ -3,26 +3,29 @@ import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import {
   CalendarDays, BookOpen, ShoppingBasket, Plus, MoreHorizontal,
   Carrot, History, Timer, CalendarClock, BarChart2, Settings as SettingsIcon, X,
+  Home as HomeIcon,
 } from 'lucide-react'
 import { useUiStore } from '../../store/useUiStore'
 
 /**
- * The phone navigation: Plan · Recipes · + · Grocery · More.
+ * The phone navigation: Home · Plan · + · Recipes · More.
  *
- * Only three destinations sit on the bar because the centre slot is the
- * creation action — the thing most often reached for one-handed. The remaining
- * six screens live behind More rather than being cut.
+ * Only four destinations sit on the bar because the centre slot is the
+ * creation action — the thing most often reached for one-handed. Grocery moved
+ * behind More when Home arrived: it is a once-a-week screen you open at the
+ * shop, where Recipes is browsed daily.
  */
 const PRIMARY = [
-  { to: '/', label: 'Plan', icon: CalendarDays },
-  { to: '/recipes', label: 'Recipes', icon: BookOpen },
+  { to: '/', label: 'Home', icon: HomeIcon },
+  { to: '/plan', label: 'Plan', icon: CalendarDays },
 ]
 
 const SECONDARY = [
-  { to: '/grocery', label: 'Grocery', icon: ShoppingBasket },
+  { to: '/recipes', label: 'Recipes', icon: BookOpen },
 ]
 
 const MORE = [
+  { to: '/grocery', label: 'Grocery', icon: ShoppingBasket },
   { to: '/foods', label: 'Foods', icon: Carrot },
   { to: '/history', label: 'History', icon: History },
   { to: '/prep', label: 'Prep', icon: Timer },
@@ -44,7 +47,7 @@ export default function BottomNav() {
 
   function quickAdd() {
     requestQuickAdd()
-    navigate('/')
+    navigate('/plan')
   }
 
   return (

@@ -7,3 +7,6 @@ dist/
 test-results/
 playwright-report/
 dist-single/
+
+# Local Supabase credentials
+.env.local
