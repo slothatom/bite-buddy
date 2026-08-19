@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { Children, useState, type ReactNode } from 'react'
 import { AlertTriangle, Check } from 'lucide-react'
 import type { Macros, MedTier, Nutrients } from '../../types'
 import { STATUS_STYLES, targetStatus, type StatusLevel } from '../../lib/status'
@@ -174,11 +174,13 @@ export function SourceLine({
   return (
     <span className="flex items-start gap-1.5 text-[13px] text-ink-500 min-w-0">
       {lang && (
-        <span className="shrink-0 mt-px px-1 py-0.5 rounded bg-border-100 text-[9px] font-extrabold tracking-wide text-ink-700 uppercase">
+        <span className="shrink-0 mt-px px-1 py-0.5 rounded bg-border-100 text-[11px] font-extrabold tracking-wide text-ink-700 uppercase">
           {lang}
         </span>
       )}
-      <span className={wrap}>{text}</span>
+      {/* min-w-0: without it this flex child refuses to shrink past the
+          badge's width and the text overflows instead of wrapping. */}
+      <span className={`min-w-0 ${wrap}`}>{text}</span>
     </span>
   )
 }
@@ -208,6 +210,35 @@ export function SectionHeading({ children, action }: { children: ReactNode; acti
     <div className="flex items-center justify-between gap-3 mb-3">
       <h2 className="text-lg font-extrabold text-ink-900">{children}</h2>
       {action}
+    </div>
+  )
+}
+
+/**
+ * A row of filter chips that wraps instead of scrolling out of sight.
+ *
+ * These rows previously scrolled horizontally, which hid most of the filters:
+ * 829px of chips on Recipes, 1,578px on Foods — about three of seventeen
+ * categories visible, with nothing on screen to say the rest existed. Wrapping
+ * shows everything, and collapsing to the first few keeps it from taking over
+ * the top of the page.
+ *
+ * Callers should order any active chip into the first `initial` so a live
+ * filter is never hidden behind the toggle.
+ */
+export function ChipRow({ children, initial = 6 }: { children: ReactNode; initial?: number }) {
+  const [expanded, setExpanded] = useState(false)
+  const items = Children.toArray(children)
+  const hidden = items.length - initial
+
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {hidden > 0 && !expanded ? items.slice(0, initial) : items}
+      {hidden > 0 && (
+        <button className="chip-off" onClick={() => setExpanded((v) => !v)}>
+          {expanded ? 'Show fewer' : `+${hidden} more`}
+        </button>
+      )}
     </div>
   )
 }
