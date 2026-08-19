@@ -3,7 +3,7 @@ import { Search, Plus, X, Loader2 } from 'lucide-react'
 import type { Food, MedCategory, MedTier } from '../types'
 import { useFoods, useFoodStore } from '../store/useFoodStore'
 import { searchFoods, buildFoodIndex } from '../lib/foodSearch'
-import { TierBadge, EmptyState, SourceLine } from '../components/ui'
+import { TierBadge, EmptyState, SourceLine, ChipRow } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS, CATEGORY_ORDER } from '../lib/categories'
 import { searchFoods as lookupOnline, type NutritionResult } from '../services/nutritionApi'
 
@@ -63,8 +63,9 @@ export default function Foods() {
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
-            {CATEGORY_ORDER.map((c) => (
+          {/* The chosen category leads, so it stays visible when collapsed. */}
+          <ChipRow initial={6}>
+            {[...CATEGORY_ORDER].sort((a, b) => Number(b === category) - Number(a === category)).map((c) => (
               <button
                 key={c}
                 onClick={() => setCategory(category === c ? null : c)}
@@ -73,7 +74,7 @@ export default function Foods() {
                 {CATEGORY_EMOJI[c]} {CATEGORY_LABELS[c]}
               </button>
             ))}
-          </div>
+          </ChipRow>
         </div>
 
         {grouped.length === 0 ? (
@@ -89,26 +90,31 @@ export default function Foods() {
               </h2>
               <div className="card divide-y divide-border-100">
                 {list.map((f) => (
-                  <div key={f.id} className="flex items-center gap-3 px-4 py-2.5 md:py-2">
+                  // One row on a wide screen. On a phone the tier badge and the
+                  // 112px figures column left the name 85px of 356, so they drop
+                  // to their own line and the name gets the width instead.
+                  <div key={f.id} className="flex flex-col gap-1 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-3 md:py-2">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-ink-900 truncate">{f.names.en}</p>
+                      <p className="text-sm font-bold text-ink-900">{f.names.en}</p>
                       {f.names.ro || f.names.hu ? (
                         <SourceLine
                           text={[f.names.ro, f.names.hu].filter(Boolean).join(' · ')
                             + (f.state !== 'as-sold' ? ` · weighed ${f.state}` : '')}
                           lang={f.names.ro ? 'ro' : 'hu'}
-                          truncate
+                          clamp={2}
                         />
                       ) : null}
                     </div>
-                    <TierBadge tier={f.medTier} />
-                    <div className="text-right shrink-0 w-28">
-                      <p className="text-sm font-mono font-bold text-ink-900">
-                        {Math.round(f.per100g.calories)}<span className="text-ink-500 font-normal text-xs"> kcal</span>
-                      </p>
-                      <p className="text-[11px] font-mono text-ink-500">
-                        {f.per100g.protein}p · {f.per100g.carbs}c · {f.per100g.fat}f
-                      </p>
+                    <div className="flex items-center justify-between gap-3 sm:justify-end">
+                      <TierBadge tier={f.medTier} />
+                      <div className="text-right shrink-0 sm:w-28">
+                        <p className="text-sm font-mono font-bold text-ink-900">
+                          {Math.round(f.per100g.calories)}<span className="text-ink-500 font-normal text-xs"> kcal</span>
+                        </p>
+                        <p className="text-xs font-mono text-ink-500">
+                          {f.per100g.protein}p · {f.per100g.carbs}c · {f.per100g.fat}f
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ))}

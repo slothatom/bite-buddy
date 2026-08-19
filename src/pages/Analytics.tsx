@@ -71,28 +71,34 @@ function WeekTab() {
       <section>
         <SectionHeading>Calories by day</SectionHeading>
         <div className="card p-5">
+          {/* The target used to be labelled on the line itself, where it sat on
+              top of any bar reaching a similar height — measured 24px of overlap
+              on a phone. It reads as a legend instead, and the line stays bare. */}
+          <p className="flex items-center gap-2 mb-3 text-xs text-ink-500">
+            <span className="w-6 border-t-2 border-dashed border-ink-900/25" aria-hidden="true" />
+            target {profile.targets.calories.toLocaleString()} kcal
+          </p>
           <div className="relative flex items-end gap-2 h-40">
             <div
               className="absolute inset-x-0 border-t-2 border-dashed border-ink-900/25 pointer-events-none"
               style={{ bottom: `${Math.min(96, (profile.targets.calories / peak) * 100)}%` }}
-            >
-              <span className="absolute -top-4 right-0 text-[10px] font-bold text-ink-500 bg-paper px-1">
-                target {profile.targets.calories.toLocaleString()}
-              </span>
-            </div>
+            />
             {days.map((d) => {
               const height = (d.n.calories / peak) * 100
               const status = targetStatus(d.n.calories, profile.targets.calories)
               return (
+                // The figures sit under the bars, not above them: above, they
+                // land exactly where the target line runs whenever the week is
+                // near target, and the dashes struck through the digits.
                 <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-                  <span className="text-[10px] font-mono text-ink-500">
-                    {d.n.calories > 0 ? Math.round(d.n.calories) : ''}
-                  </span>
                   <div
                     className={`w-full rounded-t-lg transition-all duration-500 ${STATUS_STYLES[status.level].fill}`}
                     style={{ height: `${Math.max(height, d.n.calories > 0 ? 4 : 0)}%` }}
                   />
-                  <span className="text-[10px] text-ink-500">
+                  <span className="text-[11px] font-mono text-ink-900 tabular-nums leading-none">
+                    {d.n.calories > 0 ? Math.round(d.n.calories) : ''}
+                  </span>
+                  <span className="text-[11px] text-ink-500 leading-none">
                     {new Date(d.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'narrow' })}
                   </span>
                 </div>
