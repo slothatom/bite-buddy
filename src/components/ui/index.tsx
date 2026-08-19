@@ -161,12 +161,16 @@ export function TierBadge({ tier }: { tier: MedTier }) {
  * text — rather than italic, near-invisible grey.
  */
 export function SourceLine({
-  text, lang, truncate = false,
+  text, lang, truncate = false, clamp,
 }: {
   text: string
   lang?: 'ro' | 'hu'
+  /** One line with an ellipsis — for dense lists where the line is a hint. */
   truncate?: boolean
+  /** Up to this many lines — for places where the original wording is the point. */
+  clamp?: 2 | 3
 }) {
+  const wrap = clamp ? (clamp === 2 ? 'line-clamp-2' : 'line-clamp-3') : truncate ? 'truncate' : ''
   return (
     <span className="flex items-start gap-1.5 text-[13px] text-ink-500 min-w-0">
       {lang && (
@@ -174,7 +178,7 @@ export function SourceLine({
           {lang}
         </span>
       )}
-      <span className={truncate ? 'truncate' : ''}>{text}</span>
+      <span className={wrap}>{text}</span>
     </span>
   )
 }
