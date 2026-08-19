@@ -4,7 +4,8 @@
 
 A meal planner built around one person's actual dietician plans and the Mediterranean diet.
 
-Everything lives in the browser — no account, no server, works offline, installable on a phone.
+A local project. Everything lives in your own browser — no account, no server, nothing
+leaves the machine, and it keeps working with the wifi off.
 
 ---
 
@@ -140,21 +141,36 @@ Two independent routes, because they answer different questions — and either c
 
 ## Running it
 
+This is a local project. It is not deployed anywhere, it talks to no server of
+its own, and it is meant to run on your own machine and keep working with the
+wifi off.
+
 ```bash
 npm install
-npm run dev        # http://localhost:5173/
+npm run dev        # http://localhost:5173
 npm run build
-npm run preview    # http://localhost:4173/bite-buddy/
+npm run preview    # http://localhost:4173
 ```
 
 Node 20+ (Vite 8 and React 19 both require it).
 
-The dev server is at the bare root; the production build is served from
-`/bite-buddy/` because that is where GitHub Pages puts it. `vite.config.ts`
-sets `base` per command so the two don't have to match.
-
 Run `npm install` even on an existing clone — React, Vite, Tailwind, Router and
 TypeScript all changed major versions.
+
+`base` is `./`, so the built app runs from wherever it is put — a folder, a
+different port, a USB stick — without being told its own address.
+
+### On your phone, on your own wifi
+
+```bash
+npm run build && npm run serve    # prints a http://192.168.x.x:4173 address
+```
+
+Open that address on the phone. One caveat worth knowing before you rely on it:
+browsers only allow service workers on `localhost` or over HTTPS, so over a
+plain LAN address the app runs as an ordinary web page — no home-screen
+install, no offline once the laptop sleeps. For a phone copy that genuinely
+works offline, use the one-file build below.
 
 ### Checks
 
@@ -170,12 +186,14 @@ npm run build:single   # dist-single/bite-buddy.html — CSS, JS and fonts inlin
 npm run test:single    # asserts it makes no external request at all
 ```
 
-For hosts that take a single document and refuse every subresource. It has no
-manifest, so it can't be installed to a home screen, and a page without an
-origin of its own may have nowhere to persist to — it's a preview, not a
-replacement for hosting the real build.
+Everything in one file — no server, no install, nothing fetched. Put it in your
+phone's Files app or a synced folder and open it; it works with the wifi off.
+Two things it gives up: there's no manifest, so it can't be added to the home
+screen as an app, and opened from certain viewers it may have nowhere to save
+to — take a backup from Settings before closing it if you're unsure.
 
-Both run in CI on every push (`.github/workflows/ci.yml`).
+`npm run verify` and `npm run test:e2e` run in CI on every push
+(`.github/workflows/ci.yml`).
 
 ### Optional
 
@@ -296,11 +314,18 @@ animations are disabled under `prefers-reduced-motion`.
 
 ---
 
+## Deliberately not done
+
+**No backend, no hosting, no sync.** This is a single-user offline tool, and a
+server would mean an account, a deployment and somebody else holding a copy of
+what you eat — all of it cost with no benefit here. Moving between devices is a
+backup file, exported from Settings and restored on the other one. The stores
+sit behind narrow interfaces, so sync could be added later without touching a
+screen; it just isn't wanted.
+
+The same reasoning rules out publishing recipes at public URLs for MyFitnessPal's
+recipe importer to scrape. Clipboard and CSV cover that direction offline.
+
 ## Not done yet
 
-- **Cloud sync.** Currently local-first: your phone and laptop are separate. A Supabase
-  backend is the planned next pass, and the stores are kept behind narrow interfaces so it can
-  slot in without touching screens.
-- Publishing recipes at public URLs with schema.org markup, so MyFitnessPal's recipe importer
-  can pull them by link — needs hosting, so it follows the backend.
-- Pantry tracking, household sharing, saved week templates.
+- Pantry tracking, saved week templates.

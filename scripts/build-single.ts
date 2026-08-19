@@ -45,13 +45,14 @@ if (!jsSrc || !cssHref) {
   throw new Error('Could not find the built script and stylesheet in dist/index.html.')
 }
 
-// Vite writes asset URLs against `base`; strip it back to a path inside dist/.
+// Asset URLs are written relative to whatever references them; everything the
+// build emits lands in dist/assets, so the basename is enough to find it.
 const local = (url: string) => `assets/${basename(url)}`
 
 // Fonts are the only thing the stylesheet reaches out for.
 let css = readFileSync(join(DIST, local(cssHref)), 'utf8')
 let inlined = 0
-css = css.replace(/url\((\/[^)"']+\.(?:woff2?|png|svg))\)/g, (_, url: string) => {
+css = css.replace(/url\((\.?\/[^)"']+\.(?:woff2?|png|svg))\)/g, (_, url: string) => {
   inlined++
   return `url(${dataUri(local(url))})`
 })
