@@ -20,7 +20,7 @@ export default defineConfig({
   reporter: process.env.CI ? 'line' : 'list',
 
   use: {
-    baseURL: 'http://localhost:4173/bite-buddy/',
+    baseURL: 'http://localhost:4173/',
     trace: 'on-first-retry',
     launchOptions: executablePath ? { executablePath } : {},
   },
@@ -51,7 +51,7 @@ export default defineConfig({
   // a local run happily passes against a bundle that predates your changes.
   webServer: {
     command: 'npm run build && npm run preview -- --port 4173 --strictPort',
-    url: 'http://localhost:4173/bite-buddy/',
+    url: 'http://localhost:4173/',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

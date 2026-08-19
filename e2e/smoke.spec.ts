@@ -16,8 +16,9 @@ function trackErrors(page: Page): string[] {
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`))
   page.on('console', (m) => {
     if (m.type() !== 'error') return
-    // Web fonts are fetched from a CDN that a sandboxed CI run cannot reach.
-    if (/fonts\.(googleapis|gstatic)\.com|ERR_CONNECTION|Failed to load resource/.test(m.text())) return
+    // The app is offline-only; the optional nutrition lookups are the one thing
+    // that reaches the network, and a sandboxed CI run cannot reach it.
+    if (/ERR_CONNECTION|Failed to load resource/.test(m.text())) return
     errors.push(`console: ${m.text()}`)
   })
   return errors

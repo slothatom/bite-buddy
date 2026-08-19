@@ -2,14 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig(({ command, isPreview }) => ({
-  // GitHub Pages serves the app from /bite-buddy/, but the dev server is the
-  // root of its own origin — keeping the sub-path locally only means
-  // http://localhost:5173/ 404s, which is a confusing first impression.
-  //
-  // `vite preview` reports command: 'serve' while serving build output, so it
-  // has to keep the sub-path or the built asset URLs point nowhere.
-  base: command === 'build' || isPreview ? '/bite-buddy/' : '/',
+export default defineConfig({
+  // Relative, so the built app runs from wherever it is put — a local server,
+  // a folder on a phone, a USB stick — without being told its own address.
+  base: './',
   plugins: [
     react(),
     VitePWA({
@@ -23,8 +19,8 @@ export default defineConfig(({ command, isPreview }) => ({
         background_color: '#FAF7F0',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/bite-buddy/',
-        scope: '/bite-buddy/',
+        start_url: './',
+        scope: './',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -34,16 +30,6 @@ export default defineConfig(({ command, isPreview }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         runtimeCaching: [
-          {
-            // Fonts are the only third-party asset the app loads.
-            urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\//,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'fonts',
-              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
           {
             // Nutrition lookups are a convenience; a stale answer beats none,
             // but the app must still work with no network at all.
@@ -60,4 +46,4 @@ export default defineConfig(({ command, isPreview }) => ({
       },
     }),
   ],
-}))
+})
