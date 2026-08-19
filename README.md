@@ -71,6 +71,12 @@ as an explicit line rather than being inferred from where the fill stops.
 Plan · Recipes · **+** · Grocery · More, where the centre button opens the first
 empty meal slot and More holds the remaining six screens.
 
+**Filters wrap, they don't scroll.** Recipes has 14 chips and Foods has 17; a
+horizontal scroller showed four of them and hid the rest with no affordance.
+`ChipRow` wraps and collapses to the first few behind a `+N more`, and callers
+sort any active filter to the front so a live filter is never behind the
+toggle.
+
 ---
 
 ## Features
@@ -302,10 +308,18 @@ cycle safety, and the Wednesday week boundary across daylight saving.
 That bug shipped twice here — browsers reparent the inner element and its click
 handler silently stops firing — so it is now caught mechanically.
 
-**End-to-end tests** run at desktop and phone sizes and assert three things per
-screen: it renders with no console errors, it does not scroll horizontally, and
-every control is at least 40x32px. The tap-target check is what keeps the mobile
-work from regressing.
+**End-to-end tests** run at desktop and phone sizes and assert four things per
+screen: it renders with no console errors, it does not scroll horizontally,
+every control is at least 40x32px, and — at phone width — nothing is clipped and
+nothing is hidden inside a sideways scroller.
+
+That last one exists because measuring the screens at 390px turned up nine
+places where the layout was quietly hiding its own content: meal names cut to
+`Potatoes with egg, Teleme…`, the dietician's line reduced to a stub, 829px of
+recipe filters and 1,578px of food categories scrolled out of sight with nothing
+on screen to say they were there. Every one of those looked fine in a
+screenshot. The check compares `scrollWidth` against `clientWidth`, so it does
+not.
 
 **Storage safety** — writes go through a wrapper that degrades instead of
 throwing. A full or blocked localStorage shows a banner rather than losing data
@@ -321,7 +335,14 @@ not a blank white page. On a phone with no console, those are indistinguishable.
 
 **Accessibility** — 44px minimum touch targets under `(pointer: coarse)` only,
 so phones get thumb-sized controls while desktop keeps compact ones, and
-animations are disabled under `prefers-reduced-motion`.
+animations are disabled under `prefers-reduced-motion`. Nothing below 11px.
+
+**A phone is not a narrow desktop.** Two rules came out of the layout pass and
+are worth keeping: a fixed-width column beside flexible text will win at 390px —
+the food rows gave a 112px figures column and a tier badge the room, leaving the
+name 85px of 356 — and any flex child holding text needs `min-w-0`, or it
+refuses to shrink and overflows instead of wrapping. Long content wraps or
+clamps; it is never truncated to a single line where the words carry meaning.
 
 ---
 
