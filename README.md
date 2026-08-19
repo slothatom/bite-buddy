@@ -152,7 +152,18 @@ npm run build
 npm run preview    # http://localhost:4173
 ```
 
-Node 20+ (Vite 8 and React 19 both require it).
+**Node 20.19+, 22.13+, or 24 and up.** Not simply "20 or newer" — the toolchain
+leaves gaps. ESLint 10 is the tightest constraint at
+`^20.19.0 || ^22.13.0 || >=24`, which rules out every odd-numbered release
+along with 20.0–20.18 and 22.0–22.12. Vite 8 and Vitest 4 exclude much the same
+set. Node 24 is the simplest answer and what CI runs; `package.json` now
+declares the range, so npm warns instead of letting you find out from a
+confusing build error.
+
+(`@zxing/library`, pulled in by the barcode scanner, declares
+`engines.node >= 24`. It doesn't bind here — it is browser code that Vite
+bundles and Node never executes — so `npm install` warns about it on Node 22
+and everything still passes.)
 
 Run `npm install` even on an existing clone — React, Vite, Tailwind, Router and
 TypeScript all changed major versions.
