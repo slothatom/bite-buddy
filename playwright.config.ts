@@ -52,7 +52,11 @@ export default defineConfig({
   webServer: {
     command: 'npm run build && npm run preview -- --port 4173 --strictPort',
     url: 'http://localhost:4173/',
-    reuseExistingServer: !process.env.CI,
+    // Never reuse a server that is already up. Reusing it skips the build in
+    // the command above, so the suite silently tests whatever was in dist/ —
+    // which produced a false pass while writing the name-clipping check. If the
+    // port is busy, failing loudly is the correct outcome.
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 })
