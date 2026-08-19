@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Lint, types, unit tests and the data invariants. Fast enough to be the
+  # gate on every push.
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      # Verifies every recipe component resolves, no recipe nests itself, all
+      # 481 plan lines map, names are unique, and each food's stated calories
+      # agree with its own macros.
+      - name: Data integrity
+        run: npm run data:check
+
+      - name: Build
+        run: npm run build
+
+  # Drives the real app in a browser at desktop and phone sizes. Slower, so it
+  # runs alongside rather than blocking the fast checks.
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+
+      # The Playwright config builds before serving, so there is no separate
+      # build step here — one build, and it is the one under test.
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      - name: Upload report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { discardOlderThan, safeStorage, SCHEMA_VERSION } from './persist'
 import type { WeightEntry, BodyMeasurement } from '../types'
 
 interface BodyStore {
@@ -43,6 +44,11 @@ export const useBodyStore = create<BodyStore>()(
         return entries[entries.length - 1]
       },
     }),
-    { name: 'bite-buddy-body' }
+    {
+      name: 'bite-buddy-body',
+      version: SCHEMA_VERSION,
+      storage: safeStorage<BodyStore>(),
+      migrate: discardOlderThan<BodyStore>(SCHEMA_VERSION),
+    }
   )
 )
