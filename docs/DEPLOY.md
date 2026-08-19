@@ -48,6 +48,13 @@ insert into public.allowed_emails (email, note) values
 on conflict (email) do nothing;
 ```
 
+Change them in the SQL editor, not in the repository — this repo is public, and
+an address committed to it is an address published.
+
+**Run the whole file, not just that block.** The insert needs the tables, and
+the tables are created by everything above it. Running the last few lines on
+their own gives `relation "public.allowed_emails" does not exist`.
+
 That list is the whole security model for who gets in. Anyone not on it cannot
 create an account, even knowing the URL and the key — a database trigger
 rejects the signup itself.
