@@ -115,13 +115,13 @@ export default function Planner() {
                     : 'bg-white border-border-200 hover:border-bite-300 text-ink-900'
                 }`}
               >
-                <div className={`text-[10px] sm:text-xs font-semibold uppercase tracking-wide ${isSelected ? 'text-bite-100' : 'text-ink-500'}`}>
+                <div className={`text-[11px] sm:text-xs font-semibold uppercase tracking-wide ${isSelected ? 'text-bite-100' : 'text-ink-500'}`}>
                   {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })}
                 </div>
                 <div className={`text-base sm:text-lg font-bold leading-tight ${isToday && !isSelected ? 'text-bite-700' : ''}`}>
                   {new Date(date + 'T12:00:00').getDate()}
                 </div>
-                <div className={`text-[10px] sm:text-xs font-mono ${isSelected ? 'text-bite-100' : 'text-ink-500'}`}>
+                <div className={`text-[11px] sm:text-xs font-mono tabular-nums ${isSelected ? 'text-bite-100' : 'text-ink-500'}`}>
                   {kcal > 0 ? Math.round(kcal) : '–'}
                 </div>
               </button>

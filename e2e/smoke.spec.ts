@@ -54,23 +54,40 @@ test.describe('layout', () => {
     })
   }
 
-  test('meal names are not clipped on a phone', async ({ page }, testInfo) => {
+  test('nothing is clipped or hidden sideways on a phone', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'mobile', 'this is about the narrow layout')
 
     await goto(page, '/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/')
 
-    // Recipe names run to 46 characters at the median and 77 at the longest,
-    // against roughly 150px of row. They used to be truncated, which turned
-    // most of the planner into "Potatoes with egg, Teleme…". They wrap now, so
-    // nothing in the column should be clipped horizontally.
-    const clipped = await page.evaluate(() =>
-      [...document.querySelectorAll('[data-entry-name]')]
-        .filter((el) => el.scrollWidth > el.clientWidth + 1)
-        .map((el) => el.textContent?.trim() ?? ''))
+    // Every one of these was a real defect at 390px: planner meal names cut to
+    // "Potatoes with egg, Teleme…", the dietician's line reduced to a stub,
+    // 829px of recipe filters and 1,578px of food categories scrolled out of
+    // sight with nothing saying they existed.
+    for (const route of ROUTES) {
+      await goto(page, route)
+      const problems = await page.evaluate(() => {
+        const found: string[] = []
+        const label = (el: Element) => (el.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 40)
+        for (const el of document.querySelectorAll('*')) {
+          if (!(el instanceof HTMLElement)) continue
+          const style = getComputedStyle(el)
+          if (style.display === 'none' || style.visibility === 'hidden') continue
+          const box = el.getBoundingClientRect()
+          if (!box.width || !box.height) continue
 
-    expect(clipped, 'meal names clipped instead of wrapping').toEqual([])
+          if (!el.children.length && label(el) && style.overflowX !== 'visible'
+              && el.scrollWidth > el.clientWidth + 1) {
+            found.push(`clipped by ${el.scrollWidth - el.clientWidth}px: "${label(el)}"`)
+          }
+          if (['auto', 'scroll'].includes(style.overflowX) && el.scrollWidth > el.clientWidth + 4) {
+            found.push(`${el.scrollWidth - el.clientWidth}px hidden in a sideways scroller`)
+          }
+        }
+        return [...new Set(found)]
+      })
+      expect(problems, `${route} hides content at phone width`).toEqual([])
+    }
   })
 
   test('controls are large enough to tap', async ({ page }, testInfo) => {

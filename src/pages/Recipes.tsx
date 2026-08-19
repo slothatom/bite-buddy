@@ -5,7 +5,7 @@ import { useRecipes, useRecipeStore } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { recipePerServing, roundNutrients } from '../lib/nutrition'
 import { normaliseTerm } from '../lib/units'
-import { NutrientSummary, EmptyState, SourceLine } from '../components/ui'
+import { NutrientSummary, EmptyState, SourceLine, ChipRow } from '../components/ui'
 import { recipeForMfp, copyToClipboard } from '../lib/mfp'
 
 const FILTER_TAGS: RecipeTag[] = [
@@ -60,14 +60,15 @@ export default function Recipes() {
             />
           </div>
 
-          <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+          <ChipRow initial={5}>
             <button
               onClick={() => setFavesOnly((v) => !v)}
               className={favesOnly ? 'chip bg-coral-500 text-white border border-coral-500' : 'chip-off'}
             >
               <Star size={12} className={favesOnly ? 'fill-current' : ''} /> Favourites
             </button>
-            {FILTER_TAGS.map((t) => (
+            {/* The chosen tag leads, so it stays visible when the row is collapsed. */}
+            {[...FILTER_TAGS].sort((a, b) => Number(b === tag) - Number(a === tag)).map((t) => (
               <button
                 key={t}
                 onClick={() => setTag(tag === t ? null : t)}
@@ -76,7 +77,7 @@ export default function Recipes() {
                 {t.replace('-', ' ')}
               </button>
             ))}
-          </div>
+          </ChipRow>
         </div>
 
         {filtered.length === 0 ? (
@@ -105,7 +106,7 @@ export default function Recipes() {
                         <span className="block font-semibold text-ink-900 text-sm leading-snug">{r.name.en}</span>
                         {r.sourceLine ? (
                           <span className="block mt-1">
-                            <SourceLine text={r.sourceLine} lang={r.name.hu ? 'hu' : 'ro'} truncate />
+                            <SourceLine text={r.sourceLine} lang={r.name.hu ? 'hu' : 'ro'} clamp={2} />
                           </span>
                         ) : null}
                       </span>
