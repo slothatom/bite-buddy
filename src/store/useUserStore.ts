@@ -124,7 +124,16 @@ export const useUserStore = create<UserStore>()(
       name: 'bite-buddy-user-v2',
       version: SCHEMA_VERSION,
       storage: safeStorage<{ profile: UserProfile }>(),
-      migrate: discardOlderThan<{ profile: UserProfile }>(SCHEMA_VERSION),
+      migrate: (state, version) => {
+        const carried = discardOlderThan<{ profile: UserProfile }>(SCHEMA_VERSION)(state, version)
+        if (!carried?.profile) return carried
+        // The week used to default to Wednesday, following the dietician's own
+        // plans. It is Monday now, and a stored 3 is that old default rather
+        // than a deliberate choice — the setting is still there to change it.
+        return carried.profile.weekStartsOn === 3
+          ? { ...carried, profile: { ...carried.profile, weekStartsOn: DEFAULT_WEEK_START } }
+          : carried
+      },
       // Only the profile is worth keeping; toasts are transient.
       partialize: (s) => ({ profile: s.profile }),
     },

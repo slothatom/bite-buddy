@@ -196,7 +196,8 @@ export default function Settings() {
                 {WEEKDAYS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
               </select>
               <p className="text-xs text-ink-500 mt-1">
-                Your dietician's plans all run Wednesday to Tuesday, which is the default.
+                Monday to Sunday by default. Your dietician's own plans ran Wednesday to
+                Tuesday; loading one lines its days up by weekday either way.
               </p>
             </div>
             <label className="flex items-center gap-3 cursor-pointer">
