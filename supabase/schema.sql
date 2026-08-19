@@ -23,9 +23,9 @@ create table if not exists public.allowed_emails (
 
 alter table public.allowed_emails enable row level security;
 
--- Nobody reads this from the client. It is consulted by the signup trigger,
--- which runs as the definer, and edited from the SQL editor.
-drop policy if exists "allowed_emails are not client-readable" on public.allowed_emails;
+-- No policies, deliberately: with RLS on and nothing granted, the client cannot
+-- read this table at all. The signup trigger below reaches it as the definer,
+-- and you edit it from the SQL editor.
 
 create or replace function public.enforce_allowed_email()
 returns trigger
@@ -137,17 +137,28 @@ create policy "household members update the shared state"
   using (public.is_member())
   with check (public.is_member());
 
--- Push changes to the other person's screen as they happen.
-alter publication supabase_realtime add table public.app_state;
+-- Push changes to the other person's screen as they happen. Wrapped because
+-- adding a table to a publication twice is an error, and this file is meant to
+-- be safe to re-run.
+do $$
+begin
+  alter publication supabase_realtime add table public.app_state;
+exception
+  when duplicate_object then null;
+end;
+$$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- The guest list itself
 --
--- Replace these two addresses, then run the file. Anyone not listed here
--- cannot create an account, even with the URL and the anon key.
+-- Put the real addresses in before running this, and keep them out of the
+-- repository — it is public, and an address committed here is an address
+-- published. Adding someone later is a one-line insert in the SQL editor.
+--
+-- Anyone not listed cannot create an account, even with the URL and the key.
 -- ─────────────────────────────────────────────────────────────────────────────
 
 insert into public.allowed_emails (email, note) values
-  ('arany.mak@rebeldot.com', 'you'),
-  ('second.person@example.com', 'replace with the other address')
+  ('you@example.com',  'you'),
+  ('them@example.com', 'the other person')
 on conflict (email) do nothing;
