@@ -29,8 +29,9 @@ Three things about that source data shape the whole app:
 - **Weights are stated raw.** `50 g bulgur nefiert`, `100 g piept de pui crud`. Dry bulgur is
   roughly three times the calories of cooked, so the state a food is weighed in is part of its
   identity (`raw` / `dry` / `cooked` / `as-sold`).
-- **The week starts on Wednesday.** Every plan runs Wed → Tue. That's the default; it's
-  configurable in Settings.
+- **The dietician's weeks run Wednesday to Tuesday.** The app's week is the ordinary
+  Monday → Sunday; loading a plan lines its days up by weekday, so a Wednesday meal still
+  lands on Wednesday. The start day is configurable in Settings.
 
 The dietician never wrote a single calorie. Supplying them is what this app adds.
 

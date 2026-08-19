@@ -150,10 +150,17 @@ export interface DayPlan {
   meals: PlannedMeal[]
 }
 
-/** 0 = Sunday … 3 = Wednesday. The dietician's weeks all run Wed → Tue. */
+/** 0 = Sunday, 1 = Monday … 6 = Saturday. */
 export type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
-export const DEFAULT_WEEK_START: WeekStart = 3
+/**
+ * Monday → Sunday.
+ *
+ * The dietician's own plans all run Wednesday to Tuesday, but the app's week is
+ * the ordinary one. Loading a plan lines its days up by weekday, so a Wednesday
+ * meal still lands on Wednesday — it just sits mid-week instead of first.
+ */
+export const DEFAULT_WEEK_START: WeekStart = 1
 
 // ─── Source plan archive ──────────────────────────────────────────────────────
 
