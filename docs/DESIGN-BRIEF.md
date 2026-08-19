@@ -6,6 +6,14 @@ design decisions.
 
 Written to be handed to a designer, or fed to a tool, as the source of truth.
 
+> **Superseded.** This brief was the input that produced
+> [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md), which is now the authority — and the two
+> disagree. Section 10's typography (Fredoka + Nunito) belongs to the earlier
+> "cute and cozy" round; the app ships Bungee + Plus Jakarta Sans, and the Fredoka
+> and Nunito packages have been uninstalled. Read this for the screen, state and
+> content inventory, which is still accurate; read the design system for anything
+> visual.
+
 ---
 
 ## 1. What the app is
