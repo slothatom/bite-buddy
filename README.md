@@ -4,8 +4,8 @@
 
 A meal planner built around one person's actual dietician plans and the Mediterranean diet.
 
-A local project. Everything lives in your own browser — no account, no server, nothing
-leaves the machine, and it keeps working with the wifi off.
+Two people, one shared week. Deployed free on GitHub Pages with a Supabase back end,
+and it still runs entirely offline on your own machine with no account at all.
 
 ---
 
@@ -68,8 +68,8 @@ as an explicit line rather than being inferred from where the fill stops.
 **Mediterranean tiers** use a symbol and a word (`● Daily`, `◐ Weekly`,
 `○ Moderation`, `◇ Rarely`), quiet enough to sit on 122 food rows at once.
 
-**Navigation.** Nine destinations in the desktop sidebar; on a phone the bar is
-Plan · Recipes · **+** · Grocery · More, where the centre button opens the first
+**Navigation.** Ten destinations in the desktop sidebar; on a phone the bar is
+Home · Plan · **+** · Recipes · More, where the centre button opens the first
 empty meal slot and More holds the remaining six screens.
 
 **Filters wrap, they don't scroll.** Recipes has 14 chips and Foods has 17; a
@@ -82,8 +82,13 @@ toggle.
 
 ## Features
 
+### Home
+Where you land: today's meals against your calorie ring, the week as seven bars, and who
+else is in the household and when they were last here. On the deployed app it also says
+whether your copy and theirs are in step.
+
 ### Planner
-Wed→Tue week grid, five slots a day (breakfast, two snacks, lunch, dinner), live totals against
+Mon→Sun week grid, five slots a day (breakfast, two snacks, lunch, dinner), live totals against
 your targets, copy a day to another day, and one-tap copy of a whole day formatted for
 MyFitnessPal.
 
@@ -146,11 +151,29 @@ Two independent routes, because they answer different questions — and either c
 
 ---
 
+## Deployment
+
+Free end to end: **GitHub Pages** for the site, **Supabase** free tier for the
+database and the sign-in links. Sign-in is a magic link — no passwords — and the
+guest list lives in the database, so an address that isn't on it cannot create
+an account even with the URL and the key.
+
+Everything is shared between the two accounts: one week, one grocery list, one
+recipe library. Each store syncs as a document and Postgres realtime pushes
+changes to the other screen as they happen. The honest limit is last-write-wins
+per store — with two people that is rare, and you see it happen.
+
+Setup is four steps, all in [`docs/DEPLOY.md`](docs/DEPLOY.md): make the repo
+public, create the Supabase project, run `supabase/schema.sql`, add two
+repository secrets. Every push then deploys itself.
+
+---
+
 ## Running it
 
-This is a local project. It is not deployed anywhere, it talks to no server of
-its own, and it is meant to run on your own machine and keep working with the
-wifi off.
+Locally it needs no account and no network. Without `VITE_SUPABASE_URL` set
+there is no sign-in screen and no sync — the app runs entirely on localStorage,
+which is also why the test suite needs no database.
 
 ```bash
 npm install
@@ -349,16 +372,21 @@ clamps; it is never truncated to a single line where the words carry meaning.
 
 ## Deliberately not done
 
-**No backend, no hosting, no sync.** This is a single-user offline tool, and a
-server would mean an account, a deployment and somebody else holding a copy of
-what you eat — all of it cost with no benefit here. Moving between devices is a
-backup file, exported from Settings and restored on the other one. The stores
-sit behind narrow interfaces, so sync could be added later without touching a
-screen; it just isn't wanted.
+**No conflict resolution.** Sync is last-write-wins per store, not a merge. Two
+people editing the same day within a second of each other lose one of the two
+edits. Proper merging means per-entry rows, timestamps and a resolution UI —
+a lot of machinery for a two-person household where realtime already makes the
+collision visible.
 
-The same reasoning rules out publishing recipes at public URLs for MyFitnessPal's
-recipe importer to scrape. Clipboard and CSV cover that direction offline.
+**No per-user data.** You share everything, by choice. There is no notion of
+"my plan" and "their plan", which is what keeps the permission model down to a
+single question: are you a member of this household.
+
+**Nothing is published publicly.** The site is public; your data is not. That
+also rules out publishing recipes at public URLs for MyFitnessPal's importer to
+scrape — clipboard and CSV cover that direction.
 
 ## Not done yet
 
 - Pantry tracking, saved week templates.
+- Push notifications when the other person changes the week.
