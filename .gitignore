@@ -4,3 +4,9 @@ dist/
 *.local
 .env
 .env.*
+test-results/
+playwright-report/
+dist-single/
+
+# Local Supabase credentials
+.env.local
