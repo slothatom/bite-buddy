@@ -109,7 +109,7 @@ export default function Planner() {
               <button
                 key={date}
                 onClick={() => setSelected(date)}
-                className={`rounded-xl p-2 sm:p-3 text-center transition-all border ${
+                className={`rounded-xl px-1 py-2.5 sm:p-3 text-center transition-all border ${
                   isSelected
                     ? 'bg-bite-500 text-white border-bite-500 shadow-xs'
                     : 'bg-white border-border-200 hover:border-bite-300 text-ink-900'
@@ -235,7 +235,7 @@ function SlotRow({
                 ))}
                 {meal.note ? (
                   <div className="pt-0.5" title={meal.note}>
-                    <SourceLine text={meal.note} truncate />
+                    <SourceLine text={meal.note} clamp={2} />
                   </div>
                 ) : null}
               </div>
@@ -272,12 +272,18 @@ function EntryLine({ entry }: { entry: Component }) {
     : `${Math.round(entry.grams)} g`
   const emoji = entry.kind === 'recipe' ? ctx.recipes.get(entry.recipeId)?.emoji ?? '🍽️' : '·'
 
+  // The names are long — 46 characters at the median, 77 at the longest — and a
+  // phone gives this row about 150px. Truncating turned most of them into
+  // "Potatoes with egg, Teleme…", so the name wraps and the numbers hold their
+  // own column instead. w-14 was two digits wider than four digits need.
   return (
     <div className="flex items-baseline gap-2 text-sm">
-      <span className="text-base leading-none">{emoji}</span>
-      <span className="flex-1 min-w-0 truncate text-ink-900">{label}</span>
-      {detail ? <span className="text-xs text-ink-500 font-mono shrink-0">{detail}</span> : null}
-      <span className="text-xs text-ink-700 font-mono shrink-0 w-14 text-right">{Math.round(kcal)}</span>
+      <span className="text-base leading-none shrink-0">{emoji}</span>
+      <span data-entry-name className="flex-1 min-w-0 text-ink-900">{label}</span>
+      {detail ? <span className="text-xs text-ink-500 font-mono shrink-0 tabular-nums">{detail}</span> : null}
+      <span className="text-xs text-ink-700 font-mono shrink-0 tabular-nums w-10 sm:w-14 text-right">
+        {Math.round(kcal)}
+      </span>
     </div>
   )
 }

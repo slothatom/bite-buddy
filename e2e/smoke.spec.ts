@@ -54,6 +54,25 @@ test.describe('layout', () => {
     })
   }
 
+  test('meal names are not clipped on a phone', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', 'this is about the narrow layout')
+
+    await goto(page, '/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/')
+
+    // Recipe names run to 46 characters at the median and 77 at the longest,
+    // against roughly 150px of row. They used to be truncated, which turned
+    // most of the planner into "Potatoes with egg, Teleme…". They wrap now, so
+    // nothing in the column should be clipped horizontally.
+    const clipped = await page.evaluate(() =>
+      [...document.querySelectorAll('[data-entry-name]')]
+        .filter((el) => el.scrollWidth > el.clientWidth + 1)
+        .map((el) => el.textContent?.trim() ?? ''))
+
+    expect(clipped, 'meal names clipped instead of wrapping').toEqual([])
+  })
+
   test('controls are large enough to tap', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'mobile', 'touch sizing only applies to coarse pointers')
 
