@@ -238,7 +238,12 @@ export default function Recipes() {
         )}
 
         {shown.length === 0 ? (
-          <EmptyShelf tab={tab} filtered={filtered} onNew={() => setEditing(null)} />
+          <EmptyShelf
+            tab={tab}
+            filtered={filtered}
+            onNew={() => setEditing(null)}
+            onClear={() => { setQuery(''); setCategory(null); setFilters([]); setFavesOnly(false) }}
+          />
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {cards.map((card) => (
@@ -464,11 +469,22 @@ function TidyBanner({ groups, onTidy }: { groups: RecipeVariants[]; onTidy: () =
 }
 
 /** What an empty shelf should say depends on why it is empty. */
-function EmptyShelf({ tab, filtered, onNew }: { tab: Tab; filtered: boolean; onNew: () => void }) {
+function EmptyShelf({
+  tab, filtered, onNew, onClear,
+}: {
+  tab: Tab
+  filtered: boolean
+  onNew: () => void
+  onClear: () => void
+}) {
   if (filtered) {
+    // Three dimensions can combine into a corner with nothing in it and no
+    // shelf to move to — every tab reading zero. Telling you to try another
+    // shelf would be useless advice, so there is a way straight out.
     return (
       <EmptyState title="Nothing matching that just yet">
-        Try another word, another shelf, or clear the filters.
+        <p>That combination has nothing in it.</p>
+        <button className="btn-primary mt-4" onClick={onClear}>Clear the filters</button>
       </EmptyState>
     )
   }
