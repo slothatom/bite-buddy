@@ -168,6 +168,33 @@ test.describe('the main flow', () => {
     expect(pickable, 'Schedule offers no recipes to batch').toBeGreaterThan(10)
   })
 
+  test('a cook session is built from what is planned, and its buttons stay in the card', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    await goto(page, '/schedule')
+    await page.getByRole('button', { name: /Session/ }).click()
+
+    // The week's own dishes come first, ahead of two hundred you are not
+    // cooking.
+    await expect(page.getByText('Planned this week')).toBeVisible()
+
+    // Search narrows it.
+    const before = await page.locator('input[type=checkbox]').count()
+    await page.getByLabel('Search dishes').fill('soup')
+    const after = await page.locator('input[type=checkbox]').count()
+    expect(after, 'search returned nothing at all').toBeGreaterThan(0)
+    expect(after, 'search did not narrow the list').toBeLessThan(before)
+
+    // Save sits inside the dialog. The inline safe-area padding used to
+    // replace the card's bottom padding rather than add to it, so the buttons
+    // sat flush against the edge.
+    const save = page.getByRole('button', { name: 'Save' })
+    const box = await save.boundingBox()
+    const card = await page.locator('.bg-paper.shadow-xl').boundingBox()
+    expect(box && card && box.y + box.height).toBeLessThanOrEqual((card?.y ?? 0) + (card?.height ?? 0))
+  })
+
   test('targets can be taken from the plan history', async ({ page }) => {
     await goto(page, '/settings')
     await expect(page.getByText(/Averaged over \d+ full days/)).toBeVisible()

@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { Plus, Check, Trash2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Plus, Check, Trash2, Search } from 'lucide-react'
 import { useCookStore } from '../store/useCookStore'
 import { useRecipes } from '../store/useRecipeStore'
+import { useMealPlanStore } from '../store/useMealPlanStore'
 import { EmptyState } from '../components/ui'
 
 /**
@@ -97,50 +98,119 @@ function SessionDialog({
   onClose: () => void
   onSave: (s: { id: string; date: string; time: string; recipeIds: string[]; label: string; completed: boolean }) => void
 }) {
+  const plan = useMealPlanStore((s) => s.plan)
   const [label, setLabel] = useState('')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [time, setTime] = useState('18:00')
   const [picked, setPicked] = useState<string[]>([])
+  const [query, setQuery] = useState('')
+
+  /**
+   * What you are actually cooking this week, first.
+   *
+   * The picker offered all 207 recipes in library order, so building a session
+   * meant scrolling past two hundred dishes nobody is eating to find the four
+   * that are planned. Those four are the point of a batch cook.
+   */
+  const plannedIds = useMemo(() => {
+    const ids = new Set<string>()
+    for (const day of plan) {
+      for (const meal of day.meals) {
+        for (const entry of meal.entries) {
+          if (entry.kind === 'recipe') ids.add(entry.recipeId)
+        }
+      }
+    }
+    return ids
+  }, [plan])
+
+  const matches = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const hit = (r: ReturnType<typeof useRecipes>[number]) =>
+      !q || [r.name.en, r.name.ro, r.name.hu].some((n) => n?.toLowerCase().includes(q))
+    const found = recipes.filter(hit)
+    return {
+      planned: found.filter((r) => plannedIds.has(r.id)),
+      rest: found.filter((r) => !plannedIds.has(r.id)),
+    }
+  }, [recipes, plannedIds, query])
+
+  const toggle = (id: string) =>
+    setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]))
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
-      <div className="bg-paper w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl p-5 space-y-4"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-        onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-base font-extrabold text-ink-900">New cook session</h2>
+      {/* A column with one scrolling middle. The whole dialog used to scroll,
+          which pushed Save off the bottom edge, and the inline safe-area
+          padding replaced the bottom padding rather than adding to it, so the
+          buttons sat flush against the edge of the card. */}
+      <div
+        className="bg-paper w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] flex flex-col shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="p-5 pb-3 space-y-4 shrink-0">
+          <h2 className="text-base font-extrabold text-ink-900">New cook session</h2>
 
-        <div>
-          <label className="label">What is it for</label>
-          <input className="input" placeholder="Sunday batch cook" value={label} onChange={(e) => setLabel(e.target.value)} />
-        </div>
-        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="label">Date</label>
-            <input type="date" className="input" value={date} onChange={(e) => setDate(e.target.value)} />
+            <label className="label">What is it for</label>
+            <input className="input" placeholder="Sunday batch cook" value={label} onChange={(e) => setLabel(e.target.value)} />
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="label">Date</label>
+              <input type="date" className="input" value={date} onChange={(e) => setDate(e.target.value)} />
+            </div>
+            <div>
+              <label className="label">Time</label>
+              <input type="time" className="input" value={time} onChange={(e) => setTime(e.target.value)} />
+            </div>
+          </div>
+
           <div>
-            <label className="label">Time</label>
-            <input type="time" className="input" value={time} onChange={(e) => setTime(e.target.value)} />
+            <label className="label">Dishes ({picked.length} picked)</label>
+            <div className="relative">
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
+              <input
+                className="input pl-9"
+                placeholder="Search your recipes"
+                aria-label="Search dishes"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
           </div>
         </div>
 
-        <div>
-          <label className="label">Dishes ({picked.length} picked)</label>
-          <div className="max-h-52 overflow-y-auto card-soft divide-y divide-border-200">
-            {recipes.map((r) => (
-              <label key={r.id} className="flex items-center gap-2.5 px-3 py-2 cursor-pointer text-sm">
-                <input
-                  type="checkbox" className="w-4 h-4 accent-bite-500"
-                  checked={picked.includes(r.id)}
-                  onChange={() => setPicked((p) => p.includes(r.id) ? p.filter((x) => x !== r.id) : [...p, r.id])}
-                />
-                <span className="text-ink-900">{r.emoji} {r.name.en}</span>
-              </label>
+        <div className="flex-1 min-h-0 overflow-y-auto px-5">
+          <div className="card-soft divide-y divide-border-200">
+            {matches.planned.length > 0 && (
+              <p className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-ink-500 bg-cream-50">
+                Planned this week
+              </p>
+            )}
+            {matches.planned.map((r) => (
+              <DishRow key={r.id} recipe={r} on={picked.includes(r.id)} onToggle={() => toggle(r.id)} />
             ))}
+
+            {matches.rest.length > 0 && (
+              <p className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-ink-500 bg-cream-50">
+                Everything else
+              </p>
+            )}
+            {matches.rest.map((r) => (
+              <DishRow key={r.id} recipe={r} on={picked.includes(r.id)} onToggle={() => toggle(r.id)} />
+            ))}
+
+            {matches.planned.length === 0 && matches.rest.length === 0 && (
+              <p className="px-3 py-4 text-sm text-ink-500">Nothing matches "{query.trim()}".</p>
+            )}
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div
+          className="flex gap-2 p-5 pt-3 shrink-0 border-t border-border-100"
+          style={{ paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))' }}
+        >
           <button className="btn-secondary flex-1" onClick={onClose}>Cancel</button>
           <button
             className="btn-primary flex-1"
@@ -154,5 +224,20 @@ function SessionDialog({
         </div>
       </div>
     </div>
+  )
+}
+
+function DishRow({
+  recipe, on, onToggle,
+}: {
+  recipe: ReturnType<typeof useRecipes>[number]
+  on: boolean
+  onToggle: () => void
+}) {
+  return (
+    <label className="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer text-sm">
+      <input type="checkbox" className="w-4 h-4 accent-bite-500 shrink-0" checked={on} onChange={onToggle} />
+      <span className="text-ink-900 min-w-0">{recipe.emoji} {recipe.name.en}</span>
+    </label>
   )
 }
