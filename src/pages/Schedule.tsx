@@ -16,7 +16,10 @@ export default function Schedule() {
   const recipes = useRecipes()
   const [adding, setAdding] = useState(false)
 
-  const batchable = recipes.filter((r) => r.steps.length > 0)
+  // Every recipe with ingredients can be batch-cooked. This used to require a
+  // written method, and since none of the imported meals carry one, the picker
+  // was always empty and no session could be built.
+  const batchable = recipes.filter((r) => r.components.length > 0)
 
   return (
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
@@ -101,7 +104,7 @@ function SessionDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
-      <div className="bg-white w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl p-5 space-y-4"
+      <div className="bg-paper w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl p-5 space-y-4"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}>
         <h2 className="text-base font-extrabold text-ink-900">New cook session</h2>

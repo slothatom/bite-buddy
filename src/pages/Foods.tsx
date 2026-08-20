@@ -1,11 +1,17 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { Search, Plus, X, Loader2 } from 'lucide-react'
 import type { Food, MedCategory, MedTier } from '../types'
 import { useFoods, useFoodStore } from '../store/useFoodStore'
 import { searchFoods, buildFoodIndex } from '../lib/foodSearch'
 import { TierBadge, EmptyState, SourceLine, ChipRow } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS, CATEGORY_ORDER } from '../lib/categories'
-import { searchFoods as lookupOnline, type NutritionResult } from '../services/nutritionApi'
+import {
+  searchFoods as lookupOnline, lookupBarcode,
+  type NutritionResult, type LookupOutcome, type LookupProblem,
+} from '../services/nutritionApi'
+// @zxing is 477 kB — bigger than the rest of the app put together. Loading it
+// only when the Scan tab is opened keeps it out of everyone else's way.
+const BarcodeScanner = lazy(() => import('../components/recipes/BarcodeScanner'))
 
 /**
  * The food database.
@@ -138,9 +144,12 @@ export default function Foods() {
  */
 function AddFoodModal({ onClose }: { onClose: () => void }) {
   const { addFood } = useFoodStore()
-  const [tab, setTab] = useState<'manual' | 'lookup'>('manual')
+  const [tab, setTab] = useState<'manual' | 'lookup' | 'scan'>('manual')
+  const [scanError, setScanError] = useState<string | null>(null)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<NutritionResult[]>([])
+  const [problems, setProblems] = useState<LookupOutcome['problems']>([])
+  const [searched, setSearched] = useState(false)
   const [searching, setSearching] = useState(false)
 
   const [draft, setDraft] = useState({
@@ -154,10 +163,31 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
     if (!query.trim()) return
     setSearching(true)
     try {
-      setResults(await lookupOnline(query))
+      const outcome = await lookupOnline(query)
+      setResults(outcome.results)
+      setProblems(outcome.problems)
     } finally {
+      setSearched(true)
       setSearching(false)
     }
+  }
+
+  /** Fills the form from a lookup or a scan and hands you back the fields. */
+  function applyResult(r: NutritionResult) {
+    setDraft((d) => ({
+      ...d, en: r.name,
+      calories: r.per100g.calories, protein: r.per100g.protein,
+      carbs: r.per100g.carbs, fat: r.per100g.fat,
+      fiber: r.micros?.fiber ?? 0,
+    }))
+    setTab('manual')
+  }
+
+  async function onBarcode(code: string) {
+    setScanError(null)
+    const outcome = await lookupBarcode(code)
+    if (outcome.found) applyResult(outcome.food)
+    else setScanError(barcodeMessage(outcome.reason))
   }
 
   function save() {
@@ -183,7 +213,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
-      <div className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
+      <div className="bg-paper w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} onClick={(e) => e.stopPropagation()}>
         <header className="flex items-center justify-between px-5 py-4 border-b border-border-200">
           <h2 className="text-base font-extrabold text-ink-900">Add a food</h2>
@@ -192,10 +222,10 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
 
         <div className="p-5 space-y-4">
           <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
-            {(['manual', 'lookup'] as const).map((t) => (
+            {(['manual', 'lookup', 'scan'] as const).map((t) => (
               <button key={t} onClick={() => setTab(t)}
                 className={tab === t ? 'tab-on' : 'tab-off'}>
-                {t === 'manual' ? 'Type it in' : 'Look it up'}
+                {t === 'manual' ? 'Type it in' : t === 'lookup' ? 'Look it up' : 'Scan'}
               </button>
             ))}
           </div>
@@ -215,15 +245,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
               <div className="space-y-1 max-h-56 overflow-y-auto">
                 {results.map((r, i) => (
                   <button key={i}
-                    onClick={() => {
-                      setDraft((d) => ({
-                        ...d, en: r.name,
-                        calories: r.per100g.calories, protein: r.per100g.protein,
-                        carbs: r.per100g.carbs, fat: r.per100g.fat,
-                        fiber: r.micros?.fiber ?? 0,
-                      }))
-                      setTab('manual')
-                    }}
+                    onClick={() => applyResult(r)}
                     className="w-full text-left px-3 py-2 rounded-xl hover:bg-cream-50">
                     <p className="text-sm text-ink-900">{r.name}</p>
                     <p className="text-xs text-ink-500 font-mono">
@@ -233,10 +255,32 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                 ))}
                 {!searching && !results.length && (
                   <p className="text-sm text-ink-500 text-center py-4">
-                    Nothing yet — search above, or just type it in by hand.
+                    {!searched
+                      ? 'Nothing yet — search above, or just type it in by hand.'
+                      : lookupMessage(problems)}
+                  </p>
+                )}
+                {/* Partial failures matter too: results from one source while
+                    the other is down looks like a complete answer otherwise. */}
+                {!searching && results.length > 0 && problems.length > 0 && (
+                  <p className="text-xs text-mustard-700 text-center pt-1">
+                    {lookupMessage(problems)}
                   </p>
                 )}
               </div>
+            </div>
+          )}
+
+          {tab === 'scan' && (
+            <div className="space-y-3">
+              <p className="text-sm text-ink-700">
+                Point the camera at a barcode. Packaged goods only — Open Food Facts has no
+                barcode for a carrot.
+              </p>
+              <Suspense fallback={<p className="text-sm text-ink-500">Starting the camera…</p>}>
+                <BarcodeScanner onDetected={(code) => void onBarcode(code)} onClose={() => setTab('manual')} />
+              </Suspense>
+              {scanError && <p className="text-sm text-coral-600">{scanError}</p>}
             </div>
           )}
 
@@ -299,4 +343,37 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
       </div>
     </div>
   )
+}
+
+/**
+ * What to say when a lookup did not simply find nothing.
+ *
+ * Being rate-limited is the common one: without a key of your own the USDA
+ * allows about 30 requests an hour, and the old code reported that as "no
+ * results", which sends you off to type in numbers it already had.
+ */
+function lookupMessage(problems: LookupOutcome['problems']): string {
+  if (!problems.length) return 'No matches — try another spelling, or type it in by hand.'
+
+  if (problems.every((p) => p.reason === 'offline')) {
+    return "You're offline, so the food databases can't be reached. Type it in by hand and it'll work the same."
+  }
+  if (problems.some((p) => p.reason === 'rate-limited')) {
+    return 'The USDA database is rate-limiting this app. Wait a few minutes, add your own free API key, or type it in by hand.'
+  }
+  const down = problems.map((p) => (p.source === 'usda' ? 'USDA' : 'Open Food Facts')).join(' and ')
+  return `${down} ${problems.length > 1 ? 'are' : 'is'} not responding right now. Try again shortly, or type it in by hand.`
+}
+
+function barcodeMessage(reason: 'unknown-product' | LookupProblem): string {
+  switch (reason) {
+    case 'unknown-product':
+      return "Open Food Facts doesn't know that barcode. Type the label's numbers in instead."
+    case 'offline':
+      return "You're offline, so the barcode can't be looked up. The label has the same numbers on it."
+    case 'rate-limited':
+      return 'Too many lookups just now — wait a moment and scan again.'
+    default:
+      return 'Open Food Facts is not responding. Try again shortly, or type it in.'
+  }
 }
