@@ -228,6 +228,27 @@ test.describe('the main flow', () => {
   })
 })
 
+test.describe('the home screen', () => {
+  test('answers the glance: numbers, a trend, today, and something to try', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/')
+
+    // Four tiles across the top.
+    await expect(page.getByText('Mediterranean', { exact: false }).first()).toBeVisible()
+    await expect(page.getByText("of the guide's goals")).toBeVisible()
+    await expect(page.getByText('days planned').first()).toBeVisible()
+
+    // A fortnight of bars rather than a week: fourteen columns.
+    const bars = page.locator('[title*="kcal"]')
+    await expect(bars).toHaveCount(14)
+
+    // And ideas, every one of which is grounded in the plan or the guide.
+    await expect(page.getByText('Worth a thought')).toBeVisible()
+    await expect(page.getByText('Nothing here is invented.')).toBeVisible()
+  })
+})
+
 test.describe('the shopping list', () => {
   test('is built from the days you choose, and can be corrected afterwards', async ({ page }) => {
     await goto(page, '/settings/history')

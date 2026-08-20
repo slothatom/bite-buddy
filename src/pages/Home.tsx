@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  CalendarDays, ShoppingBasket, BookOpen, ArrowRight,
-  Cloud, CloudOff, RefreshCw, AlertTriangle,
+  CalendarDays, ShoppingBasket, BookOpen, ArrowRight, Sparkles,
+  Cloud, CloudOff, RefreshCw, AlertTriangle, CookingPot, Scale,
 } from 'lucide-react'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { useUserStore } from '../store/useUserStore'
@@ -18,6 +18,12 @@ import { isConfigured } from '../lib/supabase'
 import Zig from '../components/brand/Mascot'
 import { MOMENTS } from '../lib/moments'
 import { useWatchForMoments } from '../store/useMoments'
+import { useRecipes } from '../store/useRecipeStore'
+import { useCookStore } from '../store/useCookStore'
+import { useBodyStore } from '../store/useBodyStore'
+import { scoreWeek } from '../lib/mediterranean'
+import { suggest } from '../lib/suggestions'
+import { PEOPLE } from '../lib/people'
 
 /**
  * The welcome screen, what you land on, before the planner.
@@ -29,6 +35,8 @@ import { useWatchForMoments } from '../store/useMoments'
 export default function Home() {
   useWatchForMoments()
   const { plan, weekDates } = useMealPlanStore()
+  const recipes = useRecipes()
+  const sessions = useCookStore((s) => s.sessions)
   const { profile } = useUserStore()
   const ctx = useNutritionContext()
   const members = useAuthStore((s) => s.members)
@@ -44,6 +52,47 @@ export default function Home() {
   )
   const plannedDays = days.filter((d) => d.kcal > 0).length
   const others = members.filter((m) => m.id !== me?.id)
+
+  /** The days of this week, for the guide's scoring. */
+  const weekPlan = useMemo(
+    () => plan.filter((d) => weekDates.includes(d.date)),
+    [plan, weekDates],
+  )
+
+  // How much of the guide the week keeps to, as one number. Limit categories
+  // count when you are under them, everything else when you are over.
+  const mediterranean = useMemo(() => {
+    const scored = scoreWeek(weekPlan, ctx)
+    const met = scored.filter((g) => (g.isLimit ? g.ratio <= 1 : g.ratio >= 0.9)).length
+    return { met, of: scored.length }
+  }, [weekPlan, ctx])
+
+  /** The last fortnight, so a trend has something to be a trend of. */
+  const fortnight = useMemo(() => {
+    const from = new Date(today + 'T12:00:00')
+    from.setDate(from.getDate() - 13)
+    const start = from.toISOString().slice(0, 10)
+    const out: { date: string; kcal: number }[] = []
+    for (let i = 0; i < 14; i++) {
+      const d = new Date(start + 'T12:00:00')
+      d.setDate(d.getDate() + i)
+      const date = d.toISOString().slice(0, 10)
+      const day = plan.find((p) => p.date === date)
+      out.push({ date, kcal: day ? dayNutrients(day, ctx).calories : 0 })
+    }
+    return out
+  }, [plan, ctx, today])
+
+  const nextCook = useMemo(
+    () => sessions.filter((s) => !s.completed && s.date >= today)
+      .sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`))[0],
+    [sessions, today],
+  )
+
+  const ideas = useMemo(
+    () => suggest({ days: weekPlan, recipes, ctx, today }),
+    [weekPlan, recipes, ctx, today],
+  )
 
   return (
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
@@ -62,6 +111,41 @@ export default function Home() {
             </p>
           </div>
         </header>
+
+        {/* ─── At a glance ─────────────────────────────────────────────────── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <Tile
+            label="Today"
+            value={todayTotals?.calories ? Math.round(todayTotals.calories).toLocaleString() : '0'}
+            unit="kcal"
+            note={`of ${profile.targets.calories.toLocaleString()}`}
+          />
+          <Tile
+            label="This week"
+            value={`${plannedDays}`}
+            unit="of 7"
+            note="days planned"
+          />
+          <Tile
+            label="Mediterranean"
+            value={`${mediterranean.met}`}
+            unit={`of ${mediterranean.of}`}
+            note="of the guide's goals"
+            to="/analytics"
+          />
+          {nextCook ? (
+            <Tile
+              label="Next cook"
+              value={new Date(nextCook.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })}
+              unit={nextCook.time}
+              note={nextCook.label}
+              icon={CookingPot}
+              to="/schedule"
+            />
+          ) : (
+            <WeightTile />
+          )}
+        </div>
 
         {/* ─── Today ───────────────────────────────────────────────────────── */}
         <section>
@@ -125,18 +209,20 @@ export default function Home() {
               )}
             </p>
 
-            <div className="flex items-end gap-1.5 h-16">
-              {weekDates.map((date) => {
-                const kcal = days.find((d) => d.date === date)?.kcal ?? 0
-                const peak = Math.max(profile.targets.calories, ...days.map((d) => d.kcal), 1)
+            {/* A fortnight rather than a week: seven bars is a snapshot, two
+                weeks is the first length at which a habit is visible. */}
+            <div className="flex items-end gap-1 h-16">
+              {fortnight.map(({ date, kcal }) => {
+                const peak = Math.max(profile.targets.calories, ...fortnight.map((d) => d.kcal), 1)
                 const status = targetStatus(kcal, profile.targets.calories)
                 return (
                   <div key={date} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                     <div
+                      title={`${new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}: ${Math.round(kcal)} kcal`}
                       className={`w-full rounded-t transition-all ${kcal > 0 ? STATUS_STYLES[status.level].fill : 'bg-border-100'}`}
                       style={{ height: `${kcal > 0 ? Math.max((kcal / peak) * 100, 6) : 6}%` }}
                     />
-                    <span className={`text-[11px] leading-none ${date === today ? 'font-bold text-ink-900' : 'text-ink-500'}`}>
+                    <span className={`text-[10px] leading-none ${date === today ? 'font-bold text-ink-900' : 'text-ink-300'}`}>
                       {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'narrow' })}
                     </span>
                   </div>
@@ -151,6 +237,32 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* ─── Ideas ───────────────────────────────────────────────────────── */}
+        {ideas.length > 0 && (
+          <section>
+            <SectionHeading>Worth a thought</SectionHeading>
+            <div className="card divide-y divide-border-100">
+              {ideas.map((idea) => (
+                <Link
+                  key={idea.id}
+                  to={idea.to}
+                  className="flex items-start gap-3 px-4 py-3 hover:bg-cream-50 transition-colors"
+                >
+                  <Sparkles size={16} className="text-bite-600 shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-ink-900">{idea.title}</p>
+                    <p className="text-xs text-ink-700 mt-0.5">{idea.reason}</p>
+                  </div>
+                  <ArrowRight size={15} className="text-ink-300 shrink-0 mt-0.5" />
+                </Link>
+              ))}
+            </div>
+            <p className="text-xs text-ink-500 mt-2 px-1">
+              All from your own library and your dietician's guide. Nothing here is invented.
+            </p>
+          </section>
+        )}
 
         {/* ─── The household ───────────────────────────────────────────────── */}
         {isConfigured && (
@@ -182,6 +294,92 @@ export default function Home() {
         )}
       </div>
     </div>
+  )
+}
+
+/**
+ * One number, big enough to read while walking past.
+ *
+ * The dashboard's job is to be glanceable: four of these answer "am I on
+ * track" without reading a sentence. Anything that needs a sentence belongs
+ * further down the page.
+ */
+function Tile({
+  label, value, unit, note, icon: Icon, to,
+}: {
+  label: string
+  value: string
+  unit?: string
+  note?: string
+  icon?: typeof CalendarDays
+  to?: string
+}) {
+  const body = (
+    <>
+      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
+        {Icon && <Icon size={12} />} {label}
+      </p>
+      <p className="text-xl font-extrabold text-ink-900 leading-tight mt-0.5">
+        {value}
+        {unit && <span className="text-xs font-semibold text-ink-500 ml-1">{unit}</span>}
+      </p>
+      {note && <p className="text-[11px] text-ink-500 truncate">{note}</p>}
+    </>
+  )
+
+  return to
+    ? <Link to={to} className="card p-3 min-w-0 hover:border-bite-300 transition-colors">{body}</Link>
+    : <div className="card p-3 min-w-0">{body}</div>
+}
+
+/**
+ * The fourth tile when no cook session is coming up.
+ *
+ * Whoever weighed in most recently, since a shared screen should show whoever
+ * is actually keeping a log rather than an empty box for the person who is
+ * not.
+ */
+function WeightTile() {
+  const weights = useBodyStore((s) => s.weightEntries)
+
+  const latest = PEOPLE
+    .map((p) => {
+      const mine = weights.filter((w) => w.memberId === p.id)
+      return { person: p, entries: mine, last: mine[mine.length - 1] }
+    })
+    .filter((x) => x.last)
+    .sort((a, b) => (b.last?.date ?? '').localeCompare(a.last?.date ?? ''))[0]
+
+  if (!latest?.last) {
+    return (
+      <Link to="/analytics" className="card p-3 min-w-0 hover:border-bite-300 transition-colors">
+        <p className="text-[11px] font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
+          <Scale size={12} /> Weight
+        </p>
+        <p className="text-sm font-semibold text-ink-700 leading-tight mt-1">Nothing logged</p>
+        <p className="text-[11px] text-ink-500">Tap to add one</p>
+      </Link>
+    )
+  }
+
+  const first = latest.entries[0]
+  const change = latest.last.weight - first.weight
+
+  return (
+    <Link to="/analytics" className="card p-3 min-w-0 hover:border-bite-300 transition-colors">
+      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
+        <Scale size={12} /> {latest.person.name}
+      </p>
+      <p className="text-xl font-extrabold text-ink-900 leading-tight mt-0.5">
+        {latest.last.weight}
+        <span className="text-xs font-semibold text-ink-500 ml-1">{latest.last.unit}</span>
+      </p>
+      <p className="text-[11px] text-ink-500 truncate">
+        {latest.entries.length > 1
+          ? `${change > 0 ? '+' : ''}${change.toFixed(1)} since ${new Date(first.date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
+          : 'first entry'}
+      </p>
+    </Link>
   )
 }
 
