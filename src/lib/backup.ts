@@ -70,10 +70,11 @@ export function restoreBackup(text: string): RestoreResult {
   if (backup.app !== 'bite-buddy') {
     return { ok: false, error: 'That file was not written by Bite Buddy.' }
   }
-  if (backup.schema !== SCHEMA_VERSION) {
+  const from = backup.schema
+  if (typeof from !== 'number' || from > SCHEMA_VERSION) {
     return {
       ok: false,
-      error: `That backup is from data version ${String(backup.schema ?? 'unknown')}; this app reads version ${SCHEMA_VERSION}. Restoring it would misread your data, so it has been left alone.`,
+      error: `That backup is from data version ${String(from ?? 'unknown')}; this app reads version ${SCHEMA_VERSION}. Restoring it would misread your data, so it has been left alone.`,
     }
   }
   if (typeof backup.stores !== 'object' || backup.stores === null) {
@@ -89,9 +90,19 @@ export function restoreBackup(text: string): RestoreResult {
       skipped.push(key)
       continue
     }
+
+    // An older backup goes through the same migration a stored copy would.
+    // A store that cannot bring its own state forward says so by returning
+    // undefined, and is skipped rather than restored into the wrong shape.
+    const upgraded = from === SCHEMA_VERSION ? value : store.upgrade(value, from)
+    if (typeof upgraded !== 'object' || upgraded === null) {
+      skipped.push(key)
+      continue
+    }
+
     // setState merges over the actions, and persistence writes through on its
     // own — so this restores the running app and the saved copy together.
-    store.write(value)
+    store.write(upgraded)
     restored.push(key)
   }
 

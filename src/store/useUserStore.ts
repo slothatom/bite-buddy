@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { discardOlderThan, safeStorage, SCHEMA_VERSION } from './persist'
+import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import type {
   Theme,
   Achievement, AchievementId, Targets, TdeeProfile, UserProfile, WeekStart,
@@ -130,7 +130,10 @@ export const useUserStore = create<UserStore>()(
       version: SCHEMA_VERSION,
       storage: safeStorage<{ profile: UserProfile }>(),
       migrate: (state, version) => {
-        const carried = discardOlderThan<{ profile: UserProfile }>(SCHEMA_VERSION)(state, version)
+        const carried = upgradeThrough<{ profile: UserProfile }>(SCHEMA_VERSION, {
+          // v1 → v2: the profile shape is unchanged; theme simply defaults.
+          1: (s) => s,
+        })(state, version)
         if (!carried?.profile) return carried
         // The week used to default to Wednesday, following the dietician's own
         // plans. It is Monday now, and a stored 3 is that old default rather
