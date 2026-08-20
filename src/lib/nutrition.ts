@@ -18,24 +18,30 @@ export interface NutritionContext {
 }
 
 /**
- * `aliases` maps a recipe id that is no longer in the library to the one it was
- * merged into. Those entries go into the same map, so every caller, planner
- * totals, meal labels, the grocery list, the fourteen archived weeks, resolves
- * an old id without knowing merging exists.
+ * `aliases` maps an id that is no longer in the library to the one it was
+ * merged into, for recipes and for foods alike. Those entries go into the same
+ * maps, so every caller, planner totals, meal labels, the grocery list, the
+ * fourteen archived weeks, resolves an old id without knowing merging exists.
  */
 export function buildContext(
   foods: Food[],
   recipes: Recipe[],
   aliases: Record<string, string> = {},
+  foodAliases: Record<string, string> = {},
 ): NutritionContext {
   const byId = new Map(recipes.map((r) => [r.id, r]))
-
   for (const [from, to] of Object.entries(aliases)) {
     const target = byId.get(to)
     if (target && !byId.has(from)) byId.set(from, target)
   }
 
-  return { foods: new Map(foods.map((f) => [f.id, f])), recipes: byId }
+  const foodsById = new Map(foods.map((f) => [f.id, f]))
+  for (const [from, to] of Object.entries(foodAliases)) {
+    const target = foodsById.get(to)
+    if (target && !foodsById.has(from)) foodsById.set(from, target)
+  }
+
+  return { foods: foodsById, recipes: byId }
 }
 
 const MACRO_KEYS = ['calories', 'protein', 'carbs', 'fat'] as const

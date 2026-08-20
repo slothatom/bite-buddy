@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { buildContext, type NutritionContext } from '../lib/nutrition'
 import { buildFoodIndex, type FoodIndex } from '../lib/foodSearch'
-import { useFoods, useResolvableFoods } from './useFoodStore'
+import { useFoods, useFoodStore, useResolvableFoods } from './useFoodStore'
 import { useResolvableRecipes, useRecipeStore } from './useRecipeStore'
 
 /**
@@ -21,10 +21,13 @@ export function useNutritionContext(): NutritionContext {
   // Merged-away recipes are not in the library any more, but days you already
   // planned still name them. The aliases keep those days resolving.
   const mergedInto = useRecipeStore((s) => s.mergedInto)
+  // Same for foods: a duplicate you folded away is still named by every recipe
+  // and every snack line written before you merged it.
+  const foodsMergedInto = useFoodStore((s) => s.mergedInto)
 
   return useMemo(
-    () => buildContext(foods, recipes, mergedInto),
-    [foods, recipes, mergedInto],
+    () => buildContext(foods, recipes, mergedInto, foodsMergedInto),
+    [foods, recipes, mergedInto, foodsMergedInto],
   )
 }
 

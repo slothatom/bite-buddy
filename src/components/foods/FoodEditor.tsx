@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { X, Trash2, Undo2 } from 'lucide-react'
+import { X, Trash2, Undo2, Combine } from 'lucide-react'
 import type { Food, MedCategory, MedTier, FoodState } from '../../types'
-import { useFoodStore, isCuratedFood } from '../../store/useFoodStore'
+import { useFoodStore, useFoodsMergedInto, isCuratedFood } from '../../store/useFoodStore'
 import { useRecipes } from '../../store/useRecipeStore'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
 import { saltFromSodium } from '../../lib/nutrition'
@@ -19,7 +19,8 @@ import { CATEGORY_LABELS, CATEGORY_ORDER } from '../../lib/categories'
  * and what every calculation in the app expects. A blank is unknown, not zero.
  */
 export default function FoodEditor({ food, onClose }: { food: Food; onClose: () => void }) {
-  const { updateFood, removeFood, revertFood, custom } = useFoodStore()
+  const { updateFood, removeFood, revertFood, unmergeFood, custom } = useFoodStore()
+  const folded = useFoodsMergedInto(food.id)
   const recipes = useRecipes()
   const plan = useMealPlanStore((s) => s.plan)
 
@@ -175,6 +176,21 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
                   Fetched {new Date(draft.provenance.retrievedAt).toLocaleDateString('en-GB')}
                 </p>
               )}
+            </div>
+          )}
+
+          {folded.length > 0 && (
+            <div className="card-soft p-3 flex items-start gap-2.5">
+              <Combine size={16} className="text-ink-500 shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-ink-900">
+                  {folded.length} duplicate {folded.length === 1 ? 'entry was' : 'entries were'} folded
+                  into this one. Anything that named them resolves here.
+                </p>
+                <button className="btn-ghost px-0 text-ink-500" onClick={() => unmergeFood(food.id)}>
+                  <Undo2 size={15} /> Put them back
+                </button>
+              </div>
             </div>
           )}
 

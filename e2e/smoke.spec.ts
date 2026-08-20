@@ -251,16 +251,24 @@ test.describe('the recipe library', () => {
 
   test('the duplicates that are only duplicates can be folded away in one tap', async ({ page }) => {
     await goto(page, '/recipes')
+    // A named shelf, not whichever one the time of day opens on: which cards
+    // lose a version depends on the shelf, and this used to pass or fail by
+    // the hour.
+    await page.getByRole('button', { name: /^Breakfast/ }).click()
+
     const banner = page.getByText(/dishes are written down more than once/)
     await expect(banner).toBeVisible()
 
-    const before = await page.locator('.card').count()
+    const versions = page.getByText(/\d+ versions/)
+    const before = await versions.count()
+    expect(before, 'nothing on this shelf was written twice').toBeGreaterThan(0)
+
     await page.getByRole('button', { name: 'Merge them' }).click()
 
-    // The offer goes away because there is nothing left to fold, and the shelf
-    // is shorter than it was.
+    // The offer goes away because there is nothing left to fold, and fewer
+    // dishes are still carrying repeats.
     await expect(banner).toHaveCount(0)
-    expect(await page.locator('.card').count()).toBeLessThan(before)
+    expect(await versions.count()).toBeLessThan(before)
   })
 
   test('a dish written at different portions is never swept up automatically', async ({ page }) => {
@@ -526,8 +534,11 @@ test.describe('the recipe library', () => {
     await page.getByRole('button', { name: /Delete this recipe/ }).click()
     await page.getByRole('button', { name: 'Yes, delete' }).click()
 
-    // The empty state is itself a .card, so the absence is asserted on the text.
-    await expect(page.getByText('Nothing matching that just yet')).toBeVisible()
+    // The meal is gone. The batch dish of the same name that it was built from
+    // is not, and searching now falls through to it, which is the point of
+    // deleting a meal rather than its ingredients.
+    await expect(page.getByText('Chili con carne with bulgur & pickles')).toHaveCount(0)
+    await expect(page.getByText('Nothing on this shelf, so this is every shelf.')).toBeVisible()
   })
 
   test('the editor fits a phone', async ({ page }, testInfo) => {
@@ -692,6 +703,26 @@ test.describe('the food library', () => {
 
     await expect(page.getByText('sparanghel · spárga', { exact: false })).toBeVisible()
     await expect(page.locator('text=/^RO$/')).toHaveCount(0)
+  })
+
+  test('duplicate ingredients can be folded together, and stay folded', async ({ page }) => {
+    await goto(page, '/foods')
+
+    // Add the same food twice, the way two sources would.
+    for (const _ of [1, 2]) {
+      await page.getByRole('button', { name: 'Add food' }).click()
+      await page.getByLabel('Name (English)').fill('Test kefir')
+      await page.getByRole('button', { name: 'Save food' }).click()
+    }
+
+    await expect(page.getByText('Test kefir')).toHaveCount(2)
+
+    await page.getByRole('button', { name: 'Merge them' }).click()
+    await expect(page.getByText('Test kefir')).toHaveCount(1)
+
+    // And it is still one after a reload, which is the whole point.
+    await page.reload()
+    await expect(page.getByText('Test kefir')).toHaveCount(1)
   })
 
   test('deleting a food leaves the recipes that use it intact', async ({ page }) => {

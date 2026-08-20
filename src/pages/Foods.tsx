@@ -1,7 +1,8 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
-import { Search, Plus, X, Loader2 } from 'lucide-react'
+import { Search, Plus, X, Loader2, Combine } from 'lucide-react'
 import type { Food, MedCategory, MedTier } from '../types'
-import { useFoods, useFoodStore } from '../store/useFoodStore'
+import { isCuratedFood, useFoods, useFoodStore } from '../store/useFoodStore'
+import { duplicateFoods } from '../lib/mergeFoods'
 import { searchFoods, buildFoodIndex } from '../lib/foodSearch'
 import { TierBadge, EmptyState, SourceLine, ChipRow } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS, CATEGORY_ORDER } from '../lib/categories'
@@ -24,6 +25,7 @@ const BarcodeScanner = lazy(() => import('../components/recipes/BarcodeScanner')
  */
 export default function Foods() {
   const foods = useFoods()
+  const mergeFoods = useFoodStore((s) => s.mergeFoods)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<MedCategory | null>(null)
   const [adding, setAdding] = useState(false)
@@ -35,6 +37,13 @@ export default function Foods() {
     const base = query ? searchFoods(query, index, 500) : foods
     return category ? base.filter((f) => f.category === category) : base
   }, [foods, index, query, category])
+
+  // Only offered on the unfiltered list: merging half a library because a
+  // search happened to hide the other half is not something to do in passing.
+  const duplicates = useMemo(
+    () => (query || category ? [] : duplicateFoods(foods, isCuratedFood)),
+    [foods, query, category],
+  )
 
   const grouped = useMemo(() => {
     const map = new Map<MedCategory, Food[]>()
@@ -85,6 +94,16 @@ export default function Foods() {
             ))}
           </ChipRow>
         </div>
+
+        {duplicates.length > 0 && (
+          <DuplicateBanner
+            count={duplicates.length}
+            extra={duplicates.reduce((n, g) => n + g.fold.length, 0)}
+            onMerge={() => {
+              for (const g of duplicates) mergeFoods(g.keep.id, g.fold.map((f) => f.id))
+            }}
+          />
+        )}
 
         {grouped.length === 0 ? (
           <EmptyState title="No foods matching that">
@@ -151,6 +170,44 @@ export default function Foods() {
  * databases are thin on Romanian and Hungarian staples, which is exactly why
  * the curated list exists, so manual entry is a first-class path, not a fallback.
  */
+/**
+ * The offer to fold duplicates together.
+ *
+ * Only shown for foods that match on name or source id *and* agree on the
+ * numbers. Anything that would move a total is left for you to look at.
+ */
+function DuplicateBanner({
+  count, extra, onMerge,
+}: {
+  count: number
+  extra: number
+  onMerge: () => void
+}) {
+  const [done, setDone] = useState(false)
+  if (done) return null
+
+  return (
+    <div className="rounded-2xl border border-bite-200 bg-bite-50 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+      <Combine size={20} className="text-bite-600 shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-ink-900">
+          {count} {count === 1 ? 'ingredient is' : 'ingredients are'} in here more than once
+        </p>
+        <p className="text-xs text-ink-700 mt-0.5">
+          Same food, same numbers, added twice from different sources. Folding them together
+          removes {extra} {extra === 1 ? 'copy' : 'copies'} and stops one ingredient turning into
+          three lines on the shopping list. Recipes that already name them keep working, and each
+          one can be undone from the food itself.
+        </p>
+      </div>
+      <div className="flex gap-2 shrink-0">
+        <button className="btn-primary" onClick={onMerge}>Merge them</button>
+        <button className="btn-ghost text-ink-500" onClick={() => setDone(true)}>Not now</button>
+      </div>
+    </div>
+  )
+}
+
 function AddFoodModal({ onClose }: { onClose: () => void }) {
   const { addFood } = useFoodStore()
   const [tab, setTab] = useState<'manual' | 'lookup' | 'scan'>('manual')
@@ -322,8 +379,13 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
           {tab === 'manual' && (
             <div className="space-y-3">
               <div>
-                <label className="label">Name (English)</label>
-                <input className="input" value={draft.en} onChange={(e) => setDraft({ ...draft, en: e.target.value })} />
+                <label className="label" htmlFor="new-food-name">Name (English)</label>
+                <input
+                  id="new-food-name"
+                  className="input"
+                  value={draft.en}
+                  onChange={(e) => setDraft({ ...draft, en: e.target.value })}
+                />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

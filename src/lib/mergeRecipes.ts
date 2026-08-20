@@ -49,7 +49,10 @@ export function interchangeableGroups(
 }
 
 /**
- * Follows the notes to whatever a recipe id really means now.
+ * Follows the notes to whatever an id really means now.
+ *
+ * Used for foods as well as recipes: the bookkeeping is the same, an id that
+ * used to name its own thing now names another one.
  *
  * Chains are possible, merge A into B, then B into C, so this walks until it
  * stops moving, with a bound in case a bad write ever makes a cycle. A cycle
@@ -97,8 +100,8 @@ export function planMerge(
   return next
 }
 
-/** Everything merged into this recipe, what an "undo" would bring back. */
-export function mergedIntoRecipe(merged: Record<string, string>, winnerId: string): string[] {
+/** Everything merged into this id, what an "undo" would bring back. */
+export function foldedInto(merged: Record<string, string>, winnerId: string): string[] {
   return Object.keys(merged).filter((id) => resolveMerged(merged, id) === winnerId)
 }
 
@@ -107,6 +110,6 @@ export function planUnmerge(
   merged: Record<string, string>,
   winnerId: string,
 ): Record<string, string> {
-  const undone = new Set(mergedIntoRecipe(merged, winnerId))
+  const undone = new Set(foldedInto(merged, winnerId))
   return Object.fromEntries(Object.entries(merged).filter(([from]) => !undone.has(from)))
 }

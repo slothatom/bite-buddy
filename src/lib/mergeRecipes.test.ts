@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   recipeSignature, interchangeableGroups, resolveMerged,
-  planMerge, planUnmerge, mergedIntoRecipe,
+  planMerge, planUnmerge, foldedInto,
 } from './mergeRecipes'
 import { buildContext } from './nutrition'
 import { groupVariants } from './recipeGroups'
@@ -89,8 +89,8 @@ describe('planning a merge', () => {
 
   it('lists what a merge would undo', () => {
     const merged = planMerge({}, 'keep', ['drop1', 'drop2'])
-    expect(mergedIntoRecipe(merged, 'keep').sort()).toEqual(['drop1', 'drop2'])
-    expect(mergedIntoRecipe(merged, 'elsewhere')).toEqual([])
+    expect(foldedInto(merged, 'keep').sort()).toEqual(['drop1', 'drop2'])
+    expect(foldedInto(merged, 'elsewhere')).toEqual([])
   })
 
   it('puts everything back on undo', () => {

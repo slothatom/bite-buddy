@@ -89,18 +89,38 @@ export default function Recipes() {
     return c
   }, [matching, mine])
 
+  /**
+   * Searching looks past the shelf you happen to be on.
+   *
+   * The shelf you land on depends on the time of day, so searching "telemea"
+   * at six in the evening searched dinner, found nothing, and said there was
+   * nothing, when it is on the breakfast shelf. A search that answers "no"
+   * about food you own is worse than a search that ignores a filter, so the
+   * shelf gives way and the screen says it did.
+   */
   const shown = useMemo(() => {
     const onShelf = tab === 'mine'
       ? matching.filter((r) => mine.has(r.id))
       : matching.filter((r) => groupsOf(r).includes(tab))
 
+    const list = onShelf.length === 0 && query.trim() ? matching : onShelf
+
     // Favourites first, then alphabetical: the handful you actually cook should
     // not be somewhere in the middle of seventy.
-    return [...onShelf].sort((a, b) => {
+    return [...list].sort((a, b) => {
       const fav = Number(favouriteIds.includes(b.id)) - Number(favouriteIds.includes(a.id))
       return fav || a.name.en.localeCompare(b.name.en)
     })
-  }, [matching, tab, mine, favouriteIds])
+  }, [matching, tab, mine, favouriteIds, query])
+
+  /** True when the shelf was set aside because it had no matches. */
+  const searchedEverywhere = useMemo(() => {
+    if (!query.trim()) return false
+    const onShelf = tab === 'mine'
+      ? matching.filter((r) => mine.has(r.id))
+      : matching.filter((r) => groupsOf(r).includes(tab))
+    return onShelf.length === 0 && matching.length > 0
+  }, [matching, tab, mine, query])
 
   /** One card per dish, not one per portion. */
   const cards = useMemo(() => groupVariants(shown), [shown])
@@ -234,6 +254,12 @@ export default function Recipes() {
 
         {tab !== 'mine' && !filtered && (
           <p className="text-sm text-ink-500 -mt-1">{GROUP_BLURBS[tab]}</p>
+        )}
+
+        {searchedEverywhere && (
+          <p className="text-sm text-ink-500 -mt-1">
+            Nothing on this shelf, so this is every shelf.
+          </p>
         )}
 
         {shown.length === 0 ? (

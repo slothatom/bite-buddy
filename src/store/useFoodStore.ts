@@ -4,17 +4,32 @@ import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import type { Food } from '../types'
 import { FOODS } from '../data'
+import { planMerge, planUnmerge, foldedInto } from '../lib/mergeRecipes'
 
 interface FoodStore {
   /** Foods the user added or edited. The curated list stays in code. */
   custom: Food[]
   /** Ids of curated foods the user has hidden. */
   hidden: string[]
+  /**
+   * Duplicates folded into the food that was kept.
+   *
+   * The same ingredient arrives more than once: once curated, once from USDA,
+   * once from a barcode, and three yogurts with the same numbers are three
+   * ways to get the same line wrong. Merging is a note saying which one is
+   * real, never a deletion: your plans and recipes already name the others by
+   * id, and every lookup follows the note. Undoing it puts them all back.
+   */
+  mergedInto: Record<string, string>
 
   addFood: (food: Food) => void
   updateFood: (id: string, updates: Partial<Food>) => void
   removeFood: (id: string) => void
   restoreFood: (id: string) => void
+  /** Folds duplicates into `winnerId`. Nothing is deleted. */
+  mergeFoods: (winnerId: string, loserIds: string[]) => void
+  /** Puts everything folded into `winnerId` back. */
+  unmergeFood: (winnerId: string) => void
   /** Throws away your edits to a curated food and brings the original back. */
   revertFood: (id: string) => void
 }
@@ -29,6 +44,7 @@ export const useFoodStore = create<FoodStore>()(
     (set) => ({
       custom: [],
       hidden: [],
+      mergedInto: {},
 
       addFood: (food) => set((s) => ({ custom: [...s.custom, food] })),
 
@@ -58,6 +74,12 @@ export const useFoodStore = create<FoodStore>()(
         set((s) => ({ hidden: [...new Set([...s.hidden, id])] })),
 
       restoreFood: (id) => set((s) => ({ hidden: s.hidden.filter((h) => h !== id) })),
+
+      mergeFoods: (winnerId, loserIds) =>
+        set((s) => ({ mergedInto: planMerge(s.mergedInto, winnerId, loserIds) })),
+
+      unmergeFood: (winnerId) =>
+        set((s) => ({ mergedInto: planUnmerge(s.mergedInto, winnerId) })),
 
       revertFood: (id) =>
         set((s) => ({
@@ -93,9 +115,10 @@ export function foodLibraryWith(custom: Food[]): Food[] {
  * What you can browse. Exported so nothing reimplements the rule, a second
  * copy of it is a copy that drifts the moment the rule changes.
  */
-export function visibleFoods(state: Pick<FoodStore, 'custom' | 'hidden'>): Food[] {
+export function visibleFoods(state: Pick<FoodStore, 'custom' | 'hidden' | 'mergedInto'>): Food[] {
   const hiddenSet = new Set(state.hidden)
-  return foodLibraryWith(state.custom).filter((f) => !hiddenSet.has(f.id))
+  return foodLibraryWith(state.custom)
+    .filter((f) => !hiddenSet.has(f.id) && !(f.id in state.mergedInto))
 }
 
 /**
@@ -109,8 +132,9 @@ export function useFoods(): Food[] {
   // being rebuilt on every render despite a comment saying otherwise.
   const custom = useFoodStore((s) => s.custom)
   const hidden = useFoodStore((s) => s.hidden)
+  const mergedInto = useFoodStore((s) => s.mergedInto)
 
-  return useMemo(() => visibleFoods({ custom, hidden }), [custom, hidden])
+  return useMemo(() => visibleFoods({ custom, hidden, mergedInto }), [custom, hidden, mergedInto])
 }
 
 /**
@@ -120,6 +144,12 @@ export function useFoods(): Food[] {
 export function useResolvableFoods(): Food[] {
   const custom = useFoodStore((s) => s.custom)
   return useMemo(() => foodLibraryWith(custom), [custom])
+}
+
+/** Everything folded into this food, what undoing the merge would bring back. */
+export function useFoodsMergedInto(winnerId: string): string[] {
+  const mergedInto = useFoodStore((s) => s.mergedInto)
+  return useMemo(() => foldedInto(mergedInto, winnerId), [mergedInto, winnerId])
 }
 
 /** The foods you deleted, for offering them back. */

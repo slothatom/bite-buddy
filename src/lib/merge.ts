@@ -103,11 +103,77 @@ export function mergeMealPlan(
   return { merged, conflicts }
 }
 
+/** The persisted shape of the recipe and food stores, as far as merging cares. */
+interface LibraryState {
+  custom?: unknown
+  hidden?: unknown
+  mergedInto?: unknown
+  [key: string]: unknown
+}
+
+function idOf(value: unknown): string | undefined {
+  return typeof value === 'object' && value !== null && typeof (value as { id?: unknown }).id === 'string'
+    ? (value as { id: string }).id
+    : undefined
+}
+
+/**
+ * Merges a library: your foods and recipes, what you hid, what you folded together.
+ *
+ * Taking the remote copy wholesale lost work in three ways that all showed up
+ * in use. A food added on one phone vanished when the other pushed. A recipe
+ * deleted here came back. Duplicates merged here un-merged themselves, which
+ * is the one that got reported, since merging fourteen weeks' worth of repeats
+ * is a job you only want to do once.
+ *
+ * All three are additive by nature, so all three are unioned. A merge or a
+ * deletion made anywhere holds everywhere.
+ *
+ * The cost is the other direction: undoing one of those while the other phone
+ * is offline can be undone again by its copy when it reconnects. That is worth
+ * it. Losing an undo means pressing undo twice, losing an hour of merging
+ * means doing the hour again.
+ */
+export function mergeLibrary(local: LibraryState, remote: LibraryState): MergeResult<LibraryState> {
+  const merged: LibraryState = { ...remote, ...local }
+
+  const localCustom = Array.isArray(local.custom) ? local.custom : []
+  const remoteCustom = Array.isArray(remote.custom) ? remote.custom : []
+  if (localCustom.length || remoteCustom.length) {
+    // Local wins a clash on the same id: the person holding this phone edited
+    // it most recently as far as this device can tell.
+    const byId = new Map<string, unknown>()
+    for (const entry of [...remoteCustom, ...localCustom]) {
+      const id = idOf(entry)
+      if (id) byId.set(id, entry)
+    }
+    merged.custom = [...byId.values()]
+  }
+
+  const localHidden = Array.isArray(local.hidden) ? local.hidden : []
+  const remoteHidden = Array.isArray(remote.hidden) ? remote.hidden : []
+  if (localHidden.length || remoteHidden.length) {
+    merged.hidden = [...new Set([...remoteHidden, ...localHidden])]
+  }
+
+  const isMap = (v: unknown): v is Record<string, string> =>
+    typeof v === 'object' && v !== null && !Array.isArray(v)
+  if (isMap(local.mergedInto) || isMap(remote.mergedInto)) {
+    merged.mergedInto = {
+      ...(isMap(remote.mergedInto) ? remote.mergedInto : {}),
+      ...(isMap(local.mergedInto) ? local.mergedInto : {}),
+    }
+  }
+
+  return { merged, conflicts: [] }
+}
+
 /**
  * Merges one store's document.
  *
- * Only the meal plan has a real merge. Everything else takes the remote copy,
- * which is what it did before, the difference is that this is now a decision
+ * The week is merged a day at a time; the libraries union what each side
+ * added, hid or folded together. Everything else takes the remote copy, which
+ * is what they all used to do, the difference is that this is now a decision
  * with a name rather than the only behaviour available.
  */
 export function mergeStore(
@@ -122,6 +188,9 @@ export function mergeStore(
   if (!bothObjects) return { merged: remote, conflicts: [] }
   if (key.includes('mealplan')) {
     return mergeMealPlan(local as PlanState, remote as PlanState, since)
+  }
+  if (key.includes('recipes') || key.includes('foods')) {
+    return mergeLibrary(local as LibraryState, remote as LibraryState)
   }
   return { merged: remote, conflicts: [] }
 }
