@@ -243,6 +243,141 @@ test.describe('the main flow', () => {
   })
 })
 
+test.describe('the recipe library', () => {
+  test('opens on one shelf rather than all 275', async ({ page }) => {
+    // The screen this replaced showed every recipe at once, sorted
+    // alphabetically — a wall you had to scroll past to reach anything.
+    await goto(page, '/recipes')
+
+    const shown = await page.locator('.card').count()
+    expect(shown, 'the whole library is on screen again').toBeLessThan(150)
+    expect(shown, 'the opening shelf is empty').toBeGreaterThan(5)
+
+    // The number on a tab is the number of cards you then see, not the number
+    // of recipes behind them.
+    const label = await page.getByRole('button', { name: /^Breakfast/ }).textContent()
+    expect(Number(label?.replace(/\D/g, ''))).toBe(shown)
+
+    // And the other shelves are one tap away.
+    await page.getByRole('button', { name: /^Dishes/ }).click()
+    await expect(page.getByText('Cooked once and eaten across several meals.', { exact: false })).toBeVisible()
+    expect(await page.locator('.card').count()).toBeGreaterThan(5)
+  })
+
+  test('the same dish written four times is one card, not four', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Dinner/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('green bean soup')
+
+    // Four lines across the plans, one dish. The numbering the generator added
+    // ("(2)", "(3)") should not be on screen at all.
+    await expect(page.locator('.card')).toHaveCount(1)
+    await expect(page.getByText('(2)')).toHaveCount(0)
+    await expect(page.getByText(/versions/)).toBeVisible()
+
+    await page.locator('.card button').nth(1).click()
+    await expect(page.getByText(/Written \d+ times across the plans/)).toBeVisible()
+
+    // The versions are often the same meal worded differently, so what changes
+    // when you flip between them is the dietician's own line.
+    const line = page.locator('.card-soft').first()
+    const before = await line.textContent()
+    // Scoped to the sheet: the filter chips behind it are also .chip-off.
+    await page.locator('.bg-paper .chip-off').first().click()
+    await expect(line).not.toHaveText(before ?? '')
+  })
+
+  test('filters down to four, and they narrow the shelf', async ({ page }) => {
+    await goto(page, '/recipes')
+    const before = await page.locator('.card').count()
+
+    await page.getByRole('button', { name: 'Quick', exact: true }).click()
+    const after = await page.locator('.card').count()
+    expect(after).toBeGreaterThan(0)
+    expect(after, 'the Quick filter changed nothing').toBeLessThan(before)
+  })
+
+  test('a recipe of your own can be written and lands on your shelf', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /New recipe/ }).click()
+
+    await page.getByLabel('Recipe name').fill('Midnight beans')
+    await page.getByRole('button', { name: /Add ingredient/ }).click()
+    await page.getByPlaceholder(/Search foods and recipes/).fill('lentil')
+    await page.locator('.bg-paper button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
+
+    // The numbers are derived from what went in, never typed.
+    await expect(page.getByText('Per serving')).toBeVisible()
+    await page.getByRole('button', { name: 'Add recipe' }).click()
+
+    await page.getByRole('button', { name: /^Yours/ }).click()
+    await expect(page.getByText('Midnight beans')).toBeVisible()
+  })
+
+  test('a shipped recipe can be edited, and put back the way it was', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.locator('.card button').nth(1).click()
+    const original = (await page.locator('h2').first().textContent())?.trim() ?? ''
+    expect(original.length).toBeGreaterThan(0)
+
+    await page.getByRole('button', { name: 'Edit recipe' }).click()
+    await page.getByLabel('Recipe name').fill('Renamed by me')
+    await page.getByRole('button', { name: 'Save changes' }).click()
+    await expect(page.getByText('Renamed by me')).toBeVisible()
+
+    // Editing a shipped recipe keeps a copy of your own; the original is still
+    // underneath, and Revert is how you get back to it.
+    await page.getByRole('button', { name: /^Yours/ }).click()
+    await expect(page.getByText('Renamed by me')).toBeVisible()
+
+    await page.getByText('Renamed by me').click()
+    await page.getByRole('button', { name: 'Edit recipe' }).click()
+    await page.getByRole('button', { name: /Undo my changes/ }).click()
+
+    await expect(page.getByText('Renamed by me')).toHaveCount(0)
+    await page.getByRole('button', { name: /^Yours/ }).click()
+    await expect(page.getByText('Nothing of your own yet')).toBeVisible()
+  })
+
+  test('deleting an edited recipe removes it instead of restoring the original', async ({ page }) => {
+    // The delete button used to only drop your edits, so a built-in recipe you
+    // had touched reappeared unchanged and delete looked like it had failed.
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Lunch/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('chili con carne')
+    await expect(page.locator('.card')).toHaveCount(1)
+
+    await page.locator('.card button').nth(1).click()
+    await page.getByRole('button', { name: 'Edit recipe' }).click()
+    await page.getByLabel('Prep').fill('7')
+    await page.getByRole('button', { name: 'Save changes' }).click()
+
+    await page.locator('.card button').nth(1).click()
+    await page.getByRole('button', { name: 'Edit recipe' }).click()
+    await page.getByRole('button', { name: /Delete this recipe/ }).click()
+    await page.getByRole('button', { name: 'Yes, delete' }).click()
+
+    // The empty state is itself a .card, so the absence is asserted on the text.
+    await expect(page.getByText('Nothing matching that just yet')).toBeVisible()
+  })
+
+  test('the editor fits a phone', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', 'phone widths only')
+    const errors = trackErrors(page)
+
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /New recipe/ }).click()
+    await expect(page.getByLabel('Recipe name')).toBeVisible()
+
+    const overflow = await page.evaluate(() => {
+      const de = document.documentElement
+      return de.scrollWidth - de.clientWidth
+    })
+    expect(overflow, 'the editor pushes the page sideways').toBeLessThanOrEqual(1)
+    expect(errors).toEqual([])
+  })
+})
+
 test.describe('your data survives the browser', () => {
   test.use({ permissions: ['clipboard-read', 'clipboard-write'] })
 

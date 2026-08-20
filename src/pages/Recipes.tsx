@@ -1,52 +1,114 @@
 import { useMemo, useState } from 'react'
-import { Search, Star, ClipboardCopy, X, ChefHat } from 'lucide-react'
-import type { Recipe, RecipeTag } from '../types'
+import { Search, Star, ClipboardCopy, X, ChefHat, Plus, Pencil, Clock, Layers } from 'lucide-react'
+import type { Recipe } from '../types'
 import { useRecipes, useRecipeStore } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { recipePerServing, roundNutrients } from '../lib/nutrition'
 import { normaliseTerm } from '../lib/units'
-import { NutrientSummary, EmptyState, SourceLine, ChipRow } from '../components/ui'
+import { NutrientSummary, EmptyState, SourceLine } from '../components/ui'
 import { recipeForMfp, copyToClipboard } from '../lib/mfp'
+import RecipeEditor from '../components/recipes/RecipeEditor'
+import {
+  RECIPE_GROUPS, GROUP_LABELS, GROUP_BLURBS, RECIPE_LABELS, LABEL_DEFINITIONS,
+  groupsOf, hasLabel, otherTags, groupForTime, groupVariants,
+  type RecipeGroup, type RecipeLabel, type RecipeVariants,
+} from '../lib/recipeGroups'
 
-const FILTER_TAGS: RecipeTag[] = [
-  'breakfast', 'lunch', 'dinner', 'snack', 'soup', 'salad', 'spread',
-  'high-protein', 'vegan', 'vegetarian', 'pescatarian', 'quick', 'batch',
-]
+/**
+ * The recipe library.
+ *
+ * This used to be one alphabetical grid of 275 cards behind thirteen filter
+ * chips — every recipe in the app, in one undifferentiated wall, sorted by a
+ * property nobody thinks in. Finding tomorrow's dinner meant scrolling past two
+ * hundred things that were not dinner.
+ *
+ * Now it opens on a shelf: the meal you are most likely looking for at this hour,
+ * with the rest a tap away. See lib/recipeGroups.ts for why the categories are
+ * the two axes they are.
+ */
+
+/** "Yours" is a shelf too, but a different kind — it cuts across the meals. */
+type Tab = RecipeGroup | 'mine'
 
 export default function Recipes() {
   const recipes = useRecipes()
-  const { favouriteIds, toggleFavourite } = useRecipeStore()
+  const { favouriteIds, toggleFavourite, custom } = useRecipeStore()
   const ctx = useNutritionContext()
 
+  const [tab, setTab] = useState<Tab>(() => groupForTime())
   const [query, setQuery] = useState('')
-  const [tag, setTag] = useState<RecipeTag | null>(null)
+  const [labels, setLabels] = useState<RecipeLabel[]>([])
   const [favesOnly, setFavesOnly] = useState(false)
-  const [open, setOpen] = useState<Recipe | null>(null)
+  const [open, setOpen] = useState<RecipeVariants | null>(null)
+  const [editing, setEditing] = useState<Recipe | null | undefined>(undefined)
 
-  const filtered = useMemo(() => {
+  const mine = useMemo(() => new Set(custom.map((r) => r.id)), [custom])
+
+  /** Everything the search and chips allow, before the shelf is chosen. */
+  const matching = useMemo(() => {
     const n = normaliseTerm(query)
-    return recipes
-      .filter((r) => {
-        if (favesOnly && !favouriteIds.includes(r.id)) return false
-        if (tag && !r.tags.includes(tag)) return false
-        if (!n) return true
-        // Searching the original dietician line too, so "telemea" finds the
-        // meals that were written in Romanian.
-        const haystack = normaliseTerm(
-          [r.name.en, r.name.ro, r.name.hu, r.sourceLine].filter(Boolean).join(' '))
-        return haystack.includes(n)
-      })
-      .sort((a, b) => a.name.en.localeCompare(b.name.en))
-  }, [recipes, query, tag, favesOnly, favouriteIds])
+    return recipes.filter((r) => {
+      if (favesOnly && !favouriteIds.includes(r.id)) return false
+      if (labels.some((l) => !hasLabel(r, l))) return false
+      if (!n) return true
+      // The dietician's own line is searched too, so "telemea" finds the meals
+      // that were written in Romanian.
+      const haystack = normaliseTerm(
+        [r.name.en, r.name.ro, r.name.hu, r.sourceLine].filter(Boolean).join(' '))
+      return haystack.includes(n)
+    })
+  }, [recipes, query, labels, favesOnly, favouriteIds])
+
+  /**
+   * The number on a tab counts cards, not recipes.
+   *
+   * Grouping the repeats means the two differ — Breakfast holds 77 recipes but
+   * shows 49 cards — and a tab promising 77 things that then shows 49 is a tab
+   * that lies. It counts what you will see.
+   */
+  const counts = useMemo(() => {
+    const c = new Map<Tab, number>()
+    for (const g of RECIPE_GROUPS) {
+      c.set(g, groupVariants(matching.filter((r) => groupsOf(r).includes(g))).length)
+    }
+    c.set('mine', groupVariants(matching.filter((r) => mine.has(r.id))).length)
+    return c
+  }, [matching, mine])
+
+  const shown = useMemo(() => {
+    const onShelf = tab === 'mine'
+      ? matching.filter((r) => mine.has(r.id))
+      : matching.filter((r) => groupsOf(r).includes(tab))
+
+    // Favourites first, then alphabetical: the handful you actually cook should
+    // not be somewhere in the middle of seventy.
+    return [...onShelf].sort((a, b) => {
+      const fav = Number(favouriteIds.includes(b.id)) - Number(favouriteIds.includes(a.id))
+      return fav || a.name.en.localeCompare(b.name.en)
+    })
+  }, [matching, tab, mine, favouriteIds])
+
+  /** One card per dish, not one per portion. */
+  const cards = useMemo(() => groupVariants(shown), [shown])
+
+  const filtered = Boolean(query || labels.length || favesOnly)
 
   return (
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-        <header>
-          <h1 className="display text-xl sm:text-2xl text-ink-900">Recipes</h1>
-          <p className="text-sm text-ink-700">
-            Every meal from your dietician plans, plus the dishes behind them — {recipes.length} in all.
-          </p>
+
+        <header className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="display text-xl sm:text-2xl text-ink-900">Recipes</h1>
+            <p className="text-sm text-ink-700">
+              Every meal from your dietician plans, plus the dishes behind them.
+            </p>
+          </div>
+          {/* The label collapses to the icon on a phone, so the button keeps an
+              explicit name — otherwise it has none at all for a screen reader. */}
+          <button className="btn-primary shrink-0" aria-label="New recipe" onClick={() => setEditing(null)}>
+            <Plus size={16} /> <span className="hidden sm:inline">New recipe</span>
+          </button>
         </header>
 
         <div className="space-y-3">
@@ -60,80 +122,205 @@ export default function Recipes() {
             />
           </div>
 
-          <ChipRow initial={5}>
+          {/* The shelves. Scrolls sideways on a phone rather than wrapping to
+              three lines and pushing the recipes off the screen. */}
+          <div className="-mx-4 sm:mx-0 px-4 sm:px-0 overflow-x-auto">
+            <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-max">
+              {([...RECIPE_GROUPS, 'mine'] as Tab[]).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`shrink-0 whitespace-nowrap ${tab === t ? 'tab-on' : 'tab-off'}`}
+                >
+                  {t === 'mine' ? 'Yours' : GROUP_LABELS[t]}
+                  <span className="ml-1.5 text-xs opacity-60 font-mono">{counts.get(t) ?? 0}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Four notes about the cooking, and the star. Not thirteen. */}
+          <div className="flex flex-wrap gap-1.5">
             <button
               onClick={() => setFavesOnly((v) => !v)}
               className={favesOnly ? 'chip bg-coral-500 text-white border border-coral-500' : 'chip-off'}
             >
               <Star size={12} className={favesOnly ? 'fill-current' : ''} /> Favourites
             </button>
-            {/* The chosen tag leads, so it stays visible when the row is collapsed. */}
-            {[...FILTER_TAGS].sort((a, b) => Number(b === tag) - Number(a === tag)).map((t) => (
+            {RECIPE_LABELS.map((l) => (
               <button
-                key={t}
-                onClick={() => setTag(tag === t ? null : t)}
-                className={`capitalize ${tag === t ? 'chip-on' : 'chip-off'}`}
+                key={l}
+                onClick={() => setLabels((s) => (s.includes(l) ? s.filter((x) => x !== l) : [...s, l]))}
+                className={labels.includes(l) ? 'chip-on' : 'chip-off'}
               >
-                {t.replace('-', ' ')}
+                {LABEL_DEFINITIONS[l].label}
               </button>
             ))}
-          </ChipRow>
+          </div>
         </div>
 
-        {filtered.length === 0 ? (
-          <EmptyState title="Nothing matching that just yet">
-            Try another word, or clear the filters.
-          </EmptyState>
+        {tab !== 'mine' && !filtered && (
+          <p className="text-sm text-ink-500 -mt-1">{GROUP_BLURBS[tab]}</p>
+        )}
+
+        {shown.length === 0 ? (
+          <EmptyShelf tab={tab} filtered={filtered} onNew={() => setEditing(null)} />
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((r) => {
-              const n = roundNutrients(recipePerServing(r, ctx))
-              return (
-                // The star is a sibling of the card button, not a child: nested
-                // buttons are invalid and lose their click handler.
-                <div key={r.id} className="card p-4 md:p-3.5 relative min-w-0 hover:border-bite-300 hover:shadow-e2 transition-all">
-                  <button
-                    onClick={() => toggleFavourite(r.id)}
-                    className="absolute top-1.5 right-1.5 p-3.5 text-ink-300 hover:text-coral-500 z-10"
-                    aria-label={favouriteIds.includes(r.id) ? 'Remove from favourites' : 'Add to favourites'}
-                  >
-                    <Star size={16} className={favouriteIds.includes(r.id) ? 'fill-coral-500 text-coral-500' : ''} />
-                  </button>
-                  <button onClick={() => setOpen(r)} className="block w-full min-w-0 text-left">
-                    <span className="flex items-start gap-3 pr-10 min-w-0">
-                      <span className="text-2xl leading-none shrink-0">{r.emoji}</span>
-                      <span className="flex-1 min-w-0">
-                        <span className="block font-semibold text-ink-900 text-sm leading-snug">{r.name.en}</span>
-                        {r.sourceLine ? (
-                          <span className="block mt-1">
-                            <SourceLine text={r.sourceLine} lang={r.name.hu ? 'hu' : 'ro'} clamp={2} />
-                          </span>
-                        ) : null}
-                      </span>
-                    </span>
-                    <span className="flex items-baseline gap-3 mt-3 text-xs font-mono text-ink-700">
-                      <span className="font-bold text-ink-900">{Math.round(n.calories)} kcal</span>
-                      <span>P {n.protein}</span>
-                      <span>C {n.carbs}</span>
-                      <span>F {n.fat}</span>
-                    </span>
-                  </button>
-                </div>
-              )
-            })}
+            {cards.map((card) => (
+              <RecipeCard
+                key={card.variants[0].id}
+                card={card}
+                mine={card.variants.some((r) => mine.has(r.id))}
+                favourite={card.variants.some((r) => favouriteIds.includes(r.id))}
+                onToggleFavourite={() => {
+                  // A dish is favourited, not one portion of it: the star covers
+                  // every version so it cannot end up half-lit.
+                  const anyOn = card.variants.some((r) => favouriteIds.includes(r.id))
+                  for (const r of card.variants) {
+                    if (favouriteIds.includes(r.id) === anyOn) toggleFavourite(r.id)
+                  }
+                }}
+                onOpen={() => setOpen(card)}
+                kcals={card.variants.map((r) => Math.round(recipePerServing(r, ctx).calories))}
+              />
+            ))}
           </div>
         )}
       </div>
 
-      {open && <RecipeDetail recipe={open} onClose={() => setOpen(null)} />}
+      {open && (
+        <RecipeDetail
+          card={open}
+          isMine={(r) => mine.has(r.id)}
+          onEdit={(r) => { setEditing(r); setOpen(null) }}
+          onClose={() => setOpen(null)}
+        />
+      )}
+
+      {editing !== undefined && (
+        <RecipeEditor
+          recipe={editing}
+          onClose={() => setEditing(undefined)}
+          onSaved={(saved) => { if (editing === null) setTab(groupsOf(saved)[0]) }}
+        />
+      )}
     </div>
   )
 }
 
-function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void }) {
+function RecipeCard({
+  card, mine, favourite, kcals, onToggleFavourite, onOpen,
+}: {
+  card: RecipeVariants
+  mine: boolean
+  favourite: boolean
+  kcals: number[]
+  onToggleFavourite: () => void
+  onOpen: () => void
+}) {
+  const lead = card.variants[0]
+  const minutes = lead.prepMinutes + lead.cookMinutes
+  const low = Math.min(...kcals)
+  const high = Math.max(...kcals)
+
+  return (
+    // The star is a sibling of the card button, not a child: nested buttons are
+    // invalid and lose their click handler.
+    <div className="card p-4 md:p-3.5 relative min-w-0 hover:border-bite-300 hover:shadow-e2 transition-all">
+      <button
+        onClick={onToggleFavourite}
+        className="absolute top-1.5 right-1.5 p-3.5 text-ink-300 hover:text-coral-500 z-10"
+        aria-label={favourite ? 'Remove from favourites' : 'Add to favourites'}
+      >
+        <Star size={16} className={favourite ? 'fill-coral-500 text-coral-500' : ''} />
+      </button>
+      <button onClick={onOpen} className="block w-full min-w-0 text-left">
+        <span className="flex items-start gap-3 pr-10 min-w-0">
+          <span className="text-2xl leading-none shrink-0">{lead.emoji}</span>
+          <span className="flex-1 min-w-0">
+            <span className="block font-semibold text-ink-900 text-sm leading-snug">{card.name}</span>
+            {lead.sourceLine ? (
+              <span className="block mt-1">
+                <SourceLine text={lead.sourceLine} lang={lead.name.hu ? 'hu' : 'ro'} clamp={2} />
+              </span>
+            ) : null}
+          </span>
+        </span>
+        <span className="flex items-center flex-wrap gap-x-3 gap-y-1 mt-3 text-xs font-mono text-ink-700">
+          <span className="font-bold text-ink-900">
+            {low === high ? `${low} kcal` : `${low}–${high} kcal`}
+          </span>
+          {minutes > 0 && (
+            <span className="flex items-center gap-1"><Clock size={11} />{minutes} min</span>
+          )}
+          {card.variants.length > 1 && (
+            <span className="flex items-center gap-1 text-ink-500">
+              <Layers size={11} />{card.variants.length} versions
+            </span>
+          )}
+          {mine && <span className="badge bg-bite-100 text-bite-700 not-italic">yours</span>}
+        </span>
+      </button>
+    </div>
+  )
+}
+
+/** What an empty shelf should say depends on why it is empty. */
+function EmptyShelf({ tab, filtered, onNew }: { tab: Tab; filtered: boolean; onNew: () => void }) {
+  if (filtered) {
+    return (
+      <EmptyState title="Nothing matching that just yet">
+        Try another word, another shelf, or clear the filters.
+      </EmptyState>
+    )
+  }
+
+  if (tab === 'mine') {
+    return (
+      <EmptyState title="Nothing of your own yet" mood="thinking">
+        <p>Every recipe here can be edited — change one and your version lands on this shelf, with the original safe underneath.</p>
+        <button className="btn-primary mt-4" onClick={onNew}><Plus size={16} /> Write one</button>
+      </EmptyState>
+    )
+  }
+
+  if (tab === 'snack') {
+    return (
+      <EmptyState title="Snacks are not recipes here" mood="thinking">
+        <p>
+          Your plans write them as lines rather than dishes — 150 g apple, 10 g cashews — so they
+          are added straight to a day in the planner. Write one as a recipe if you would rather
+          reuse it.
+        </p>
+        <button className="btn-primary mt-4" onClick={onNew}><Plus size={16} /> Write one</button>
+      </EmptyState>
+    )
+  }
+
+  return (
+    <EmptyState title={`Nothing on the ${GROUP_LABELS[tab].toLowerCase()} shelf`} mood="thinking">
+      <button className="btn-primary mt-2" onClick={onNew}><Plus size={16} /> Write one</button>
+    </EmptyState>
+  )
+}
+
+function RecipeDetail({
+  card, isMine, onEdit, onClose,
+}: {
+  card: RecipeVariants
+  isMine: (recipe: Recipe) => boolean
+  onEdit: (recipe: Recipe) => void
+  onClose: () => void
+}) {
   const ctx = useNutritionContext()
   const [copied, setCopied] = useState(false)
+  const [version, setVersion] = useState(0)
+
+  const recipe = card.variants[Math.min(version, card.variants.length - 1)]
+  const mine = isMine(recipe)
   const perServing = roundNutrients(recipePerServing(recipe, ctx))
+  const extras = otherTags(recipe)
 
   async function copyForMfp() {
     const ok = await copyToClipboard(recipeForMfp(recipe, ctx))
@@ -148,20 +335,50 @@ function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="sticky top-0 bg-paper flex items-start justify-between gap-3 px-5 py-4 border-b border-border-200">
+        <header className="sticky top-0 bg-paper flex items-start justify-between gap-2 px-5 py-4 border-b border-border-200">
           <div className="flex items-start gap-3 min-w-0">
             <span className="text-2xl leading-none">{recipe.emoji}</span>
             <div className="min-w-0">
-              <h2 className="text-base font-extrabold text-ink-900 leading-snug">{recipe.name.en}</h2>
+              <h2 className="text-base font-extrabold text-ink-900 leading-snug">{card.name}</h2>
               {recipe.name.ro || recipe.name.hu ? (
                 <p className="text-xs text-ink-500">{[recipe.name.ro, recipe.name.hu].filter(Boolean).join(' · ')}</p>
               ) : null}
             </div>
           </div>
-          <button className="btn-ghost btn-icon shrink-0" onClick={onClose} aria-label="Close"><X size={18} /></button>
+          <div className="flex items-center gap-1 shrink-0">
+            <button className="btn-ghost btn-icon" onClick={() => onEdit(recipe)} aria-label="Edit recipe"><Pencil size={17} /></button>
+            <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
+          </div>
         </header>
 
         <div className="p-5 space-y-5">
+          {/* The plans write the same dish more than once — sometimes at a
+              different portion, more often just worded differently ("supă de
+              fasole verde" one week, "ciorbă de fasole verde" the next). One
+              card, and the wordings live in here. */}
+          {card.variants.length > 1 && (
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-2">
+                Written {card.variants.length} times across the plans
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {card.variants.map((v, i) => {
+                  const kcal = Math.round(recipePerServing(v, ctx).calories)
+                  return (
+                    <button
+                      key={v.id}
+                      onClick={() => setVersion(i)}
+                      className={i === version ? 'chip-on' : 'chip-off'}
+                    >
+                      {i + 1}
+                      <span className="ml-1.5 font-mono opacity-70">{kcal}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {recipe.sourceLine ? (
             <div className="card-soft p-3">
               <p className="text-[10px] font-bold uppercase tracking-wide text-ink-500 mb-1">How your dietician wrote it</p>
@@ -178,9 +395,20 @@ function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void
               {recipe.prepMinutes || recipe.cookMinutes
                 ? ` · ${recipe.prepMinutes + recipe.cookMinutes} min`
                 : ''}
+              {mine ? ' · yours' : ''}
             </p>
             <NutrientSummary n={perServing} />
           </div>
+
+          {/* The tags that are not shelves and not filters still describe the
+              dish, so they live here rather than at the top of the screen. */}
+          {extras.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {extras.map((t) => (
+                <span key={t} className="chip-off capitalize pointer-events-none">{t.replace('-', ' ')}</span>
+              ))}
+            </div>
+          )}
 
           <div>
             <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-2">What goes in</p>
@@ -191,12 +419,15 @@ function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void
                   : ctx.recipes.get(c.recipeId)?.name.en ?? c.recipeId
                 const qty = c.kind === 'food' ? `${Math.round(c.grams)} g` : `${c.servings}×`
                 return (
-                  <li key={i} className="flex justify-between text-sm text-ink-900">
-                    <span>{label}</span>
-                    <span className="font-mono text-ink-700">{qty}</span>
+                  <li key={i} className="flex justify-between gap-3 text-sm text-ink-900">
+                    <span className="min-w-0">{label}</span>
+                    <span className="font-mono text-ink-700 shrink-0">{qty}</span>
                   </li>
                 )
               })}
+              {!recipe.components.length && (
+                <li className="text-sm text-ink-500">Nothing listed yet.</li>
+              )}
             </ul>
           </div>
 
@@ -209,20 +440,27 @@ function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void
                     <span className="shrink-0 w-5 h-5 rounded-full bg-bite-100 text-bite-800 text-xs font-bold grid place-items-center">
                       {i + 1}
                     </span>
-                    <span>{s.instruction}</span>
+                    <span className="min-w-0">{s.instruction}</span>
                   </li>
                 ))}
               </ol>
             </div>
           )}
 
-          <button className="btn-secondary w-full" onClick={copyForMfp}>
-            <ClipboardCopy size={15} /> {copied ? 'Copied to clipboard' : 'Copy for MyFitnessPal'}
-          </button>
+          <div className="flex gap-2">
+            <button className="btn-secondary flex-1" onClick={copyForMfp}>
+              <ClipboardCopy size={15} /> {copied ? 'Copied' : 'Copy for MyFitnessPal'}
+            </button>
+            <button className="btn-secondary shrink-0" onClick={() => onEdit(recipe)}>
+              <Pencil size={15} /> Edit
+            </button>
+          </div>
+
           {recipe.steps.length === 0 && (
             <p className="flex items-start gap-2 text-xs text-ink-500">
               <ChefHat size={14} className="shrink-0 mt-0.5" />
-              This one came straight from a plan, so it lists what goes in but not how.
+              This one came straight from a plan, so it lists what goes in but not how. Edit it to
+              write the method down the first time you cook it.
             </p>
           )}
         </div>

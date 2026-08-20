@@ -14,7 +14,14 @@ interface RecipeStore {
   addRecipe: (recipe: Recipe) => void
   updateRecipe: (id: string, updates: Partial<Recipe>) => void
   removeRecipe: (id: string) => void
+  /** Throws away your edits to a built-in recipe and brings the original back. */
+  revertRecipe: (id: string) => void
   toggleFavourite: (id: string) => void
+}
+
+/** True for the 275 recipes that ship with the app, as opposed to your own. */
+export function isBuiltIn(id: string): boolean {
+  return ALL_RECIPES.some((r) => r.id === id)
 }
 
 export const useRecipeStore = create<RecipeStore>()(
@@ -37,12 +44,28 @@ export const useRecipeStore = create<RecipeStore>()(
           return { custom: [...s.custom, { ...base, ...updates }] }
         }),
 
+      /**
+       * Deleting has to cover two cases, and used to get the overlap wrong.
+       *
+       * A recipe of your own is simply dropped. A built-in one cannot be, since
+       * it lives in code — so it goes on the hidden list instead. The case that
+       * was broken is a built-in you had edited: it exists in `custom` as an
+       * override, so deleting it only removed the override and the original
+       * reappeared, looking for all the world like the delete had failed. Both
+       * halves now run, so an edited built-in hides like any other.
+       */
       removeRecipe: (id) =>
-        set((s) =>
-          s.custom.some((r) => r.id === id)
-            ? { custom: s.custom.filter((r) => r.id !== id), favouriteIds: s.favouriteIds.filter((f) => f !== id) }
-            : { hidden: [...new Set([...s.hidden, id])] },
-        ),
+        set((s) => ({
+          custom: s.custom.filter((r) => r.id !== id),
+          hidden: isBuiltIn(id) ? [...new Set([...s.hidden, id])] : s.hidden,
+          favouriteIds: s.favouriteIds.filter((f) => f !== id),
+        })),
+
+      revertRecipe: (id) =>
+        set((s) => ({
+          custom: s.custom.filter((r) => r.id !== id),
+          hidden: s.hidden.filter((h) => h !== id),
+        })),
 
       toggleFavourite: (id) =>
         set((s) => ({
