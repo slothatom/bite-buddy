@@ -31,6 +31,8 @@ interface RecipeStore {
   mergeRecipes: (winnerId: string, loserIds: string[]) => void
   /** Brings back everything that was merged into `winnerId`. */
   unmergeRecipe: (winnerId: string) => void
+  /** Puts a deleted recipe back in the library, edits and all. */
+  restoreRecipe: (id: string) => void
 }
 
 /** True for the 275 recipes that ship with the app, as opposed to your own. */
@@ -60,27 +62,34 @@ export const useRecipeStore = create<RecipeStore>()(
         }),
 
       /**
-       * Deleting has to cover two cases, and used to get the overlap wrong.
+       * Deleting takes a recipe out of the library without destroying it.
        *
-       * A recipe of your own is simply dropped. A built-in one cannot be, since
-       * it lives in code — so it goes on the hidden list instead. The case that
-       * was broken is a built-in you had edited: it exists in `custom` as an
-       * override, so deleting it only removed the override and the original
-       * reappeared, looking for all the world like the delete had failed. Both
-       * halves now run, so an edited built-in hides like any other.
+       * Nothing is dropped, and that is deliberate. A recipe you deleted may
+       * still be named by a day you planned in March, and the plan stores an id
+       * rather than a copy — so throwing the recipe away turned that day's
+       * dinner into a blank worth zero calories, quietly rewriting your own
+       * history. It goes on the hidden list instead: gone from every list,
+       * search, picker and filter, still resolvable by anything that already
+       * refers to it, and restorable.
+       *
+       * The favourite goes, because a star you cannot see is a star you cannot
+       * clear. Ingredients are untouched — other recipes use them.
        */
       removeRecipe: (id) =>
         set((s) => ({
-          custom: s.custom.filter((r) => r.id !== id),
-          hidden: isBuiltIn(id) ? [...new Set([...s.hidden, id])] : s.hidden,
+          hidden: [...new Set([...s.hidden, id])],
           favouriteIds: s.favouriteIds.filter((f) => f !== id),
         })),
 
       revertRecipe: (id) =>
         set((s) => ({
-          custom: s.custom.filter((r) => r.id !== id),
+          // For a built-in this throws away your edits; for a recipe of your
+          // own there is nothing underneath, so it only un-deletes.
+          custom: isBuiltIn(id) ? s.custom.filter((r) => r.id !== id) : s.custom,
           hidden: s.hidden.filter((h) => h !== id),
         })),
+
+      restoreRecipe: (id) => set((s) => ({ hidden: s.hidden.filter((h) => h !== id) })),
 
       toggleFavourite: (id) =>
         set((s) => ({
@@ -126,24 +135,61 @@ export const useRecipeStore = create<RecipeStore>()(
   ),
 )
 
+/** The library as it stands, with your edits applied. Deleted ones included. */
+export function libraryWith(custom: Recipe[]): Recipe[] {
+  const overridden = new Set(custom.map((r) => r.id))
+  return [...ALL_RECIPES.filter((r) => !overridden.has(r.id)), ...custom]
+}
+
+/**
+ * What you can actually browse: the library, minus what you deleted and what
+ * you merged away. Exported so nothing has to reimplement it — a second copy of
+ * this rule in a test is a second copy that can drift out of step with the app.
+ */
+export function visibleRecipes(state: Pick<RecipeStore, 'custom' | 'hidden' | 'mergedInto'>): Recipe[] {
+  const hiddenSet = new Set(state.hidden)
+  return libraryWith(state.custom)
+    .filter((r) => !hiddenSet.has(r.id) && !(r.id in state.mergedInto))
+}
+
 export function useRecipes(): Recipe[] {
   // See useFoods: a fresh array per render made every downstream useMemo a lie.
   const custom = useRecipeStore((s) => s.custom)
   const hidden = useRecipeStore((s) => s.hidden)
   const mergedInto = useRecipeStore((s) => s.mergedInto)
 
-  return useMemo(() => {
-    const overridden = new Set(custom.map((r) => r.id))
-    const hiddenSet = new Set(hidden)
-    // Merged-away recipes leave the library but keep resolving — see
-    // useNutritionContext, which still maps their ids to what they became.
-    const gone = (id: string) => hiddenSet.has(id) || id in mergedInto
+  // Deleted and merged-away recipes both leave the library and both keep
+  // resolving — see useResolvableRecipes.
+  return useMemo(() => visibleRecipes({ custom, hidden, mergedInto }), [custom, hidden, mergedInto])
+}
 
-    return [
-      ...ALL_RECIPES.filter((r) => !overridden.has(r.id) && !gone(r.id)),
-      ...custom.filter((r) => !gone(r.id)),
-    ]
-  }, [custom, hidden, mergedInto])
+/**
+ * Everything a saved plan might still name, deleted recipes included.
+ *
+ * This is what the nutrition context is built from. A day you planned in March
+ * stores a recipe id, not a copy of the recipe, so deleting that recipe must not
+ * be able to reach back and blank the day — the historical record stays whole
+ * even though the recipe is gone from every list you can browse.
+ */
+export function useResolvableRecipes(): Recipe[] {
+  const custom = useRecipeStore((s) => s.custom)
+  return useMemo(() => libraryWith(custom), [custom])
+}
+
+/** The ids of recipes you deleted, for marking them where they still appear. */
+export function useDeletedIds(): Set<string> {
+  const hidden = useRecipeStore((s) => s.hidden)
+  return useMemo(() => new Set(hidden), [hidden])
+}
+
+/** The deleted recipes themselves, for offering them back. */
+export function useDeletedRecipes(): Recipe[] {
+  const custom = useRecipeStore((s) => s.custom)
+  const hidden = useRecipeStore((s) => s.hidden)
+  return useMemo(() => {
+    const hiddenSet = new Set(hidden)
+    return libraryWith(custom).filter((r) => hiddenSet.has(r.id))
+  }, [custom, hidden])
 }
 
 /** What was folded into this recipe, for showing an undo next to it. */

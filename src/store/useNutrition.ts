@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { buildContext, type NutritionContext } from '../lib/nutrition'
 import { buildFoodIndex, type FoodIndex } from '../lib/foodSearch'
 import { useFoods } from './useFoodStore'
-import { useRecipes, useRecipeStore } from './useRecipeStore'
+import { useResolvableRecipes, useRecipeStore } from './useRecipeStore'
 
 /**
  * The lookup tables every nutrition calculation needs.
@@ -13,7 +13,9 @@ import { useRecipes, useRecipeStore } from './useRecipeStore'
  */
 export function useNutritionContext(): NutritionContext {
   const foods = useFoods()
-  const recipes = useRecipes()
+  // Everything a saved plan might name, including recipes you have deleted: a
+  // day planned in March stores an id, and losing the recipe must not blank it.
+  const recipes = useResolvableRecipes()
   // Merged-away recipes are not in the library any more, but days you already
   // planned still name them. The aliases keep those days resolving.
   const mergedInto = useRecipeStore((s) => s.mergedInto)

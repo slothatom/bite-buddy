@@ -320,11 +320,12 @@ export default function RecipeEditor({
                 <div className="card-soft p-3 space-y-2">
                   <p className="text-sm text-ink-900 font-semibold">Delete “{draft.name.en}”?</p>
                   <p className="text-xs text-ink-700">
+                    This recipe will be removed from your recipes, and from search, the planner
+                    and your favourites.{' '}
                     {usedInPlan > 0
-                      ? `It is in your plan ${usedInPlan} ${usedInPlan === 1 ? 'time' : 'times'} — those entries will stop showing what they were.`
-                      : isBuiltIn(draft.id)
-                        ? 'It came with the app, so it is hidden rather than destroyed. You can bring it back from Settings.'
-                        : 'This one is yours, so it goes for good.'}
+                      ? `The ${usedInPlan} ${usedInPlan === 1 ? 'day' : 'days'} you have already planned with it keep it, marked as deleted — historical meal data is not affected.`
+                      : 'Historical meal data will not be affected.'}{' '}
+                    You can restore it from Settings.
                   </p>
                   <div className="flex gap-2">
                     <button className="btn-danger flex-1" onClick={() => { removeRecipe(draft.id); onClose() }}>

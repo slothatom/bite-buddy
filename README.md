@@ -164,7 +164,14 @@ four recipes in five narrows nothing, so it is yours to apply.
 
 Every recipe is editable, including the 275 that ship in code: the first change keeps a copy
 of your own and the original stays underneath, so **Revert** and **Delete** are separate
-buttons that mean different things. **New recipe** writes one from scratch — name, shelf,
+buttons that mean different things.
+
+**Deleting** takes a recipe out of the library, search, the planner's picker, your favourites
+and every filter — but does not destroy it. A day you planned in March names the recipe by id
+rather than storing a copy, so throwing it away turned that day's dinner into a blank worth
+zero calories, quietly rewriting your own history. Deleted recipes stay resolvable: the day
+keeps its meal and its numbers, with the entry marked `deleted`. **Settings → Deleted recipes**
+puts them back. Ingredients are never touched — other recipes use them. **New recipe** writes one from scratch — name, shelf,
 labels, weighed ingredients (foods or other recipes) and a method — with the nutrition derived
 as you type rather than entered.
 
