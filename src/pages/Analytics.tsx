@@ -5,8 +5,8 @@ import { useUserStore } from '../store/useUserStore'
 import {
   useBodyStore, useWeightFor, useMeasurementsFor, useUnassignedCount,
 } from '../store/useBodyStore'
-import { useAuthStore } from '../store/useAuth'
 import { MEASUREMENT_KEYS, MEASUREMENT_LABELS, type MeasurementKey } from '../types'
+import { PEOPLE, type PersonId } from '../lib/people'
 import { useNutritionContext } from '../store/useNutrition'
 import { dayNutrients } from '../lib/nutrition'
 import { scoreWeek } from '../lib/mediterranean'
@@ -173,12 +173,11 @@ function BodyTab() {
     addWeightEntry, removeWeightEntry, addMeasurement, removeMeasurement, claimUnassigned,
   } = useBodyStore()
   const { profile } = useUserStore()
-  const me = useAuthStore((s) => s.user)
-  const members = useAuthStore((s) => s.members)
 
-  // Signed out, a local clone or the test suite, there is one person and no
-  // ids, so everything sits under the unclaimed heading and simply works.
-  const [who, setWho] = useState<string | undefined>(() => me?.id)
+  // Both people are always on screen, signed in or not. Two waists averaged
+  // into one line is a graph of nothing, and a tab that only appears once
+  // somebody signs in is a tab nobody finds.
+  const [who, setWho] = useState<PersonId>(PEOPLE[0].id)
   const unassigned = useUnassignedCount()
 
   const weights = useWeightFor(who)
@@ -192,29 +191,29 @@ function BodyTab() {
 
   return (
     <div className="space-y-5">
-      {/* Whose body. Only worth showing when there is more than one person. */}
-      {members.length > 1 && (
-        <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
-          {members.map((m) => (
-            <button
-              key={m.id}
-              onClick={() => setWho(m.id)}
-              className={who === m.id ? 'tab-on' : 'tab-off'}
-            >
-              {m.id === me?.id ? 'You' : (m.display_name || m.email.split('@')[0])}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Whose body. */}
+      <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
+        {PEOPLE.map((p) => (
+          <button
+            key={p.id}
+            role="tab"
+            aria-selected={who === p.id}
+            onClick={() => setWho(p.id)}
+            className={who === p.id ? 'tab-on' : 'tab-off'}
+          >
+            {p.name}
+          </button>
+        ))}
+      </div>
 
-      {unassigned > 0 && me && (
+      {unassigned > 0 && (
         <div className="rounded-2xl border border-bite-200 bg-bite-50 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
           <p className="flex-1 min-w-0 text-sm text-ink-900">
             {unassigned} {unassigned === 1 ? 'entry was' : 'entries were'} logged before the app
             knew who was who. They are nobody's until you say so.
           </p>
-          <button className="btn-primary shrink-0" onClick={() => claimUnassigned(me.id)}>
-            These are mine
+          <button className="btn-primary shrink-0" onClick={() => claimUnassigned(who)}>
+            {PEOPLE.find((p) => p.id === who)?.name}'s
           </button>
         </div>
       )}

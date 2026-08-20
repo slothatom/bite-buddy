@@ -605,6 +605,33 @@ test.describe('progress, per person', () => {
     await expect(page.locator('.card').filter({ hasText: /^Chest\d/ })).toHaveCount(0)
   })
 
+  test('the two people have their own histories, signed in or not', async ({ page }) => {
+    await goto(page, '/analytics')
+    await page.getByRole('button', { name: 'Body' }).click()
+
+    // Both tabs are there before anybody signs in. They used to appear only
+    // once the household list loaded, which meant never on a device that was
+    // signed out, and the one history on screen belonged to whoever was
+    // holding the phone.
+    await expect(page.getByRole('tab', { name: 'Arany' })).toBeVisible()
+    await expect(page.getByRole('tab', { name: 'Oli' })).toBeVisible()
+
+    await page.getByLabel('Weight').fill('68.4')
+    await page.getByRole('button', { name: /^Log$/ }).click()
+    await expect(page.getByText('68.4 kg')).toBeVisible()
+
+    await page.getByRole('tab', { name: 'Oli' }).click()
+    await expect(page.getByText('68.4 kg')).toHaveCount(0)
+
+    await page.getByLabel('Weight').fill('61.2')
+    await page.getByRole('button', { name: /^Log$/ }).click()
+    await expect(page.getByText('61.2 kg')).toBeVisible()
+
+    await page.getByRole('tab', { name: 'Arany' }).click()
+    await expect(page.getByText('68.4 kg')).toBeVisible()
+    await expect(page.getByText('61.2 kg')).toHaveCount(0)
+  })
+
   test('a measurement can be taken back off', async ({ page }) => {
     await goto(page, '/analytics')
     await page.getByRole('button', { name: 'Body' }).click()
