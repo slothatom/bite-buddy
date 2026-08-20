@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
+import { planMerge, planUnmerge, mergedIntoRecipe } from '../lib/mergeRecipes'
 import type { Recipe } from '../types'
 import { ALL_RECIPES } from '../data'
 
@@ -10,6 +11,14 @@ interface RecipeStore {
   custom: Recipe[]
   hidden: string[]
   favouriteIds: string[]
+  /**
+   * "This recipe is really that one", written as loser id → winner id.
+   *
+   * A merge hides nothing and deletes nothing: every lookup resolves through
+   * this map, so a day you already planned — or one of the fourteen archived
+   * weeks, which live in code and cannot be rewritten — still finds a recipe.
+   */
+  mergedInto: Record<string, string>
 
   addRecipe: (recipe: Recipe) => void
   updateRecipe: (id: string, updates: Partial<Recipe>) => void
@@ -17,6 +26,11 @@ interface RecipeStore {
   /** Throws away your edits to a built-in recipe and brings the original back. */
   revertRecipe: (id: string) => void
   toggleFavourite: (id: string) => void
+
+  /** Folds `loserIds` into `winnerId`. Reversible, and loses no references. */
+  mergeRecipes: (winnerId: string, loserIds: string[]) => void
+  /** Brings back everything that was merged into `winnerId`. */
+  unmergeRecipe: (winnerId: string) => void
 }
 
 /** True for the 275 recipes that ship with the app, as opposed to your own. */
@@ -30,6 +44,7 @@ export const useRecipeStore = create<RecipeStore>()(
       custom: [],
       hidden: [],
       favouriteIds: [],
+      mergedInto: {},
 
       addRecipe: (recipe) => set((s) => ({ custom: [...s.custom, recipe] })),
 
@@ -73,6 +88,27 @@ export const useRecipeStore = create<RecipeStore>()(
             ? s.favouriteIds.filter((f) => f !== id)
             : [...s.favouriteIds, id],
         })),
+
+      mergeRecipes: (winnerId, loserIds) =>
+        set((s) => {
+          const mergedInto = planMerge(s.mergedInto, winnerId, loserIds)
+          const folded = new Set(Object.keys(mergedInto))
+
+          // A star on a version that is no longer shown would be a favourite you
+          // cannot see or clear, so it moves to the one that survived.
+          const hadStar = s.favouriteIds.some((id) => folded.has(id) || id === winnerId)
+          const favouriteIds = s.favouriteIds.filter((id) => !folded.has(id))
+
+          return {
+            mergedInto,
+            favouriteIds: hadStar && !favouriteIds.includes(winnerId)
+              ? [...favouriteIds, winnerId]
+              : favouriteIds,
+          }
+        }),
+
+      unmergeRecipe: (winnerId) =>
+        set((s) => ({ mergedInto: planUnmerge(s.mergedInto, winnerId) })),
     }),
     {
       name: 'bite-buddy-recipes-v2',
@@ -94,13 +130,24 @@ export function useRecipes(): Recipe[] {
   // See useFoods: a fresh array per render made every downstream useMemo a lie.
   const custom = useRecipeStore((s) => s.custom)
   const hidden = useRecipeStore((s) => s.hidden)
+  const mergedInto = useRecipeStore((s) => s.mergedInto)
 
   return useMemo(() => {
     const overridden = new Set(custom.map((r) => r.id))
     const hiddenSet = new Set(hidden)
+    // Merged-away recipes leave the library but keep resolving — see
+    // useNutritionContext, which still maps their ids to what they became.
+    const gone = (id: string) => hiddenSet.has(id) || id in mergedInto
+
     return [
-      ...ALL_RECIPES.filter((r) => !overridden.has(r.id) && !hiddenSet.has(r.id)),
-      ...custom,
+      ...ALL_RECIPES.filter((r) => !overridden.has(r.id) && !gone(r.id)),
+      ...custom.filter((r) => !gone(r.id)),
     ]
-  }, [custom, hidden])
+  }, [custom, hidden, mergedInto])
+}
+
+/** What was folded into this recipe, for showing an undo next to it. */
+export function useMergedInto(winnerId: string): string[] {
+  const mergedInto = useRecipeStore((s) => s.mergedInto)
+  return useMemo(() => mergedIntoRecipe(mergedInto, winnerId), [mergedInto, winnerId])
 }

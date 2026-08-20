@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
-import { Search, Star, ClipboardCopy, X, ChefHat, Plus, Pencil, Clock, Layers } from 'lucide-react'
+import {
+  Search, Star, ClipboardCopy, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
+} from 'lucide-react'
 import type { Recipe } from '../types'
-import { useRecipes, useRecipeStore } from '../store/useRecipeStore'
+import { useRecipes, useRecipeStore, useMergedInto } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { recipePerServing, roundNutrients } from '../lib/nutrition'
 import { normaliseTerm } from '../lib/units'
@@ -13,6 +15,7 @@ import {
   groupsOf, hasLabel, otherTags, groupForTime, groupVariants,
   type RecipeGroup, type RecipeLabel, type RecipeVariants,
 } from '../lib/recipeGroups'
+import { interchangeableGroups } from '../lib/mergeRecipes'
 
 /**
  * The recipe library.
@@ -32,14 +35,17 @@ type Tab = RecipeGroup | 'mine'
 
 export default function Recipes() {
   const recipes = useRecipes()
-  const { favouriteIds, toggleFavourite, custom } = useRecipeStore()
+  const { favouriteIds, toggleFavourite, custom, mergeRecipes } = useRecipeStore()
   const ctx = useNutritionContext()
 
   const [tab, setTab] = useState<Tab>(() => groupForTime())
   const [query, setQuery] = useState('')
   const [labels, setLabels] = useState<RecipeLabel[]>([])
   const [favesOnly, setFavesOnly] = useState(false)
-  const [open, setOpen] = useState<RecipeVariants | null>(null)
+  // The name rather than the group itself: merging changes what the group
+  // contains, and a sheet holding a snapshot went on listing versions that had
+  // just been folded away.
+  const [openName, setOpenName] = useState<string | null>(null)
   const [editing, setEditing] = useState<Recipe | null | undefined>(undefined)
 
   const mine = useMemo(() => new Set(custom.map((r) => r.id)), [custom])
@@ -92,6 +98,23 @@ export default function Recipes() {
   const cards = useMemo(() => groupVariants(shown), [shown])
 
   const filtered = Boolean(query || labels.length || favesOnly)
+
+  // Looked up across the whole library, not the current shelf, so changing a
+  // filter underneath an open recipe does not shut it.
+  const openCard = useMemo(
+    () => (openName ? groupVariants(recipes).find((c) => c.name === openName) ?? null : null),
+    [openName, recipes],
+  )
+
+  /**
+   * Repeats across the whole library — not just this shelf — where every
+   * version comes to the same numbers. Those can be folded together without
+   * anyone having to decide which portion to keep.
+   */
+  const tidyable = useMemo(
+    () => interchangeableGroups(groupVariants(recipes), ctx),
+    [recipes, ctx],
+  )
 
   return (
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
@@ -159,6 +182,17 @@ export default function Recipes() {
           </div>
         </div>
 
+        {tidyable.length > 0 && !filtered && (
+          <TidyBanner
+            groups={tidyable}
+            onTidy={() => {
+              for (const g of tidyable) {
+                mergeRecipes(g.variants[0].id, g.variants.slice(1).map((r) => r.id))
+              }
+            }}
+          />
+        )}
+
         {tab !== 'mine' && !filtered && (
           <p className="text-sm text-ink-500 -mt-1">{GROUP_BLURBS[tab]}</p>
         )}
@@ -181,7 +215,7 @@ export default function Recipes() {
                     if (favouriteIds.includes(r.id) === anyOn) toggleFavourite(r.id)
                   }
                 }}
-                onOpen={() => setOpen(card)}
+                onOpen={() => setOpenName(card.name)}
                 kcals={card.variants.map((r) => Math.round(recipePerServing(r, ctx).calories))}
               />
             ))}
@@ -189,12 +223,12 @@ export default function Recipes() {
         )}
       </div>
 
-      {open && (
+      {openCard && (
         <RecipeDetail
-          card={open}
+          card={openCard}
           isMine={(r) => mine.has(r.id)}
-          onEdit={(r) => { setEditing(r); setOpen(null) }}
-          onClose={() => setOpen(null)}
+          onEdit={(r) => { setEditing(r); setOpenName(null) }}
+          onClose={() => setOpenName(null)}
         />
       )}
 
@@ -266,6 +300,43 @@ function RecipeCard({
   )
 }
 
+/**
+ * The offer to tidy up the repeats that are only repeats.
+ *
+ * Only appears for groups whose versions come to the same numbers — a dish
+ * written at 259 kcal and 408 kcal is a real choice about portions and is never
+ * swept up here. It disappears once there is nothing left to fold, which is the
+ * point: this is a chore, not a feature you are meant to keep visiting.
+ */
+function TidyBanner({ groups, onTidy }: { groups: RecipeVariants[]; onTidy: () => void }) {
+  const [done, setDone] = useState(false)
+  const extra = groups.reduce((n, g) => n + g.variants.length - 1, 0)
+
+  if (done) return null
+
+  return (
+    // Deliberately not `.card`: a card on this screen means a recipe, and this
+    // is a notice about them.
+    <div className="rounded-2xl border border-bite-200 bg-bite-50 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+      <Combine size={20} className="text-bite-600 shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-ink-900">
+          {groups.length} {groups.length === 1 ? 'dish is' : 'dishes are'} written down more than once
+        </p>
+        <p className="text-xs text-ink-700 mt-0.5">
+          Same ingredients, same numbers — just worded differently from one week to the next.
+          Folding them together removes {extra} {extra === 1 ? 'copy' : 'copies'}. Days you have
+          already planned keep working, and each one can be undone.
+        </p>
+      </div>
+      <div className="flex gap-2 shrink-0">
+        <button className="btn-primary" onClick={onTidy}>Merge them</button>
+        <button className="btn-ghost text-ink-500" onClick={() => setDone(true)}>Not now</button>
+      </div>
+    </div>
+  )
+}
+
 /** What an empty shelf should say depends on why it is empty. */
 function EmptyShelf({ tab, filtered, onNew }: { tab: Tab; filtered: boolean; onNew: () => void }) {
   if (filtered) {
@@ -314,10 +385,13 @@ function RecipeDetail({
   onClose: () => void
 }) {
   const ctx = useNutritionContext()
+  const { mergeRecipes, unmergeRecipe } = useRecipeStore()
   const [copied, setCopied] = useState(false)
   const [version, setVersion] = useState(0)
+  const [confirmMerge, setConfirmMerge] = useState(false)
 
   const recipe = card.variants[Math.min(version, card.variants.length - 1)]
+  const folded = useMergedInto(recipe.id)
   const mine = isMine(recipe)
   const perServing = roundNutrients(recipePerServing(recipe, ctx))
   const extras = otherTags(recipe)
@@ -376,6 +450,54 @@ function RecipeDetail({
                   )
                 })}
               </div>
+
+              {/* Keeping the one you are looking at is the only sensible
+                  default — you chose it by flipping to it. */}
+              {confirmMerge ? (
+                <div className="card-soft p-3 mt-3 space-y-2">
+                  <p className="text-sm text-ink-900">
+                    Keep version {version + 1} and fold the other {card.variants.length - 1} into it?
+                  </p>
+                  <p className="text-xs text-ink-700">
+                    Days already planned with the others will show this one instead. Nothing is
+                    deleted — you can put them back.
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      className="btn-primary flex-1"
+                      onClick={() => {
+                        mergeRecipes(recipe.id, card.variants.filter((v) => v.id !== recipe.id).map((v) => v.id))
+                        setConfirmMerge(false)
+                        setVersion(0)
+                      }}
+                    >
+                      Merge into this one
+                    </button>
+                    <button className="btn-secondary flex-1" onClick={() => setConfirmMerge(false)}>
+                      Leave them
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button className="btn-ghost text-ink-500 mt-2 -ml-2" onClick={() => setConfirmMerge(true)}>
+                  <Combine size={15} /> Merge these into one
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* The other side of it: a recipe that has swallowed others says so,
+              and offers the way back. */}
+          {folded.length > 0 && (
+            <div className="card-soft p-3 flex items-center gap-3">
+              <Combine size={16} className="text-ink-500 shrink-0" />
+              <p className="flex-1 min-w-0 text-xs text-ink-700">
+                {folded.length} other {folded.length === 1 ? 'version was' : 'versions were'} folded
+                into this one.
+              </p>
+              <button className="btn-ghost shrink-0 text-ink-500" onClick={() => unmergeRecipe(recipe.id)}>
+                <Undo2 size={14} /> Undo
+              </button>
             </div>
           )}
 

@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { buildContext, type NutritionContext } from '../lib/nutrition'
 import { buildFoodIndex, type FoodIndex } from '../lib/foodSearch'
 import { useFoods } from './useFoodStore'
-import { useRecipes } from './useRecipeStore'
+import { useRecipes, useRecipeStore } from './useRecipeStore'
 
 /**
  * The lookup tables every nutrition calculation needs.
@@ -14,7 +14,14 @@ import { useRecipes } from './useRecipeStore'
 export function useNutritionContext(): NutritionContext {
   const foods = useFoods()
   const recipes = useRecipes()
-  return useMemo(() => buildContext(foods, recipes), [foods, recipes])
+  // Merged-away recipes are not in the library any more, but days you already
+  // planned still name them. The aliases keep those days resolving.
+  const mergedInto = useRecipeStore((s) => s.mergedInto)
+
+  return useMemo(
+    () => buildContext(foods, recipes, mergedInto),
+    [foods, recipes, mergedInto],
+  )
 }
 
 export function useFoodIndex(): FoodIndex {
