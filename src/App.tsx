@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Sidebar from './components/layout/Sidebar'
 import BottomNav from './components/layout/BottomNav'
@@ -6,20 +7,39 @@ import ErrorBoundary from './components/layout/ErrorBoundary'
 import StorageBanner from './components/layout/StorageBanner'
 import Home from './pages/Home'
 import Planner from './pages/Planner'
-import Recipes from './pages/Recipes'
-import Foods from './pages/Foods'
-import GroceryList from './pages/GroceryList'
-import History from './pages/History'
-import PrepMode from './pages/PrepMode'
-import Schedule from './pages/Schedule'
-import Analytics from './pages/Analytics'
-import Settings from './pages/Settings'
 import SignIn from './pages/SignIn'
+
 import { useUserStore } from './store/useUserStore'
 import { useAuthStore } from './store/useAuth'
 import { useSyncSession } from './store/useSync'
 import { isConfigured } from './lib/supabase'
 import Zig from './components/brand/Mascot'
+
+/**
+ * Home and Planner load with the app; everything else on demand.
+ *
+ * One bundle meant the first screen waited on the barcode scanner, the whole
+ * plan archive and every other screen before it could paint — 561 kB of it,
+ * which is the difference between usable and not when you open this on mobile
+ * data in a shop. The service worker precaches the split chunks too, so being
+ * offline is unaffected: they are already on the device.
+ *
+ * Home and Planner stay eager because one of them is always what you open.
+ */
+const Recipes = lazy(() => import('./pages/Recipes'))
+const Foods = lazy(() => import('./pages/Foods'))
+const GroceryList = lazy(() => import('./pages/GroceryList'))
+const History = lazy(() => import('./pages/History'))
+const PrepMode = lazy(() => import('./pages/PrepMode'))
+const Schedule = lazy(() => import('./pages/Schedule'))
+const Analytics = lazy(() => import('./pages/Analytics'))
+const Settings = lazy(() => import('./pages/Settings'))
+
+/** Deliberately quiet: a chunk off the local service worker arrives in a frame
+    or two, and a spinner that flashes reads as jank rather than progress. */
+function ScreenLoading() {
+  return <div className="flex-1" aria-busy="true" />
+}
 
 function ToastLayer() {
   const { toast, clearToast } = useUserStore()
@@ -42,19 +62,21 @@ function Shell() {
       <div className="flex min-h-screen bg-cream-50">
         <Sidebar />
         <main className="flex-1 flex flex-col min-w-0">
-          <Routes>
-            <Route path="/"          element={<Home />} />
-            <Route path="/plan"      element={<Planner />} />
-            <Route path="/recipes"   element={<Recipes />} />
-            <Route path="/foods"     element={<Foods />} />
-            <Route path="/grocery"   element={<GroceryList />} />
-            <Route path="/history"   element={<History />} />
-            <Route path="/prep"      element={<PrepMode />} />
-            <Route path="/schedule"  element={<Schedule />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/settings"  element={<Settings />} />
-            <Route path="*"          element={<Navigate to="/" replace />} />
-          </Routes>
+          <Suspense fallback={<ScreenLoading />}>
+            <Routes>
+              <Route path="/"          element={<Home />} />
+              <Route path="/plan"      element={<Planner />} />
+              <Route path="/recipes"   element={<Recipes />} />
+              <Route path="/foods"     element={<Foods />} />
+              <Route path="/grocery"   element={<GroceryList />} />
+              <Route path="/history"   element={<History />} />
+              <Route path="/prep"      element={<PrepMode />} />
+              <Route path="/schedule"  element={<Schedule />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/settings"  element={<Settings />} />
+              <Route path="*"          element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
         </main>
         <BottomNav />
       </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { Search, Plus, X, Loader2 } from 'lucide-react'
 import type { Food, MedCategory, MedTier } from '../types'
 import { useFoods, useFoodStore } from '../store/useFoodStore'
@@ -9,7 +9,9 @@ import {
   searchFoods as lookupOnline, lookupBarcode,
   type NutritionResult, type LookupOutcome, type LookupProblem,
 } from '../services/nutritionApi'
-import BarcodeScanner from '../components/recipes/BarcodeScanner'
+// @zxing is 477 kB — bigger than the rest of the app put together. Loading it
+// only when the Scan tab is opened keeps it out of everyone else's way.
+const BarcodeScanner = lazy(() => import('../components/recipes/BarcodeScanner'))
 
 /**
  * The food database.
@@ -275,7 +277,9 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                 Point the camera at a barcode. Packaged goods only — Open Food Facts has no
                 barcode for a carrot.
               </p>
-              <BarcodeScanner onDetected={(code) => void onBarcode(code)} onClose={() => setTab('manual')} />
+              <Suspense fallback={<p className="text-sm text-ink-500">Starting the camera…</p>}>
+                <BarcodeScanner onDetected={(code) => void onBarcode(code)} onClose={() => setTab('manual')} />
+              </Suspense>
               {scanError && <p className="text-sm text-coral-600">{scanError}</p>}
             </div>
           )}

@@ -29,6 +29,10 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // The barcode library is 477 kB and useless offline anyway — scanning a
+        // product means looking it up over the network. Precaching it would put
+        // it on every device that never opens the scanner.
+        globIgnores: ['**/esm-*.js'],
         runtimeCaching: [
           {
             // Nutrition lookups are a convenience; a stale answer beats none,
