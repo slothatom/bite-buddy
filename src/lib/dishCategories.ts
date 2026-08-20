@@ -22,7 +22,7 @@ import { groupsOf, type RecipeGroup } from './recipeGroups'
 
 /** Ordered roughly by how much of a meal each one usually is. */
 export const DISH_CATEGORIES: DishCategory[] = [
-  'soup', 'stew', 'curry', 'salad', 'pasta', 'noodles', 'rice',
+  'soup', 'stew', 'curry', 'salad', 'pasta', 'noodles', 'rice', 'grain',
   'sandwich', 'wrap', 'burger', 'pizza', 'taco', 'quesadilla',
   'omelette', 'egg', 'meat', 'fish', 'seafood', 'vegetable',
   'porridge', 'cereal', 'pancake', 'waffle', 'bread', 'toast', 'pastry',
@@ -32,7 +32,7 @@ export const DISH_CATEGORIES: DishCategory[] = [
 
 export const CATEGORY_LABELS: Record<DishCategory, string> = {
   soup: 'Soup', stew: 'Stew', curry: 'Curry', salad: 'Salad',
-  pasta: 'Pasta', noodles: 'Noodles', rice: 'Rice',
+  pasta: 'Pasta', noodles: 'Noodles', rice: 'Rice', grain: 'Grain',
   sandwich: 'Sandwich', wrap: 'Wrap', burger: 'Burger', pizza: 'Pizza',
   taco: 'Taco', quesadilla: 'Quesadilla',
   omelette: 'Omelette', egg: 'Egg', meat: 'Meat', fish: 'Fish',
@@ -62,6 +62,9 @@ export const CATEGORY_MEAL_TIMES: Record<DishCategory, RecipeGroup[]> = {
   pasta: ['lunch', 'dinner'],
   noodles: ['lunch', 'dinner'],
   rice: ['lunch', 'dinner'],
+  // Bulgur, couscous, quinoa — and mămăligă when it is a side rather than a
+  // breakfast bowl, which is why Porridge is a separate category.
+  grain: ['lunch', 'dinner'],
   sandwich: ['breakfast', 'lunch', 'dinner', 'snack'],
   wrap: ['lunch', 'dinner', 'snack'],
   burger: ['lunch', 'dinner'],

@@ -104,7 +104,7 @@ export interface PrepStep {
  * multi-select axes; this is the single-valued one.
  */
 export type DishCategory =
-  | 'soup' | 'salad' | 'pasta' | 'noodles' | 'rice' | 'curry' | 'stew'
+  | 'soup' | 'salad' | 'pasta' | 'noodles' | 'rice' | 'grain' | 'curry' | 'stew'
   | 'sandwich' | 'wrap' | 'burger' | 'pizza' | 'taco' | 'quesadilla'
   | 'omelette' | 'pancake' | 'waffle' | 'porridge' | 'cereal'
   | 'bread' | 'toast' | 'pastry' | 'cake' | 'cookie' | 'dessert'

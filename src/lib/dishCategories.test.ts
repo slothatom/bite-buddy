@@ -12,9 +12,11 @@ import { ALL_RECIPES, FOODS } from '../data'
 const ctx = buildContext(FOODS, ALL_RECIPES)
 
 describe('the taxonomy itself', () => {
-  it('has all thirty-seven categories, each with a label and meal times', () => {
-    expect(DISH_CATEGORIES).toHaveLength(37)
-    expect(new Set(DISH_CATEGORIES).size).toBe(37)
+  it('has every category, each with a label and meal times', () => {
+    // 37 from the brief plus Grain, which the brief was missing: it had Rice,
+    // Pasta and Noodles but nowhere for bulgur, couscous or quinoa.
+    expect(DISH_CATEGORIES).toHaveLength(38)
+    expect(new Set(DISH_CATEGORIES).size).toBe(38)
     for (const c of DISH_CATEGORIES) {
       expect(CATEGORY_LABELS[c], c).toBeTruthy()
       expect(CATEGORY_MEAL_TIMES[c].length, c).toBeGreaterThan(0)
@@ -113,6 +115,21 @@ describe('reading a category off a recipe', () => {
     const spread = find('Tuna spread')
     expect(spread.sourceLine ?? spread.name.ro).toBeDefined()
     expect(categorise(spread, ctx)).toBe('dip')
+  })
+
+  it('files a grain dish under Grain, and a grain side under its dish', () => {
+    // The category the brief was missing. It means "the grain is the dish" —
+    // "Bulgur with chicken breast" is one; "Zucchini patties with bulgur" is
+    // not, and stays a vegetable dish.
+    expect(categorise(find('Bulgur with chicken breast & avocado'), ctx)).toBe('grain')
+    expect(categorise(find('Zucchini patties with bulgur & raw vegetable salad'), ctx)).toBe('vegetable')
+  })
+
+  it('keeps mămăligă apart from a bowl of oats', () => {
+    // Polenta arrives under cottage cheese as the starch of a meal; porridge is
+    // a bowl and a spoon. Filing both as Porridge made the distinction useless.
+    expect(categorise(find('Polenta with cottage cheese & yogurt'), ctx)).toBe('grain')
+    expect(categorise(find('Oat porridge'), ctx)).toBe('porridge')
   })
 
   it('does not call a plate a sauce because a sauce came with it', () => {
