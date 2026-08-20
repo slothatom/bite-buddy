@@ -29,6 +29,7 @@ const Recipes = lazy(() => import('./pages/Recipes'))
 const Foods = lazy(() => import('./pages/Foods'))
 const GroceryList = lazy(() => import('./pages/GroceryList'))
 const Schedule = lazy(() => import('./pages/Schedule'))
+const Activity = lazy(() => import('./pages/Activity'))
 const Analytics = lazy(() => import('./pages/Analytics'))
 const Settings = lazy(() => import('./pages/Settings'))
 
@@ -64,6 +65,7 @@ function Shell() {
                   works, plenty of things link to it. */}
               <Route path="/history"   element={<Navigate to="/settings/history" replace />} />
               <Route path="/schedule"  element={<Schedule />} />
+              <Route path="/movement" element={<Activity />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings/*" element={<Settings />} />
               <Route path="*"          element={<Navigate to="/" replace />} />

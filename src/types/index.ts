@@ -427,3 +427,75 @@ export interface ReleaseNote {
   title: string
   changes: { type: 'feature' | 'fix' | 'improvement'; text: string }[]
 }
+
+// ─── Exercise and sleep ───────────────────────────────────────────────────────
+
+/**
+ * How hard an activity is, as a multiple of sitting still.
+ *
+ * MET, from the Compendium of Physical Activities. One MET is roughly what you
+ * burn doing nothing, so an activity at 8 METs burns eight times that. It is
+ * how any calorie figure for exercise is arrived at, and it is an estimate:
+ * two people doing the same hour of the same thing do not burn the same
+ * amount.
+ */
+export interface ExerciseKind {
+  id: string
+  name: string
+  group: ExerciseGroup
+  met: number
+  /** Set for the ones you count in reps rather than minutes. */
+  reps?: boolean
+}
+
+export type ExerciseGroup =
+  | 'cardio' | 'strength' | 'core' | 'mobility' | 'sport' | 'everyday'
+
+/** One exercise inside a session. */
+export interface WorkoutEntry {
+  id: string
+  exerciseId: string
+  /** Minutes. The unit everything is costed in, reps or not. */
+  minutes: number
+  sets?: number
+  reps?: number
+  weightKg?: number
+  note?: string
+}
+
+export interface Workout {
+  id: string
+  /** Whose it is. See lib/people.ts. */
+  personId: string
+  date: string
+  entries: WorkoutEntry[]
+  /**
+   * A session logged as one lump, for when the detail is not worth typing:
+   * "gym, an hour, about 400 kcal". Costed as given rather than from METs.
+   */
+  bulk?: { label: string; minutes: number; calories?: number }
+  note?: string
+}
+
+export type ActivitySource = 'manual' | 'garmin'
+
+/** A day's steps, however they got here. */
+export interface StepEntry {
+  id: string
+  personId: string
+  date: string
+  steps: number
+  source: ActivitySource
+}
+
+export interface SleepEntry {
+  id: string
+  personId: string
+  /** The night ending on this date, so it lines up with the day you felt it. */
+  date: string
+  hours: number
+  /** Out of 5, as you would rate it yourself. Nothing derives from this. */
+  quality?: number
+  source: ActivitySource
+  note?: string
+}

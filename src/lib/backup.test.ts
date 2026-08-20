@@ -16,6 +16,7 @@ describe('createBackup', () => {
     expect(backup.app).toBe('bite-buddy')
     expect(backup.schema).toBe(SCHEMA_VERSION)
     expect(Object.keys(backup.stores).sort()).toEqual([
+      'bite-buddy-activity',
       'bite-buddy-body',
       'bite-buddy-cook',
       'bite-buddy-foods-v2',
@@ -117,7 +118,7 @@ describe('restoreBackup', () => {
     expect(result.ok).toBe(true)
     if (result.ok) {
       expect(result.skipped).toEqual(['bite-buddy-from-the-future'])
-      expect(result.restored).toHaveLength(6)
+      expect(result.restored).toHaveLength(7)
     }
   })
 })
