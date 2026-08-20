@@ -371,15 +371,35 @@ test.describe('the recipe library', () => {
     expect(soups).toBeLessThan(all)
 
     await page.getByRole('button', { name: 'Filters' }).click()
-    await page.getByText('High Protein').click()
+    await page.getByText('Veggie Packed').click()
     await page.getByRole('button', { name: 'Close' }).click()
-    const highProteinSoups = await page.locator('.card').count()
-    expect(highProteinSoups).toBeLessThan(soups)
+
+    // Narrower, and still showing something: an assertion of "fewer" alone is
+    // satisfied by zero, which is how a dead-end combination passed once.
+    const veggieSoups = await page.locator('.card').count()
+    expect(veggieSoups).toBeGreaterThan(0)
+    expect(veggieSoups).toBeLessThan(soups)
 
     // And what you picked is visible and removable, not hidden in a sheet.
     await expect(page.getByRole('button', { name: /Soup/ })).toBeVisible()
-    await page.getByRole('button', { name: /High Protein/ }).click()
+    await page.getByRole('button', { name: /Veggie Packed/ }).click()
     expect(await page.locator('.card').count()).toBe(soups)
+  })
+
+  test('a combination with nothing in it offers the way out', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Dinner/ }).click()
+    await page.getByRole('button', { name: 'Any dish' }).click()
+    await page.getByRole('button', { name: /^Soup/ }).click()
+    await page.getByRole('button', { name: 'Filters' }).click()
+    await page.getByText('High Protein').click()
+    await page.getByRole('button', { name: 'Close' }).click()
+
+    // No soup in the library is 25 g of protein, and with every tab reading
+    // zero there is no other shelf to send anyone to.
+    await expect(page.getByText('That combination has nothing in it')).toBeVisible()
+    await page.getByRole('button', { name: 'Clear the filters' }).click()
+    expect(await page.locator('.card').count()).toBeGreaterThan(5)
   })
 
   test('only offers categories that have something in them', async ({ page }) => {
