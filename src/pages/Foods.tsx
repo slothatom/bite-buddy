@@ -120,12 +120,12 @@ export default function Foods() {
                     </div>
                     <div className="flex items-center justify-between gap-3 sm:justify-end">
                       <TierBadge tier={f.medTier} />
-                      <div className="text-right shrink-0 sm:w-28">
+                      <div className="text-right shrink-0 sm:w-52">
                         <p className="text-sm font-mono font-bold text-ink-900">
                           {Math.round(f.per100g.calories)}<span className="text-ink-500 font-normal text-xs"> kcal</span>
                         </p>
-                        <p className="text-xs font-mono text-ink-500">
-                          {f.per100g.protein}p · {f.per100g.carbs}c · {f.per100g.fat}f
+                        <p className="text-xs text-ink-500">
+                          Protein {f.per100g.protein} g · Carbs {f.per100g.carbs} g · Fat {f.per100g.fat} g
                         </p>
                       </div>
                     </div>
@@ -358,7 +358,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
               <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">Per 100 g</p>
               <div className="grid grid-cols-4 gap-2">
                 {([
-                  ['calories', 'kcal'], ['protein', 'P'], ['carbs', 'C'], ['fat', 'F'],
+                  ['calories', 'kcal'], ['protein', 'Protein'], ['carbs', 'Carbs'], ['fat', 'Fat'],
                 ] as const).map(([key, label]) => (
                   <div key={key}>
                     <label className="label">{label}</label>

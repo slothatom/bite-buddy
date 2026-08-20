@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import {
-  Search, Star, ClipboardCopy, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
+  Search, Star, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
   ChevronDown, SlidersHorizontal,
 } from 'lucide-react'
 import type { DishCategory, QuickFilter, Recipe } from '../types'
@@ -9,7 +9,6 @@ import { useNutritionContext } from '../store/useNutrition'
 import { recipePerServing, reportPerServing, roundNutrients } from '../lib/nutrition'
 import { normaliseTerm } from '../lib/units'
 import { NutrientSummary, EmptyState, SourceLine } from '../components/ui'
-import { recipeForMfp, copyToClipboard } from '../lib/mfp'
 import RecipeEditor from '../components/recipes/RecipeEditor'
 import {
   RECIPE_GROUPS, GROUP_LABELS, GROUP_BLURBS,
@@ -373,7 +372,7 @@ function RecipeCard({
             <span className="block font-semibold text-ink-900 text-sm leading-snug">{card.name}</span>
             {lead.sourceLine ? (
               <span className="block mt-1">
-                <SourceLine text={lead.sourceLine} lang={lead.name.hu ? 'hu' : 'ro'} clamp={2} />
+                <SourceLine text={lead.sourceLine} clamp={2} />
               </span>
             ) : null}
           </span>
@@ -528,7 +527,6 @@ function RecipeDetail({
 }) {
   const ctx = useNutritionContext()
   const { mergeRecipes, unmergeRecipe } = useRecipeStore()
-  const [copied, setCopied] = useState(false)
   const [version, setVersion] = useState(0)
   const [confirmMerge, setConfirmMerge] = useState(false)
 
@@ -537,12 +535,6 @@ function RecipeDetail({
   const mine = isMine(recipe)
   const report = reportPerServing(recipe, ctx)
   const perServing = roundNutrients(report.total)
-
-  async function copyForMfp() {
-    const ok = await copyToClipboard(recipeForMfp(recipe, ctx))
-    setCopied(ok)
-    setTimeout(() => setCopied(false), 2200)
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
@@ -646,7 +638,7 @@ function RecipeDetail({
           {recipe.sourceLine ? (
             <div className="card-soft p-3">
               <p className="text-[10px] font-bold uppercase tracking-wide text-ink-500 mb-1">How your dietician wrote it</p>
-              <SourceLine text={recipe.sourceLine} lang={recipe.name.hu ? 'hu' : 'ro'} />
+              <SourceLine text={recipe.sourceLine} />
             </div>
           ) : null}
 
@@ -715,10 +707,7 @@ function RecipeDetail({
           )}
 
           <div className="flex gap-2">
-            <button className="btn-secondary flex-1" onClick={copyForMfp}>
-              <ClipboardCopy size={15} /> {copied ? 'Copied' : 'Copy for MyFitnessPal'}
-            </button>
-            <button className="btn-secondary shrink-0" onClick={() => onEdit(recipe)}>
+            <button className="btn-secondary flex-1" onClick={() => onEdit(recipe)}>
               <Pencil size={15} /> Edit
             </button>
           </div>

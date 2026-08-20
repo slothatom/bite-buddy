@@ -10,10 +10,10 @@ import { useDeletedFoods, useFoodStore } from '../store/useFoodStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { SOURCE_PLANS } from '../data'
 import { ACTIVITY_LABELS, averagePlanDay, fromPlans, fromTdee, totalDailyEnergy } from '../lib/targets'
-import { copyToClipboard, parseMfpCsv, type MfpDiaryEntry } from '../lib/mfp'
 import { backupFilename, createBackup, restoreBackup } from '../lib/backup'
 import { saveTextFile } from '../lib/download'
 import { SectionHeading } from '../components/ui'
+import { copyToClipboard } from '../lib/clipboard'
 import { useAuthStore } from '../store/useAuth'
 import { isConfigured } from '../lib/supabase'
 
@@ -51,7 +51,7 @@ export default function Settings() {
           <p className="text-sm text-ink-700 mb-4">
             Currently{' '}
             <strong className="font-mono">{profile.targets.calories} kcal</strong>{' '}
-            ({profile.targets.protein}p · {profile.targets.carbs}c · {profile.targets.fat}f), set{' '}
+            (Protein {profile.targets.protein} g · Carbs {profile.targets.carbs} g · Fat {profile.targets.fat} g), set{' '}
             {profile.targets.source === 'from-plans' ? 'from your plans'
               : profile.targets.source === 'tdee' ? 'by the calculator' : 'by hand'}.
           </p>
@@ -68,8 +68,8 @@ export default function Settings() {
                       <p className="text-sm text-ink-700 mt-0.5">
                         Averaged over {planAverage.days} full days:{' '}
                         <strong className="font-mono text-ink-900">{planAverage.perDay.calories} kcal</strong>{' '}
-                        · {planAverage.perDay.protein}p · {planAverage.perDay.carbs}c · {planAverage.perDay.fat}f
-                        · {planAverage.perDay.fiber}g fibre
+                        · Protein {planAverage.perDay.protein} g · Carbs {planAverage.perDay.carbs} g
+                        · Fat {planAverage.perDay.fat} g · Fibre {planAverage.perDay.fiber} g
                       </p>
                       <p className="text-xs text-ink-500 mt-1">
                         Individual days ranged from {planAverage.min} to {planAverage.max} kcal.
@@ -149,7 +149,7 @@ export default function Settings() {
                         Maintenance is about <strong className="font-mono">{Math.round(tdee ?? 0)} kcal</strong>;
                         your goal gives{' '}
                         <strong className="font-mono text-ink-900">{tdeeTargets.calories} kcal</strong>{' '}
-                        · {tdeeTargets.protein}p · {tdeeTargets.carbs}c · {tdeeTargets.fat}f
+                        · Protein {tdeeTargets.protein} g · Carbs {tdeeTargets.carbs} g · Fat {tdeeTargets.fat} g
                       </p>
                       <button className="btn-primary" onClick={() => setTargets(tdeeTargets)}>Use these</button>
                     </>
@@ -208,12 +208,6 @@ export default function Settings() {
               </p>
             </div>
           </div>
-        </section>
-
-        {/* ─── MyFitnessPal ────────────────────────────────────────────────── */}
-        <section>
-          <SectionHeading>MyFitnessPal</SectionHeading>
-          <MfpImport />
         </section>
 
         {/* ─── Backup ──────────────────────────────────────────────────────── */}
@@ -347,70 +341,6 @@ function BackupPanel() {
 }
 
 /**
- * Imports a MyFitnessPal diary export.
- *
- * MyFitnessPal has no public API, so a CSV export is the only way to get diary
- * history out. The import is read-only and summary-level: it shows what was
- * logged, it does not try to rebuild those meals from this app's food database.
- */
-function MfpImport() {
-  const [entries, setEntries] = useState<MfpDiaryEntry[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  async function onFile(file: File) {
-    setError(null)
-    const parsed = parseMfpCsv(await file.text())
-    if (!parsed.length) {
-      setError('No diary rows found. Export "Nutrition" from MyFitnessPal and upload that CSV.')
-      setEntries(null)
-      return
-    }
-    setEntries(parsed)
-  }
-
-  const byDay = useMemo(() => {
-    if (!entries) return []
-    const map = new Map<string, number>()
-    for (const e of entries) map.set(e.date, (map.get(e.date) ?? 0) + e.macros.calories)
-    return [...map].sort((a, b) => b[0].localeCompare(a[0]))
-  }, [entries])
-
-  return (
-    <div className="card p-4 space-y-3">
-      <p className="text-sm text-ink-700">
-        MyFitnessPal closed its API to new developers, so nothing can be written to your diary
-        automatically. What works: copy a day or a recipe to the clipboard from the planner and
-        paste it in, and bring your history here.
-      </p>
-
-      <label className="btn-secondary w-fit cursor-pointer">
-        <Upload size={15} /> Import diary CSV
-        <input type="file" accept=".csv,text/csv" className="hidden"
-          onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f) }} />
-      </label>
-
-      {error ? <p className="text-sm text-coral-600">{error}</p> : null}
-
-      {entries && (
-        <div className="space-y-2">
-          <p className="text-sm text-bite-700 flex items-center gap-1.5">
-            <Check size={15} /> Read {entries.length} entries across {byDay.length} days.
-          </p>
-          <div className="max-h-48 overflow-y-auto card-soft divide-y divide-border-200">
-            {byDay.slice(0, 60).map(([date, kcal]) => (
-              <div key={date} className="flex justify-between px-3 py-1.5 text-xs">
-                <span className="text-ink-700">{date}</span>
-                <span className="font-mono text-ink-700">{Math.round(kcal)} kcal</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-/**
  * The signed-in account.
  *
  * Only rendered on the deployed app; a local clone has no accounts at all.
@@ -420,8 +350,16 @@ function MfpImport() {
 function AccountPanel() {
   const { user, members, setDisplayName, signOut } = useAuthStore()
   const mine = members.find((m) => m.id === user?.id)
-  const [name, setName] = useState(mine?.display_name ?? '')
+
+  // The saved name arrives a moment after the page does, the session is read
+  // from storage but the household list is a request. Holding the field in
+  // state alone meant it initialised empty and stayed empty, so the name
+  // looked lost after every refresh. Null means "not typed in yet", and until
+  // then the field shows whatever the household knows.
+  const [typed, setTyped] = useState<string | null>(null)
+  const name = typed ?? mine?.display_name ?? ''
   const [saved, setSaved] = useState(false)
+  const [failed, setFailed] = useState(false)
 
   return (
     <section>
@@ -437,16 +375,26 @@ function AccountPanel() {
           <div className="flex gap-2">
             <input
               className="input" placeholder="e.g. Ana" value={name}
-              onChange={(e) => { setName(e.target.value); setSaved(false) }}
+              onChange={(e) => { setTyped(e.target.value); setSaved(false); setFailed(false) }}
             />
             <button
               className="btn-secondary shrink-0"
-              disabled={!name.trim()}
-              onClick={() => { void setDisplayName(name.trim()); setSaved(true) }}
+              disabled={!name.trim() || name.trim() === mine?.display_name}
+              onClick={async () => {
+                const ok = await setDisplayName(name.trim())
+                setSaved(ok)
+                setFailed(!ok)
+                if (ok) setTyped(null)
+              }}
             >
               {saved ? <><Check size={15} /> Saved</> : 'Save'}
             </button>
           </div>
+          {failed && (
+            <p className="text-xs text-coral-600 mt-1">
+              That did not save. Check you are still signed in and try again.
+            </p>
+          )}
         </div>
 
         <button className="btn-ghost text-ink-500 hover:text-coral-600 w-fit" onClick={() => void signOut()}>

@@ -136,7 +136,7 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
 
           <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">Per 100 g</p>
           <div className="grid grid-cols-4 gap-2">
-            {([['calories', 'kcal'], ['protein', 'P'], ['carbs', 'C'], ['fat', 'F']] as const).map(([key, label]) => (
+            {([['calories', 'kcal'], ['protein', 'Protein'], ['carbs', 'Carbs'], ['fat', 'Fat']] as const).map(([key, label]) => (
               <div key={key}>
                 <label className="label">{label}</label>
                 <input type="number" min={0} className="input px-2" aria-label={label}
