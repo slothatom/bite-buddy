@@ -6,6 +6,13 @@ export default defineConfig({
   // Relative, so the built app runs from wherever it is put — a local server,
   // a folder on a phone, a USB stick — without being told its own address.
   base: './',
+
+  // Stamped into the bundle so the running app can say which build it is. Without
+  // this, "did the deploy land?" is unanswerable from the device it landed on.
+  define: {
+    __BUILD_SHA__: JSON.stringify((process.env.GITHUB_SHA ?? 'local').slice(0, 7)),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
   plugins: [
     react(),
     VitePWA({
