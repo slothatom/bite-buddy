@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
-import type { Moment, Targets, TdeeProfile, Theme, UserProfile, WeekStart } from '../types'
+import type { Moment, Targets, TdeeProfile, UserProfile, WeekStart } from '../types'
 import { type MomentKind, noticeMoments, type MomentContext } from '../lib/moments'
 import { DEFAULT_WEEK_START } from '../types'
 import { FALLBACK_TARGETS } from '../lib/targets'
@@ -14,7 +14,6 @@ interface UserStore {
   setTdee: (tdee: TdeeProfile) => void
   setWeekStart: (day: WeekStart) => void
   setFoodNameLanguage: (lang: UserProfile['foodNameLanguage']) => void
-  setTheme: (theme: Theme) => void
 
   /** Records anything newly true. Already-noticed moments are left alone. */
   notice: (context: MomentContext) => void
@@ -30,7 +29,6 @@ const INITIAL_PROFILE: UserProfile = {
   weightUnit: 'kg',
   weekStartsOn: DEFAULT_WEEK_START,
   foodNameLanguage: 'en',
-  theme: 'system',
   moments: [],
 }
 
@@ -44,7 +42,6 @@ export const useUserStore = create<UserStore>()(
       setTdee: (tdee) => set((s) => ({ profile: { ...s.profile, tdee } })),
       setWeekStart: (weekStartsOn) => set((s) => ({ profile: { ...s.profile, weekStartsOn } })),
       setFoodNameLanguage: (foodNameLanguage) => set((s) => ({ profile: { ...s.profile, foodNameLanguage } })),
-      setTheme: (theme) => set((s) => ({ profile: { ...s.profile, theme } })),
 
       notice: (context) =>
         set((s) => {
@@ -79,7 +76,7 @@ export const useUserStore = create<UserStore>()(
       storage: safeStorage<{ profile: UserProfile }>(),
       migrate: (state, version) => {
         const carried = upgradeThrough<{ profile: UserProfile }>(SCHEMA_VERSION, {
-          // v1 → v2: the profile shape is unchanged; theme simply defaults.
+          // v1 → v2: the profile shape is unchanged.
           1: (s) => s,
           // v2 → v3: XP, levels, streaks and achievements are gone. Their
           // values are dropped rather than translated — there is nothing in a

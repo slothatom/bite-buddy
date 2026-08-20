@@ -60,12 +60,11 @@ grounds, warm ink text.
 everything else. Both bundled, not fetched from a CDN, so the app looks the same
 offline.
 
-**Dark mode** is eight neutral tokens redefined, plus the accent steps used as
-text — a mid-tone that reads on cream is unreadable on near-black. Three states,
-not two: an explicit choice sets `data-theme`, and the default follows the
-device. An end-to-end check walks every screen in dark mode and fails on any
-text whose contrast against its actual painted background collapses, which is
-what a surface missing from the dark palette looks like.
+**One palette.** The app is cream and ink, and only that. A dark theme existed
+and has been taken out: it doubled every colour decision, and the guard it
+needed — a walk over every screen looking for text whose contrast against its
+painted background collapsed — was catching bugs that only a second palette
+could create.
 
 **Status is never hue alone.** `src/lib/status.ts` returns a label, a symbol and
 a signed delta alongside the colour level, and every consumer renders at least
@@ -393,6 +392,7 @@ src/
 ├── lib/
 │   ├── units.ts          # "o lingurita", "jumatate de farfurie", raw vs dry
 │   ├── portions.ts       # g/kg/ml/l/piece/tsp/tbsp/cup → grams
+│   ├── foodImport.ts     # a search result becomes a food you own
 │   ├── nutrition.ts      # the one place nutrition numbers are produced
 │   ├── targets.ts        # plan averages + TDEE
 │   ├── mediterranean.ts  # serving goals from the guide
@@ -408,6 +408,12 @@ src/
 ---
 
 ## Ingredients and nutrition
+
+One search covers everything an ingredient could come from. Your own foods and
+recipes appear instantly and work with no signal; USDA and Open Food Facts
+arrive underneath a moment later, and picking one of those saves it to your
+foods — with its source and id — and drops it into the recipe in a single tap.
+There is no leaving a half-written recipe to go and fetch an ingredient.
 
 Free and open sources only, in this order: **USDA FoodData Central → Open Food
 Facts → typed in by hand**. USDA is the reference for generic ingredients —

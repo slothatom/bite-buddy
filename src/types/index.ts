@@ -257,8 +257,6 @@ export interface DayPlan {
 /** 0 = Sunday, 1 = Monday … 6 = Saturday. */
 import type { MomentKind } from '../lib/moments'
 
-export type Theme = 'system' | 'light' | 'dark'
-
 export type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 /**
@@ -385,7 +383,6 @@ export interface UserProfile {
   /** Which language to show food and recipe names in. */
   foodNameLanguage: 'en' | 'ro' | 'hu'
   /** 'system' follows the device; the other two override it in either direction. */
-  theme: Theme
   /** Little things Zig has noticed. See lib/moments.ts for why these are not points. */
   moments: Moment[]
 }

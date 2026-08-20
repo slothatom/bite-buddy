@@ -23,7 +23,10 @@ const WEEKDAYS: { value: WeekStart; label: string }[] = [
 ]
 
 export default function Settings() {
-  const { profile, setName, setTargets, setTdee, setWeekStart, setTheme } = useUserStore()
+  const { profile, setName, setTargets, setTdee, setWeekStart } = useUserStore()
+  // Signed out, the account section has nothing to show and no one to sign out;
+  // everything else on this screen belongs to the device and still works.
+  const session = useAuthStore((s) => s.session)
   const ctx = useNutritionContext()
 
   const planAverage = useMemo(() => averagePlanDay(SOURCE_PLANS, ctx), [ctx])
@@ -203,17 +206,6 @@ export default function Settings() {
                 Tuesday; loading one lines its days up by weekday either way.
               </p>
             </div>
-            <div>
-              <label className="label">Appearance</label>
-              <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
-                {([['system', 'Match device'], ['light', 'Light'], ['dark', 'Dark']] as const).map(([value, label]) => (
-                  <button key={value} onClick={() => setTheme(value)}
-                    className={profile.theme === value ? 'tab-on' : 'tab-off'}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
         </section>
 
@@ -232,7 +224,7 @@ export default function Settings() {
         {/* ─── Account ─────────────────────────────────────────────────────── */}
         <DeletedRecipesPanel />
 
-        {isConfigured && <AccountPanel />}
+        {isConfigured && session && <AccountPanel />}
 
         <VersionPanel />
       </div>
