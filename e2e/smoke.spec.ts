@@ -195,6 +195,20 @@ test.describe('the main flow', () => {
     expect(box && card && box.y + box.height).toBeLessThanOrEqual((card?.y ?? 0) + (card?.height ?? 0))
   })
 
+  test('the calorie calculator shows its arithmetic', async ({ page }) => {
+    await goto(page, '/settings')
+    await page.getByLabel('Sex').selectOption('female')
+    await page.getByLabel('Age').fill('34')
+    await page.getByLabel('Height (cm)').fill('168')
+    await page.getByLabel('Weight (kg)').fill('68')
+
+    await page.getByText('How that was worked out').click()
+
+    // The resting rate, worked by hand: 10 x 68 + 6.25 x 168 - 5 x 34 - 161.
+    await expect(page.getByText('10 x 68 kg + 6.25 x 168 cm - 5 x 34 - 161')).toBeVisible()
+    await expect(page.getByText('= 1399 kcal')).toBeVisible()
+  })
+
   test('targets can be taken from the plan history', async ({ page }) => {
     await goto(page, '/settings')
     await expect(page.getByText(/Averaged over \d+ full days/)).toBeVisible()
