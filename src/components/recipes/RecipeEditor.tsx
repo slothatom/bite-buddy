@@ -1,11 +1,11 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { Search, X, Trash2, Plus, Undo2, GripVertical } from 'lucide-react'
-import type { Component, DishCategory, QuickFilter, Recipe, RecipeTag } from '../../types'
+import type { Component, DishCategory, PortionUnit, QuickFilter, Recipe, RecipeTag } from '../../types'
 import { useRecipeStore, useRecipes, isBuiltIn } from '../../store/useRecipeStore'
 import { useFoods } from '../../store/useFoodStore'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
 import { useNutritionContext } from '../../store/useNutrition'
-import { recipePerServing, componentNutrients, roundNutrients } from '../../lib/nutrition'
+import { recipePerServing, componentNutrients, reportPerServing, roundNutrients } from '../../lib/nutrition'
 import { buildFoodIndex, searchFoods } from '../../lib/foodSearch'
 import { normaliseTerm } from '../../lib/units'
 import {
@@ -16,6 +16,7 @@ import {
   QUICK_FILTERS, QUICK_FILTER_DEFINITIONS, hasQuickFilter, withQuickFilter,
 } from '../../lib/dishCategories'
 import { NutrientSummary } from '../ui'
+import { UNIT_LABELS, unitsFor, toGrams, fromGrams, defaultUnit, APPROXIMATE_UNITS } from '../../lib/portions'
 
 /**
  * Editing a recipe, whether it came from the dietician or from you.
@@ -50,7 +51,8 @@ export default function RecipeEditor({
   const edited = !isNew && custom.some((r) => r.id === draft.id)
   const canRevert = edited && isBuiltIn(draft.id)
 
-  const perServing = roundNutrients(recipePerServing(draft, ctx))
+  const report = reportPerServing(draft, ctx)
+  const perServing = roundNutrients(report.total)
   const groups = groupsOf(draft)
 
   /** How many planned meals point at this recipe — deleting it would blank them. */
@@ -303,7 +305,7 @@ export default function RecipeEditor({
               {Math.round(perServing.calories)}
               <span className="text-sm font-semibold text-ink-500 ml-1">kcal</span>
             </p>
-            <NutrientSummary n={perServing} />
+            <NutrientSummary n={perServing} partial={report.partial} />
           </div>
 
           {/* ─── Getting rid of it ──────────────────────────────────────── */}
@@ -361,7 +363,15 @@ export default function RecipeEditor({
   )
 }
 
-/** One ingredient line: what it is, how much of it, and what that costs. */
+/**
+ * One ingredient line: what it is, how much of it, and what that costs.
+ *
+ * The amount can be entered in any unit and is stored in grams, because grams
+ * are the only thing the rest of the app can work with — the grocery list adds
+ * weights together and a recipe has to scale. The unit you picked is remembered
+ * for the row so the number you typed is the number you see, but nothing
+ * downstream ever has to know about cups.
+ */
 function ComponentRow({
   component, onChange, onRemove,
 }: {
@@ -370,41 +380,77 @@ function ComponentRow({
   onRemove: () => void
 }) {
   const ctx = useNutritionContext()
+  const food = component.kind === 'food' ? ctx.foods.get(component.foodId) : undefined
   const name = component.kind === 'food'
-    ? ctx.foods.get(component.foodId)?.names.en ?? component.foodId
+    ? food?.names.en ?? component.foodId
     : ctx.recipes.get(component.recipeId)?.name.en ?? component.recipeId
   const kcal = Math.round(componentNutrients(component, ctx).calories)
 
+  const [unit, setUnit] = useState<PortionUnit>(() => (food ? defaultUnit(food) : 'g'))
+  const available = food ? unitsFor(food) : []
+
+  // What to show in the box: the stored grams expressed in the chosen unit.
+  const shown = component.kind === 'food'
+    ? fromGrams(component.grams, unit, food) ?? component.grams
+    : component.servings
+
+  function setAmount(value: number) {
+    if (component.kind !== 'food') {
+      onChange({ ...component, servings: Math.max(0, value) })
+      return
+    }
+    const grams = toGrams(Math.max(0, value), unit, food)
+    if (grams != null) onChange({ ...component, grams })
+  }
+
+  function changeUnit(next: PortionUnit) {
+    // The weight does not change when you change how you are describing it —
+    // 100 g stays 100 g and simply reads as 0.42 cup.
+    setUnit(next)
+  }
+
   return (
-    <div className="flex items-center gap-2 py-1">
-      <GripVertical size={14} className="shrink-0 text-ink-300" aria-hidden />
-      <span className="flex-1 min-w-0">
-        <span className="block text-sm text-ink-900 truncate">{name}</span>
-        <span className="block text-xs font-mono text-ink-500">{kcal} kcal</span>
-      </span>
-      <div className="relative shrink-0">
+    <div className="py-1">
+      <div className="flex items-center gap-2">
+        <GripVertical size={14} className="shrink-0 text-ink-300" aria-hidden />
+        <span className="flex-1 min-w-0">
+          <span className="block text-sm text-ink-900 truncate">{name}</span>
+          <span className="block text-xs font-mono text-ink-500">
+            {kcal} kcal
+            {component.kind === 'food' && unit !== 'g' ? ` · ${Math.round(component.grams)} g` : ''}
+          </span>
+        </span>
         <input
           type="number"
           inputMode="decimal"
           min={0}
-          step={component.kind === 'food' ? 5 : 0.5}
-          className="input w-20 pr-7 text-right"
-          value={component.kind === 'food' ? component.grams : component.servings}
-          onChange={(e) => {
-            const v = Math.max(0, Number(e.target.value))
-            onChange(component.kind === 'food'
-              ? { ...component, grams: v }
-              : { ...component, servings: v })
-          }}
+          step={component.kind === 'food' ? (unit === 'g' || unit === 'ml' ? 5 : 0.25) : 0.5}
+          className="input w-20 text-right shrink-0"
+          value={Math.round(shown * 100) / 100}
+          onChange={(e) => setAmount(Number(e.target.value))}
           aria-label={`Amount of ${name}`}
         />
-        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-ink-500 pointer-events-none">
-          {component.kind === 'food' ? 'g' : '×'}
-        </span>
+        {component.kind === 'food' && available.length > 1 ? (
+          <select
+            className="input w-20 shrink-0 px-2"
+            value={unit}
+            onChange={(e) => changeUnit(e.target.value as PortionUnit)}
+            aria-label={`Unit for ${name}`}
+          >
+            {available.map((u) => <option key={u} value={u}>{UNIT_LABELS[u]}</option>)}
+          </select>
+        ) : (
+          <span className="w-20 shrink-0 text-sm text-ink-500 px-2">×</span>
+        )}
+        <button className="btn-ghost btn-icon shrink-0 text-ink-500" onClick={onRemove} aria-label={`Remove ${name}`}>
+          <Trash2 size={16} />
+        </button>
       </div>
-      <button className="btn-ghost btn-icon shrink-0 text-ink-500" onClick={onRemove} aria-label={`Remove ${name}`}>
-        <Trash2 size={16} />
-      </button>
+      {component.kind === 'food' && APPROXIMATE_UNITS.includes(unit) && (
+        <p className="text-[11px] text-ink-500 pl-6">
+          {unit === 'piece' ? 'A piece of this is taken as its usual size.' : 'A rough measure — weigh it if it matters.'}
+        </p>
+      )}
     </div>
   )
 }

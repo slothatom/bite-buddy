@@ -369,7 +369,7 @@ plain 4/4/9 makes every vegetable look mis-keyed.
 | State | Zustand + `persist` (localStorage) |
 | Build | Vite 8 · `vite-plugin-pwa` (Workbox) |
 | Quality | ESLint 10 · Vitest · Playwright |
-| Nutrition lookup | USDA FoodData Central · Open Food Facts |
+| Nutrition lookup | USDA FoodData Central (CC0) · Open Food Facts (ODbL) |
 | Barcodes | `@zxing/browser` |
 | Data pipeline | `tsx` scripts, run on demand |
 
@@ -385,6 +385,7 @@ src/
 │   └── generated/        # built by scripts/build-data.ts
 ├── lib/
 │   ├── units.ts          # "o lingurita", "jumatate de farfurie", raw vs dry
+│   ├── portions.ts       # g/kg/ml/l/piece/tsp/tbsp/cup → grams
 │   ├── nutrition.ts      # the one place nutrition numbers are produced
 │   ├── targets.ts        # plan averages + TDEE
 │   ├── mediterranean.ts  # serving goals from the guide
@@ -396,6 +397,45 @@ src/
 ├── pages/                # Planner, Recipes, Foods, Grocery, History, Prep, Schedule, Progress, Settings
 └── store/                # zustand stores
 ```
+
+---
+
+## Ingredients and nutrition
+
+Free and open sources only, in this order: **USDA FoodData Central → Open Food
+Facts → typed in by hand**. USDA is the reference for generic ingredients —
+chicken, rice, a tomato — because its figures are laboratory measurements; Open
+Food Facts covers branded and packaged products, which is what community-entered
+label data is actually good for. Barcodes go straight to Open Food Facts.
+
+Every imported food keeps its **provenance**: which source, the source's own id
+(FDC ID or barcode) and name, what the figures are per, and the date they were
+fetched. That is what stops the same ingredient being fetched twice, and what
+lets a wrong number be traced back to whoever said it.
+
+**Missing means unknown, never zero.** A source that says nothing about zinc has
+not told you there is no zinc. Nutrients are optional throughout, absent rather
+than `0`, and a total made of ingredients that do not all report a nutrient is
+marked: `12 g +` means a floor rather than a figure. `reportNutrients` is what
+computes that, and it is the reason `addNutrients` does not coerce.
+
+**Salt and sodium are one number.** Sodium in milligrams is canonical, salt is
+`sodium × 2.5 ÷ 1000`, and what the source actually said is kept on the food's
+provenance — European labels state salt, USDA states sodium. Sugar and salt are
+shown alongside the macros rather than among the micronutrients, because they
+are the two you watch across a day.
+
+**Units.** `g · kg · ml · l · piece · tsp · tbsp · cup`, all converted to grams
+on entry, because grams are the only thing the grocery list and recipe scaling
+can work with. `piece` is read off the food's own named portions and is not
+offered for a food that has none — falling back to grams would turn "1 piece"
+into 1 g. Millilitres are treated as grams; spoons and cups are volumes used as
+weights, and the UI says so rather than pretending otherwise.
+
+Nutrition is calculated at three levels and always derived, never stored:
+ingredient (per the quantity used) → recipe (the sum) → serving (÷ servings).
+Changing a quantity recalculates everything immediately, because there is
+nothing to keep in step.
 
 ---
 

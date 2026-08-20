@@ -6,7 +6,7 @@ import {
 import type { DishCategory, QuickFilter, Recipe } from '../types'
 import { useRecipes, useRecipeStore, useMergedInto } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
-import { recipePerServing, roundNutrients } from '../lib/nutrition'
+import { recipePerServing, reportPerServing, roundNutrients } from '../lib/nutrition'
 import { normaliseTerm } from '../lib/units'
 import { NutrientSummary, EmptyState, SourceLine } from '../components/ui'
 import { recipeForMfp, copyToClipboard } from '../lib/mfp'
@@ -535,7 +535,8 @@ function RecipeDetail({
   const recipe = card.variants[Math.min(version, card.variants.length - 1)]
   const folded = useMergedInto(recipe.id)
   const mine = isMine(recipe)
-  const perServing = roundNutrients(recipePerServing(recipe, ctx))
+  const report = reportPerServing(recipe, ctx)
+  const perServing = roundNutrients(report.total)
 
   async function copyForMfp() {
     const ok = await copyToClipboard(recipeForMfp(recipe, ctx))
@@ -660,7 +661,7 @@ function RecipeDetail({
                 : ''}
               {mine ? ' · yours' : ''}
             </p>
-            <NutrientSummary n={perServing} />
+            <NutrientSummary n={perServing} partial={report.partial} />
           </div>
 
           {/* What it is, and what it asks of you — the two axes that are not

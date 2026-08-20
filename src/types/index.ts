@@ -7,17 +7,46 @@ export interface Macros {
   fat: number      // g
 }
 
+/**
+ * Everything beyond the four macros.
+ *
+ * Every field is optional and `undefined` means **unknown**, never zero. A food
+ * whose source said nothing about zinc has not told you there is no zinc in it,
+ * and a total that quietly treats the two the same is a total that lies. See
+ * `reportNutrients` in lib/nutrition.ts for how a partial total says so.
+ *
+ * Sodium is the canonical salt figure and is always in milligrams; sources give
+ * either salt or sodium, and `saltFromSodium` converts. What the source
+ * actually said is kept on the food's provenance.
+ */
 export interface Micros {
   fiber?: number        // g
   sugar?: number        // g
   sodium?: number       // mg
+  saturatedFat?: number // g
+  cholesterol?: number  // mg
   calcium?: number      // mg
   iron?: number         // mg
+  magnesium?: number    // mg
+  potassium?: number    // mg
+  zinc?: number         // mg
+  vitaminA?: number     // mcg RAE
+  vitaminB6?: number    // mg
+  vitaminB12?: number   // mcg
   vitaminC?: number     // mg
   vitaminD?: number     // mcg
-  potassium?: number    // mg
-  saturatedFat?: number // g
+  vitaminE?: number     // mg
+  folate?: number       // mcg DFE
 }
+
+/** The micronutrient keys, in the order they are worth showing. */
+export const MICRO_KEYS = [
+  'fiber', 'sugar', 'sodium', 'saturatedFat', 'cholesterol',
+  'calcium', 'iron', 'magnesium', 'potassium', 'zinc',
+  'vitaminA', 'vitaminB6', 'vitaminB12', 'vitaminC', 'vitaminD', 'vitaminE', 'folate',
+] as const
+
+export type MicroKey = typeof MICRO_KEYS[number]
 
 /** Everything we know about a quantity of food. */
 export type Nutrients = Macros & Micros
@@ -59,6 +88,37 @@ export interface FoodUnit {
   grams: number
 }
 
+/**
+ * The units an amount can be entered in.
+ *
+ * Grams are what everything is stored and calculated in; the rest are ways of
+ * saying a number of grams. Millilitres are treated as grams, which is right for
+ * water, milk and stock and close enough for oil at the quantities a kitchen
+ * scale can read anyway.
+ */
+export type PortionUnit = 'g' | 'kg' | 'ml' | 'l' | 'piece' | 'tsp' | 'tbsp' | 'cup'
+
+/**
+ * Where a food's numbers came from, kept so they never have to be fetched twice
+ * and so a wrong number can be traced back to whoever said it.
+ */
+export interface FoodProvenance {
+  source: 'curated' | 'usda' | 'off' | 'custom'
+  /** FDC ID for USDA, barcode for Open Food Facts. */
+  externalId?: string
+  /** The name the source used, which is often not the name you gave it. */
+  sourceName?: string
+  /** What the figures are per — almost always 100 g. */
+  basePortion: { amount: number; unit: PortionUnit }
+  /** ISO date the figures were fetched. Nutrition data gets revised. */
+  retrievedAt?: string
+  /**
+   * Salt as the source stated it, before normalising to sodium in milligrams.
+   * European labels give salt in grams; USDA gives sodium in milligrams.
+   */
+  saltAsGiven?: { kind: 'salt' | 'sodium'; value: number; unit: 'g' | 'mg' }
+}
+
 export interface Food {
   id: string
   /** Display names. English is required; Romanian/Hungarian come from the plans. */
@@ -73,6 +133,8 @@ export interface Food {
   /** Named portions, beyond plain grams. */
   units: FoodUnit[]
   source: 'curated' | 'usda' | 'off' | 'custom'
+  /** Where the numbers came from. Absent on the foods curated by hand. */
+  provenance?: FoodProvenance
   /** Set on foods the user added themselves. */
   createdAt?: string
 }

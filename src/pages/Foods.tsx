@@ -5,6 +5,7 @@ import { useFoods, useFoodStore } from '../store/useFoodStore'
 import { searchFoods, buildFoodIndex } from '../lib/foodSearch'
 import { TierBadge, EmptyState, SourceLine, ChipRow } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS, CATEGORY_ORDER } from '../lib/categories'
+import { saltFromSodium } from '../lib/nutrition'
 import {
   searchFoods as lookupOnline, lookupBarcode,
   type NutritionResult, type LookupOutcome, type LookupProblem,
@@ -156,8 +157,10 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
     en: '', ro: '', hu: '',
     category: 'vegetables' as MedCategory,
     medTier: 'daily' as MedTier,
-    calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0,
+    calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0,
   })
+  /** Everything the source said, kept whole so nothing is lost on the way in. */
+  const [imported, setImported] = useState<NutritionResult | null>(null)
 
   async function runLookup() {
     if (!query.trim()) return
@@ -174,11 +177,14 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
 
   /** Fills the form from a lookup or a scan and hands you back the fields. */
   function applyResult(r: NutritionResult) {
+    setImported(r)
     setDraft((d) => ({
       ...d, en: r.name,
       calories: r.per100g.calories, protein: r.per100g.protein,
       carbs: r.per100g.carbs, fat: r.per100g.fat,
       fiber: r.micros?.fiber ?? 0,
+      sugar: r.micros?.sugar ?? 0,
+      sodium: r.micros?.sodium ?? 0,
     }))
     setTab('manual')
   }
@@ -192,6 +198,14 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
 
   function save() {
     if (!draft.en.trim()) return
+
+    // Whatever the source knew is kept, not just the fields on the form: a
+    // micronutrient it reported is worth storing even though nothing here shows
+    // it, and re-fetching it later would mean asking the same question twice.
+    const source = imported?.source === 'usda' ? 'usda'
+      : imported?.source === 'openfoodfacts' ? 'off'
+      : 'custom'
+
     addFood({
       id: `custom-${Date.now().toString(36)}`,
       names: { en: draft.en.trim(), ro: draft.ro.trim() || undefined, hu: draft.hu.trim() || undefined },
@@ -200,12 +214,25 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
       medTier: draft.medTier,
       state: 'as-sold',
       per100g: {
+        ...imported?.micros,
         calories: draft.calories, protein: draft.protein,
         carbs: draft.carbs, fat: draft.fat,
+        // Typed-in zeros mean "nothing entered", not "none of it": storing them
+        // would turn an unknown into a claim.
         ...(draft.fiber ? { fiber: draft.fiber } : {}),
+        ...(draft.sugar ? { sugar: draft.sugar } : {}),
+        ...(draft.sodium ? { sodium: draft.sodium } : {}),
       },
       units: [],
-      source: 'custom',
+      source,
+      provenance: {
+        source,
+        externalId: imported?.externalId,
+        sourceName: imported?.sourceName,
+        basePortion: imported?.basePortion ?? { amount: 100, unit: 'g' },
+        retrievedAt: imported ? new Date().toISOString() : undefined,
+        saltAsGiven: imported?.saltAsGiven,
+      },
       createdAt: new Date().toISOString(),
     })
     onClose()
@@ -321,9 +348,9 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
               </div>
 
               <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">Per 100 g</p>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 {([
-                  ['calories', 'kcal'], ['protein', 'P'], ['carbs', 'C'], ['fat', 'F'], ['fiber', 'Fib'],
+                  ['calories', 'kcal'], ['protein', 'P'], ['carbs', 'C'], ['fat', 'F'],
                 ] as const).map(([key, label]) => (
                   <div key={key}>
                     <label className="label">{label}</label>
@@ -333,6 +360,45 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                   </div>
                 ))}
               </div>
+
+              {/* Sugar and salt get their own row because they are the two you
+                  are keeping an eye on across a day, not just per food. */}
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  ['fiber', 'Fibre g'], ['sugar', 'Sugar g'], ['sodium', 'Sodium mg'],
+                ] as const).map(([key, label]) => (
+                  <div key={key}>
+                    <label className="label">{label}</label>
+                    <input type="number" min={0} className="input px-2"
+                      value={draft[key]}
+                      onChange={(e) => setDraft({ ...draft, [key]: Number(e.target.value) })} />
+                  </div>
+                ))}
+              </div>
+              {draft.sodium > 0 && (
+                <p className="text-xs text-ink-500 -mt-1">
+                  That is about {(saltFromSodium(draft.sodium) ?? 0).toFixed(2)} g of salt.
+                </p>
+              )}
+              <p className="text-xs text-ink-500">
+                Leave anything you do not know blank — a zero here means there is none of it,
+                which is a different claim.
+              </p>
+
+              {imported && (
+                <div className="card-soft p-3 text-xs text-ink-700 space-y-0.5">
+                  <p>
+                    From <strong>{imported.source === 'usda' ? 'USDA FoodData Central' : 'Open Food Facts'}</strong>
+                    {imported.externalId ? ` · ${imported.externalId}` : ''}
+                  </p>
+                  <p className="text-ink-500">
+                    Per {imported.basePortion.amount} {imported.basePortion.unit}
+                    {imported.micros && Object.keys(imported.micros).length > 0
+                      ? ` · ${Object.keys(imported.micros).length} nutrients kept`
+                      : ''}
+                  </p>
+                </div>
+              )}
 
               <button className="btn-primary w-full" onClick={save} disabled={!draft.en.trim()}>
                 Save food

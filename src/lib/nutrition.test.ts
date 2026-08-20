@@ -3,6 +3,7 @@ import type { Food, Recipe } from '../types'
 import {
   atwaterCalories, buildContext, calorieDrift, componentsNutrients,
   recipePerServing, recipeTotal, scaleNutrients, addNutrients,
+  reportNutrients, saltFromSodium, sodiumFromSalt,
 } from './nutrition'
 
 function food(id: string, per100g: Food['per100g']): Food {
@@ -102,5 +103,81 @@ describe('arithmetic helpers', () => {
     const b = { calories: 50, protein: 2, carbs: 5, fat: 1 }
     expect(addNutrients(a, b)).toMatchObject({ calories: 150, protein: 7, fiber: 3 })
     expect(scaleNutrients(a, 2)).toMatchObject({ calories: 200, fiber: 6 })
+  })
+})
+
+describe('unknown is not zero', () => {
+  const ctx = buildContext(
+    [
+      {
+        id: 'knows-fibre', names: { en: 'Knows fibre' }, aliases: [], category: 'grains',
+        medTier: 'daily', state: 'as-sold', units: [], source: 'curated',
+        per100g: { calories: 100, protein: 5, carbs: 20, fat: 1, fiber: 4, sodium: 200 },
+      },
+      {
+        id: 'says-nothing', names: { en: 'Says nothing' }, aliases: [], category: 'grains',
+        medTier: 'daily', state: 'as-sold', units: [], source: 'curated',
+        per100g: { calories: 100, protein: 5, carbs: 20, fat: 1 },
+      },
+    ],
+    [],
+  )
+
+  it('leaves a nutrient nobody mentioned out of the total entirely', () => {
+    // Not zero: a food whose source said nothing about zinc has not told you
+    // there is no zinc in it.
+    const total = componentsNutrients([{ kind: 'food', foodId: 'says-nothing', grams: 100 }], ctx)
+    expect(total.fiber).toBeUndefined()
+    expect(total.zinc).toBeUndefined()
+  })
+
+  it('still adds up what is known, because a floor is worth having', () => {
+    const total = componentsNutrients([
+      { kind: 'food', foodId: 'knows-fibre', grams: 100 },
+      { kind: 'food', foodId: 'says-nothing', grams: 100 },
+    ], ctx)
+    expect(total.fiber).toBe(4)
+  })
+
+  it('marks a total as partial when only some ingredients knew', () => {
+    const report = reportNutrients([
+      { kind: 'food', foodId: 'knows-fibre', grams: 100 },
+      { kind: 'food', foodId: 'says-nothing', grams: 100 },
+    ], ctx)
+
+    expect(report.total.fiber).toBe(4)
+    expect(report.partial).toContain('fiber')
+    expect(report.partial).toContain('sodium')
+  })
+
+  it('does not mark a total partial when everyone agreed', () => {
+    const report = reportNutrients([
+      { kind: 'food', foodId: 'knows-fibre', grams: 50 },
+      { kind: 'food', foodId: 'knows-fibre', grams: 50 },
+    ], ctx)
+
+    expect(report.total.fiber).toBe(4)
+    expect(report.partial).toEqual([])
+  })
+
+  it('does not mark a nutrient nobody knew — there is no figure to qualify', () => {
+    const report = reportNutrients([{ kind: 'food', foodId: 'says-nothing', grams: 100 }], ctx)
+    expect(report.partial).not.toContain('fiber')
+  })
+})
+
+describe('salt and sodium are one number', () => {
+  it('converts sodium to salt the way a label does', () => {
+    expect(saltFromSodium(1000)).toBeCloseTo(2.5, 5)
+    expect(saltFromSodium(400)).toBeCloseTo(1, 5)
+  })
+
+  it('goes back again without drift', () => {
+    expect(sodiumFromSalt(2.5)).toBeCloseTo(1000, 5)
+    expect(saltFromSodium(sodiumFromSalt(1.7))).toBeCloseTo(1.7, 5)
+  })
+
+  it('keeps unknown sodium unknown rather than calling it no salt', () => {
+    expect(saltFromSodium(undefined)).toBeUndefined()
   })
 })
