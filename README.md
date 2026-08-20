@@ -118,6 +118,17 @@ just worded differently (`supă de fasole verde` one week, `ciorbă de fasole ve
 which is why 68 of the 204 imported meals are numbered repeats. Those collapse into one card
 with the wordings inside it, taking the library from 275 cards to 207.
 
+Collapsing them is only a display; they can also be **merged** for real, which takes them out
+of the library and out of the planner's picker. 21 of the 45 repeated dishes have versions that
+come to identical numbers, and those are offered as a one-tap tidy — the other 24 differ by
+portion (`Spicy chicken & vegetable pan` runs 259 to 408 kcal), which is a real choice and is
+never swept up automatically; merge those by hand from the recipe itself.
+
+A merge deletes nothing. It records "this recipe is really that one", and every lookup resolves
+through the note — which is what lets you merge something a planned day already names, or
+something one of the fourteen archived weeks refers to, since those ids live in code and cannot
+be rewritten. Undo puts them back.
+
 Every recipe is editable, including the 275 that ship in code: the first change keeps a copy
 of your own and the original stays underneath, so **Revert** and **Delete** are separate
 buttons that mean different things. **New recipe** writes one from scratch — name, shelf,
@@ -345,6 +356,7 @@ src/
 │   ├── targets.ts        # plan averages + TDEE
 │   ├── mediterranean.ts  # serving goals from the guide
 │   ├── recipeGroups.ts   # shelves, labels and the repeated-dish grouping
+│   ├── mergeRecipes.ts   # folding repeats together without losing references
 │   └── mfp.ts            # clipboard + diary CSV
 ├── pages/                # Planner, Recipes, Foods, Grocery, History, Prep, Schedule, Progress, Settings
 └── store/                # zustand stores

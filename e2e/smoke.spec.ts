@@ -287,6 +287,64 @@ test.describe('the recipe library', () => {
     await expect(line).not.toHaveText(before ?? '')
   })
 
+  test('the duplicates that are only duplicates can be folded away in one tap', async ({ page }) => {
+    await goto(page, '/recipes')
+    const banner = page.getByText(/dishes are written down more than once/)
+    await expect(banner).toBeVisible()
+
+    const before = await page.locator('.card').count()
+    await page.getByRole('button', { name: 'Merge them' }).click()
+
+    // The offer goes away because there is nothing left to fold, and the shelf
+    // is shorter than it was.
+    await expect(banner).toHaveCount(0)
+    expect(await page.locator('.card').count()).toBeLessThan(before)
+  })
+
+  test('a dish written at different portions is never swept up automatically', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: 'Merge them' }).click()
+
+    // 259 kcal and 408 kcal are a real choice, so this one still has versions.
+    await page.getByRole('button', { name: /^Lunch/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('spicy chicken')
+    await page.locator('.card button').nth(1).click()
+    await expect(page.getByText(/Written \d+ times across the plans/)).toBeVisible()
+  })
+
+  test('merging by hand keeps the version you are looking at, and can be undone', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Lunch/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('spicy chicken')
+    await page.locator('.card button').nth(1).click()
+
+    await page.getByRole('button', { name: /Merge these into one/ }).click()
+    await page.getByRole('button', { name: 'Merge into this one' }).click()
+
+    // One version left, and the sheet offers the way back.
+    await expect(page.getByText(/Written \d+ times across the plans/)).toHaveCount(0)
+    await expect(page.getByText(/versions were folded into this one/)).toBeVisible()
+
+    await page.getByRole('button', { name: 'Undo' }).click()
+    await expect(page.getByText(/Written \d+ times across the plans/)).toBeVisible()
+  })
+
+  test('a day already planned survives a merge', async ({ page }) => {
+    // The fourteen archived weeks name recipe ids in code, so a merge must not
+    // leave a planned day pointing at nothing.
+    await goto(page, '/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/plan')
+    await expect(page.getByText('7 of 7 days planned')).toBeVisible()
+
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: 'Merge them' }).click()
+
+    await goto(page, '/plan')
+    await expect(page.getByText('7 of 7 days planned')).toBeVisible()
+    await expect(page.getByText('Unknown')).toHaveCount(0)
+  })
+
   test('filters down to four, and they narrow the shelf', async ({ page }) => {
     await goto(page, '/recipes')
     const before = await page.locator('.card').count()
