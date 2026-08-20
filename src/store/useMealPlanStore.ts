@@ -27,6 +27,54 @@ export function getWeekDates(reference: Date = new Date(), weekStartsOn: WeekSta
   })
 }
 
+/** How much of the plan you are looking at. */
+export type PlanRange = 'week' | 'fortnight' | 'month'
+
+export const RANGE_LABELS: Record<PlanRange, string> = {
+  week: '1 week',
+  fortnight: '2 weeks',
+  month: '1 month',
+}
+
+function addDays(date: string, days: number): string {
+  const d = new Date(date + 'T12:00:00')
+  d.setDate(d.getDate() + days)
+  return d.toISOString().slice(0, 10)
+}
+
+/**
+ * The dates on screen, for a window that starts at `weekStart`.
+ *
+ * A week and a fortnight are simply seven and fourteen days from there. A
+ * month is the calendar month the window sits in, padded out to whole weeks so
+ * the grid has no ragged edges: the days either side belong to the neighbouring
+ * months and are real days you can plan, they are just drawn quieter.
+ */
+export function getRangeDates(
+  weekStart: string,
+  range: PlanRange,
+  weekStartsOn: WeekStart = DEFAULT_WEEK_START,
+): string[] {
+  if (range === 'week') return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
+  if (range === 'fortnight') return Array.from({ length: 14 }, (_, i) => addDays(weekStart, i))
+
+  const anchor = new Date(weekStart + 'T12:00:00')
+  const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1, 12)
+  const last = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0, 12)
+
+  const gridStart = getWeekDates(first, weekStartsOn)[0]
+  const gridEnd = getWeekDates(last, weekStartsOn)[6]
+
+  const out: string[] = []
+  for (let d = gridStart; d <= gridEnd; d = addDays(d, 1)) out.push(d)
+  return out
+}
+
+/** The month a window belongs to, for labelling and for greying the edges. */
+export function monthOf(weekStart: string): number {
+  return new Date(weekStart + 'T12:00:00').getMonth()
+}
+
 function emptyWeek(dates: string[]): DayPlan[] {
   return dates.map((date) => ({ date, meals: [] }))
 }
@@ -39,6 +87,34 @@ function emptyWeek(dates: string[]): DayPlan[] {
  */
 function touch(day: DayPlan): DayPlan {
   return { ...day, updatedAt: new Date().toISOString() }
+}
+
+/**
+ * Applies a change to one day, creating it if the plan has never seen it.
+ *
+ * The planner used to hold exactly the seven days on screen, so every mutation
+ * could assume its day existed. It does not any more: you can look at a
+ * fortnight or a month, and a day three weeks out is a day nothing has written
+ * to yet. Without this, adding a meal there did nothing at all, silently.
+ */
+function withDay(plan: DayPlan[], date: string, change: (day: DayPlan) => DayPlan): DayPlan[] {
+  if (plan.some((d) => d.date === date)) {
+    return plan.map((d) => (d.date === date ? change(d) : d))
+  }
+  return [...plan, change({ date, meals: [] })].sort((a, b) => a.date.localeCompare(b.date))
+}
+
+/**
+ * Days worth keeping.
+ *
+ * Everything with food in it, since that is your history, plus the empty days
+ * of whatever is on screen so the grid has something to render. An empty day
+ * from a week nobody is looking at is a row of nothing, and keeping every one
+ * of them forever would grow the synced document without adding a fact.
+ */
+function pruneEmptyDays(plan: DayPlan[], keep: string[]): DayPlan[] {
+  const shown = new Set(keep)
+  return plan.filter((d) => d.meals.length > 0 || shown.has(d.date))
 }
 
 function newId(): string {
@@ -84,8 +160,7 @@ export const useMealPlanStore = create<MealPlanStore>()(
 
         setMeal: (date, slot, entries, note) =>
           set((s) => ({
-            plan: s.plan.map((day) => {
-              if (day.date !== date) return day
+            plan: withDay(s.plan, date, (day) => {
               const others = day.meals.filter((m) => m.slot !== slot)
               if (!entries.length) return touch({ ...day, meals: others })
               return touch({ ...day, meals: [...others, { id: newId(), slot, entries, note }] })
@@ -94,8 +169,7 @@ export const useMealPlanStore = create<MealPlanStore>()(
 
         addEntry: (date, slot, entry) =>
           set((s) => ({
-            plan: s.plan.map((day) => {
-              if (day.date !== date) return day
+            plan: withDay(s.plan, date, (day) => {
               const existing = day.meals.find((m) => m.slot === slot)
               if (existing) {
                 return touch({
@@ -126,14 +200,23 @@ export const useMealPlanStore = create<MealPlanStore>()(
             const source = s.plan.find((d) => d.date === fromDate)
             if (!source?.meals.length) return {}
             const meals: PlannedMeal[] = source.meals.map((m) => ({ ...m, id: newId() }))
-            return { plan: s.plan.map((day) => (day.date === toDate ? touch({ ...day, meals }) : day)) }
+            return { plan: withDay(s.plan, toDate, (day) => touch({ ...day, meals })) }
           }),
 
+        /**
+         * Moves the window, keeping every other day.
+         *
+         * This used to replace the plan with the seven days of the week you
+         * moved to, so planning a fortnight ahead and then stepping back threw
+         * the second week away. The window is now just a window.
+         */
         goToWeek: (reference, weekStartsOn) => {
           const dates = getWeekDates(reference, weekStartsOn)
           set((s) => {
-            const existing = new Map(s.plan.map((d) => [d.date, d]))
-            return { weekDates: dates, plan: dates.map((date) => existing.get(date) ?? { date, meals: [] }) }
+            const existing = new Set(s.plan.map((d) => d.date))
+            const added = dates.filter((d) => !existing.has(d)).map((date) => ({ date, meals: [] }))
+            const plan = [...s.plan, ...added].sort((a, b) => a.date.localeCompare(b.date))
+            return { weekDates: dates, plan: pruneEmptyDays(plan, dates) }
           })
         },
 

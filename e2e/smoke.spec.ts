@@ -203,6 +203,40 @@ test.describe('the main flow', () => {
   })
 })
 
+test.describe('the planner', () => {
+  test('shows a week, a fortnight or a month, and keeps what you planned', async ({ page }) => {
+    await goto(page, '/plan')
+
+    const days = page.locator('button[aria-pressed]')
+    await expect(days).toHaveCount(7)
+
+    await page.getByRole('tab', { name: '2 weeks' }).click()
+    await expect(days).toHaveCount(14)
+
+    await page.getByRole('tab', { name: '1 month' }).click()
+    const monthDays = await days.count()
+    expect(monthDays % 7, 'a month grid should be whole weeks').toBe(0)
+    expect(monthDays).toBeGreaterThanOrEqual(28)
+
+    // Plan something, step a month forward and back: it is still there. The
+    // plan used to hold only the seven days on screen, so moving the window
+    // threw the rest away.
+    await page.getByRole('tab', { name: '1 week' }).click()
+    await page.getByRole('button', { name: /Pop something in/ }).first().click()
+    await page.getByPlaceholder(/What are we having/).fill('Bruschetta')
+    await page.getByText('Bruschetta', { exact: false }).nth(1).click()
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+
+    const planned = page.locator('button[aria-pressed]').filter({ hasText: /\d\d\d/ })
+    await expect(planned).toHaveCount(1)
+
+    await page.getByRole('button', { name: 'Next week' }).click()
+    await expect(planned).toHaveCount(0)
+    await page.getByRole('button', { name: 'Previous week' }).click()
+    await expect(planned).toHaveCount(1)
+  })
+})
+
 test.describe('the recipe library', () => {
   test('opens on one shelf rather than all 275', async ({ page }) => {
     // The screen this replaced showed every recipe at once, sorted

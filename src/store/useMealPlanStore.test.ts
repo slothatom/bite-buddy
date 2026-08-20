@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getWeekDates } from './useMealPlanStore'
+import { getRangeDates, getWeekDates, useMealPlanStore } from './useMealPlanStore'
 
 /**
  * The week shape is the one piece of date handling that is easy to get subtly
@@ -40,5 +40,58 @@ describe('getWeekDates', () => {
     // each date on its own day regardless of the local offset.
     const week = getWeekDates(new Date('2026-03-30T12:00:00'))
     expect(new Set(week).size).toBe(7)
+  })
+})
+
+describe('getRangeDates', () => {
+  it('gives seven days for a week and fourteen for a fortnight', () => {
+    expect(getRangeDates('2026-08-10', 'week')).toHaveLength(7)
+
+    const fortnight = getRangeDates('2026-08-10', 'fortnight')
+    expect(fortnight).toHaveLength(14)
+    expect(fortnight[0]).toBe('2026-08-10')
+    expect(fortnight[13]).toBe('2026-08-23')
+  })
+
+  it('pads a month out to whole weeks', () => {
+    // August 2026 starts on a Saturday, so a Monday-start grid begins on
+    // 27 July and runs to 6 September: six whole weeks.
+    const month = getRangeDates('2026-08-10', 'month')
+    expect(month.length % 7).toBe(0)
+    expect(month[0]).toBe('2026-07-27')
+    expect(month[month.length - 1]).toBe('2026-09-06')
+    expect(month).toContain('2026-08-01')
+    expect(month).toContain('2026-08-31')
+  })
+
+  it('follows the week start you chose', () => {
+    // Wednesday, the day every one of the dietician's plans begins on.
+    expect(getRangeDates('2026-08-12', 'month', 3)[0]).toBe('2026-07-29')
+  })
+})
+
+describe('planning beyond the week on screen', () => {
+  it('keeps a day you planned when the window moves off it', () => {
+    // This lost work: the plan held exactly the seven days on screen, so
+    // stepping to the next fortnight threw the one you had just filled in.
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-10T12:00:00'), 1)
+    store.addEntry('2026-08-12', 'lunch', { kind: 'food', foodId: 'food-apple', grams: 150 })
+
+    store.goToWeek(new Date('2026-09-07T12:00:00'), 1)
+    expect(useMealPlanStore.getState().plan.find((d) => d.date === '2026-08-12')?.meals)
+      .toHaveLength(1)
+
+    // And an empty day nobody is looking at is not kept forever.
+    expect(useMealPlanStore.getState().plan.some((d) => d.date === '2026-08-13')).toBe(false)
+  })
+
+  it('creates a day that the window has never shown, rather than doing nothing', () => {
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-10T12:00:00'), 1)
+    store.addEntry('2026-11-03', 'dinner', { kind: 'food', foodId: 'food-apple', grams: 100 })
+
+    expect(useMealPlanStore.getState().plan.find((d) => d.date === '2026-11-03')?.meals)
+      .toHaveLength(1)
   })
 })
