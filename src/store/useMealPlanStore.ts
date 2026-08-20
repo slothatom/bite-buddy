@@ -248,6 +248,8 @@ export const useMealPlanStore = create<MealPlanStore>()(
             ? state.plan.map((day) => ({ ...(day as DayPlan), updatedAt: new Date(0).toISOString() }))
             : state.plan,
         }),
+        // v2 → v3: XP left the user profile; the plan is unaffected.
+        2: (state) => state,
       }),
     },
   ),

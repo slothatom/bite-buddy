@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
@@ -59,17 +60,24 @@ export const useRecipeStore = create<RecipeStore>()(
         // a field, and discarding everything else over that would cost the user
         // their foods, recipes and logs for nothing.
         1: (state) => state,
+        // v2 → v3: XP left the user profile; nothing here changed either.
+        2: (state) => state,
       }),
     },
   ),
 )
 
 export function useRecipes(): Recipe[] {
-  const { custom, hidden } = useRecipeStore()
-  const overridden = new Set(custom.map((r) => r.id))
-  const hiddenSet = new Set(hidden)
-  return [
-    ...ALL_RECIPES.filter((r) => !overridden.has(r.id) && !hiddenSet.has(r.id)),
-    ...custom,
-  ]
+  // See useFoods: a fresh array per render made every downstream useMemo a lie.
+  const custom = useRecipeStore((s) => s.custom)
+  const hidden = useRecipeStore((s) => s.hidden)
+
+  return useMemo(() => {
+    const overridden = new Set(custom.map((r) => r.id))
+    const hiddenSet = new Set(hidden)
+    return [
+      ...ALL_RECIPES.filter((r) => !overridden.has(r.id) && !hiddenSet.has(r.id)),
+      ...custom,
+    ]
+  }, [custom, hidden])
 }

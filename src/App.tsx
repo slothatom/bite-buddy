@@ -2,14 +2,12 @@ import { lazy, Suspense } from 'react'
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Sidebar from './components/layout/Sidebar'
 import BottomNav from './components/layout/BottomNav'
-import XpToast from './components/layout/XpToast'
 import ErrorBoundary from './components/layout/ErrorBoundary'
 import StorageBanner from './components/layout/StorageBanner'
 import Home from './pages/Home'
 import Planner from './pages/Planner'
 import SignIn from './pages/SignIn'
 
-import { useUserStore } from './store/useUserStore'
 import { useAuthStore } from './store/useAuth'
 import { useSyncSession } from './store/useSync'
 import { useTheme } from './store/useTheme'
@@ -40,12 +38,6 @@ const Settings = lazy(() => import('./pages/Settings'))
     or two, and a spinner that flashes reads as jank rather than progress. */
 function ScreenLoading() {
   return <div className="flex-1" aria-busy="true" />
-}
-
-function ToastLayer() {
-  const { toast, clearToast } = useUserStore()
-  if (!toast) return null
-  return <XpToast key={`${toast.amount}-${toast.label}`} amount={toast.amount} label={toast.label} onDone={clearToast} />
 }
 
 /**
@@ -81,7 +73,6 @@ function Shell() {
         </main>
         <BottomNav />
       </div>
-      <ToastLayer />
     </>
   )
 }

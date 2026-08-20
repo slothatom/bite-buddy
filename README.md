@@ -118,6 +118,13 @@ verbatim. Load any week straight into the planner.
 Built from the planned week, resolving nested recipes down to what you actually buy, merged by
 food and grouped by category. Weights are raw, matching how the plans are written.
 
+### Moments
+Eight little things Zig notices — a first day planned, a whole week, something actually
+cooked. Each once, ever, then he stops. Deliberately not a points system: nothing counts,
+so nothing can be lost, and nothing resets. A streak works by threatening you with what
+you lose by stopping, which is a poor thing to aim at somebody's eating — a week where you
+skip the planner is a normal week. `src/lib/moments.ts` says so at greater length.
+
 ### Backup
 Settings → Your data. Download or copy everything you've entered as one JSON file, and restore
 it from a file or a paste. There's no account behind the app, so this is the only copy that
