@@ -314,8 +314,6 @@
 
 /* ─── Gamification (opt-in) ────────────────────────────────────────────────── */
 
-@utility xp-bar { @apply relative h-2 rounded-full bg-border-100 overflow-hidden; }
-@utility xp-bar-fill { @apply h-full rounded-full bg-bite-500 transition-all duration-700 ease-out; }
 
 /* ─── Touch sizing ─────────────────────────────────────────────────────────────
    Applied only where the pointer is coarse, so phones get the 44px minimum that

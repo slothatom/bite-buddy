@@ -7,6 +7,7 @@ import { useFoods } from '../../store/useFoodStore'
 import { useNutritionContext } from '../../store/useNutrition'
 import { recipePerServing, componentsNutrients } from '../../lib/nutrition'
 import { normaliseTerm } from '../../lib/units'
+import { groupsOf } from '../../lib/recipeGroups'
 import { searchFoods } from '../../lib/foodSearch'
 import { buildFoodIndex } from '../../lib/foodSearch'
 
@@ -26,7 +27,11 @@ export default function AddEntryModal({
   onAdd: (entry: Component) => void
 }) {
   const [query, setQuery] = useState('')
-  const [tab, setTab] = useState<'recipes' | 'foods'>('recipes')
+  // Snacks open on foods. The plans write them as lines rather than dishes
+  // ("150 g mere, 10 g caju"), so the recipe tab for a snack slot was reliably
+  // empty — an empty list is a worse answer than the right list.
+  const isSnack = slot === 'snack1' || slot === 'snack2'
+  const [tab, setTab] = useState<'recipes' | 'foods'>(isSnack ? 'foods' : 'recipes')
   const [grams, setGrams] = useState<Record<string, number>>({})
 
   const recipes = useRecipes()
@@ -37,9 +42,7 @@ export default function AddEntryModal({
   const matchedRecipes = useMemo(() => {
     const n = normaliseTerm(query)
     const slotMatch = (r: Recipe) =>
-      slot === 'snack1' || slot === 'snack2'
-        ? r.tags.includes('snack')
-        : r.tags.includes(slot)
+      groupsOf(r).includes(isSnack ? 'snack' : slot)
 
     const pool = recipes.filter((r) => {
       if (!n) return slotMatch(r)
@@ -49,7 +52,7 @@ export default function AddEntryModal({
     })
 
     return pool.slice(0, 60)
-  }, [recipes, query, slot])
+  }, [recipes, query, slot, isSnack])
 
   const matchedFoods = useMemo(() => searchFoods(query, foodIndex, 40), [query, foodIndex])
 

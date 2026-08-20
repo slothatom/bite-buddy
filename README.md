@@ -79,11 +79,19 @@ as an explicit line rather than being inferred from where the fill stops.
 Home · Plan · **+** · Recipes · More, where the centre button opens the first
 empty meal slot and More holds the remaining six screens.
 
-**Filters wrap, they don't scroll.** Recipes has 14 chips and Foods has 17; a
-horizontal scroller showed four of them and hid the rest with no affordance.
-`ChipRow` wraps and collapses to the first few behind a `+N more`, and callers
-sort any active filter to the front so a live filter is never behind the
-toggle.
+**Filters wrap, they don't scroll.** Foods has 17 category chips; a horizontal
+scroller showed four of them and hid the rest with no affordance. `ChipRow`
+wraps and collapses to the first few behind a `+N more`, and callers sort any
+active filter to the front so a live filter is never behind the toggle.
+
+**Shelves, then filters.** Recipes used to offer thirteen tags side by side —
+meal times, diets and dish shapes as if they were one kind of choice. They are
+read through two axes instead: a *group* (when you eat it: breakfast, lunch,
+dinner, snacks, or dishes) which decides the shelf, and four optional *labels*
+(quick, batch, veggie, high protein) which filter within it. Everything else a
+recipe is tagged with survives and is shown on the recipe, but no longer
+competes for space at the top of the screen. Nothing is stored differently —
+`src/lib/recipeGroups.ts` reads the tags the library already has.
 
 ---
 
@@ -100,9 +108,21 @@ your targets, copy a day to another day, and one-tap copy of a whole day formatt
 MyFitnessPal.
 
 ### Recipes
-275 recipes, searchable in English, Romanian or Hungarian — typing `telemea` or `zabpehely`
-finds the right thing. Every imported meal shows the original dietician line as provenance.
-Macros are always derived from components, never stored, so they can't drift out of date.
+275 recipes on six shelves, opening on the meal you are most likely looking for at this hour.
+Searchable in English, Romanian or Hungarian — typing `telemea` or `zabpehely` finds the right
+thing. Every imported meal shows the original dietician line as provenance. Macros are always
+derived from components, never stored, so they can't drift out of date.
+
+The plans write the same dish more than once — sometimes at a different portion, more often
+just worded differently (`supă de fasole verde` one week, `ciorbă de fasole verde` the next),
+which is why 68 of the 204 imported meals are numbered repeats. Those collapse into one card
+with the wordings inside it, taking the library from 275 cards to 207.
+
+Every recipe is editable, including the 275 that ship in code: the first change keeps a copy
+of your own and the original stays underneath, so **Revert** and **Delete** are separate
+buttons that mean different things. **New recipe** writes one from scratch — name, shelf,
+labels, weighed ingredients (foods or other recipes) and a method — with the nutrition derived
+as you type rather than entered.
 
 ### Foods
 122 foods with per-100 g nutrition, each carrying EN/RO/HU names and a Mediterranean tier
@@ -324,6 +344,7 @@ src/
 │   ├── nutrition.ts      # the one place nutrition numbers are produced
 │   ├── targets.ts        # plan averages + TDEE
 │   ├── mediterranean.ts  # serving goals from the guide
+│   ├── recipeGroups.ts   # shelves, labels and the repeated-dish grouping
 │   └── mfp.ts            # clipboard + diary CSV
 ├── pages/                # Planner, Recipes, Foods, Grocery, History, Prep, Schedule, Progress, Settings
 └── store/                # zustand stores
