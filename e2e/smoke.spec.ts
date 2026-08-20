@@ -6,8 +6,8 @@ import { test, expect, type Page } from '@playwright/test'
  */
 
 const ROUTES = [
-  '/', '/plan', '/recipes', '/foods', '/grocery', '/history',
-  '/prep', '/schedule', '/analytics', '/settings',
+  '/', '/plan', '/recipes', '/foods', '/grocery',
+  '/schedule', '/analytics', '/settings', '/settings/history',
 ]
 
 /** Fails the test on any uncaught error or console error, on any page. */
@@ -57,7 +57,7 @@ test.describe('layout', () => {
   test('nothing is clipped or hidden sideways on a phone', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'mobile', 'this is about the narrow layout')
 
-    await goto(page, '/history')
+    await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
     // Every one of these was a real defect at 390px: planner meal names cut to
@@ -94,7 +94,7 @@ test.describe('layout', () => {
     test.skip(testInfo.project.name !== 'mobile', 'touch sizing only applies to coarse pointers')
 
     // Seed real content so the check sees populated screens, not empty states.
-    await goto(page, '/history')
+    await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
     for (const route of ROUTES) {
@@ -121,7 +121,7 @@ test.describe('the main flow', () => {
     const errors = trackErrors(page)
 
     // 1. The archive offers all 14 plans.
-    await goto(page, '/history')
+    await goto(page, '/settings/history')
     await expect(page.getByRole('button', { name: /^Load$/ })).toHaveCount(14)
 
     // 2. Loading one fills the planner.
@@ -157,32 +157,15 @@ test.describe('the main flow', () => {
   })
 
   test('every screen that lists things actually lists something', async ({ page }) => {
-    // Prep and Schedule both filtered their lists on recipes having a written
-    // method. Not one of the 275 does, the dietician wrote portions, not
-    // instructions, so both screens shipped permanently empty and rendered
-    // fine while doing it. Nothing caught that, because "renders without
-    // errors" is exactly what an empty state does.
-    await goto(page, '/prep')
-    await expect(page.getByText('Nothing to cook yet')).toHaveCount(0)
-    const cookable = await page.locator('.card').count()
-    expect(cookable, 'Prep offers no recipes to cook').toBeGreaterThan(10)
-
+    // Schedule filtered its list on recipes having a written method. Not one of
+    // the 275 does, the dietician wrote portions, not instructions, so the
+    // screen shipped permanently empty and rendered fine while doing it.
+    // Nothing caught that, because "renders without errors" is exactly what an
+    // empty state does.
     await goto(page, '/schedule')
     await page.getByRole('button', { name: /Session/ }).click()
     const pickable = await page.locator('input[type=checkbox]').count()
     expect(pickable, 'Schedule offers no recipes to batch').toBeGreaterThan(10)
-  })
-
-  test('a prep session weighs the ingredients out', async ({ page }) => {
-    await goto(page, '/prep')
-    await page.locator('.card').first().click()
-
-    // The weigh-out is derived from components, so it works for recipes that
-    // have no method written at all.
-    await expect(page.getByText('Weigh everything out')).toBeVisible()
-    const rows = await page.locator('input[type=checkbox]').count()
-    expect(rows, 'weigh-out is empty').toBeGreaterThan(0)
-    await expect(page.locator('text=/\\d+ g/').first()).toBeVisible()
   })
 
   test('targets can be taken from the plan history', async ({ page }) => {
@@ -284,7 +267,7 @@ test.describe('the recipe library', () => {
   test('a day already planned survives a merge', async ({ page }) => {
     // The fourteen archived weeks name recipe ids in code, so a merge must not
     // leave a planned day pointing at nothing.
-    await goto(page, '/history')
+    await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
@@ -660,7 +643,7 @@ test.describe('the food library', () => {
   test('deleting a food leaves the recipes that use it intact', async ({ page }) => {
     // A food is named by every recipe containing it, and directly by the snack
     // lines in a plan. Destroying it would blank them all at once.
-    await goto(page, '/history')
+    await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await goto(page, '/plan')
     const before = await page.locator('text=/\\d+ of 7 days planned/').first().textContent()
@@ -738,7 +721,7 @@ test.describe('your data survives the browser', () => {
   test('a backup can be taken out and brought back', async ({ page }) => {
     // Nothing here syncs anywhere, so a backup is the only copy of a planned
     // week that outlives the browser storage it was written to.
-    await goto(page, '/history')
+    await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
@@ -765,7 +748,7 @@ test.describe('your data survives the browser', () => {
   })
 
   test('a file from another version is refused, not half-applied', async ({ page }) => {
-    await goto(page, '/history')
+    await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
     await goto(page, '/settings')

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import {
   Sparkles, Calculator, Pencil, Upload, Check,
   Download, ClipboardCopy, ClipboardPaste, LogOut, Undo2,
@@ -14,6 +15,7 @@ import { backupFilename, createBackup, restoreBackup } from '../lib/backup'
 import { saveTextFile } from '../lib/download'
 import { SectionHeading } from '../components/ui'
 import { copyToClipboard } from '../lib/clipboard'
+import { PlanArchive } from '../components/settings/PlanArchive'
 import { useAuthStore } from '../store/useAuth'
 import { isConfigured } from '../lib/supabase'
 
@@ -23,7 +25,59 @@ const WEEKDAYS: { value: WeekStart; label: string }[] = [
   { value: 0, label: 'Sunday' },
 ]
 
+/**
+ * Two tabs, because the plan archive is a settings-shaped thing.
+ *
+ * It is fourteen weeks of history you read once in a while and load a week
+ * from, not somewhere you go daily, and it was taking a slot in the navigation
+ * next to the screens you open every day. The old /history address still
+ * works and lands here.
+ */
+type Tab = 'settings' | 'history'
+
 export default function Settings() {
+  const location = useLocation()
+  const tab: Tab = location.pathname.startsWith('/settings/history') ? 'history' : 'settings'
+
+  return (
+    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        <header>
+          <h1 className="display text-xl sm:text-2xl text-ink-900">
+            {tab === 'history' ? 'Plan history' : 'Settings'}
+          </h1>
+          <p className="text-sm text-ink-700">
+            {tab === 'history'
+              ? "Every week your dietician wrote, in their own words."
+              : 'Targets, the shape of your week, and your data.'}
+          </p>
+        </header>
+
+        <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
+          <TabLink to="/settings" label="Settings" on={tab === 'settings'} />
+          <TabLink to="/settings/history" label="Plan history" on={tab === 'history'} />
+        </div>
+
+        {tab === 'history' ? <PlanArchive /> : <SettingsPanels />}
+      </div>
+    </div>
+  )
+}
+
+function TabLink({ to, label, on }: { to: string; label: string; on: boolean }) {
+  return (
+    <Link
+      to={to}
+      role="tab"
+      aria-selected={on}
+      className={on ? 'tab-on' : 'tab-off'}
+    >
+      {label}
+    </Link>
+  )
+}
+
+function SettingsPanels() {
   const { profile, setName, setTargets, setTdee, setWeekStart } = useUserStore()
   // Signed out, the account section has nothing to show and no one to sign out;
   // everything else on this screen belongs to the device and still works.
@@ -38,13 +92,7 @@ export default function Settings() {
   const [manual, setManual] = useState<Targets>(profile.targets)
 
   return (
-    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-8">
-        <header>
-          <h1 className="display text-xl sm:text-2xl text-ink-900">Settings</h1>
-          <p className="text-sm text-ink-700">Targets, the shape of your week, and your data.</p>
-        </header>
-
+    <div className="space-y-8">
         {/* ─── Targets ─────────────────────────────────────────────────────── */}
         <section>
           <SectionHeading>Daily targets</SectionHeading>
@@ -223,7 +271,6 @@ export default function Settings() {
         {isConfigured && session && <AccountPanel />}
 
         <VersionPanel />
-      </div>
     </div>
   )
 }

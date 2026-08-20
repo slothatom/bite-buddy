@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react'
 import { CalendarPlus, Check } from 'lucide-react'
-import type { SourcePlan } from '../types'
-import { SLOT_LABELS } from '../types'
-import { SOURCE_PLANS } from '../data'
-import { useMealPlanStore } from '../store/useMealPlanStore'
-import { useUserStore } from '../store/useUserStore'
-import { EMPTY_CONTEXT } from '../lib/moments'
-import { useNutritionContext } from '../store/useNutrition'
-import { componentsNutrients } from '../lib/nutrition'
+import type { SourcePlan } from '../../types'
+import { SLOT_LABELS } from '../../types'
+import { SOURCE_PLANS } from '../../data'
+import { useMealPlanStore } from '../../store/useMealPlanStore'
+import { useUserStore } from '../../store/useUserStore'
+import { EMPTY_CONTEXT } from '../../lib/moments'
+import { useNutritionContext } from '../../store/useNutrition'
+import { componentsNutrients } from '../../lib/nutrition'
 
 /**
  * The archive of the dietician's plans.
@@ -16,7 +16,7 @@ import { componentsNutrients } from '../lib/nutrition'
  * record of what was actually prescribed, and the calorie figures beside it are
  * this app's interpretation, not the dietician's.
  */
-export default function History() {
+export function PlanArchive() {
   const [openId, setOpenId] = useState<string | null>(SOURCE_PLANS[0]?.id ?? null)
   const [loadedId, setLoadedId] = useState<string | null>(null)
   const { loadSourcePlan, weekDates } = useMealPlanStore()
@@ -28,33 +28,28 @@ export default function History() {
   )
 
   return (
-    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-        <header>
-          <h1 className="display text-xl sm:text-2xl text-ink-900">Plan history</h1>
-          <p className="text-sm text-ink-700">
-            {plans.length} weeks from your dietician, {plans.reduce((a, p) => a + p.days.length, 0)} days in all.
-            Drop any week straight into your planner.
-          </p>
-        </header>
+    <div className="space-y-5">
+      <p className="text-sm text-ink-700">
+        {plans.length} weeks from your dietician, {plans.reduce((a, p) => a + p.days.length, 0)} days in all.
+        Drop any week straight into your planner.
+      </p>
 
-        <div className="space-y-3">
-          {plans.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              open={openId === plan.id}
-              loaded={loadedId === plan.id}
-              onToggle={() => setOpenId(openId === plan.id ? null : plan.id)}
-              onLoad={() => {
-                loadSourcePlan(plan)
-                setLoadedId(plan.id)
-                notice({ ...EMPTY_CONTEXT, loadedFromArchive: true })
-              }}
-              weekLabel={weekDates[0]}
-            />
-          ))}
-        </div>
+      <div className="space-y-3">
+        {plans.map((plan) => (
+          <PlanCard
+            key={plan.id}
+            plan={plan}
+            open={openId === plan.id}
+            loaded={loadedId === plan.id}
+            onToggle={() => setOpenId(openId === plan.id ? null : plan.id)}
+            onLoad={() => {
+              loadSourcePlan(plan)
+              setLoadedId(plan.id)
+              notice({ ...EMPTY_CONTEXT, loadedFromArchive: true })
+            }}
+            weekLabel={weekDates[0]}
+          />
+        ))}
       </div>
     </div>
   )

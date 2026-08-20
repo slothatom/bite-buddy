@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import {
-  CalendarDays, BookOpen, Carrot, ShoppingBasket, Timer,
-  CalendarClock, BarChart2, History, Settings as SettingsIcon, Home,
+  CalendarDays, BookOpen, Carrot, ShoppingBasket,
+  CalendarClock, BarChart2, Settings as SettingsIcon, Home,
 } from 'lucide-react'
 import { Wordmark } from '../brand/Mascot'
 
@@ -11,8 +11,6 @@ const NAV = [
   { to: '/recipes',    label: 'Recipes',   icon: BookOpen },
   { to: '/foods',      label: 'Foods',     icon: Carrot },
   { to: '/grocery',    label: 'Grocery',   icon: ShoppingBasket },
-  { to: '/history',    label: 'History',   icon: History },
-  { to: '/prep',       label: 'Prep',      icon: Timer },
   { to: '/schedule',   label: 'Schedule',  icon: CalendarClock },
   { to: '/analytics',  label: 'Progress',  icon: BarChart2 },
   { to: '/settings',   label: 'Settings',  icon: SettingsIcon },

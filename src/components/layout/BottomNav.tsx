@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import {
   CalendarDays, BookOpen, ShoppingBasket, Plus, MoreHorizontal,
-  Carrot, History, Timer, CalendarClock, BarChart2, Settings as SettingsIcon, X,
+  Carrot, CalendarClock, BarChart2, Settings as SettingsIcon, X,
   Home as HomeIcon,
 } from 'lucide-react'
 import { useUiStore } from '../../store/useUiStore'
@@ -27,8 +27,6 @@ const SECONDARY = [
 const MORE = [
   { to: '/grocery', label: 'Grocery', icon: ShoppingBasket },
   { to: '/foods', label: 'Foods', icon: Carrot },
-  { to: '/history', label: 'History', icon: History },
-  { to: '/prep', label: 'Prep', icon: Timer },
   { to: '/schedule', label: 'Schedule', icon: CalendarClock },
   { to: '/analytics', label: 'Progress', icon: BarChart2 },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },

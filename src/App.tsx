@@ -28,8 +28,6 @@ import Zig from './components/brand/Mascot'
 const Recipes = lazy(() => import('./pages/Recipes'))
 const Foods = lazy(() => import('./pages/Foods'))
 const GroceryList = lazy(() => import('./pages/GroceryList'))
-const History = lazy(() => import('./pages/History'))
-const PrepMode = lazy(() => import('./pages/PrepMode'))
 const Schedule = lazy(() => import('./pages/Schedule'))
 const Analytics = lazy(() => import('./pages/Analytics'))
 const Settings = lazy(() => import('./pages/Settings'))
@@ -62,11 +60,12 @@ function Shell() {
               <Route path="/recipes"   element={<Recipes />} />
               <Route path="/foods"     element={<Foods />} />
               <Route path="/grocery"   element={<GroceryList />} />
-              <Route path="/history"   element={<History />} />
-              <Route path="/prep"      element={<PrepMode />} />
+              {/* The archive lives inside Settings now. The old address still
+                  works, plenty of things link to it. */}
+              <Route path="/history"   element={<Navigate to="/settings/history" replace />} />
               <Route path="/schedule"  element={<Schedule />} />
               <Route path="/analytics" element={<Analytics />} />
-              <Route path="/settings"  element={<Settings />} />
+              <Route path="/settings/*" element={<Settings />} />
               <Route path="*"          element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>

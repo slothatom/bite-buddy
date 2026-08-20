@@ -103,7 +103,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 <Link to="/plan" className="btn-primary">Plan today</Link>
-                <Link to="/history" className="btn-secondary">Load a week</Link>
+                <Link to="/settings/history" className="btn-secondary">Load a week</Link>
               </div>
             </div>
           )}
