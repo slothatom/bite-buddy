@@ -160,6 +160,8 @@ export interface DayPlan {
 }
 
 /** 0 = Sunday, 1 = Monday … 6 = Saturday. */
+import type { MomentKind } from '../lib/moments'
+
 export type Theme = 'system' | 'light' | 'dark'
 
 export type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6
@@ -277,28 +279,10 @@ export interface Targets extends Macros {
   source: TargetSource
 }
 
-// ─── Gamification ─────────────────────────────────────────────────────────────
-
-export type AchievementId =
-  | 'first_recipe' | 'five_recipes' | 'first_plan'
-  | 'week_complete' | 'grocery_master' | 'prep_master'
-  | 'streak_3' | 'streak_7' | 'macro_goal' | 'weight_logged'
-
-export interface Achievement {
-  id: AchievementId
-  name: string
-  description: string
-  emoji: string
-  xpReward: number
-  unlockedAt?: string
-}
+// ─── The user ─────────────────────────────────────────────────────────────────
 
 export interface UserProfile {
   name: string
-  xp: number
-  level: number
-  streak: number
-  lastActiveDate?: string
   targets: Targets
   tdee: TdeeProfile
   weightUnit: 'kg' | 'lbs'
@@ -307,9 +291,15 @@ export interface UserProfile {
   foodNameLanguage: 'en' | 'ro' | 'hu'
   /** 'system' follows the device; the other two override it in either direction. */
   theme: Theme
-  /** XP, levels and achievements are opt-in — the planner stays calm by default. */
-  showGamification: boolean
-  achievements: Achievement[]
+  /** Little things Zig has noticed. See lib/moments.ts for why these are not points. */
+  moments: Moment[]
+}
+
+/** One thing Zig noticed, once. */
+export interface Moment {
+  kind: MomentKind
+  at: string
+  seen: boolean
 }
 
 // ─── Release Notes ────────────────────────────────────────────────────────────

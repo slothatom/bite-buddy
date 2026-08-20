@@ -1,9 +1,8 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   CalendarDays, BookOpen, Carrot, ShoppingBasket, Timer,
-  CalendarClock, BarChart2, History, Settings as SettingsIcon, Flame, Home,
+  CalendarClock, BarChart2, History, Settings as SettingsIcon, Home,
 } from 'lucide-react'
-import { useUserStore } from '../../store/useUserStore'
 import { Wordmark } from '../brand/Mascot'
 
 const NAV = [
@@ -21,8 +20,7 @@ const NAV = [
 
 export default function Sidebar() {
   const location = useLocation()
-  const { profile, xpProgress } = useUserStore()
-  const progress = xpProgress()
+
 
   return (
     <aside className="hidden md:flex w-56 min-h-screen bg-cream-50 border-r border-border-200 flex-col shrink-0">
@@ -42,26 +40,6 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {profile.showGamification && (
-        <div className="mx-3 mb-3 p-3 rounded-2xl bg-paper border border-border-200">
-          <div className="flex items-center justify-between mb-2">
-            <div className="min-w-0">
-              <p className="text-[10px] font-semibold text-ink-500 uppercase tracking-wide">
-                Level {profile.level}
-              </p>
-              <p className="font-bold text-ink-900 text-sm truncate">{profile.name}</p>
-            </div>
-            {profile.streak > 0 && (
-              <span className="badge bg-coral-100 text-coral-700 shrink-0">
-                <Flame size={11} /> {profile.streak}
-              </span>
-            )}
-          </div>
-          <div className="xp-bar">
-            <div className="xp-bar-fill" style={{ width: `${progress.progress * 100}%` }} />
-          </div>
-        </div>
-      )}
     </aside>
   )
 }
