@@ -43,7 +43,7 @@ export default function Sidebar() {
       </nav>
 
       {profile.showGamification && (
-        <div className="mx-3 mb-3 p-3 rounded-2xl bg-white border border-border-200">
+        <div className="mx-3 mb-3 p-3 rounded-2xl bg-paper border border-border-200">
           <div className="flex items-center justify-between mb-2">
             <div className="min-w-0">
               <p className="text-[10px] font-semibold text-ink-500 uppercase tracking-wide">

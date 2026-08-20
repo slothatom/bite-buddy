@@ -116,6 +116,56 @@ test.describe('layout', () => {
   })
 })
 
+test.describe('dark mode', () => {
+  test.use({ colorScheme: 'dark' })
+
+  test('every screen inverts, and nothing keeps a light-mode colour', async ({ page }) => {
+    await goto(page, '/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    for (const route of ROUTES) {
+      await goto(page, route)
+
+      // The classic failure is a surface whose colour is only defined in the
+      // light palette, leaving light text on a light card.
+      const problems = await page.evaluate(() => {
+        const luminance = (colour: string) => {
+          const [r, g, b] = (colour.match(/\d+/g) ?? ['255', '255', '255']).map(Number)
+          return (0.299 * r + 0.587 * g + 0.114 * b) / 255
+        }
+        const found: string[] = []
+
+        const body = getComputedStyle(document.body).backgroundColor
+        if (luminance(body) > 0.5) found.push(`body background is light: ${body}`)
+
+        for (const el of document.querySelectorAll('*')) {
+          if (!(el instanceof HTMLElement) || !el.textContent?.trim()) continue
+          if (el.children.length) continue
+          const style = getComputedStyle(el)
+          const box = el.getBoundingClientRect()
+          if (!box.width || !box.height) continue
+
+          // Walk up for the nearest painted background.
+          let node: HTMLElement | null = el
+          let background = 'rgba(0, 0, 0, 0)'
+          while (node) {
+            const bg = getComputedStyle(node).backgroundColor
+            if (bg && !bg.startsWith('rgba(0, 0, 0, 0)')) { background = bg; break }
+            node = node.parentElement
+          }
+          const contrast = Math.abs(luminance(style.color) - luminance(background))
+          if (contrast < 0.15) {
+            found.push(`"${el.textContent.trim().slice(0, 24)}" is ${style.color} on ${background}`)
+          }
+        }
+        return [...new Set(found)].slice(0, 5)
+      })
+
+      expect(problems, `${route} has unreadable text in dark mode`).toEqual([])
+    }
+  })
+})
+
 test.describe('the main flow', () => {
   test('load a dietician week, then build a grocery list from it', async ({ page }) => {
     const errors = trackErrors(page)

@@ -12,6 +12,7 @@ import SignIn from './pages/SignIn'
 import { useUserStore } from './store/useUserStore'
 import { useAuthStore } from './store/useAuth'
 import { useSyncSession } from './store/useSync'
+import { useTheme } from './store/useTheme'
 import { isConfigured } from './lib/supabase'
 import Zig from './components/brand/Mascot'
 
@@ -94,6 +95,9 @@ function Shell() {
  * needs an account, running it yourself does not.
  */
 function Gate() {
+  // Applied above the sign-in screen too — the theme is a device preference,
+  // not something that should wait for a session.
+  useTheme()
   const ready = useAuthStore((s) => s.ready)
   const session = useAuthStore((s) => s.session)
 
