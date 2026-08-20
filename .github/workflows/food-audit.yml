@@ -1,0 +1,102 @@
+name: Weekly food check
+
+# Sunday morning, before anyone plans the week. The food database is edited by
+# hand and topped up from two crowd-fed sources, so it drifts: a decimal point
+# in the wrong place, a group that no longer matches, a figure fetched two
+# years ago. A wrong food is wrong in every recipe that uses it and every day
+# those recipes are planned into, quietly, until somebody looks.
+on:
+  schedule:
+    - cron: '0 6 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check the food database
+        id: audit
+        run: |
+          npx tsx scripts/audit-foods.ts > audit.txt 2>&1 || true
+          npx tsx scripts/audit-foods.ts --json > audit.json 2>/dev/null || true
+          cat audit.txt
+
+      # One issue, reopened and rewritten each week rather than a new one every
+      # Sunday. Fifty-two issues saying much the same thing is a way of being
+      # ignored.
+      - name: Report what it found
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs')
+            const text = fs.readFileSync('audit.txt', 'utf8').trim()
+            const report = JSON.parse(fs.readFileSync('audit.json', 'utf8'))
+
+            const wrong = report.findings.filter((f) => f.severity === 'wrong')
+            const questions = report.findings.filter(
+              (f) => f.severity === 'check' && f.kind !== 'gap')
+
+            const title = 'Weekly food check'
+            const body = [
+              `Ran on ${new Date().toISOString().slice(0, 10)}.`,
+              '',
+              wrong.length
+                ? `**${wrong.length} food${wrong.length === 1 ? '' : 's'} with numbers that cannot be right.**`
+                : 'Nothing impossible in the numbers.',
+              questions.length
+                ? `${questions.length} worth a look.`
+                : 'Nothing else worth a look.',
+              '',
+              '```',
+              text,
+              '```',
+              '',
+              'Nothing was changed. This is a report.',
+            ].join('\n')
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              labels: 'food-check',
+              per_page: 10,
+            })
+
+            const existing = open[0]
+            const quiet = !wrong.length && !questions.length
+
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                title,
+                body,
+                state: quiet ? 'closed' : 'open',
+              })
+              return
+            }
+
+            // Nothing to say and nothing open: do not open an issue to say so.
+            if (quiet) return
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['food-check'],
+            })

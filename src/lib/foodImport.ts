@@ -10,23 +10,30 @@ import type { NutritionResult } from '../services/nutritionApi'
  * looked up again, and a wrong number with nothing to trace it to.
  */
 
-/** Which of the guide's groups a source's own wording suggests. */
+/**
+ * Which of the guide's groups a source's own wording suggests.
+ *
+ * Anchored at the start of a word rather than matched anywhere in the string.
+ * Unanchored, "leustean" contains "tea" and became a beverage, "peanut" made
+ * everything a legume, and any word ending in "ham" was red meat. Endings stay
+ * open, since "blueberries" really is a berry.
+ */
 const CATEGORY_HINTS: [RegExp, MedCategory][] = [
-  [/yogurt|yoghurt|kefir|cheese|milk|cream|butter/i, 'dairy'],
-  [/chicken|turkey|poultry/i, 'poultry'],
-  [/beef|pork|lamb|veal|bacon|ham|sausage/i, 'red-meat'],
-  [/fish|salmon|tuna|cod|trout|mackerel|sardine|shrimp|prawn|squid/i, 'fish-seafood'],
-  [/\begg/i, 'eggs'],
-  [/bean|lentil|chickpea|pea\b|tofu|hummus/i, 'legumes'],
-  [/bread|rice|pasta|oat|flour|cereal|quinoa|bulgur|couscous|barley/i, 'grains'],
-  [/nut|almond|walnut|cashew|seed|peanut/i, 'nuts-seeds'],
-  [/oil|vinegar|olive/i, 'fats-vinegars'],
-  [/juice|water|tea|coffee|drink|soda|cola/i, 'beverages'],
-  [/chocolate|candy|sweet|biscuit|cookie|cake|crisps|chips/i, 'treats'],
-  [/sugar|honey|syrup/i, 'sweeteners'],
-  [/sauce|ketchup|mayonnaise|mustard|spread|dip/i, 'spreads-sauces'],
-  [/salt|pepper|spice|herb|basil|oregano|cinnamon/i, 'herbs-spices'],
-  [/apple|banana|orange|berry|berries|grape|melon|peach|pear|plum|mango|fruit/i, 'fruits'],
+  [/\b(yogurt|yoghurt|kefir|cheese|milk|cream|butter|telemea|skyr|ricotta)/i, 'dairy'],
+  [/\b(chicken|turkey|poultry)/i, 'poultry'],
+  [/\b(beef|pork|lamb|veal|bacon|ham|sausage|mince)\b/i, 'red-meat'],
+  [/\b(fish|salmon|tuna|cod|trout|mackerel|sardine|shrimp|prawn|squid)/i, 'fish-seafood'],
+  [/\beggs?\b/i, 'eggs'],
+  [/\b(bean|beans|lentil|chickpea|pea|peas|tofu|hummus|humus)\b/i, 'legumes'],
+  [/\b(bread|rice|pasta|oat|oats|flour|cereal|quinoa|bulgur|couscous|barley)/i, 'grains'],
+  [/\b(nut|nuts|almond|walnut|cashew|seed|seeds|peanut)/i, 'nuts-seeds'],
+  [/\b(oil|vinegar|olive)/i, 'fats-vinegars'],
+  [/\b(juice|water|tea|coffee|drink|soda|cola)\b/i, 'beverages'],
+  [/\b(chocolate|candy|sweets|biscuit|cookie|cake|crisps|chips)\b/i, 'treats'],
+  [/\b(sugar|honey|syrup)/i, 'sweeteners'],
+  [/\b(sauce|ketchup|mayonnaise|mustard|spread|dip)\b/i, 'spreads-sauces'],
+  [/\b(salt|black pepper|peppercorn|spice|herb|basil|oregano|cinnamon)/i, 'herbs-spices'],
+  [/\b(apple|banana|orange|grape|melon|peach|pear|plum|mango|fruit)|berry|berries/i, 'fruits'],
 ]
 
 /**
@@ -45,7 +52,7 @@ export function guessCategory(name: string): MedCategory {
 }
 
 /** How often the guide says to eat that group. */
-const TIER_BY_CATEGORY: Partial<Record<MedCategory, MedTier>> = {
+export const TIER_BY_CATEGORY: Partial<Record<MedCategory, MedTier>> = {
   vegetables: 'daily', fruits: 'daily', grains: 'daily', 'nuts-seeds': 'daily',
   'herbs-spices': 'daily', 'fats-vinegars': 'daily', beverages: 'daily',
   legumes: 'weekly', 'fish-seafood': 'weekly',

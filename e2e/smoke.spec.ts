@@ -195,6 +195,17 @@ test.describe('the main flow', () => {
     expect(box && card && box.y + box.height).toBeLessThanOrEqual((card?.y ?? 0) + (card?.height ?? 0))
   })
 
+  test('the food check reports on the library without changing it', async ({ page }) => {
+    await goto(page, '/settings')
+    await expect(page.getByText(/foods checked against their own numbers/)).toBeVisible()
+
+    await page.getByRole('button', { name: 'Show me' }).click()
+    // The shipped library has a handful of questions in it and nothing
+    // impossible, so this is the shape the panel should be in.
+    await expect(page.getByText(/worth a look/)).toBeVisible()
+    await expect(page.getByText(/cannot be right/)).toHaveCount(0)
+  })
+
   test('the calorie calculator shows its arithmetic', async ({ page }) => {
     await goto(page, '/settings')
     await page.getByLabel('Sex').selectOption('female')
