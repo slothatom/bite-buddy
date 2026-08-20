@@ -18,20 +18,20 @@ describe('two bodies, one app', () => {
   it('keeps each person\'s weights apart', () => {
     // Averaging two people into one trend line is a graph of nothing.
     const { addWeightEntry } = useBodyStore.getState()
-    addWeightEntry(weight('01', 'ana', 68))
-    addWeightEntry(weight('02', 'olivia', 59))
-    addWeightEntry(weight('03', 'ana', 67.4))
+    addWeightEntry(weight('01', 'arany', 68))
+    addWeightEntry(weight('02', 'oli', 59))
+    addWeightEntry(weight('03', 'arany', 67.4))
 
-    expect(forMember('ana').map((e) => e.weight)).toEqual([68, 67.4])
-    expect(forMember('olivia').map((e) => e.weight)).toEqual([59])
+    expect(forMember('arany').map((e) => e.weight)).toEqual([68, 67.4])
+    expect(forMember('oli').map((e) => e.weight)).toEqual([59])
   })
 
   it('keeps measurements apart the same way', () => {
     const { addMeasurement } = useBodyStore.getState()
-    addMeasurement(measured('01', 'ana', 80))
-    addMeasurement(measured('02', 'olivia', 71))
+    addMeasurement(measured('01', 'arany', 80))
+    addMeasurement(measured('02', 'oli', 71))
 
-    const mine = useBodyStore.getState().measurements.filter((m) => m.memberId === 'ana')
+    const mine = useBodyStore.getState().measurements.filter((m) => m.memberId === 'arany')
     expect(mine).toHaveLength(1)
     expect(mine[0].measurements.waist).toBe(80)
   })
@@ -39,7 +39,7 @@ describe('two bodies, one app', () => {
   it('records only the measurements actually taken', () => {
     // A blank is "not measured today", not a zero that reads as a change.
     useBodyStore.getState().addMeasurement({
-      id: '1', date: '2026-08-20', unit: 'cm', memberId: 'ana',
+      id: '1', date: '2026-08-20', unit: 'cm', memberId: 'arany',
       measurements: { waist: 80, thighs: 55 },
     })
 
@@ -56,33 +56,45 @@ describe('two bodies, one app', () => {
     const { addWeightEntry } = useBodyStore.getState()
     addWeightEntry(weight('01', undefined, 70))
 
-    expect(forMember('ana')).toHaveLength(0)
+    expect(forMember('arany')).toHaveLength(0)
     expect(forMember(undefined)).toHaveLength(1)
+  })
+
+  it('treats an id that is nobody as unclaimed, so it can be given back', () => {
+    // Entries used to be stamped with the signed-in account's id, which named
+    // a session rather than a person and differed per device. Those ids mean
+    // nothing now; hiding the entries behind them would lose the history.
+    const { addWeightEntry, claimUnassigned } = useBodyStore.getState()
+    addWeightEntry(weight('01', 'a3f0c9de-0000-4000-8000-000000000000', 70))
+
+    expect(forMember('arany')).toHaveLength(0)
+    claimUnassigned('arany')
+    expect(forMember('arany')).toHaveLength(1)
   })
 
   it('claims the unassigned ones when told to, and only those', () => {
     const { addWeightEntry, addMeasurement, claimUnassigned } = useBodyStore.getState()
     addWeightEntry(weight('01', undefined, 70))
-    addWeightEntry(weight('02', 'olivia', 59))
+    addWeightEntry(weight('02', 'oli', 59))
     addMeasurement(measured('03', undefined, 80))
 
-    claimUnassigned('ana')
+    claimUnassigned('arany')
 
-    expect(forMember('ana')).toHaveLength(1)
-    expect(forMember('olivia')).toHaveLength(1)
+    expect(forMember('arany')).toHaveLength(1)
+    expect(forMember('oli')).toHaveLength(1)
     expect(forMember(undefined)).toHaveLength(0)
-    expect(useBodyStore.getState().measurements[0].memberId).toBe('ana')
+    expect(useBodyStore.getState().measurements[0].memberId).toBe('arany')
   })
 
   it('deletes one person\'s entry without touching the other\'s', () => {
     const { addWeightEntry, removeWeightEntry } = useBodyStore.getState()
-    addWeightEntry(weight('01', 'ana', 68))
-    addWeightEntry(weight('02', 'olivia', 59))
+    addWeightEntry(weight('01', 'arany', 68))
+    addWeightEntry(weight('02', 'oli', 59))
 
     removeWeightEntry('01')
 
-    expect(forMember('ana')).toHaveLength(0)
-    expect(forMember('olivia')).toHaveLength(1)
+    expect(forMember('arany')).toHaveLength(0)
+    expect(forMember('oli')).toHaveLength(1)
   })
 
   it('works with no accounts at all, where everything is unassigned', () => {
