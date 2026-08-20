@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { discardOlderThan, safeStorage, SCHEMA_VERSION } from './persist'
 import type {
+  Theme,
   Achievement, AchievementId, Targets, TdeeProfile, UserProfile, WeekStart,
 } from '../types'
 import { DEFAULT_WEEK_START } from '../types'
@@ -33,6 +34,7 @@ interface UserStore {
   setTdee: (tdee: TdeeProfile) => void
   setWeekStart: (day: WeekStart) => void
   setFoodNameLanguage: (lang: UserProfile['foodNameLanguage']) => void
+  setTheme: (theme: Theme) => void
   setShowGamification: (show: boolean) => void
 
   addXp: (amount: number, label?: string) => void
@@ -53,6 +55,7 @@ const INITIAL_PROFILE: UserProfile = {
   weightUnit: 'kg',
   weekStartsOn: DEFAULT_WEEK_START,
   foodNameLanguage: 'en',
+  theme: 'system',
   // The planner is meant to feel calm; XP is opt-in from Settings.
   showGamification: false,
   achievements: [],
@@ -78,6 +81,8 @@ export const useUserStore = create<UserStore>()(
       setTdee: (tdee) => set((s) => ({ profile: { ...s.profile, tdee } })),
       setWeekStart: (weekStartsOn) => set((s) => ({ profile: { ...s.profile, weekStartsOn } })),
       setFoodNameLanguage: (foodNameLanguage) => set((s) => ({ profile: { ...s.profile, foodNameLanguage } })),
+
+      setTheme: (theme) => set((s) => ({ profile: { ...s.profile, theme } })),
       setShowGamification: (showGamification) => set((s) => ({ profile: { ...s.profile, showGamification } })),
 
       addXp: (amount, label) =>
