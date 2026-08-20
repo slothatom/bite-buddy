@@ -2,7 +2,10 @@ import { useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays } from 'lucide-react'
 import type { Component, DayPlan, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
-import { useMealPlanStore, getWeekDates } from '../store/useMealPlanStore'
+import {
+  useMealPlanStore, getWeekDates, getRangeDates, monthOf,
+  RANGE_LABELS, type PlanRange,
+} from '../store/useMealPlanStore'
 import { useDeletedIds } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
@@ -22,21 +25,37 @@ export default function Planner() {
   const { weekDates, plan, goToWeek, addEntry, removeMeal, clearDay, copyDay } = useMealPlanStore()
   const ctx = useNutritionContext()
 
+  const [range, setRange] = useState<PlanRange>('week')
   const [selected, setSelected] = useState<string>(() => todayOrFirst(weekDates))
   const [adding, setAdding] = useState<{ date: string; slot: MealSlot } | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
   const { quickAdd, clearQuickAdd } = useUiStore()
 
   const byDate = useMemo(() => new Map(plan.map((d) => [d.date, d])), [plan])
+
+  /**
+   * The days on screen. A week, a fortnight, or the calendar month padded out
+   * to whole weeks.
+   */
+  const dates = useMemo(
+    () => getRangeDates(weekDates[0], range, profile.weekStartsOn),
+    [weekDates, range, profile.weekStartsOn],
+  )
+  const anchorMonth = monthOf(weekDates[0])
   const selectedDay = byDate.get(selected) ?? { date: selected, meals: [] }
   const selectedTotals = dayNutrients(selectedDay, ctx)
   const targets = profile.targets
 
-  const weekTotal = useMemo(
-    () => plan.reduce((acc, d) => addNutrients(acc, dayNutrients(d, ctx)), emptyNutrients()),
-    [plan, ctx],
+  // Totals are for what you are looking at, not for everything ever planned.
+  const shownDays = useMemo(
+    () => dates.map((date) => byDate.get(date)).filter((d): d is DayPlan => Boolean(d)),
+    [dates, byDate],
   )
-  const plannedDays = plan.filter((d) => d.meals.length).length
+  const weekTotal = useMemo(
+    () => shownDays.reduce((acc, d) => addNutrients(acc, dayNutrients(d, ctx)), emptyNutrients()),
+    [shownDays, ctx],
+  )
+  const plannedDays = shownDays.filter((d) => d.meals.length).length
 
   // The bottom bar's centre button lands here. Rather than syncing that intent
   // into local state from an effect, which costs a second render, the open
@@ -51,70 +70,91 @@ export default function Planner() {
     clearQuickAdd()
   }
 
-  function shiftWeek(weeks: number) {
+  /** Steps by whatever you are looking at: a week, a fortnight, or a month. */
+  function shift(direction: -1 | 1) {
     const ref = new Date(weekDates[0] + 'T12:00:00')
-    ref.setDate(ref.getDate() + weeks * 7)
+    if (range === 'month') ref.setMonth(ref.getMonth() + direction)
+    else ref.setDate(ref.getDate() + direction * (range === 'fortnight' ? 14 : 7))
+
     goToWeek(ref, profile.weekStartsOn)
-    setSelected(getWeekDates(ref, profile.weekStartsOn)[0])
+    setSelected(getRangeDates(
+      getWeekDates(ref, profile.weekStartsOn)[0], range, profile.weekStartsOn,
+    )[0])
   }
 
   return (
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
-        {/* Week navigation */}
+        {/* Navigation */}
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="display text-xl sm:text-2xl text-ink-900">Your week</h1>
+            <h1 className="display text-xl sm:text-2xl text-ink-900">
+              {range === 'month' ? formatMonth(weekDates[0]) : 'Your week'}
+            </h1>
             <p className="text-sm text-ink-700">
-              {formatRange(weekDates)} · {plannedDays} of 7 days planned
+              {formatRange(dates)} · {plannedDays} of {dates.length} days planned
             </p>
           </div>
           <div className="flex items-center gap-1">
-            <button className="btn-secondary btn-icon" onClick={() => shiftWeek(-1)} aria-label="Previous week">
+            <button className="btn-secondary btn-icon" onClick={() => shift(-1)} aria-label={`Previous ${range}`}>
               <ChevronLeft size={18} />
             </button>
             <button
               className="btn-secondary"
               onClick={() => { goToWeek(new Date(), profile.weekStartsOn); setSelected(new Date().toISOString().slice(0, 10)) }}
             >
-              This week
+              Today
             </button>
-            <button className="btn-secondary btn-icon" onClick={() => shiftWeek(1)} aria-label="Next week">
+            <button className="btn-secondary btn-icon" onClick={() => shift(1)} aria-label={`Next ${range}`}>
               <ChevronRight size={18} />
             </button>
           </div>
         </header>
 
-        {/* Week strip */}
-        <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
-          {weekDates.map((date) => {
-            const day = byDate.get(date)
-            const kcal = day ? dayNutrients(day, ctx).calories : 0
-            const isSelected = date === selected
-            const isToday = date === new Date().toISOString().slice(0, 10)
-            return (
-              <button
-                key={date}
-                onClick={() => setSelected(date)}
-                className={`rounded-xl px-1 py-2.5 sm:p-3 text-center transition-all border ${
-                  isSelected
-                    ? 'bg-bite-500 text-white border-bite-500 shadow-xs'
-                    : 'bg-paper border-border-200 hover:border-bite-300 text-ink-900'
-                }`}
-              >
-                <div className={`text-[11px] sm:text-xs font-semibold uppercase tracking-wide ${isSelected ? 'text-bite-100' : 'text-ink-500'}`}>
+        {/* How much of it to look at. A week is the working unit; a fortnight
+            is how far ahead a shop reaches; a month is for seeing the shape of
+            it rather than the detail. */}
+        <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
+          {(Object.keys(RANGE_LABELS) as PlanRange[]).map((r) => (
+            <button
+              key={r}
+              role="tab"
+              aria-selected={range === r}
+              onClick={() => setRange(r)}
+              className={range === r ? 'tab-on' : 'tab-off'}
+            >
+              {RANGE_LABELS[r]}
+            </button>
+          ))}
+        </div>
+
+        {/* The days themselves, seven to a row however many there are. The
+            weekday letters only appear once a grid is more than one row, where
+            reading down a column is the point. */}
+        <div className="space-y-1.5 sm:space-y-2">
+          {dates.length > 7 && (
+            <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+              {dates.slice(0, 7).map((date) => (
+                <div key={date} className="text-center text-[11px] font-bold uppercase tracking-wide text-ink-500">
                   {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })}
                 </div>
-                <div className={`text-base sm:text-lg font-bold leading-tight ${isToday && !isSelected ? 'text-bite-700' : ''}`}>
-                  {new Date(date + 'T12:00:00').getDate()}
-                </div>
-                <div className={`text-[11px] sm:text-xs font-mono tabular-nums ${isSelected ? 'text-bite-100' : 'text-ink-500'}`}>
-                  {kcal > 0 ? Math.round(kcal) : '–'}
-                </div>
-              </button>
-            )
-          })}
+              ))}
+            </div>
+          )}
+          <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+            {dates.map((date) => (
+              <DayCell
+                key={date}
+                date={date}
+                kcal={(() => { const d = byDate.get(date); return d ? dayNutrients(d, ctx).calories : 0 })()}
+                selected={date === selected}
+                showWeekday={dates.length <= 7}
+                dim={range === 'month' && monthOf(date) !== anchorMonth}
+                onSelect={() => setSelected(date)}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Day totals */}
@@ -161,7 +201,8 @@ export default function Planner() {
             <strong className="font-mono">
               {plannedDays ? Math.round(weekTotal.calories / plannedDays) : 0}
             </strong>{' '}
-            kcal a day on average, across {plannedDays} planned {plannedDays === 1 ? 'day' : 'days'}.
+            kcal a day on average, across {plannedDays} planned {plannedDays === 1 ? 'day' : 'days'}
+            {range === 'week' ? ' this week' : range === 'fortnight' ? ' in this fortnight' : ' this month'}.
           </span>
         </section>
       </div>
@@ -178,7 +219,7 @@ export default function Planner() {
       {copyFrom && (
         <CopyDayDialog
           from={copyFrom}
-          dates={weekDates}
+          dates={dates}
           onClose={() => setCopyFrom(null)}
           onPick={(to) => { copyDay(copyFrom, to); setCopyFrom(null) }}
         />
@@ -327,6 +368,56 @@ function formatDate(date: string): string {
 function formatRange(dates: string[]): string {
   const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
   const first = new Date(dates[0] + 'T12:00:00').toLocaleDateString('en-GB', opts)
-  const last = new Date(dates[6] + 'T12:00:00').toLocaleDateString('en-GB', opts)
-  return `${first} – ${last}`
+  const last = new Date(dates[dates.length - 1] + 'T12:00:00').toLocaleDateString('en-GB', opts)
+  return `${first} to ${last}`
+}
+
+function formatMonth(date: string): string {
+  return new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+}
+
+/**
+ * One day in the grid.
+ *
+ * The same cell serves all three ranges. In a month it is tighter and the days
+ * belonging to the months either side are drawn quieter, since they are real
+ * days you can plan but not the ones you came to look at.
+ */
+function DayCell({
+  date, kcal, selected, showWeekday, dim, onSelect,
+}: {
+  date: string
+  kcal: number
+  selected: boolean
+  showWeekday: boolean
+  dim: boolean
+  onSelect: () => void
+}) {
+  const today = date === new Date().toISOString().slice(0, 10)
+  const d = new Date(date + 'T12:00:00')
+
+  return (
+    <button
+      onClick={onSelect}
+      aria-label={formatDate(date)}
+      aria-pressed={selected}
+      className={`rounded-xl px-1 py-2.5 sm:p-3 min-h-14 text-center transition-all border ${
+        selected
+          ? 'bg-bite-500 text-white border-bite-500 shadow-xs'
+          : 'bg-paper border-border-200 hover:border-bite-300 text-ink-900'
+      } ${dim && !selected ? 'opacity-45' : ''}`}
+    >
+      {showWeekday && (
+        <div className={`text-[11px] sm:text-xs font-semibold uppercase tracking-wide ${selected ? 'text-bite-100' : 'text-ink-500'}`}>
+          {d.toLocaleDateString('en-GB', { weekday: 'short' })}
+        </div>
+      )}
+      <div className={`text-base sm:text-lg font-bold leading-tight ${today && !selected ? 'text-bite-700' : ''}`}>
+        {d.getDate()}
+      </div>
+      <div className={`text-[11px] sm:text-xs font-mono tabular-nums ${selected ? 'text-bite-100' : 'text-ink-500'}`}>
+        {kcal > 0 ? Math.round(kcal) : ''}
+      </div>
+    </button>
+  )
 }
