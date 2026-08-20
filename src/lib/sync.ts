@@ -23,6 +23,7 @@ import { supabase } from './supabase'
 import { SCHEMA_VERSION } from '../store/persist'
 import { STORES, type StoreKey } from '../store/registry'
 import { PushQueue } from './pushQueue'
+import { mergeStore } from './merge'
 
 export type SyncState = 'off' | 'connecting' | 'live' | 'error'
 
@@ -33,6 +34,11 @@ export interface SyncSnapshot {
   unsaved: number
   /** Set when a row was written by a version of the app this one cannot read. */
   schemaMismatch: boolean
+  /**
+   * Days both of you changed since your copies last agreed. One version won;
+   * this is how the other person's loss becomes visible rather than silent.
+   */
+  conflicts: string[]
 }
 
 let applying = false
@@ -41,13 +47,14 @@ const listeners = new Set<() => void>()
 // One frozen object, replaced only when something actually changes. React's
 // useSyncExternalStore compares snapshots by identity, so returning a fresh
 // object per read would re-render forever.
-let snapshot: SyncSnapshot = { state: 'off', at: null, unsaved: 0, schemaMismatch: false }
+let snapshot: SyncSnapshot = { state: 'off', at: null, unsaved: 0, schemaMismatch: false, conflicts: [] }
 
 function announce(next: Partial<SyncSnapshot>) {
   const merged = { ...snapshot, ...next }
   if (
     merged.state === snapshot.state && merged.at === snapshot.at &&
-    merged.unsaved === snapshot.unsaved && merged.schemaMismatch === snapshot.schemaMismatch
+    merged.unsaved === snapshot.unsaved && merged.schemaMismatch === snapshot.schemaMismatch &&
+    merged.conflicts.join() === snapshot.conflicts.join()
   ) return
   snapshot = merged
   for (const fn of listeners) fn()
@@ -62,6 +69,9 @@ export function onSyncChange(fn: () => void): () => void {
   return () => listeners.delete(fn)
 }
 
+/** When the local copy and the server last agreed, per store. */
+const agreedAt = new Map<StoreKey, number>()
+
 function applyRemote(key: StoreKey, data: unknown, schema: number) {
   const store = STORES.find((s) => s.name === key)
   if (!store || typeof data !== 'object' || data === null) return
@@ -75,12 +85,26 @@ function applyRemote(key: StoreKey, data: unknown, schema: number) {
     return
   }
 
+  // Merge rather than overwrite. The week is combined a day at a time, so an
+  // edit of theirs no longer erases a different day of yours.
+  const { merged, conflicts } = mergeStore(key, store.read(), data, agreedAt.get(key))
+  agreedAt.set(key, Date.now())
+
   applying = true
   try {
-    store.write(data as object)
+    store.write(merged as object)
   } finally {
     applying = false
   }
+
+  if (conflicts.length) {
+    announce({ conflicts: [...new Set([...snapshot.conflicts, ...conflicts])] })
+  }
+}
+
+/** Dismisses the conflict notice once you have looked at the days involved. */
+export function acknowledgeConflicts(): void {
+  announce({ conflicts: [] })
 }
 
 /**
@@ -159,6 +183,10 @@ export function startSync(userId: string): () => void {
           const row = payload.new as { key?: string; data?: unknown; schema?: number; updated_by?: string }
           if (!row?.key || row.updated_by === userId) return
           applyRemote(row.key as StoreKey, row.data, row.schema ?? -1)
+          // The merge may have produced something neither side has: our days
+          // plus theirs. That result has to go back, or their device keeps a
+          // week missing ours.
+          queue.mark(row.key as StoreKey)
           announce({ state: 'live', at: new Date() })
         },
       )

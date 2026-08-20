@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { discardOlderThan, safeStorage, SCHEMA_VERSION } from './persist'
+import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import type {
   Component, DayPlan, GroceryItem, MealSlot, PlannedMeal, SourcePlan, WeekStart,
 } from '../types'
@@ -29,6 +29,16 @@ export function getWeekDates(reference: Date = new Date(), weekStartsOn: WeekSta
 
 function emptyWeek(dates: string[]): DayPlan[] {
   return dates.map((date) => ({ date, meals: [] }))
+}
+
+/**
+ * Stamps a day as changed.
+ *
+ * Every mutation goes through this, because sync merges the week a day at a
+ * time and an unstamped day cannot be compared against the other person's copy.
+ */
+function touch(day: DayPlan): DayPlan {
+  return { ...day, updatedAt: new Date().toISOString() }
 }
 
 function newId(): string {
@@ -77,8 +87,8 @@ export const useMealPlanStore = create<MealPlanStore>()(
             plan: s.plan.map((day) => {
               if (day.date !== date) return day
               const others = day.meals.filter((m) => m.slot !== slot)
-              if (!entries.length) return { ...day, meals: others }
-              return { ...day, meals: [...others, { id: newId(), slot, entries, note }] }
+              if (!entries.length) return touch({ ...day, meals: others })
+              return touch({ ...day, meals: [...others, { id: newId(), slot, entries, note }] })
             }),
           })),
 
@@ -88,25 +98,27 @@ export const useMealPlanStore = create<MealPlanStore>()(
               if (day.date !== date) return day
               const existing = day.meals.find((m) => m.slot === slot)
               if (existing) {
-                return {
+                return touch({
                   ...day,
                   meals: day.meals.map((m) =>
                     m.slot === slot ? { ...m, entries: [...m.entries, entry] } : m),
-                }
+                })
               }
-              return { ...day, meals: [...day.meals, { id: newId(), slot, entries: [entry] }] }
+              return touch({ ...day, meals: [...day.meals, { id: newId(), slot, entries: [entry] }] })
             }),
           })),
 
         removeMeal: (date, mealId) =>
           set((s) => ({
             plan: s.plan.map((day) =>
-              day.date === date ? { ...day, meals: day.meals.filter((m) => m.id !== mealId) } : day),
+              day.date === date
+                ? touch({ ...day, meals: day.meals.filter((m) => m.id !== mealId) })
+                : day),
           })),
 
         clearDay: (date) =>
           set((s) => ({
-            plan: s.plan.map((day) => (day.date === date ? { ...day, meals: [] } : day)),
+            plan: s.plan.map((day) => (day.date === date ? touch({ ...day, meals: [] }) : day)),
           })),
 
         copyDay: (fromDate, toDate) =>
@@ -114,7 +126,7 @@ export const useMealPlanStore = create<MealPlanStore>()(
             const source = s.plan.find((d) => d.date === fromDate)
             if (!source?.meals.length) return {}
             const meals: PlannedMeal[] = source.meals.map((m) => ({ ...m, id: newId() }))
-            return { plan: s.plan.map((day) => (day.date === toDate ? { ...day, meals } : day)) }
+            return { plan: s.plan.map((day) => (day.date === toDate ? touch({ ...day, meals }) : day)) }
           }),
 
         goToWeek: (reference, weekStartsOn) => {
@@ -134,13 +146,13 @@ export const useMealPlanStore = create<MealPlanStore>()(
               plan: s.weekDates.map((date) => {
                 const weekday = new Date(date + 'T12:00:00').getDay()
                 const day = byWeekday.get(weekday)
-                if (!day) return { date, meals: [] }
-                return {
+                if (!day) return touch({ date, meals: [] })
+                return touch({
                   date,
                   meals: day.meals
                     .filter((m) => m.entries.length)
                     .map((m) => ({ id: newId(), slot: m.slot, entries: m.entries, note: m.text })),
-                }
+                })
               }),
               groceryItems: [],
             }
@@ -151,7 +163,7 @@ export const useMealPlanStore = create<MealPlanStore>()(
           const imported = new Map(data.plan.map((d) => [d.date, d]))
           set({
             weekDates: dates,
-            plan: dates.map((date) => imported.get(date) ?? { date, meals: [] }),
+            plan: dates.map((date) => touch(imported.get(date) ?? { date, meals: [] })),
             groceryItems: [],
           })
         },
@@ -226,7 +238,17 @@ export const useMealPlanStore = create<MealPlanStore>()(
       name: 'bite-buddy-mealplan-v2',
       version: SCHEMA_VERSION,
       storage: safeStorage<MealPlanStore>(),
-      migrate: discardOlderThan<MealPlanStore>(SCHEMA_VERSION),
+      migrate: upgradeThrough<MealPlanStore>(SCHEMA_VERSION, {
+        // v1 → v2: days gained updatedAt. Existing days are stamped once, at
+        // the epoch, so anything either of you touches from now on wins over
+        // state that predates the merge.
+        1: (state) => ({
+          ...state,
+          plan: Array.isArray(state.plan)
+            ? state.plan.map((day) => ({ ...(day as DayPlan), updatedAt: new Date(0).toISOString() }))
+            : state.plan,
+        }),
+      }),
     },
   ),
 )
