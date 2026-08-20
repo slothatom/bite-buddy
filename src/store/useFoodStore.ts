@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
@@ -54,6 +55,8 @@ export const useFoodStore = create<FoodStore>()(
         // a field, and discarding everything else over that would cost the user
         // their foods, recipes and logs for nothing.
         1: (state) => state,
+        // v2 → v3: XP left the user profile; nothing here changed either.
+        2: (state) => state,
       }),
     },
   ),
@@ -64,11 +67,19 @@ export const useFoodStore = create<FoodStore>()(
  * hidden entries removed.
  */
 export function useFoods(): Food[] {
-  const { custom, hidden } = useFoodStore()
-  const overridden = new Set(custom.map((f) => f.id))
-  const hiddenSet = new Set(hidden)
-  return [
-    ...FOODS.filter((f) => !overridden.has(f.id) && !hiddenSet.has(f.id)),
-    ...custom,
-  ]
+  // Memoised on the two arrays it derives from. Without this the result is a
+  // new array on every render, which defeats every useMemo downstream that
+  // takes it as a dependency — including the nutrition context, which was
+  // being rebuilt on every render despite a comment saying otherwise.
+  const custom = useFoodStore((s) => s.custom)
+  const hidden = useFoodStore((s) => s.hidden)
+
+  return useMemo(() => {
+    const overridden = new Set(custom.map((f) => f.id))
+    const hiddenSet = new Set(hidden)
+    return [
+      ...FOODS.filter((f) => !overridden.has(f.id) && !hiddenSet.has(f.id)),
+      ...custom,
+    ]
+  }, [custom, hidden])
 }

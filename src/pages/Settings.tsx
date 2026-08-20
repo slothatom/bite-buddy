@@ -22,7 +22,7 @@ const WEEKDAYS: { value: WeekStart; label: string }[] = [
 ]
 
 export default function Settings() {
-  const { profile, setName, setTargets, setTdee, setWeekStart, setShowGamification, setTheme } = useUserStore()
+  const { profile, setName, setTargets, setTdee, setWeekStart, setTheme } = useUserStore()
   const ctx = useNutritionContext()
 
   const planAverage = useMemo(() => averagePlanDay(SOURCE_PLANS, ctx), [ctx])
@@ -213,16 +213,6 @@ export default function Settings() {
                 ))}
               </div>
             </div>
-
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" checked={profile.showGamification}
-                onChange={(e) => setShowGamification(e.target.checked)}
-                className="w-4 h-4 accent-bite-500" />
-              <span className="text-sm text-ink-900">
-                Show XP, levels and achievements
-                <span className="block text-xs text-ink-500">Off by default to keep the planner quiet.</span>
-              </span>
-            </label>
           </div>
         </section>
 

@@ -6,6 +6,7 @@ import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { EmptyState } from '../components/ui'
 import { flattenComponents } from '../lib/ingredients'
+import { EMPTY_CONTEXT } from '../lib/moments'
 import Zig from '../components/brand/Mascot'
 
 /**
@@ -68,7 +69,7 @@ export default function PrepMode() {
 
 function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void }) {
   const ctx = useNutritionContext()
-  const { addXp, unlockAchievement } = useUserStore()
+  const { notice } = useUserStore()
   const { updateRecipe } = useRecipeStore()
 
   // Stage 0 is the weigh-out; the written steps follow it. Keeping them in one
@@ -90,8 +91,7 @@ function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void })
 
   function finish() {
     setDone(true)
-    unlockAchievement('prep_master')
-    addXp(100, 'Prep complete')
+    notice({ ...EMPTY_CONTEXT, cookedSomething: true })
   }
 
   /** Writing the method as you cook it — it is kept on the recipe for next time. */

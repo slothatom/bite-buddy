@@ -47,6 +47,8 @@ export const useCookStore = create<CookStore>()(
         // a field, and discarding everything else over that would cost the user
         // their foods, recipes and logs for nothing.
         1: (state) => state,
+        // v2 → v3: XP left the user profile; nothing here changed either.
+        2: (state) => state,
       }),
     }
   )
