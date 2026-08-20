@@ -16,6 +16,8 @@ import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import { CalorieRing, SectionHeading } from '../components/ui'
 import { isConfigured } from '../lib/supabase'
 import Zig from '../components/brand/Mascot'
+import { MOMENTS } from '../lib/moments'
+import { useWatchForMoments } from '../store/useMoments'
 
 /**
  * The welcome screen — what you land on, before the planner.
@@ -25,6 +27,7 @@ import Zig from '../components/brand/Mascot'
  * way through to a screen that does the work.
  */
 export default function Home() {
+  useWatchForMoments()
   const { plan, weekDates } = useMealPlanStore()
   const { profile } = useUserStore()
   const ctx = useNutritionContext()
@@ -45,6 +48,8 @@ export default function Home() {
   return (
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+        <MomentNote />
 
         <header className="flex items-start gap-4">
           <Zig mood={plannedDays ? 'happy' : 'thinking'} size={58} />
@@ -176,6 +181,38 @@ export default function Home() {
           </section>
         )}
       </div>
+    </div>
+  )
+}
+
+/**
+ * One thing Zig noticed, shown once.
+ *
+ * Above the greeting so it is the first thing you see, and gone the moment you
+ * acknowledge it. There is no history to browse and no total to admire — see
+ * lib/moments.ts for why that is the point.
+ */
+function MomentNote() {
+  const { unseenMoment, markMomentSeen } = useUserStore()
+  const moment = unseenMoment()
+  if (!moment) return null
+
+  const definition = MOMENTS[moment.kind]
+  if (!definition) return null
+
+  return (
+    <div className="card p-4 flex items-start gap-3 border-bite-200 bg-bite-50">
+      <Zig mood={definition.mood} size={44} />
+      <div className="flex-1 min-w-0">
+        <p className="font-bold text-ink-900 text-sm">{definition.title}</p>
+        <p className="text-sm text-ink-700 mt-0.5">{definition.note}</p>
+      </div>
+      <button
+        className="btn-ghost shrink-0 text-ink-500"
+        onClick={() => markMomentSeen(moment.kind)}
+      >
+        Lovely
+      </button>
     </div>
   )
 }

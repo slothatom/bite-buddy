@@ -20,7 +20,7 @@ import type { PersistStorage, StorageValue } from 'zustand/middleware'
  * misinterpreted.
  */
 
-export const SCHEMA_VERSION = 2
+export const SCHEMA_VERSION = 3
 
 /** Set when a write has failed, so the UI can tell the user their data isn't saving. */
 let storageFailed: string | null = null

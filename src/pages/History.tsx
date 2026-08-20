@@ -4,6 +4,8 @@ import type { SourcePlan } from '../types'
 import { SLOT_LABELS } from '../types'
 import { SOURCE_PLANS } from '../data'
 import { useMealPlanStore } from '../store/useMealPlanStore'
+import { useUserStore } from '../store/useUserStore'
+import { EMPTY_CONTEXT } from '../lib/moments'
 import { useNutritionContext } from '../store/useNutrition'
 import { componentsNutrients } from '../lib/nutrition'
 
@@ -18,6 +20,7 @@ export default function History() {
   const [openId, setOpenId] = useState<string | null>(SOURCE_PLANS[0]?.id ?? null)
   const [loadedId, setLoadedId] = useState<string | null>(null)
   const { loadSourcePlan, weekDates } = useMealPlanStore()
+  const notice = useUserStore((s) => s.notice)
 
   const plans = useMemo(
     () => [...SOURCE_PLANS].sort((a, b) => (b.issuedOn ?? '').localeCompare(a.issuedOn ?? '')),
@@ -43,7 +46,11 @@ export default function History() {
               open={openId === plan.id}
               loaded={loadedId === plan.id}
               onToggle={() => setOpenId(openId === plan.id ? null : plan.id)}
-              onLoad={() => { loadSourcePlan(plan); setLoadedId(plan.id) }}
+              onLoad={() => {
+                loadSourcePlan(plan)
+                setLoadedId(plan.id)
+                notice({ ...EMPTY_CONTEXT, loadedFromArchive: true })
+              }}
               weekLabel={weekDates[0]}
             />
           ))}
