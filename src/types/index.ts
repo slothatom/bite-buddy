@@ -328,25 +328,42 @@ export interface GroceryItem {
 
 // ─── Weight & Body ───────────────────────────────────────────────────────────
 
+/**
+ * Body entries belong to a person, unlike everything else in this app.
+ *
+ * The week, the targets, the recipes and the grocery list are shared between
+ * the two of you on purpose — you eat the same dinners. A waist measurement is
+ * not that: pooling two people's bodies into one trend line makes a graph of
+ * nothing. `memberId` is the id of whoever it belongs to.
+ *
+ * Undefined means an entry logged before the app knew about people, or logged
+ * on a copy running with no account at all. Those show as unclaimed rather than
+ * being assigned to whoever happens to be looking.
+ */
 export interface WeightEntry {
   id: string
   date: string   // 'YYYY-MM-DD'
   weight: number
   unit: 'kg' | 'lbs'
   notes?: string
+  memberId?: string
+}
+
+/** The five, plus weight, which has its own entry type for its own history. */
+export const MEASUREMENT_KEYS = ['waist', 'hips', 'chest', 'arms', 'thighs'] as const
+export type MeasurementKey = typeof MEASUREMENT_KEYS[number]
+
+export const MEASUREMENT_LABELS: Record<MeasurementKey, string> = {
+  waist: 'Waist', hips: 'Hips', chest: 'Chest', arms: 'Arms', thighs: 'Thighs',
 }
 
 export interface BodyMeasurement {
   id: string
   date: string
-  measurements: {
-    waist?: number
-    hips?: number
-    chest?: number
-    arms?: number
-    thighs?: number
-  }
+  /** Each one optional: you measure what you measure on the day. */
+  measurements: Partial<Record<MeasurementKey, number>>
   unit: 'cm' | 'in'
+  memberId?: string
 }
 
 // ─── Targets ─────────────────────────────────────────────────────────────────
