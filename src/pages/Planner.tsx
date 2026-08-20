@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, ClipboardCopy, CalendarDays } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays } from 'lucide-react'
 import type { Component, DayPlan, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import { useMealPlanStore, getWeekDates } from '../store/useMealPlanStore'
@@ -10,7 +10,6 @@ import { componentsNutrients, dayNutrients, emptyNutrients, addNutrients } from 
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
 import { useUiStore } from '../store/useUiStore'
 import AddEntryModal from '../components/planner/AddEntryModal'
-import { dayQuickAdd, copyToClipboard } from '../lib/mfp'
 
 /**
  * The weekly planner.
@@ -26,7 +25,6 @@ export default function Planner() {
   const [selected, setSelected] = useState<string>(() => todayOrFirst(weekDates))
   const [adding, setAdding] = useState<{ date: string; slot: MealSlot } | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
   const { quickAdd, clearQuickAdd } = useUiStore()
 
   const byDate = useMemo(() => new Map(plan.map((d) => [d.date, d])), [plan])
@@ -58,17 +56,6 @@ export default function Planner() {
     ref.setDate(ref.getDate() + weeks * 7)
     goToWeek(ref, profile.weekStartsOn)
     setSelected(getWeekDates(ref, profile.weekStartsOn)[0])
-  }
-
-  async function copyDayForMfp() {
-    const perSlot = MEAL_SLOTS.map((slot) => ({
-      slot,
-      macros: componentsNutrients(
-        selectedDay.meals.filter((m) => m.slot === slot).flatMap((m) => m.entries), ctx),
-    }))
-    const ok = await copyToClipboard(dayQuickAdd(formatDate(selected), perSlot, selectedTotals))
-    setCopied(ok)
-    setTimeout(() => setCopied(false), 2200)
   }
 
   return (
@@ -139,9 +126,6 @@ export default function Planner() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-border-200">
-            <button className="btn-secondary" onClick={copyDayForMfp}>
-              <ClipboardCopy size={15} /> {copied ? 'Copied' : 'Copy for MyFitnessPal'}
-            </button>
             <button className="btn-secondary" onClick={() => setCopyFrom(selected)}>
               <Copy size={15} /> Copy day to…
             </button>

@@ -29,7 +29,8 @@ interface AuthStore {
 
   signIn: (email: string) => Promise<void>
   signOut: () => Promise<void>
-  setDisplayName: (name: string) => Promise<void>
+  /** Whether the name actually saved, so the button can tell the truth. */
+  setDisplayName: (name: string) => Promise<boolean>
   refreshMembers: () => Promise<void>
 }
 
@@ -63,9 +64,18 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
 
   setDisplayName: async (name) => {
     const user = get().user
-    if (!supabase || !user) return
-    await supabase.from('members').update({ display_name: name }).eq('id', user.id)
+    if (!supabase || !user) return false
+    // .select() matters: a row-level policy that refuses the update does not
+    // raise an error, it just changes nothing. Asking for the changed rows back
+    // is the only way to tell a save from a silent refusal.
+    const { data, error } = await supabase
+      .from('members').update({ display_name: name }).eq('id', user.id).select('id')
+    if (error || !data?.length) return false
+    // Optimistic, so the field keeps the name even if the reload is slow or the
+    // row comes back filtered by a policy.
+    set({ members: get().members.map((m) => (m.id === user.id ? { ...m, display_name: name } : m)) })
     await get().refreshMembers()
+    return true
   },
 
   refreshMembers: async () => {

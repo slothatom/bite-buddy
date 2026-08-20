@@ -209,10 +209,9 @@ export function TierBadge({ tier }: { tier: MedTier }) {
  * text, rather than italic, near-invisible grey.
  */
 export function SourceLine({
-  text, lang, truncate = false, clamp,
+  text, truncate = false, clamp,
 }: {
   text: string
-  lang?: 'ro' | 'hu'
   /** One line with an ellipsis, for dense lists where the line is a hint. */
   truncate?: boolean
   /** Up to this many lines, for places where the original wording is the point. */
@@ -220,16 +219,7 @@ export function SourceLine({
 }) {
   const wrap = clamp ? (clamp === 2 ? 'line-clamp-2' : 'line-clamp-3') : truncate ? 'truncate' : ''
   return (
-    <span className="flex items-start gap-1.5 text-[13px] text-ink-500 min-w-0">
-      {lang && (
-        <span className="shrink-0 mt-px px-1 py-0.5 rounded bg-border-100 text-[11px] font-extrabold tracking-wide text-ink-700 uppercase">
-          {lang}
-        </span>
-      )}
-      {/* min-w-0: without it this flex child refuses to shrink past the
-          badge's width and the text overflows instead of wrapping. */}
-      <span className={`min-w-0 ${wrap}`}>{text}</span>
-    </span>
+    <span className={`block text-[13px] text-ink-500 min-w-0 ${wrap}`}>{text}</span>
   )
 }
 
