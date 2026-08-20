@@ -144,11 +144,11 @@ function RecipeDetail({ recipe, onClose }: { recipe: Recipe; onClose: () => void
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
       <div
-        className="bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
+        className="bg-paper w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="sticky top-0 bg-white flex items-start justify-between gap-3 px-5 py-4 border-b border-border-200">
+        <header className="sticky top-0 bg-paper flex items-start justify-between gap-3 px-5 py-4 border-b border-border-200">
           <div className="flex items-start gap-3 min-w-0">
             <span className="text-2xl leading-none">{recipe.emoji}</span>
             <div className="min-w-0">

@@ -60,6 +60,13 @@ grounds, warm ink text.
 everything else. Both bundled, not fetched from a CDN, so the app looks the same
 offline.
 
+**Dark mode** is eight neutral tokens redefined, plus the accent steps used as
+text — a mid-tone that reads on cream is unreadable on near-black. Three states,
+not two: an explicit choice sets `data-theme`, and the default follows the
+device. An end-to-end check walks every screen in dark mode and fails on any
+text whose contrast against its actual painted background collapses, which is
+what a surface missing from the dark palette looks like.
+
 **Status is never hue alone.** `src/lib/status.ts` returns a label, a symbol and
 a signed delta alongside the colour level, and every consumer renders at least
 one of them: bars show `+ Slightly over · +42 g`, and the target sits on the bar
@@ -99,8 +106,9 @@ Macros are always derived from components, never stored, so they can't drift out
 
 ### Foods
 122 foods with per-100 g nutrition, each carrying EN/RO/HU names and a Mediterranean tier
-(daily / weekly / moderation / rarely). Add your own by hand or by USDA / Open Food Facts
-lookup — the barcode scanner is still there for packaged goods.
+(daily / weekly / moderation / rarely). Add your own by hand, by USDA / Open Food Facts
+lookup, or by scanning a barcode. A lookup that fails says why — rate-limited, offline, or
+the service being down — rather than reporting "no results" for a food the database has.
 
 ### History
 All 14 plans as a browsable archive with the original Romanian and Hungarian preserved
@@ -122,8 +130,11 @@ Weekly calories against target, Mediterranean serving goals (≥3 veg/day, ≥3 
 and a weight log.
 
 ### Prep & Schedule
-Step-by-step cooking with timers, and batch-cook sessions — because the plans deliberately
-repeat a dish across several days.
+A cook session starts with a weigh-out derived from the recipe's components — nested recipes
+resolved, duplicates merged — because the dietician wrote portions, not instructions. Any
+written method follows, and you can add steps as you cook; they're saved onto the recipe for
+whoever cooks it next. Batch-cook sessions group dishes, since the plans deliberately repeat
+one across several days.
 
 ---
 

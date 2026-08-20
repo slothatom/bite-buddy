@@ -112,7 +112,7 @@ export default function Planner() {
                 className={`rounded-xl px-1 py-2.5 sm:p-3 text-center transition-all border ${
                   isSelected
                     ? 'bg-bite-500 text-white border-bite-500 shadow-xs'
-                    : 'bg-white border-border-200 hover:border-bite-300 text-ink-900'
+                    : 'bg-paper border-border-200 hover:border-bite-300 text-ink-900'
                 }`}
               >
                 <div className={`text-[11px] sm:text-xs font-semibold uppercase tracking-wide ${isSelected ? 'text-bite-100' : 'text-ink-500'}`}>
@@ -298,7 +298,7 @@ function CopyDayDialog({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 backdrop-blur-xs p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl p-5 w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-paper rounded-2xl p-5 w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
         <h3 className="font-bold text-ink-900 mb-1">Copy {formatDate(from)}</h3>
         <p className="text-sm text-ink-700 mb-4">Pick the day to copy these meals into.</p>
         <div className="space-y-1">

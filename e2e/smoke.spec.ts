@@ -116,6 +116,56 @@ test.describe('layout', () => {
   })
 })
 
+test.describe('dark mode', () => {
+  test.use({ colorScheme: 'dark' })
+
+  test('every screen inverts, and nothing keeps a light-mode colour', async ({ page }) => {
+    await goto(page, '/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    for (const route of ROUTES) {
+      await goto(page, route)
+
+      // The classic failure is a surface whose colour is only defined in the
+      // light palette, leaving light text on a light card.
+      const problems = await page.evaluate(() => {
+        const luminance = (colour: string) => {
+          const [r, g, b] = (colour.match(/\d+/g) ?? ['255', '255', '255']).map(Number)
+          return (0.299 * r + 0.587 * g + 0.114 * b) / 255
+        }
+        const found: string[] = []
+
+        const body = getComputedStyle(document.body).backgroundColor
+        if (luminance(body) > 0.5) found.push(`body background is light: ${body}`)
+
+        for (const el of document.querySelectorAll('*')) {
+          if (!(el instanceof HTMLElement) || !el.textContent?.trim()) continue
+          if (el.children.length) continue
+          const style = getComputedStyle(el)
+          const box = el.getBoundingClientRect()
+          if (!box.width || !box.height) continue
+
+          // Walk up for the nearest painted background.
+          let node: HTMLElement | null = el
+          let background = 'rgba(0, 0, 0, 0)'
+          while (node) {
+            const bg = getComputedStyle(node).backgroundColor
+            if (bg && !bg.startsWith('rgba(0, 0, 0, 0)')) { background = bg; break }
+            node = node.parentElement
+          }
+          const contrast = Math.abs(luminance(style.color) - luminance(background))
+          if (contrast < 0.15) {
+            found.push(`"${el.textContent.trim().slice(0, 24)}" is ${style.color} on ${background}`)
+          }
+        }
+        return [...new Set(found)].slice(0, 5)
+      })
+
+      expect(problems, `${route} has unreadable text in dark mode`).toEqual([])
+    }
+  })
+})
+
 test.describe('the main flow', () => {
   test('load a dietician week, then build a grocery list from it', async ({ page }) => {
     const errors = trackErrors(page)
@@ -154,6 +204,35 @@ test.describe('the main flow', () => {
     const first = page.locator('.card button').nth(1)
     await first.click()
     await expect(page.getByText('How your dietician wrote it')).toBeVisible()
+  })
+
+  test('every screen that lists things actually lists something', async ({ page }) => {
+    // Prep and Schedule both filtered their lists on recipes having a written
+    // method. Not one of the 275 does — the dietician wrote portions, not
+    // instructions — so both screens shipped permanently empty and rendered
+    // fine while doing it. Nothing caught that, because "renders without
+    // errors" is exactly what an empty state does.
+    await goto(page, '/prep')
+    await expect(page.getByText('Nothing to cook yet')).toHaveCount(0)
+    const cookable = await page.locator('.card').count()
+    expect(cookable, 'Prep offers no recipes to cook').toBeGreaterThan(10)
+
+    await goto(page, '/schedule')
+    await page.getByRole('button', { name: /Session/ }).click()
+    const pickable = await page.locator('input[type=checkbox]').count()
+    expect(pickable, 'Schedule offers no recipes to batch').toBeGreaterThan(10)
+  })
+
+  test('a prep session weighs the ingredients out', async ({ page }) => {
+    await goto(page, '/prep')
+    await page.locator('.card').first().click()
+
+    // The weigh-out is derived from components, so it works for recipes that
+    // have no method written at all.
+    await expect(page.getByText('Weigh everything out')).toBeVisible()
+    const rows = await page.locator('input[type=checkbox]').count()
+    expect(rows, 'weigh-out is empty').toBeGreaterThan(0)
+    await expect(page.locator('text=/\\d+ g/').first()).toBeVisible()
   })
 
   test('targets can be taken from the plan history', async ({ page }) => {
