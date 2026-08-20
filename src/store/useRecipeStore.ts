@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
-import { planMerge, planUnmerge, mergedIntoRecipe } from '../lib/mergeRecipes'
+import { planMerge, planUnmerge, foldedInto } from '../lib/mergeRecipes'
 import type { Recipe } from '../types'
 import { ALL_RECIPES } from '../data'
 
@@ -195,5 +195,5 @@ export function useDeletedRecipes(): Recipe[] {
 /** What was folded into this recipe, for showing an undo next to it. */
 export function useMergedInto(winnerId: string): string[] {
   const mergedInto = useRecipeStore((s) => s.mergedInto)
-  return useMemo(() => mergedIntoRecipe(mergedInto, winnerId), [mergedInto, winnerId])
+  return useMemo(() => foldedInto(mergedInto, winnerId), [mergedInto, winnerId])
 }

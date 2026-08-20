@@ -127,19 +127,38 @@ export function baseName(name: string): string {
 export interface RecipeVariants {
   /** The name with the generator's numbering taken off. */
   name: string
-  /** Always at least one, in the order they were given. */
+  /**
+   * Always at least one. The first is what the card shows and what opens when
+   * you tap it, so it is chosen rather than left to the order they arrived in.
+   */
   variants: Recipe[]
 }
 
+/**
+ * The version that speaks for the group.
+ *
+ * One with the dietician's own line first. The card shows that line, and a
+ * shelf holding two of a dish would show it while tapping through opened a
+ * third version from elsewhere in the library that had no line at all, so the
+ * provenance visibly disappeared between the card and the recipe. Whether a
+ * version carries its source line is a property of the version, not of which
+ * shelf you came from, so picking on that makes the two agree.
+ */
+function leadFirst(variants: Recipe[]): Recipe[] {
+  const lead = variants.findIndex((r) => r.sourceLine)
+  if (lead <= 0) return variants
+  return [variants[lead], ...variants.filter((_, i) => i !== lead)]
+}
+
 export function groupVariants(recipes: Recipe[]): RecipeVariants[] {
-  const byName = new Map<string, RecipeVariants>()
+  const byName = new Map<string, Recipe[]>()
 
   for (const recipe of recipes) {
     const name = baseName(recipe.name.en)
     const existing = byName.get(name)
-    if (existing) existing.variants.push(recipe)
-    else byName.set(name, { name, variants: [recipe] })
+    if (existing) existing.push(recipe)
+    else byName.set(name, [recipe])
   }
 
-  return [...byName.values()]
+  return [...byName].map(([name, variants]) => ({ name, variants: leadFirst(variants) }))
 }

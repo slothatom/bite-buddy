@@ -111,8 +111,45 @@ describe('mergeStore', () => {
     expect((mergeStore('bite-buddy-mealplan-v2', local, remote).merged as typeof local).plan[0].meals)
       .toEqual([meal('mine')])
 
-    expect(mergeStore('bite-buddy-foods-v2', { custom: ['mine'] }, { custom: ['theirs'] }).merged)
-      .toEqual({ custom: ['theirs'] })
+    expect(mergeStore('bite-buddy-cook', { sessions: ['mine'] }, { sessions: ['theirs'] }).merged)
+      .toEqual({ sessions: ['theirs'] })
+  })
+
+  it('keeps a merge made on one phone when the other pushes its copy', () => {
+    // The reported one. Folding fourteen weeks of duplicates together is a job
+    // you do once, and taking the remote copy wholesale undid it every time
+    // the other device synced.
+    const local = { custom: [], hidden: [], mergedInto: { 'food-2': 'food-1' } }
+    const remote = { custom: [], hidden: [], mergedInto: {} }
+
+    expect((mergeStore('bite-buddy-foods-v2', local, remote).merged as typeof local).mergedInto)
+      .toEqual({ 'food-2': 'food-1' })
+  })
+
+  it('keeps both sides of a library rather than one', () => {
+    const local = {
+      custom: [{ id: 'mine', names: { en: 'Kefir' } }],
+      hidden: ['food-a'],
+      mergedInto: { x: 'y' },
+    }
+    const remote = {
+      custom: [{ id: 'theirs', names: { en: 'Skyr' } }],
+      hidden: ['food-b'],
+      mergedInto: { p: 'q' },
+    }
+
+    const merged = mergeStore('bite-buddy-recipes-v2', local, remote).merged as typeof local
+    expect(merged.custom.map((f) => f.id).sort()).toEqual(['mine', 'theirs'])
+    expect([...merged.hidden].sort()).toEqual(['food-a', 'food-b'])
+    expect(merged.mergedInto).toEqual({ x: 'y', p: 'q' })
+  })
+
+  it('lets this device win when both edited the same entry', () => {
+    const local = { custom: [{ id: 'r1', name: 'mine' }] }
+    const remote = { custom: [{ id: 'r1', name: 'theirs' }] }
+
+    const merged = mergeStore('bite-buddy-recipes-v2', local, remote).merged as typeof local
+    expect(merged.custom).toEqual([{ id: 'r1', name: 'mine' }])
   })
 
   it('falls back to the remote copy for anything that is not an object', () => {
