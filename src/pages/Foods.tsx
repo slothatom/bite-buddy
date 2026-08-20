@@ -5,6 +5,7 @@ import { useFoods, useFoodStore } from '../store/useFoodStore'
 import { searchFoods, buildFoodIndex } from '../lib/foodSearch'
 import { TierBadge, EmptyState, SourceLine, ChipRow } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS, CATEGORY_ORDER } from '../lib/categories'
+import FoodEditor from '../components/foods/FoodEditor'
 import { saltFromSodium } from '../lib/nutrition'
 import {
   searchFoods as lookupOnline, lookupBarcode,
@@ -26,6 +27,7 @@ export default function Foods() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<MedCategory | null>(null)
   const [adding, setAdding] = useState(false)
+  const [editing, setEditing] = useState<Food | null>(null)
 
   const index = useMemo(() => buildFoodIndex(foods), [foods])
 
@@ -100,14 +102,18 @@ export default function Foods() {
                   // One row on a wide screen. On a phone the tier badge and the
                   // 112px figures column left the name 85px of 356, so they drop
                   // to their own line and the name gets the width instead.
-                  <div key={f.id} className="flex flex-col gap-1 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-3 md:py-2">
+                  <button
+                    key={f.id}
+                    onClick={() => setEditing(f)}
+                    aria-label={`Edit ${f.names.en}`}
+                    className="w-full text-left flex flex-col gap-1 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-3 md:py-2 hover:bg-cream-50 transition-colors"
+                  >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-ink-900">{f.names.en}</p>
                       {f.names.ro || f.names.hu ? (
                         <SourceLine
                           text={[f.names.ro, f.names.hu].filter(Boolean).join(' · ')
                             + (f.state !== 'as-sold' ? ` · weighed ${f.state}` : '')}
-                          lang={f.names.ro ? 'ro' : 'hu'}
                           clamp={2}
                         />
                       ) : null}
@@ -123,7 +129,7 @@ export default function Foods() {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </section>
@@ -132,6 +138,8 @@ export default function Foods() {
       </div>
 
       {adding && <AddFoodModal onClose={() => setAdding(false)} />}
+
+      {editing && <FoodEditor food={editing} onClose={() => setEditing(null)} />}
     </div>
   )
 }

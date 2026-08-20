@@ -598,6 +598,63 @@ test.describe('building a recipe from the food database', () => {
   })
 })
 
+test.describe('the food library', () => {
+  test('a food can be edited, and the edit sticks', async ({ page }) => {
+    await goto(page, '/foods')
+    await page.getByPlaceholder(/Search/).first().fill('asparagus')
+    await page.getByRole('button', { name: /^Edit / }).first().click()
+
+    await expect(page.getByLabel('Food name')).toHaveValue('Asparagus')
+    await page.getByLabel('Food name').fill('Asparagus spears')
+    await page.getByRole('button', { name: 'Save changes' }).click()
+
+    await expect(page.getByText('Asparagus spears')).toBeVisible()
+  })
+
+  test('the name line no longer claims a language it is not', async ({ page }) => {
+    // It joined the Romanian name, the Hungarian name and the weighing state
+    // into one string and labelled the lot "RO".
+    await goto(page, '/foods')
+    await page.getByPlaceholder(/Search/).first().fill('asparagus')
+
+    await expect(page.getByText('sparanghel · spárga', { exact: false })).toBeVisible()
+    await expect(page.locator('text=/^RO$/')).toHaveCount(0)
+  })
+
+  test('deleting a food leaves the recipes that use it intact', async ({ page }) => {
+    // A food is named by every recipe containing it, and directly by the snack
+    // lines in a plan. Destroying it would blank them all at once.
+    await goto(page, '/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/plan')
+    const before = await page.locator('text=/\\d+ of 7 days planned/').first().textContent()
+
+    await goto(page, '/foods')
+    await page.getByPlaceholder(/Search/).first().fill('olive oil')
+    await page.getByRole('button', { name: /^Edit / }).first().click()
+    await page.getByRole('button', { name: /Delete this food/ }).click()
+    await expect(page.getByText(/Delete “Extra virgin olive oil”\?/)).toBeVisible()
+    await expect(page.getByText(/nothing you have already eaten is affected/i)).toBeVisible()
+    await page.getByRole('button', { name: 'Yes, delete' }).click()
+
+    // Gone from the library…
+    await page.getByPlaceholder(/Search/).first().fill('olive oil')
+    await expect(page.getByRole('button', { name: /^Edit Extra virgin olive oil/ })).toHaveCount(0)
+
+    // …and the week is untouched.
+    await goto(page, '/plan')
+    expect(await page.locator('text=/\\d+ of 7 days planned/').first().textContent()).toBe(before)
+
+    // And it can be put back.
+    await goto(page, '/settings')
+    await expect(page.getByText('Deleted foods')).toBeVisible()
+    await page.getByRole('button', { name: 'Restore' }).first().click()
+    await goto(page, '/foods')
+    await page.getByPlaceholder(/Search/).first().fill('olive oil')
+    await expect(page.getByRole('button', { name: /^Edit Extra virgin olive oil/ })).toBeVisible()
+  })
+})
+
 test.describe('finding an ingredient', () => {
   test('one search covers your foods, your recipes and the open databases', async ({ page }) => {
     await goto(page, '/recipes')

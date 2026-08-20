@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { buildContext, type NutritionContext } from '../lib/nutrition'
 import { buildFoodIndex, type FoodIndex } from '../lib/foodSearch'
-import { useFoods } from './useFoodStore'
+import { useFoods, useResolvableFoods } from './useFoodStore'
 import { useResolvableRecipes, useRecipeStore } from './useRecipeStore'
 
 /**
@@ -12,7 +12,9 @@ import { useResolvableRecipes, useRecipeStore } from './useRecipeStore'
  * on the weekly planner where totals are computed for 35 meal slots at once.
  */
 export function useNutritionContext(): NutritionContext {
-  const foods = useFoods()
+  // Deleted foods included: a snack line names a food by id, and losing the
+  // food would blank the day the same way losing a recipe did.
+  const foods = useResolvableFoods()
   // Everything a saved plan might name, including recipes you have deleted: a
   // day planned in March stores an id, and losing the recipe must not blank it.
   const recipes = useResolvableRecipes()
