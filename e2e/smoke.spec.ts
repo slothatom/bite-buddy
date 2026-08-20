@@ -156,6 +156,35 @@ test.describe('the main flow', () => {
     await expect(page.getByText('How your dietician wrote it')).toBeVisible()
   })
 
+  test('every screen that lists things actually lists something', async ({ page }) => {
+    // Prep and Schedule both filtered their lists on recipes having a written
+    // method. Not one of the 275 does — the dietician wrote portions, not
+    // instructions — so both screens shipped permanently empty and rendered
+    // fine while doing it. Nothing caught that, because "renders without
+    // errors" is exactly what an empty state does.
+    await goto(page, '/prep')
+    await expect(page.getByText('Nothing to cook yet')).toHaveCount(0)
+    const cookable = await page.locator('.card').count()
+    expect(cookable, 'Prep offers no recipes to cook').toBeGreaterThan(10)
+
+    await goto(page, '/schedule')
+    await page.getByRole('button', { name: /Session/ }).click()
+    const pickable = await page.locator('input[type=checkbox]').count()
+    expect(pickable, 'Schedule offers no recipes to batch').toBeGreaterThan(10)
+  })
+
+  test('a prep session weighs the ingredients out', async ({ page }) => {
+    await goto(page, '/prep')
+    await page.locator('.card').first().click()
+
+    // The weigh-out is derived from components, so it works for recipes that
+    // have no method written at all.
+    await expect(page.getByText('Weigh everything out')).toBeVisible()
+    const rows = await page.locator('input[type=checkbox]').count()
+    expect(rows, 'weigh-out is empty').toBeGreaterThan(0)
+    await expect(page.locator('text=/\\d+ g/').first()).toBeVisible()
+  })
+
   test('targets can be taken from the plan history', async ({ page }) => {
     await goto(page, '/settings')
     await expect(page.getByText(/Averaged over \d+ full days/)).toBeVisible()

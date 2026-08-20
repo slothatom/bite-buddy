@@ -1,24 +1,31 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Play, Pause, RotateCcw, Check, ChevronLeft } from 'lucide-react'
+import { Play, Pause, RotateCcw, Check, ChevronLeft, Plus } from 'lucide-react'
 import type { Recipe } from '../types'
-import { useRecipes } from '../store/useRecipeStore'
+import { useRecipes, useRecipeStore } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { EmptyState } from '../components/ui'
+import { flattenComponents } from '../lib/ingredients'
+import Zig from '../components/brand/Mascot'
 
 /**
- * Step-by-step cooking, with a timer on the steps that need one.
+ * Cooking, one thing at a time.
  *
- * Only recipes that actually carry a method are offered: the meals imported
- * from the plans have components but no steps, so walking through them would
- * be an empty screen.
+ * This screen used to offer only recipes carrying a written method — and since
+ * the dietician wrote portions rather than instructions, not one of the 275 has
+ * any, so it was permanently empty.
+ *
+ * What every recipe does have is components, and the part of cooking those
+ * describe is real work: getting the right weight of the right things out
+ * before you start. So a session is the weigh-out first, then whatever method
+ * has been written, and you can write that method yourself as you go.
  */
 export default function PrepMode() {
   const recipes = useRecipes()
   const [active, setActive] = useState<Recipe | null>(null)
 
   const cookable = useMemo(
-    () => recipes.filter((r) => r.steps.length > 0).sort((a, b) => a.name.en.localeCompare(b.name.en)),
+    () => recipes.filter((r) => r.components.length > 0).sort((a, b) => a.name.en.localeCompare(b.name.en)),
     [recipes],
   )
 
@@ -33,7 +40,9 @@ export default function PrepMode() {
         </header>
 
         {cookable.length === 0 ? (
-          <EmptyState title="No recipes with a method yet" />
+          <EmptyState title="Nothing to cook yet">
+            Add a recipe and it will show up here.
+          </EmptyState>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {cookable.map((r) => (
@@ -43,7 +52,9 @@ export default function PrepMode() {
                 <span className="flex-1 min-w-0">
                   <span className="block font-semibold text-ink-900 text-sm">{r.name.en}</span>
                   <span className="block text-xs text-ink-500">
-                    {r.steps.length} steps · {r.prepMinutes + r.cookMinutes} min
+                    {r.components.length} {r.components.length === 1 ? 'ingredient' : 'ingredients'}
+                    {r.steps.length > 0 && ` · ${r.steps.length} steps`}
+                    {r.prepMinutes + r.cookMinutes > 0 && ` · ${r.prepMinutes + r.cookMinutes} min`}
                   </span>
                 </span>
               </button>
@@ -58,11 +69,24 @@ export default function PrepMode() {
 function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void }) {
   const ctx = useNutritionContext()
   const { addXp, unlockAchievement } = useUserStore()
-  const [index, setIndex] = useState(0)
-  const [done, setDone] = useState(false)
+  const { updateRecipe } = useRecipeStore()
 
-  const step = recipe.steps[index]
-  const isLast = index === recipe.steps.length - 1
+  // Stage 0 is the weigh-out; the written steps follow it. Keeping them in one
+  // index means one progress bar and one Back button for the whole session.
+  const [index, setIndex] = useState(0)
+  const [weighed, setWeighed] = useState<Set<string>>(new Set())
+  const [done, setDone] = useState(false)
+  const [newStep, setNewStep] = useState('')
+
+  const ingredients = useMemo(
+    () => flattenComponents(recipe.components, ctx),
+    [recipe, ctx],
+  )
+
+  const total = recipe.steps.length + 1
+  const onWeighOut = index === 0
+  const step = onWeighOut ? null : recipe.steps[index - 1]
+  const isLast = index === total - 1
 
   function finish() {
     setDone(true)
@@ -70,14 +94,24 @@ function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void })
     addXp(100, 'Prep complete')
   }
 
+  /** Writing the method as you cook it — it is kept on the recipe for next time. */
+  function addStep() {
+    const instruction = newStep.trim()
+    if (!instruction) return
+    updateRecipe(recipe.id, {
+      steps: [...recipe.steps, { id: `${Date.now()}`, instruction, timerSeconds: 0 }],
+    })
+    setNewStep('')
+  }
+
   if (done) {
     return (
       <div className="flex-1 grid place-items-center px-6 pb-24">
         <div className="text-center max-w-sm">
-          <div className="text-5xl mb-4">🎉</div>
-          <h2 className="display text-lg text-ink-900">{recipe.name.en} is done</h2>
+          <Zig mood="celebrate" size={84} />
+          <h2 className="display text-lg text-ink-900 mt-3">{recipe.name.en} is done</h2>
           <p className="text-sm text-ink-700 mt-1 mb-6">Makes {recipe.servings} servings.</p>
-          <button className="btn-primary w-full" onClick={onExit}>Cook something else</button>
+          <button className="btn-primary w-full justify-center" onClick={onExit}>Cook something else</button>
         </div>
       </div>
     )
@@ -90,43 +124,81 @@ function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void })
 
         <header>
           <h1 className="text-xl font-extrabold text-ink-900">{recipe.emoji} {recipe.name.en}</h1>
-          <p className="text-sm text-ink-700">Step {index + 1} of {recipe.steps.length}</p>
+          <p className="text-sm text-ink-700">
+            {onWeighOut ? 'Weigh everything out' : `Step ${index} of ${recipe.steps.length}`}
+          </p>
           <div className="h-1.5 rounded-full bg-border-100 overflow-hidden mt-2">
             <div className="h-full bg-teal-500 rounded-full transition-all duration-300"
-              style={{ width: `${((index + 1) / recipe.steps.length) * 100}%` }} />
+              style={{ width: `${((index + 1) / total) * 100}%` }} />
           </div>
         </header>
 
-        <div className="card p-6">
-          <p className="text-lg text-ink-900 leading-relaxed">{step.instruction}</p>
-          {step.timerSeconds > 0 && <StepTimer key={step.id} seconds={step.timerSeconds} />}
-        </div>
+        {onWeighOut ? (
+          <div className="card divide-y divide-border-100">
+            {ingredients.map((ing) => {
+              const checked = weighed.has(ing.foodId)
+              return (
+                <label key={ing.foodId} className="flex items-center gap-3 px-4 py-3 cursor-pointer">
+                  <input
+                    type="checkbox" className="w-5 h-5 accent-bite-500 shrink-0"
+                    checked={checked}
+                    onChange={() => setWeighed((prev) => {
+                      const next = new Set(prev)
+                      if (checked) next.delete(ing.foodId); else next.add(ing.foodId)
+                      return next
+                    })}
+                  />
+                  <span className={`flex-1 min-w-0 text-sm ${checked ? 'line-through text-ink-500' : 'text-ink-900'}`}>
+                    {ing.food.names.en}
+                    {ing.food.state !== 'as-sold' && (
+                      <span className="ml-2 text-xs text-ink-500">weighed {ing.food.state}</span>
+                    )}
+                  </span>
+                  <span className="shrink-0 font-mono text-sm font-bold text-ink-900 tabular-nums">
+                    {Math.round(ing.grams)} g
+                  </span>
+                </label>
+              )
+            })}
+            {!ingredients.length && (
+              <p className="px-4 py-3 text-sm text-ink-500">This recipe has no ingredients listed.</p>
+            )}
+          </div>
+        ) : (
+          <div className="card p-6">
+            <p className="text-lg text-ink-900 leading-relaxed">{step?.instruction}</p>
+            {step && step.timerSeconds > 0 && <StepTimer key={step.id} seconds={step.timerSeconds} />}
+          </div>
+        )}
 
         <div className="flex gap-2">
           <button className="btn-secondary flex-1" disabled={index === 0} onClick={() => setIndex(index - 1)}>
             Back
           </button>
           <button className="btn-primary flex-1" onClick={() => (isLast ? finish() : setIndex(index + 1))}>
-            {isLast ? <><Check size={16} /> Finish</> : 'Next step'}
+            {isLast ? <><Check size={16} /> Finish</> : onWeighOut && recipe.steps.length ? 'Start cooking' : 'Next'}
           </button>
         </div>
 
-        <details className="card p-4">
-          <summary className="text-sm font-semibold text-ink-900 cursor-pointer">Ingredients</summary>
-          <ul className="mt-3 space-y-1">
-            {recipe.components.map((c, i) => (
-              <li key={i} className="flex justify-between text-sm text-ink-700">
-                <span>
-                  {c.kind === 'food'
-                    ? ctx.foods.get(c.foodId)?.names.en ?? c.foodId
-                    : ctx.recipes.get(c.recipeId)?.name.en ?? c.recipeId}
-                </span>
-                <span className="font-mono text-ink-500">
-                  {c.kind === 'food' ? `${Math.round(c.grams)} g` : `${c.servings}×`}
-                </span>
-              </li>
-            ))}
-          </ul>
+        {/* The dietician wrote portions, not method. This is where the method
+            gets written — once, by whoever cooks it first. */}
+        <details className="card p-4" open={!recipe.steps.length}>
+          <summary className="text-sm font-semibold text-ink-900 cursor-pointer">
+            {recipe.steps.length ? 'Add another step' : 'No method written yet — add one'}
+          </summary>
+          <div className="flex gap-2 mt-3">
+            <input
+              className="input" placeholder="e.g. Soften the onion in oil for 5 minutes"
+              value={newStep} onChange={(e) => setNewStep(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') addStep() }}
+            />
+            <button className="btn-secondary shrink-0" disabled={!newStep.trim()} onClick={addStep}>
+              <Plus size={15} /> Add
+            </button>
+          </div>
+          <p className="text-xs text-ink-500 mt-2">
+            Saved on the recipe, so it's there the next time either of you cooks it.
+          </p>
         </details>
       </div>
     </div>
