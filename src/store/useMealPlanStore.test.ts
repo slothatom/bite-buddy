@@ -95,3 +95,72 @@ describe('planning beyond the week on screen', () => {
       .toHaveLength(1)
   })
 })
+
+describe('rearranging a week', () => {
+  /** A clean plan with one meal, so each test starts from the same place. */
+  function planWith(): { date: string; mealId: string } {
+    useMealPlanStore.setState({ plan: [] })
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-10T12:00:00'), 1)
+    store.addEntry('2026-08-12', 'lunch', { kind: 'food', foodId: 'food-apple', grams: 150 })
+    const day = useMealPlanStore.getState().plan.find((d) => d.date === '2026-08-12')!
+    return { date: '2026-08-12', mealId: day.meals[0].id }
+  }
+
+  function mealsOn(date: string) {
+    return useMealPlanStore.getState().plan.find((d) => d.date === date)?.meals ?? []
+  }
+
+  it('moves a meal to another day, leaving nothing behind', () => {
+    const { date, mealId } = planWith()
+    useMealPlanStore.getState().moveMeal(date, mealId, '2026-08-13')
+
+    expect(mealsOn('2026-08-12')).toHaveLength(0)
+    expect(mealsOn('2026-08-13')).toHaveLength(1)
+    expect(mealsOn('2026-08-13')[0].slot).toBe('lunch')
+  })
+
+  it('moves a meal to another slot on the same day', () => {
+    const { date, mealId } = planWith()
+    useMealPlanStore.getState().moveMeal(date, mealId, date, 'dinner')
+
+    expect(mealsOn(date)).toHaveLength(1)
+    expect(mealsOn(date)[0].slot).toBe('dinner')
+  })
+
+  it('duplicates a meal without the two becoming one', () => {
+    // Sharing an id would mean removing the copy removed the original too.
+    const { date, mealId } = planWith()
+    useMealPlanStore.getState().duplicateMeal(date, mealId, '2026-08-14', 'dinner')
+
+    expect(mealsOn(date)).toHaveLength(1)
+    expect(mealsOn('2026-08-14')).toHaveLength(1)
+    expect(mealsOn('2026-08-14')[0].id).not.toBe(mealId)
+
+    useMealPlanStore.getState().removeMeal('2026-08-14', mealsOn('2026-08-14')[0].id)
+    expect(mealsOn(date)).toHaveLength(1)
+  })
+
+  it('swaps two meals, each taking the other slot as well as the other day', () => {
+    const { date, mealId } = planWith()
+    const store = useMealPlanStore.getState()
+    store.addEntry('2026-08-14', 'dinner', { kind: 'food', foodId: 'food-banana', grams: 120 })
+    const other = mealsOn('2026-08-14')[0]
+
+    store.swapMeals({ date, mealId }, { date: '2026-08-14', mealId: other.id })
+
+    const lunch = mealsOn(date)[0]
+    const dinner = mealsOn('2026-08-14')[0]
+    expect(lunch.slot).toBe('lunch')
+    expect(dinner.slot).toBe('dinner')
+    expect(lunch.entries).toEqual(other.entries)
+    expect(dinner.entries).toEqual([{ kind: 'food', foodId: 'food-apple', grams: 150 }])
+  })
+
+  it('does nothing when the meal is not there', () => {
+    const { date } = planWith()
+    const before = JSON.stringify(useMealPlanStore.getState().plan)
+    useMealPlanStore.getState().moveMeal(date, 'no-such-meal', '2026-08-13')
+    expect(JSON.stringify(useMealPlanStore.getState().plan)).toBe(before)
+  })
+})

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays, MoveRight } from 'lucide-react'
 import type { Component, DayPlan, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import {
@@ -17,18 +17,24 @@ import AddEntryModal from '../components/planner/AddEntryModal'
 /**
  * The weekly planner.
  *
- * The grid runs from the user's chosen week start, Wednesday by default,
- * matching how every one of the dietician's plans is laid out.
+ * The grid runs from the user's chosen week start, Monday by default, and any
+ * of the seven days is allowed. The dietician's own plans all ran Wednesday to
+ * Tuesday, and loading one lines its days up by weekday rather than forcing the
+ * week to start where the document did.
  */
 export default function Planner() {
   const { profile } = useUserStore()
-  const { weekDates, plan, goToWeek, addEntry, removeMeal, clearDay, copyDay } = useMealPlanStore()
+  const {
+    weekDates, plan, goToWeek, addEntry, removeMeal, clearDay, copyDay,
+    moveMeal, duplicateMeal,
+  } = useMealPlanStore()
   const ctx = useNutritionContext()
 
   const [range, setRange] = useState<PlanRange>('week')
   const [selected, setSelected] = useState<string>(() => todayOrFirst(weekDates))
   const [adding, setAdding] = useState<{ date: string; slot: MealSlot } | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
+  const [moving, setMoving] = useState<{ date: string; mealId: string } | null>(null)
   const { quickAdd, clearQuickAdd } = useUiStore()
 
   const byDate = useMemo(() => new Map(plan.map((d) => [d.date, d])), [plan])
@@ -188,6 +194,7 @@ export default function Planner() {
                 day={selectedDay}
                 onAdd={() => setAdding({ date: selected, slot })}
                 onRemove={(mealId) => removeMeal(selected, mealId)}
+                onMove={(mealId) => setMoving({ date: selected, mealId })}
               />
             ))}
           </div>
@@ -216,6 +223,16 @@ export default function Planner() {
         />
       )}
 
+      {moving && (
+        <MoveMealDialog
+          from={moving}
+          dates={dates}
+          onClose={() => setMoving(null)}
+          onMove={(date, slot) => { moveMeal(moving.date, moving.mealId, date, slot); setMoving(null) }}
+          onCopy={(date, slot) => { duplicateMeal(moving.date, moving.mealId, date, slot); setMoving(null) }}
+        />
+      )}
+
       {copyFrom && (
         <CopyDayDialog
           from={copyFrom}
@@ -229,12 +246,13 @@ export default function Planner() {
 }
 
 function SlotRow({
-  slot, day, onAdd, onRemove,
+  slot, day, onAdd, onRemove, onMove,
 }: {
   slot: MealSlot
   day: DayPlan
   onAdd: () => void
   onRemove: (mealId: string) => void
+  onMove: (mealId: string) => void
 }) {
   const ctx = useNutritionContext()
   const meals = day.meals.filter((m) => m.slot === slot)
@@ -265,13 +283,22 @@ function SlotRow({
                   </div>
                 ) : null}
               </div>
-              <button
-                className="btn-ghost btn-icon shrink-0 text-ink-300 hover:text-coral-600"
-                onClick={() => onRemove(meal.id)}
-                aria-label="Remove meal"
-              >
-                <X size={16} />
-              </button>
+              <div className="flex shrink-0">
+                <button
+                  className="btn-ghost btn-icon text-ink-300 hover:text-bite-700"
+                  onClick={() => onMove(meal.id)}
+                  aria-label="Move or copy meal"
+                >
+                  <MoveRight size={16} />
+                </button>
+                <button
+                  className="btn-ghost btn-icon text-ink-300 hover:text-coral-600"
+                  onClick={() => onRemove(meal.id)}
+                  aria-label="Remove meal"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
           ))}
           <button
@@ -323,6 +350,80 @@ function EntryLine({ entry }: { entry: Component }) {
       <span className="text-xs text-ink-700 font-mono shrink-0 tabular-nums w-10 sm:w-14 text-right">
         {Math.round(kcal)}
       </span>
+    </div>
+  )
+}
+
+/**
+ * Moving or copying one meal.
+ *
+ * Both live in one dialog because the choice you are making is the same, which
+ * day and which slot, and only the last tap differs. Two separate flows would
+ * mean picking a destination twice to find out you wanted the other one.
+ */
+function MoveMealDialog({
+  from, dates, onClose, onMove, onCopy,
+}: {
+  from: { date: string; mealId: string }
+  dates: string[]
+  onClose: () => void
+  onMove: (date: string, slot: MealSlot) => void
+  onCopy: (date: string, slot: MealSlot) => void
+}) {
+  const plan = useMealPlanStore((s) => s.plan)
+  const meal = plan.find((d) => d.date === from.date)?.meals.find((m) => m.id === from.mealId)
+  const [date, setDate] = useState(from.date)
+  const [slot, setSlot] = useState<MealSlot>(meal?.slot ?? 'lunch')
+
+  if (!meal) return null
+  const unchanged = date === from.date && slot === meal.slot
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 backdrop-blur-xs p-4" onClick={onClose}>
+      <div
+        className="bg-paper rounded-2xl p-5 w-full max-w-sm shadow-xl max-h-[85vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="font-bold text-ink-900 mb-1">Move or copy this meal</h3>
+        <p className="text-sm text-ink-700 mb-4">Pick where it should go.</p>
+
+        <label className="label" htmlFor="move-slot">Slot</label>
+        <select
+          id="move-slot"
+          className="input mb-4"
+          value={slot}
+          onChange={(e) => setSlot(e.target.value as MealSlot)}
+        >
+          {MEAL_SLOTS.map((s) => (
+            <option key={s} value={s}>{SLOT_LABELS[s]}</option>
+          ))}
+        </select>
+
+        <p className="label">Day</p>
+        <div className="space-y-1 mb-4">
+          {dates.map((d) => (
+            <button
+              key={d}
+              onClick={() => setDate(d)}
+              className={`w-full text-left px-3 py-2 rounded-xl text-sm ${
+                d === date ? 'bg-bite-50 text-bite-700 font-semibold' : 'text-ink-900 hover:bg-cream-50'
+              }`}
+            >
+              {formatDate(d)}{d === from.date ? ' (where it is now)' : ''}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <button className="btn-primary flex-1" disabled={unchanged} onClick={() => onMove(date, slot)}>
+            Move it
+          </button>
+          <button className="btn-secondary flex-1" onClick={() => onCopy(date, slot)}>
+            Copy it
+          </button>
+        </div>
+        <button className="btn-ghost w-full mt-2" onClick={onClose}>Cancel</button>
+      </div>
     </div>
   )
 }
