@@ -148,6 +148,15 @@ export interface PlannedMeal {
 export interface DayPlan {
   date: string        // 'YYYY-MM-DD'
   meals: PlannedMeal[]
+  /**
+   * When this day last changed, as an ISO timestamp.
+   *
+   * Sync merges the week a day at a time, so the two of you editing different
+   * days both keep your work. Deciding which version of the *same* day wins
+   * needs a per-day timestamp; without one the only possible answer is
+   * "whichever write landed last", which is how an edit disappears.
+   */
+  updatedAt?: string
 }
 
 /** 0 = Sunday, 1 = Monday … 6 = Saturday. */
