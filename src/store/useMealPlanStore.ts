@@ -146,6 +146,19 @@ interface MealPlanStore {
   removeMeal: (date: string, mealId: string) => void
   clearDay: (date: string) => void
   copyDay: (fromDate: string, toDate: string) => void
+  /**
+   * Takes a meal off one day and puts it on another, or in another slot.
+   *
+   * Plans change by rearranging far more often than by being written fresh:
+   * Thursday's dinner becomes Friday's because Thursday ran late. Doing that
+   * with the tools that existed meant reading what was there, deleting it, and
+   * typing it again on the other day.
+   */
+  moveMeal: (fromDate: string, mealId: string, toDate: string, toSlot?: MealSlot) => void
+  /** The same meal again somewhere else, leaving the original where it is. */
+  duplicateMeal: (fromDate: string, mealId: string, toDate: string, toSlot?: MealSlot) => void
+  /** Exchanges two meals, each landing where the other was. */
+  swapMeals: (a: { date: string; mealId: string }, b: { date: string; mealId: string }) => void
   goToWeek: (reference: Date, weekStartsOn: WeekStart) => void
   /** Drops one of the dietician's weeks onto the current week's dates. */
   loadSourcePlan: (source: SourcePlan) => void
@@ -213,6 +226,62 @@ export const useMealPlanStore = create<MealPlanStore>()(
           set((s) => ({
             plan: s.plan.map((day) => (day.date === date ? touch({ ...day, meals: [] }) : day)),
           })),
+
+        moveMeal: (fromDate, mealId, toDate, toSlot) =>
+          set((s) => {
+            const meal = s.plan.find((d) => d.date === fromDate)?.meals.find((m) => m.id === mealId)
+            if (!meal) return {}
+            const landed: PlannedMeal = { ...meal, slot: toSlot ?? meal.slot }
+            if (fromDate === toDate) {
+              return {
+                plan: withDay(s.plan, toDate, (day) => touch({
+                  ...day,
+                  meals: day.meals.map((m) => (m.id === mealId ? landed : m)),
+                })),
+              }
+            }
+            const without = s.plan.map((day) =>
+              day.date === fromDate
+                ? touch({ ...day, meals: day.meals.filter((m) => m.id !== mealId) })
+                : day)
+            return {
+              plan: withDay(without, toDate, (day) => touch({ ...day, meals: [...day.meals, landed] })),
+            }
+          }),
+
+        duplicateMeal: (fromDate, mealId, toDate, toSlot) =>
+          set((s) => {
+            const meal = s.plan.find((d) => d.date === fromDate)?.meals.find((m) => m.id === mealId)
+            if (!meal) return {}
+            // A new id, or the copy and the original would be the same meal as
+            // far as every other action is concerned: removing one would remove
+            // both.
+            const copy: PlannedMeal = { ...meal, id: newId(), slot: toSlot ?? meal.slot }
+            return { plan: withDay(s.plan, toDate, (day) => touch({ ...day, meals: [...day.meals, copy] })) }
+          }),
+
+        swapMeals: (a, b) =>
+          set((s) => {
+            const first = s.plan.find((d) => d.date === a.date)?.meals.find((m) => m.id === a.mealId)
+            const second = s.plan.find((d) => d.date === b.date)?.meals.find((m) => m.id === b.mealId)
+            if (!first || !second) return {}
+
+            // Slots are exchanged along with days: swapping Tuesday's lunch for
+            // Friday's dinner has to leave a lunch on Friday, not two dinners.
+            const swapped = (day: DayPlan): DayPlan => touch({
+              ...day,
+              meals: day.meals.map((m) => {
+                if (m.id === a.mealId) return { ...second, id: m.id, slot: first.slot }
+                if (m.id === b.mealId) return { ...first, id: m.id, slot: second.slot }
+                return m
+              }),
+            })
+
+            return {
+              plan: s.plan.map((day) =>
+                day.date === a.date || day.date === b.date ? swapped(day) : day),
+            }
+          }),
 
         copyDay: (fromDate, toDate) =>
           set((s) => {

@@ -529,6 +529,25 @@ test.describe('the recipe library', () => {
     await expect(page.getByText(/Cozy & Comforting/)).toBeVisible()
   })
 
+  test('a recipe can be scaled, and a serving stays a serving', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.locator('.card button').nth(1).click()
+
+    // The per-serving figure is the headline. Doubling the batch must not touch
+    // it: twice as much food is not a more filling portion.
+    const perServing = (await page.locator('p.font-mono.text-3xl').first().textContent())?.trim() ?? ''
+    const first = page.locator('li').filter({ hasText: /\d+ g$/ }).first()
+    const before = Number(((await first.textContent()) ?? '').match(/(\d+) g/)?.[1] ?? 0)
+    expect(before, 'no weighed ingredient to scale').toBeGreaterThan(0)
+
+    await page.getByRole('button', { name: 'One serving more' }).click()
+
+    await expect(page.getByText(/Scaled from \d+/)).toBeVisible()
+    expect((await page.locator('p.font-mono.text-3xl').first().textContent())?.trim()).toBe(perServing)
+    const after = Number(((await first.textContent()) ?? '').match(/(\d+) g/)?.[1] ?? 0)
+    expect(after).toBeGreaterThan(before)
+  })
+
   test('a recipe of your own can be written and lands on your shelf', async ({ page }) => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /New recipe/ }).click()
@@ -1034,6 +1053,48 @@ test.describe('your data survives the browser', () => {
     await expect(page.getByText(/left alone/)).toBeVisible()
     await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
+  })
+})
+
+test.describe('rearranging the week', () => {
+  test('a meal moves to another day and slot, and can be copied instead', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    await goto(page, '/plan')
+    // A day with meals on it, rather than whichever day today happens to be.
+    await page.locator('button[aria-pressed]').filter({ hasText: /\d\d\d/ }).first().click()
+
+    const lunch = page.locator('.card').filter({ hasText: 'Lunch' }).first()
+    const moved = (await lunch.locator('[data-entry-name]').first().textContent())?.trim() ?? ''
+    expect(moved.length, 'no lunch to move').toBeGreaterThan(0)
+
+    await lunch.getByRole('button', { name: 'Move or copy meal' }).first().click()
+    await page.getByLabel('Slot').selectOption('dinner')
+    await page.getByRole('button', { name: 'Move it' }).click()
+
+    // Same day, different slot: it left lunch and arrived at dinner.
+    await expect(page.locator('.card').filter({ hasText: 'Dinner' }).first()
+      .locator('[data-entry-name]').filter({ hasText: moved })).toBeVisible()
+  })
+
+  test('a copy leaves the original where it was', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    await goto(page, '/plan')
+    await page.locator('button[aria-pressed]').filter({ hasText: /\d\d\d/ }).first().click()
+
+    const breakfast = page.locator('.card').filter({ hasText: 'Breakfast' }).first()
+    const name = (await breakfast.locator('[data-entry-name]').first().textContent())?.trim() ?? ''
+
+    await breakfast.getByRole('button', { name: 'Move or copy meal' }).first().click()
+    await page.getByLabel('Slot').selectOption('snack1')
+    await page.getByRole('button', { name: 'Copy it' }).click()
+
+    await expect(breakfast.locator('[data-entry-name]').filter({ hasText: name })).toBeVisible()
+    await expect(page.locator('.card').filter({ hasText: 'Snack 1' }).first()
+      .locator('[data-entry-name]').filter({ hasText: name })).toBeVisible()
   })
 })
 

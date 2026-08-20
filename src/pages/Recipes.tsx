@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import {
   Search, Star, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
-  ChevronDown, SlidersHorizontal,
+  ChevronDown, SlidersHorizontal, Minus,
 } from 'lucide-react'
 import type { DishCategory, QuickFilter, Recipe } from '../types'
 import { useRecipes, useRecipeStore, useMergedInto } from '../store/useRecipeStore'
@@ -562,6 +562,19 @@ function RecipeDetail({
   const report = reportPerServing(recipe, ctx)
   const perServing = roundNutrients(report.total)
 
+  /**
+   * How many you are cooking, which is not always how many the recipe was
+   * written for.
+   *
+   * Only the shopping changes: a portion is a portion however many you make,
+   * so the per-serving figures above are left alone and the quantities below
+   * follow the number you set. Scaling the per-serving numbers as well is the
+   * mistake worth avoiding, it would say a double batch is twice as filling.
+   */
+  const [wanted, setWanted] = useState(recipe.servings)
+  const scale = recipe.servings > 0 ? wanted / recipe.servings : 1
+  const scaled = wanted !== recipe.servings
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
       <div
@@ -673,7 +686,7 @@ function RecipeDetail({
               {Math.round(perServing.calories)}<span className="text-base font-semibold text-ink-500 ml-1">kcal</span>
             </p>
             <p className="text-xs text-ink-500 mb-3">
-              per serving · makes {recipe.servings}
+              per serving · written for {recipe.servings}
               {recipe.prepMinutes || recipe.cookMinutes
                 ? ` · ${recipe.prepMinutes + recipe.cookMinutes} min`
                 : ''}
@@ -696,13 +709,41 @@ function RecipeDetail({
           </div>
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-2">What goes in</p>
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <p className="text-xs font-bold uppercase tracking-wide text-ink-500">What goes in</p>
+              <div className="flex items-center gap-1">
+                <button
+                  className="btn-ghost btn-icon text-ink-500"
+                  onClick={() => setWanted((n) => Math.max(1, n - 1))}
+                  disabled={wanted <= 1}
+                  aria-label="One serving fewer"
+                >
+                  <Minus size={15} />
+                </button>
+                <span className="text-sm font-mono text-ink-900 tabular-nums w-16 text-center">
+                  {wanted} {wanted === 1 ? 'serving' : 'servings'}
+                </span>
+                <button
+                  className="btn-ghost btn-icon text-ink-500"
+                  onClick={() => setWanted((n) => Math.min(99, n + 1))}
+                  disabled={wanted >= 99}
+                  aria-label="One serving more"
+                >
+                  <Plus size={15} />
+                </button>
+              </div>
+            </div>
+
             <ul className="space-y-1">
               {recipe.components.map((c, i) => {
                 const label = c.kind === 'food'
                   ? ctx.foods.get(c.foodId)?.names.en ?? c.foodId
                   : ctx.recipes.get(c.recipeId)?.name.en ?? c.recipeId
-                const qty = c.kind === 'food' ? `${Math.round(c.grams)} g` : `${c.servings}×`
+                const qty = c.kind === 'food'
+                  ? `${Math.round(c.grams * scale)} g`
+                  // Half a batch of a nested dish is a real answer, so this one
+                  // keeps a decimal rather than rounding 0.5 away to nothing.
+                  : `${Math.round(c.servings * scale * 100) / 100}×`
                 return (
                   <li key={i} className="flex justify-between gap-3 text-sm text-ink-900">
                     <span className="min-w-0">{label}</span>
@@ -714,6 +755,16 @@ function RecipeDetail({
                 <li className="text-sm text-ink-500">Nothing listed yet.</li>
               )}
             </ul>
+
+            {scaled && recipe.components.length > 0 && (
+              <p className="text-xs text-ink-500 mt-2">
+                Scaled from {recipe.servings}. The whole lot comes to{' '}
+                <strong className="font-mono text-ink-700">
+                  {Math.round(perServing.calories * wanted).toLocaleString()} kcal
+                </strong>
+                , and a serving is unchanged.
+              </p>
+            )}
           </div>
 
           {recipe.steps.length > 0 && (
