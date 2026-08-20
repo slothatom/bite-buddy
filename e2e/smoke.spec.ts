@@ -7,7 +7,7 @@ import { test, expect, type Page } from '@playwright/test'
 
 const ROUTES = [
   '/', '/plan', '/recipes', '/foods', '/grocery',
-  '/schedule', '/analytics', '/settings', '/settings/history',
+  '/schedule', '/movement', '/analytics', '/settings', '/settings/history',
 ]
 
 /** Fails the test on any uncaught error or console error, on any page. */
@@ -800,6 +800,58 @@ test.describe('progress, per person', () => {
 
     await page.getByRole('button', { name: 'Remove' }).first().click()
     await expect(page.getByText('hips 95')).toHaveCount(0)
+  })
+})
+
+test.describe('movement, per person', () => {
+  test('a session is built from the exercise list and costed from your weight', async ({ page }) => {
+    // A weight first: without one the app refuses to guess a calorie figure.
+    await goto(page, '/analytics')
+    await page.getByRole('button', { name: 'Body' }).click()
+    await page.getByLabel('Weight').fill('70')
+    await page.getByRole('button', { name: /^Log$/ }).click()
+
+    await goto(page, '/movement')
+    await page.getByRole('button', { name: 'Build a session' }).click()
+    await page.getByLabel('Search exercises').fill('running')
+    await page.getByRole('button', { name: /Running \(10 km\/h\)/ }).click()
+    await page.getByRole('button', { name: 'Save session' }).click()
+
+    // 10 METs, 70 kg, 30 minutes: 10 x 3.5 x 70 / 200 x 30 = 368 kcal.
+    await expect(page.getByText(/30 min · about 368 kcal/)).toBeVisible()
+  })
+
+  test('a session can be logged in one lump, with the figure your watch gave', async ({ page }) => {
+    await goto(page, '/movement')
+    await page.getByRole('button', { name: 'Log it in one go' }).click()
+    await page.getByLabel('What was it').fill('Climbing')
+    await page.getByLabel('kcal, if known').fill('430')
+    await page.getByRole('button', { name: 'Save' }).click()
+
+    await expect(page.getByText('Climbing')).toBeVisible()
+    await expect(page.getByText(/about 430 kcal/)).toBeVisible()
+  })
+
+  test('the two people keep separate logs', async ({ page }) => {
+    await goto(page, '/movement')
+    await page.getByRole('button', { name: 'Log it in one go' }).click()
+    await page.getByLabel('What was it').fill('Arany swim')
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(page.getByText('Arany swim')).toBeVisible()
+
+    await page.getByRole('tab', { name: 'Oli' }).click()
+    await expect(page.getByText('Arany swim')).toHaveCount(0)
+  })
+
+  test('sleep is logged per person and kept per night', async ({ page }) => {
+    await goto(page, '/movement')
+    await page.getByRole('tab', { name: 'Sleep' }).click()
+    await page.getByLabel('Hours slept').fill('7.5')
+    await page.getByRole('button', { name: /^Log$/ }).click()
+    await expect(page.getByText('7.5 h', { exact: true })).toBeVisible()
+
+    await page.getByRole('tab', { name: 'Oli' }).click()
+    await expect(page.getByText('7.5 h', { exact: true })).toHaveCount(0)
   })
 })
 
