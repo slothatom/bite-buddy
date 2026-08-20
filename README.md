@@ -97,8 +97,16 @@ A recipe is now described by three separate things:
 A category says what the food *is* — never when it is eaten, how it is served or
 how it was cooked, which rules out "Main", "Side" and "Bowl": those describe a
 role at a table and tell you nothing when you are deciding what to make. There
-are 37 of them; this library uses 18, and the filter only offers the ones with
+are 38 of them; this library uses 19, and the filter only offers the ones with
 something behind them.
+
+**Grain** is the 38th, added because Rice, Pasta and Noodles left nowhere for the
+bulgur, couscous and quinoa this library runs on — those dishes fell through to
+their protein, so there was no way to ask for a grain bowl. It means *the grain
+is the dish*: "Bulgur with chicken breast" is one, "Zucchini patties with bulgur"
+is not. Mămăligă sits here rather than under Porridge, since in these plans it
+arrives under cottage cheese as the starch of a meal rather than in a bowl with
+a spoon; oats stay Porridge, which is the distinction the two categories are for.
 
 `CATEGORY_MEAL_TIMES` maps a category to when it is usually eaten, but only ever
 as a *default*: a recipe's own meal times come from the plans, which is actual

@@ -23,11 +23,12 @@ import { recipePerServing, type NutritionContext } from './nutrition'
  *    plates, and what makes it a meal is the protein, not the bread that comes
  *    with everything.
  *
- * One gap worth stating: the given categories have Rice, Pasta and Noodles but
- * nothing for the other grains, and this library runs on bulgur, couscous,
- * quinoa and mămăligă. Those dishes fall through to their protein, which reads
- * correctly ("Bulgur with chicken breast" is a meat dish) but means there is no
- * way to ask for "a grain bowl". A `grain` category would fix it in one line.
+ * Grain is the category the original list did not have. Rice, Pasta and Noodles
+ * were there, but this library runs on bulgur, couscous and quinoa, and without
+ * somewhere to put them those dishes fell through to their protein — "Bulgur
+ * with chicken breast" read as a meat dish, which is not wrong but left no way
+ * to ask for a grain bowl. Porridge stays separate: mămăligă and oats at
+ * breakfast are a different thing from bulgur under a chicken breast.
  */
 
 // ─── Category ────────────────────────────────────────────────────────────────
@@ -52,8 +53,12 @@ const NAME_RULES: [RegExp, DishCategory][] = [
   [/\bpasta\b|spaghetti|penne|lasagn/i, 'pasta'],
   [/\bnoodle/i, 'noodles'],
   [/\brisotto|\brice\b(?! cakes)/i, 'rice'],
+  // Mămăligă is here rather than under Porridge: in these plans it arrives
+  // under cottage cheese as the starch of a meal, not in a bowl with a spoon.
+  // Oats stay Porridge, which is the distinction the two categories are for.
+  [/\bbulgur|couscous|cus-?cus|quinoa|freekeh|barley|buckwheat|polenta|m[ăa]m[ăa]lig/i, 'grain'],
   [/\bomelette|shakshuka|scrambled|fried eggs/i, 'omelette'],
-  [/\bporridge|polenta|m[ăa]m[ăa]lig/i, 'porridge'],
+  [/\bporridge/i, 'porridge'],
   [/\bmuesli|granola|cereal/i, 'cereal'],
   [/\bpudding|ice bar|brownie|chocolate\b/i, 'dessert'],
   [/\boats?\b|oatmeal/i, 'porridge'],
@@ -88,7 +93,9 @@ const FOOD_CATEGORY: Record<string, DishCategory> = {
   vegetables: 'vegetable',
   fruits: 'fruit',
   'nuts-seeds': 'snack',
-  grains: 'porridge',
+  // A dish led by a grain is a grain dish. Oats and mămăligă are caught by the
+  // name rules above and stay Porridge, which is where they belong.
+  grains: 'grain',
   treats: 'dessert',
   'spreads-sauces': 'dip',
   beverages: 'drink',
