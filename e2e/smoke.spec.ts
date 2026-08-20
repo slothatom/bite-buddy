@@ -203,6 +203,47 @@ test.describe('the main flow', () => {
   })
 })
 
+test.describe('the shopping list', () => {
+  test('is built from the days you choose, and can be corrected afterwards', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/grocery')
+
+    // Everything planned, then one day only: a shorter list, because nobody
+    // shops for a fortnight at once.
+    await page.getByRole('button', { name: 'Build list' }).click()
+    const all = await page.locator('input[type=checkbox]').count()
+    expect(all).toBeGreaterThan(20)
+
+    await page.getByRole('button', { name: 'None' }).click()
+    const firstDay = page.locator('button[aria-pressed]').filter({ hasNotText: 'x' }).first()
+    await firstDay.click()
+    await page.getByRole('button', { name: 'Rebuild' }).click()
+    const one = await page.locator('input[type=checkbox]').count()
+    expect(one, 'one day should need less shopping than a fortnight').toBeLessThan(all)
+
+    // A line you add by hand survives a rebuild, since the plan never knew
+    // about it.
+    await page.getByLabel('Add an item').fill('Washing-up liquid')
+    await page.getByLabel('How much').fill('2 bottles')
+    await page.getByRole('button', { name: 'Add to list' }).click()
+    await expect(page.getByText('2 bottles')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Rebuild' }).click()
+    await expect(page.getByText('Washing-up liquid')).toBeVisible()
+
+    // And it can be corrected, or thrown away.
+    await page.getByRole('button', { name: 'Edit Washing-up liquid' }).click()
+    await page.getByLabel('Amount').fill('1.5 kg')
+    await page.getByRole('button', { name: 'Save item' }).click()
+    await expect(page.getByText('1.5 kg')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Edit Washing-up liquid' }).click()
+    await page.getByRole('button', { name: 'Remove Washing-up liquid' }).click()
+    await expect(page.getByText('Washing-up liquid')).toHaveCount(0)
+  })
+})
+
 test.describe('the planner', () => {
   test('shows a week, a fortnight or a month, and keeps what you planned', async ({ page }) => {
     await goto(page, '/plan')

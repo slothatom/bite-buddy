@@ -317,13 +317,21 @@ export interface CookSession {
 
 export interface GroceryItem {
   id: string
-  /** Resolved food, so RO/HU/EN spellings of the same thing merge into one line. */
+  /**
+   * Resolved food, so RO/HU/EN spellings of the same thing merge into one
+   * line. Empty on a line you added yourself, which need not be a food the app
+   * knows: washing-up liquid is a real shopping list item.
+   */
   foodId: string
   name: string
   grams: number
   category: MedCategory
   checked: boolean
   fromRecipeIds: string[]
+  /** Added by hand rather than worked out from the plan; rebuilding keeps it. */
+  manual?: boolean
+  /** An amount that is not a weight, shown exactly as typed: "2 packs". */
+  amount?: string
 }
 
 // ─── Weight & Body ───────────────────────────────────────────────────────────
