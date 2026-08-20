@@ -15,6 +15,13 @@ interface FoodStore {
   updateFood: (id: string, updates: Partial<Food>) => void
   removeFood: (id: string) => void
   restoreFood: (id: string) => void
+  /** Throws away your edits to a curated food and brings the original back. */
+  revertFood: (id: string) => void
+}
+
+/** True for the foods that ship with the app, as opposed to your own. */
+export function isCuratedFood(id: string): boolean {
+  return FOODS.some((f) => f.id === id)
 }
 
 export const useFoodStore = create<FoodStore>()(
@@ -37,14 +44,28 @@ export const useFoodStore = create<FoodStore>()(
           return { custom: [...s.custom, { ...base, ...updates, source: 'custom' as const }] }
         }),
 
+      /**
+       * Deleting a food takes it out of the library without destroying it.
+       *
+       * Same reason as recipes, and it bites harder here: a food is named by
+       * every recipe that uses it *and* directly by the snack lines in your
+       * plan — "150 g apple, 10 g cashews" is two food references, not a recipe.
+       * Dropping the food would blank all of them at once. It goes on the hidden
+       * list instead: gone from the library, from search and from every picker,
+       * still resolvable by anything that already refers to it.
+       */
       removeFood: (id) =>
-        set((s) =>
-          s.custom.some((f) => f.id === id)
-            ? { custom: s.custom.filter((f) => f.id !== id) }
-            : { hidden: [...new Set([...s.hidden, id])] },
-        ),
+        set((s) => ({ hidden: [...new Set([...s.hidden, id])] })),
 
       restoreFood: (id) => set((s) => ({ hidden: s.hidden.filter((h) => h !== id) })),
+
+      revertFood: (id) =>
+        set((s) => ({
+          // For a curated food this throws away your edits; for one of your own
+          // there is nothing underneath, so it only un-deletes.
+          custom: isCuratedFood(id) ? s.custom.filter((f) => f.id !== id) : s.custom,
+          hidden: s.hidden.filter((h) => h !== id),
+        })),
     }),
     {
       name: 'bite-buddy-foods-v2',
@@ -62,9 +83,24 @@ export const useFoodStore = create<FoodStore>()(
   ),
 )
 
+/** The library as it stands, with your edits applied. Deleted ones included. */
+export function foodLibraryWith(custom: Food[]): Food[] {
+  const overridden = new Set(custom.map((f) => f.id))
+  return [...FOODS.filter((f) => !overridden.has(f.id)), ...custom]
+}
+
+/**
+ * What you can browse. Exported so nothing reimplements the rule — a second
+ * copy of it is a copy that drifts the moment the rule changes.
+ */
+export function visibleFoods(state: Pick<FoodStore, 'custom' | 'hidden'>): Food[] {
+  const hiddenSet = new Set(state.hidden)
+  return foodLibraryWith(state.custom).filter((f) => !hiddenSet.has(f.id))
+}
+
 /**
  * The effective food list: curated foods, with user edits taking precedence and
- * hidden entries removed.
+ * deleted entries removed.
  */
 export function useFoods(): Food[] {
   // Memoised on the two arrays it derives from. Without this the result is a
@@ -74,12 +110,24 @@ export function useFoods(): Food[] {
   const custom = useFoodStore((s) => s.custom)
   const hidden = useFoodStore((s) => s.hidden)
 
+  return useMemo(() => visibleFoods({ custom, hidden }), [custom, hidden])
+}
+
+/**
+ * Everything a saved plan or a recipe might still name, deleted foods included.
+ * This is what the nutrition context is built from.
+ */
+export function useResolvableFoods(): Food[] {
+  const custom = useFoodStore((s) => s.custom)
+  return useMemo(() => foodLibraryWith(custom), [custom])
+}
+
+/** The foods you deleted, for offering them back. */
+export function useDeletedFoods(): Food[] {
+  const custom = useFoodStore((s) => s.custom)
+  const hidden = useFoodStore((s) => s.hidden)
   return useMemo(() => {
-    const overridden = new Set(custom.map((f) => f.id))
     const hiddenSet = new Set(hidden)
-    return [
-      ...FOODS.filter((f) => !overridden.has(f.id) && !hiddenSet.has(f.id)),
-      ...custom,
-    ]
+    return foodLibraryWith(custom).filter((f) => hiddenSet.has(f.id))
   }, [custom, hidden])
 }

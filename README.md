@@ -175,7 +175,12 @@ labels, weighed ingredients (foods or other recipes) and a method — with the n
 as you type rather than entered.
 
 ### Foods
-122 foods with per-100 g nutrition, each carrying EN/RO/HU names and a Mediterranean tier
+122 foods with per-100 g nutrition, each carrying EN/RO/HU names and a Mediterranean tier.
+Every one is editable and deletable, the curated ones included: the first change keeps a copy
+of your own with the original underneath, so **Revert** and **Delete** mean different things.
+Deleting takes a food out of the library without destroying it — a food is named by every
+recipe that contains it *and* directly by the snack lines in your plan, so throwing it away
+would blank all of them at once. **Settings → Deleted foods** puts them back
 (daily / weekly / moderation / rarely). Add your own by hand, by USDA / Open Food Facts
 lookup, or by scanning a barcode. A lookup that fails says why — rate-limited, offline, or
 the service being down — rather than reporting "no results" for a food the database has.
