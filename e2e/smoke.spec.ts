@@ -466,6 +466,88 @@ test.describe('the recipe library', () => {
     await expect(page.getByText('Nothing of your own yet')).toBeVisible()
   })
 
+  test('deleting a recipe takes it out of everything but leaves history alone', async ({ page }) => {
+    // Built as a scenario rather than picked out of the library, so every clause
+    // is exercised on one recipe whose name and contents are known.
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: 'New recipe' }).click()
+    await page.getByLabel('Recipe name').fill('Doomed dinner')
+    await page.getByRole('button', { name: /Add ingredient/ }).click()
+    await page.getByPlaceholder(/Search foods and recipes/).fill('chicken breast')
+    await page.locator('.bg-paper button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
+    await page.getByRole('button', { name: 'Add recipe' }).click()
+
+    // Put it in a day, and remember what that day came to.
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: /Pop something in/ }).first().click()
+    await page.getByPlaceholder(/What are we having/).fill('Doomed dinner')
+    await page.getByText('Doomed dinner').first().click()
+    await expect(page.locator('[data-entry-name]').filter({ hasText: 'Doomed dinner' })).toBeVisible()
+    const dayTotal = await page.locator('text=/\\d+ of 7 days planned/').first().textContent()
+
+    // Star it, so the delete has a favourite to clear.
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Yours/ }).click()
+    await page.getByRole('button', { name: 'Add to favourites' }).first().click()
+
+    // Delete it. The confirmation names it and says what will not be affected.
+    await page.locator('.card button').nth(1).click()
+    await page.getByRole('button', { name: 'Edit recipe' }).click()
+    await page.getByRole('button', { name: /Delete this recipe/ }).click()
+    await expect(page.getByText('Delete “Doomed dinner”?')).toBeVisible()
+    await expect(page.getByText(/[Hh]istorical meal data/)).toBeVisible()
+    await page.getByRole('button', { name: 'Yes, delete' }).click()
+
+    // Gone from the list, from search, and from favourites.
+    await expect(page.getByText('Doomed dinner')).toHaveCount(0)
+    await page.getByPlaceholder(/Search in English/).fill('Doomed dinner')
+    await expect(page.getByText('Doomed dinner')).toHaveCount(0)
+    await page.getByPlaceholder(/Search in English/).fill('')
+    await page.getByRole('button', { name: /Favourites/ }).click()
+    await expect(page.getByText('Doomed dinner')).toHaveCount(0)
+
+    // Gone from the planner's picker. Scoped to the sheet, since the plan
+    // behind it still shows the meal — that is the point of the next assertion.
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: /Pop something in/ }).first().click()
+    await page.getByRole('button', { name: 'recipes' }).click()
+    await page.getByPlaceholder(/What are we having/).fill('Doomed dinner')
+    // Asserted on the empty state rather than on the absence of the name: the
+    // name is in the "no matches" message itself, so counting it always found one.
+    await expect(page.getByText(/No recipes match/)).toBeVisible()
+    await page.getByRole('button', { name: 'Close' }).click()
+
+    // But the day it was planned into is exactly as it was, and says why.
+    await expect(page.locator('text=/\\d+ of 7 days planned/').first()).toHaveText(dayTotal ?? '')
+    const line = page.locator('[data-entry-name]').filter({ hasText: 'Doomed dinner' })
+    await expect(line).toBeVisible()
+    await expect(line).toContainText('deleted')
+
+    // And it can be put back.
+    await goto(page, '/settings')
+    await page.getByRole('button', { name: 'Restore' }).first().click()
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Yours/ }).click()
+    await expect(page.getByText('Doomed dinner')).toBeVisible()
+  })
+
+  test('deleting a recipe leaves its ingredients alone', async ({ page }) => {
+    // Other recipes use them.
+    await goto(page, '/foods')
+    const before = await page.locator('.card').count()
+
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Lunch/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('chili con carne')
+    await page.locator('.card button').nth(1).click()
+    await page.getByRole('button', { name: 'Edit recipe' }).click()
+    await page.getByRole('button', { name: /Delete this recipe/ }).click()
+    await page.getByRole('button', { name: 'Yes, delete' }).click()
+
+    await goto(page, '/foods')
+    expect(await page.locator('.card').count()).toBe(before)
+  })
+
   test('deleting an edited recipe removes it instead of restoring the original', async ({ page }) => {
     // The delete button used to only drop your edits, so a built-in recipe you
     // had touched reappeared unchanged and delete looked like it had failed.

@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import {
   Sparkles, Calculator, Pencil, Upload, Check,
-  Download, ClipboardCopy, ClipboardPaste, LogOut,
+  Download, ClipboardCopy, ClipboardPaste, LogOut, Undo2,
 } from 'lucide-react'
 import type { ActivityLevel, Goal, Sex, Targets, WeekStart } from '../types'
 import { useUserStore } from '../store/useUserStore'
+import { useDeletedRecipes, useRecipeStore } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { SOURCE_PLANS } from '../data'
 import { ACTIVITY_LABELS, averagePlanDay, fromPlans, fromTdee, totalDailyEnergy } from '../lib/targets'
@@ -229,6 +230,8 @@ export default function Settings() {
         </section>
 
         {/* ─── Account ─────────────────────────────────────────────────────── */}
+        <DeletedRecipesPanel />
+
         {isConfigured && <AccountPanel />}
 
         <VersionPanel />
@@ -505,6 +508,42 @@ function VersionPanel() {
           {checking ? 'Checking…' : checked ? 'Up to date' : 'Check now'}
         </button>
       </div>
+    </section>
+  )
+}
+
+/**
+ * Recipes you deleted, and the way back.
+ *
+ * Deleting takes a recipe out of every list, search and picker, but does not
+ * destroy it — a day you planned months ago names it by id, and throwing it away
+ * would blank that day. This is where they wait. It disappears when there is
+ * nothing in it, so it is not a permanent reminder of things you got rid of on
+ * purpose.
+ */
+function DeletedRecipesPanel() {
+  const deleted = useDeletedRecipes()
+  const restoreRecipe = useRecipeStore((s) => s.restoreRecipe)
+  if (!deleted.length) return null
+
+  return (
+    <section>
+      <SectionHeading>Deleted recipes</SectionHeading>
+      <div className="card divide-y divide-border-100">
+        {deleted.map((r) => (
+          <div key={r.id} className="flex items-center gap-3 px-4 py-3">
+            <span className="text-xl shrink-0">{r.emoji}</span>
+            <span className="flex-1 min-w-0 text-sm text-ink-900 truncate">{r.name.en}</span>
+            <button className="btn-secondary shrink-0" onClick={() => restoreRecipe(r.id)}>
+              <Undo2 size={15} /> Restore
+            </button>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-ink-500 mt-2 px-1">
+        These are out of your library but not gone: any day you already planned with one still
+        shows it, marked as deleted, so your history stays as it happened.
+      </p>
     </section>
   )
 }

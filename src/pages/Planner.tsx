@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, ClipboardCopy, Calend
 import type { Component, DayPlan, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import { useMealPlanStore, getWeekDates } from '../store/useMealPlanStore'
+import { useDeletedIds } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { componentsNutrients, dayNutrients, emptyNutrients, addNutrients } from '../lib/nutrition'
@@ -262,7 +263,13 @@ function SlotRow({
 
 function EntryLine({ entry }: { entry: Component }) {
   const ctx = useNutritionContext()
+  const deleted = useDeletedIds()
   const kcal = componentsNutrients([entry], ctx).calories
+
+  // A recipe you deleted still resolves here, so the day keeps its meal and its
+  // calories. It is marked rather than hidden: the record is what happened, and
+  // silently dropping it would rewrite it.
+  const isDeleted = entry.kind === 'recipe' && deleted.has(entry.recipeId)
 
   const label = entry.kind === 'recipe'
     ? ctx.recipes.get(entry.recipeId)?.name.en ?? 'Unknown recipe'
@@ -279,7 +286,14 @@ function EntryLine({ entry }: { entry: Component }) {
   return (
     <div className="flex items-baseline gap-2 text-sm">
       <span className="text-base leading-none shrink-0">{emoji}</span>
-      <span data-entry-name className="flex-1 min-w-0 text-ink-900">{label}</span>
+      <span data-entry-name className={`flex-1 min-w-0 ${isDeleted ? 'text-ink-500' : 'text-ink-900'}`}>
+        {label}
+        {isDeleted && (
+          <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-ink-500">
+            deleted
+          </span>
+        )}
+      </span>
       {detail ? <span className="text-xs text-ink-500 font-mono shrink-0 tabular-nums">{detail}</span> : null}
       <span className="text-xs text-ink-700 font-mono shrink-0 tabular-nums w-10 sm:w-14 text-right">
         {Math.round(kcal)}
