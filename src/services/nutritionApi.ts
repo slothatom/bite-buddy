@@ -97,50 +97,110 @@ function parseOFFProduct(p: Record<string, unknown>): NutritionResult {
   }
 }
 
-export async function searchFoods(query: string): Promise<NutritionResult[]> {
-  const [usda, off] = await Promise.allSettled([searchUSDA(query), searchOFF(query)])
-  const results: NutritionResult[] = []
-  if (usda.status === 'fulfilled') results.push(...usda.value)
-  if (off.status === 'fulfilled')  results.push(...off.value)
-  return results.slice(0, 14)
+export type LookupProblem = 'offline' | 'rate-limited' | 'unavailable'
+
+export interface LookupOutcome {
+  results: NutritionResult[]
+  /**
+   * Which sources failed and why.
+   *
+   * Both lookups used to swallow every failure and return an empty array, so
+   * being rate-limited, being offline and genuinely finding nothing all looked
+   * identical — "no results" — and the obvious next move was to type the
+   * numbers in by hand for a food the database knew perfectly well.
+   */
+  problems: Array<{ source: 'usda' | 'openfoodfacts'; reason: LookupProblem }>
 }
 
-async function searchUSDA(query: string): Promise<NutritionResult[]> {
+/** Requests that hang leave the UI saying "searching" forever. */
+const TIMEOUT_MS = 8_000
+
+async function fetchJson(url: string, signal?: AbortSignal): Promise<unknown> {
+  const timeout = AbortSignal.timeout(TIMEOUT_MS)
+  const res = await fetch(url, {
+    signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+  })
+  if (res.status === 429) throw new LookupError('rate-limited')
+  if (!res.ok) throw new LookupError('unavailable')
+  return res.json()
+}
+
+class LookupError extends Error {
+  constructor(readonly reason: LookupProblem) {
+    super(reason)
+  }
+}
+
+function reasonFor(error: unknown): LookupProblem {
+  if (error instanceof LookupError) return error.reason
+  // A failed fetch with no response is the network being gone. Distinguishing
+  // it matters: one is worth retrying in a moment, the other is not.
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return 'offline'
+  return error instanceof TypeError ? 'offline' : 'unavailable'
+}
+
+export async function searchFoods(query: string, signal?: AbortSignal): Promise<LookupOutcome> {
+  const [usda, off] = await Promise.allSettled([
+    searchUSDA(query, signal),
+    searchOFF(query, signal),
+  ])
+
+  const results: NutritionResult[] = []
+  const problems: LookupOutcome['problems'] = []
+
+  if (usda.status === 'fulfilled') results.push(...usda.value)
+  else problems.push({ source: 'usda', reason: reasonFor(usda.reason) })
+
+  if (off.status === 'fulfilled') results.push(...off.value)
+  else problems.push({ source: 'openfoodfacts', reason: reasonFor(off.reason) })
+
+  return { results: results.slice(0, 14), problems }
+}
+
+async function searchUSDA(query: string, signal?: AbortSignal): Promise<NutritionResult[]> {
   const params = new URLSearchParams({
     query,
     api_key: USDA_KEY,
     dataType: 'Foundation,SR Legacy',
     pageSize: '7',
   })
-  const res = await fetch(`${USDA_BASE}/foods/search?${params}`)
-  if (!res.ok) return []
-  const data = await res.json() as { foods?: USDAFood[] }
+  const data = await fetchJson(`${USDA_BASE}/foods/search?${params}`, signal) as { foods?: USDAFood[] }
   return (data.foods ?? []).map(parseUSDAFood)
 }
 
-async function searchOFF(query: string): Promise<NutritionResult[]> {
+async function searchOFF(query: string, signal?: AbortSignal): Promise<NutritionResult[]> {
   const params = new URLSearchParams({
     search_terms: query,
     json: '1',
     page_size: '7',
     fields: 'product_name,generic_name,nutriments',
   })
-  const res = await fetch(`${OFF_BASE}/cgi/search.pl?${params}`)
-  if (!res.ok) return []
-  const data = await res.json() as { products?: Record<string, unknown>[] }
+  const data = await fetchJson(`${OFF_BASE}/cgi/search.pl?${params}`, signal) as {
+    products?: Record<string, unknown>[]
+  }
   return (data.products ?? [])
     .filter((p) => p.product_name)
     .map(parseOFFProduct)
 }
 
-export async function lookupBarcode(barcode: string): Promise<NutritionResult | null> {
+export type BarcodeResult =
+  | { found: true; food: NutritionResult }
+  | { found: false; reason: 'unknown-product' | LookupProblem }
+
+/**
+ * A barcode is scanned at arm's length in a shop, so the difference between
+ * "we have never heard of this product" and "your phone has no signal" is the
+ * difference between typing it in and stepping outside.
+ */
+export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
   try {
-    const res = await fetch(`${OFF_BASE}/api/v2/product/${barcode}.json`)
-    if (!res.ok) return null
-    const data = await res.json() as { status: number; product?: Record<string, unknown> }
-    if (data.status !== 1 || !data.product) return null
-    return parseOFFProduct(data.product)
-  } catch {
-    return null
+    const data = await fetchJson(`${OFF_BASE}/api/v2/product/${barcode}.json`) as {
+      status: number
+      product?: Record<string, unknown>
+    }
+    if (data.status !== 1 || !data.product) return { found: false, reason: 'unknown-product' }
+    return { found: true, food: parseOFFProduct(data.product) }
+  } catch (error) {
+    return { found: false, reason: reasonFor(error) }
   }
 }
