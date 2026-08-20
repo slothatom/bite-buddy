@@ -151,6 +151,8 @@ export interface DayPlan {
 }
 
 /** 0 = Sunday, 1 = Monday … 6 = Saturday. */
+export type Theme = 'system' | 'light' | 'dark'
+
 export type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 /**
@@ -294,6 +296,8 @@ export interface UserProfile {
   weekStartsOn: WeekStart
   /** Which language to show food and recipe names in. */
   foodNameLanguage: 'en' | 'ro' | 'hu'
+  /** 'system' follows the device; the other two override it in either direction. */
+  theme: Theme
   /** XP, levels and achievements are opt-in — the planner stays calm by default. */
   showGamification: boolean
   achievements: Achievement[]
