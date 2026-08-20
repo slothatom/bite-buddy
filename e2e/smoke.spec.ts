@@ -1037,6 +1037,90 @@ test.describe('your data survives the browser', () => {
   })
 })
 
+test.describe('what you enter is still there tomorrow', () => {
+  /**
+   * The check that nothing else makes.
+   *
+   * Every store writes to localStorage through the same persist wrapper, and a
+   * store that stops writing looks completely normal until the page is
+   * reloaded. Screens are tested for what they show; this is the only test that
+   * closes the app and opens it again.
+   */
+  test('a week, a target, a weight, a workout and a cook session all survive a reload', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    await goto(page, '/analytics')
+    await page.getByRole('button', { name: 'Body' }).click()
+    await page.getByLabel('Weight').fill('69.2')
+    await page.getByRole('button', { name: /^Log$/ }).click()
+    await expect(page.getByText('69.2 kg')).toBeVisible()
+
+    await goto(page, '/movement')
+    await page.getByRole('button', { name: 'Log it in one go' }).click()
+    await page.getByLabel('What was it').fill('Long walk')
+    await page.getByLabel('kcal, if known').fill('310')
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(page.getByText('Long walk')).toBeVisible()
+
+    await goto(page, '/schedule')
+    await page.getByRole('button', { name: /Session/ }).click()
+    await page.getByPlaceholder('Sunday batch cook').fill('Reload cook')
+    await page.locator('input[type=date]')
+      .fill(new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10))
+    await page.getByRole('button', { name: 'Save' }).click()
+    await expect(page.getByText('Reload cook')).toBeVisible()
+
+    await goto(page, '/settings')
+    await page.getByRole('button', { name: 'Use these' }).first().click()
+    await expect(page.getByText(/set from your plans/)).toBeVisible()
+
+    // Reload is the whole point: this is the app being closed and opened.
+    await page.reload()
+    await page.waitForLoadState('networkidle')
+
+    await goto(page, '/plan')
+    await expect(page.getByText('7 of 7 days planned')).toBeVisible()
+
+    await goto(page, '/analytics')
+    await page.getByRole('button', { name: 'Body' }).click()
+    await expect(page.getByText('69.2 kg')).toBeVisible()
+
+    await goto(page, '/movement')
+    await expect(page.getByText('Long walk')).toBeVisible()
+
+    await goto(page, '/schedule')
+    await expect(page.getByText('Reload cook')).toBeVisible()
+
+    await goto(page, '/settings')
+    await expect(page.getByText(/set from your plans/)).toBeVisible()
+
+    // Every store that holds something is on disk under its own key, which is
+    // also the key it syncs under. A store missing here saves nowhere.
+    const keys = await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith('bite-buddy')))
+    for (const key of ['bite-buddy-mealplan-v2', 'bite-buddy-user-v2', 'bite-buddy-body',
+                       'bite-buddy-activity', 'bite-buddy-cook']) {
+      expect(keys, `${key} was never written`).toContain(key)
+    }
+  })
+
+  test('a recipe of your own is still yours after a reload', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /New recipe/ }).click()
+    await page.getByLabel('Recipe name').fill('Reload test omelette')
+    await page.getByRole('button', { name: /Add ingredient/ }).click()
+    await page.getByPlaceholder(/Anything: yours/).fill('lentil')
+    await page.locator('button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
+    await page.getByRole('button', { name: 'Add recipe' }).click()
+
+    await page.reload()
+    await page.waitForLoadState('networkidle')
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Yours/ }).click()
+    await expect(page.getByText('Reload test omelette')).toBeVisible()
+  })
+})
+
 test.describe('resilience', () => {
   test('starts cleanly when stored data is corrupt', async ({ page }) => {
     const errors = trackErrors(page)

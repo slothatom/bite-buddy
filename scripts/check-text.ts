@@ -20,7 +20,17 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(HERE, '..')
 
 const SEARCH = ['src', 'e2e', 'scripts', 'docs', 'supabase', '.github']
-const FILES = ['README.md', 'index.html', 'package.json']
+/**
+ * The root files, listed rather than globbed.
+ *
+ * The three config files were missed for a fortnight because the walk only
+ * covered directories, and a rule that quietly exempts the files you edit least
+ * often is the one that lets the character back in.
+ */
+const FILES = [
+  'README.md', 'index.html', 'package.json',
+  'vite.config.ts', 'vitest.config.ts', 'playwright.config.ts', 'eslint.config.js',
+]
 const EXTENSIONS = ['.ts', '.tsx', '.js', '.mjs', '.md', '.css', '.html', '.sql', '.yml', '.yaml']
 
 /** The character itself, built from its code point so this file stays clean. */
