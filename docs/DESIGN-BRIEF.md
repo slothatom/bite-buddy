@@ -6,41 +6,50 @@ design decisions.
 
 Written to be handed to a designer, or fed to a tool, as the source of truth.
 
-> **Superseded.** This brief was the input that produced
-> [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md), which is now the authority, and the two
-> disagree. Section 10's typography (Fredoka + Nunito) belongs to the earlier
-> "cute and cozy" round; the app ships Bungee + Plus Jakarta Sans, and the Fredoka
-> and Nunito packages have been uninstalled. Read this for the screen, state and
-> content inventory, which is still accurate; read the design system for anything
-> visual.
+> **Companion document.** [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md) is the visual
+> authority: palette, type scale, component specs. This brief is the product
+> inventory behind it, what exists, how much of it there is, and what it has to
+> survive. The two agree today; the "Bold & Playful" system in that file is what
+> the app actually ships.
+>
+> Last checked against the code on 20 August 2026.
 
 ---
 
 ## 1. What the app is
 
-An **offline, single-user meal planner**. No accounts, no server, no sync, everything
-lives in the browser. It plans a week of eating, keeps a recipe library, and turns that
-week into a shopping list.
+An **offline-first meal planner for two people**, Arany and Oli. It installs to a
+phone, works with no network, and syncs through Supabase when an account is
+configured. Run it yourself with no Supabase keys and there is no sign-in at all:
+everything stays on the device.
 
-**What makes it unlike other meal apps:** the content was not invented. The library was
-parsed out of **14 real dietician plan documents** written in Romanian and Hungarian
-across 2021–22, 97 days, 481 individual meals. A second source, an 89-page
-Mediterranean Diet guide, supplies the food taxonomy: 17 categories, each with a
-how-often tier and weekly serving goals the app scores against.
+**What makes it unlike other meal apps:** the content was not invented. The library
+was parsed out of **14 real dietician plan documents** written in Romanian and
+Hungarian across 2021 and 2022, 97 days, 481 individual meals. A second source, an
+89-page Mediterranean Diet guide, supplies the food taxonomy: 17 categories, each
+with a how-often tier and weekly serving goals the app scores against.
 
 Three properties of that source data shape the whole product, and therefore the design:
 
 | Property | Consequence for design |
 |---|---|
-| The dietician wrote **weighed portion lines**, not recipes (`50 g paine int + 100 g humus, jumatate de farfurie de legume`) | A meal is a *list of entries*, not one recipe. A snack is two food lines. Rows must handle 1–6 entries. |
+| The dietician wrote **weighed portion lines**, not recipes (`50 g paine int + 100 g humus, jumatate de farfurie de legume`) | A meal is a *list of entries*, not one recipe. A snack is two food lines. Rows must handle 1 to 6 entries. |
 | Weights are stated **uncooked** (`50 g bulgur nefiert`, `100 g piept de pui crud`) | Every food carries a state, raw / dry / cooked / as-sold, that sometimes needs surfacing |
-| Every plan week ran **Wednesday → Tuesday** | No calendar component may assume a Monday or Sunday start. It is configurable, but Wednesday is the default. |
+| Every plan week ran **Wednesday to Tuesday** | No calendar component may assume a fixed first day. The week start is a setting, any of the seven; Monday is the default, and loading an archived plan lines its days up by weekday. |
 
 The dietician never wrote a single calorie. Supplying them is what the app adds.
 
 ### Who uses it and where
 
-One person, daily, in two very different contexts:
+Two people in one household, sharing a kitchen and a plan:
+
+- **Shared**: the daily targets, the planned week, the recipe library, the food
+  database, the shopping list, the cooking schedule.
+- **Personal**: weight, five body measurements, exercise, sleep. Every one of those
+  rows says whose it is, and both people appear on screen whether or not either has
+  signed in.
+
+Used daily in two very different contexts:
 
 - **Phone**, standing in a kitchen or walking round a supermarket. Often one-handed,
   often with wet or cold hands, sometimes in poor light.
@@ -57,13 +66,17 @@ satisfy them rather than discover them later.
 
 | Constraint | Detail |
 |---|---|
-| **Two primary form factors** | Sidebar (9 items) on desktop becomes a bottom bar (5 items) on phone. Both need to feel deliberate. |
-| **44px touch targets** | Applied under `(pointer: coarse)` **only**, so phones get thumb-sized controls while pointer devices keep compact ones. A test fails the build if any control drops below 40×32. |
+| **Two primary form factors** | Sidebar (9 items) on desktop becomes a bottom bar (4 destinations plus a centre add button) on phone, with the rest behind More. |
+| **44px touch targets** | Applied under `(pointer: coarse)` **only**, so phones get thumb-sized controls while pointer devices keep compact ones. A test fails the build if any control drops below 40x32. |
 | **No horizontal scroll** | Asserted per screen at 390px. Long recipe names and 187-character source lines are the usual culprits. |
-| **Fully offline** | Installable PWA. No CDN anything, fonts are bundled as files, icons are inline SVG. Any asset a design needs must ship in the build. |
-| **Numbers are the content** | Calories plus four macros, per meal, per day, per week. Figures must align in columns, tabular numerals are not optional. |
-| **Two languages on one row** | Nearly every recipe shows an English name with the dietician's original Romanian or Hungarian beneath it. This pairing needs a real typographic treatment, not just smaller grey text. |
+| **Fully offline** | Installable PWA. No CDN anything, fonts are bundled as files, icons are inline SVG or lucide components. Any asset a design needs must ship in the build. |
+| **Light only** | There is no dark theme and no theme switch. It was built, then removed on purpose: one surface to design, one set of contrast decisions to get right. |
+| **Numbers are the content** | Calories plus four macros, per meal, per day, per week. Figures align in columns; tabular numerals are set globally on `body`. |
+| **Macros are written out** | Protein, Carbs, Fat, Fibre in full. No single-letter labels anywhere in the interface. |
+| **Two languages on one row** | Many recipes show an English name with the dietician's original Romanian or Hungarian beneath it. This pairing needs a real typographic treatment, not just smaller grey text. |
+| **Unknown is not zero** | A nutrient no ingredient knew about is shown as a floor (`12 g +`), never as a total. Any figure display has to have room for that marker. |
 | **Over target is normal** | These are real days, not a game. Slightly over should read as information; only well over should read as a signal. Colour alone should not carry it. |
+| **Nothing is deleted** | Deleting a recipe or a food hides it; archived weeks that name it still resolve. Merging duplicates works the same way. Deleted items stay listed in Settings and can be restored. |
 | **Reduced motion** | All animation is disabled under `prefers-reduced-motion: reduce`. |
 
 ---
@@ -74,15 +87,19 @@ Nine screens. Routes are hash-based so the app works offline.
 
 | Screen | Route | Its job | What's on it |
 |---|---|---|---|
-| **Planner** | `/` | Home. Plan and read a week. | 7-day strip with per-day calories · calorie ring · 4 macro bars · 5 meal slots, each holding any number of entries · copy-day and clipboard actions |
-| **Recipes** | `/recipes` | Find something to eat. | 275 cards in a 1/2/3-column grid · search · 14 filter chips · favourite toggles · detail sheet with provenance, components and method |
-| **Foods** | `/foods` | The ingredient database. | 122 rows under 16 category headings, each with per-100 g figures and a how-often tier · add-food sheet with manual entry, online lookup and barcode scan |
-| **Grocery** | `/grocery` | Get through a shop one-handed. | Checklist grouped by category · progress bar · ~46 rows for a full week |
-| **History** | `/history` | Browse the 14 original plans. | Expandable plan cards, each with 7 days of untranslated source text and a load-into-planner action |
-| **Prep** | `/prep` | Cook along. | Recipe picker, then one large step at a time with a countdown timer and a progress bar |
-| **Schedule** | `/schedule` | Plan batch-cook sessions. | Session list with date, time, completion state and recipe tags |
-| **Progress** | `/analytics` | See how the week went. | Three tabs: 7-bar calorie chart · Mediterranean serving goals as 7 progress rows · weight log with a sparkline |
-| **Settings** | `/settings` | Targets and preferences. | Three target-setting routes · TDEE form · week-start select · toggles · CSV import |
+| **Home** | `/` | Open the app and know where you stand. | Greeting with Zig, four at-a-glance tiles (today's calories, days planned, Mediterranean goals met, next cook or latest weight), today's meals against a calorie ring, a seven-bar week chart, one dismissible moment, sync status |
+| **Planner** | `/plan` | Plan and read a stretch of days. | Week, fortnight or month range, day cards with per-day calories, 5 meal slots each holding any number of entries, add-entry sheet, copy day, macro bars against target |
+| **Recipes** | `/recipes` | Find something to eat. | 275 recipes on meal-type shelves, grouped into variant cards, dish-category sheet, 14 quick-filter chips, search, favourites, detail sheet with provenance and method, editor, merge duplicates, delete |
+| **Foods** | `/foods` | The ingredient database. | 122 rows under 16 category headings, per-100 g figures and a how-often tier, add by hand or from USDA FoodData Central, Open Food Facts or a barcode, edit, merge, delete, provenance on every imported food |
+| **Grocery** | `/grocery` | Get through a shop one-handed. | Checklist grouped by category, scoped to the days you pick, editable rows, free-typed additions, progress bar |
+| **Schedule** | `/schedule` | Plan batch-cook sessions. | Session list with date, time, dishes and completion state, plus an email reminder to both people before a session |
+| **Movement** | `/movement` | Log what the body did. | Person tabs (Arany, Oli), then Exercise and Sleep tabs: workout builder with an exercise search, calories from body weight, step counts, Garmin CSV import |
+| **Progress** | `/analytics` | See how the week went. | Three tabs. This week: seven-bar calorie chart. Mediterranean: serving goals as progress rows. Body: person tabs, weight log, and waist, hips, chest, arms and thighs each with their own trend |
+| **Settings** | `/settings` | Targets, preferences, data, archive. | Two tabs. Settings: daily targets (from the plans, from a TDEE calculation, or set by hand), week start, backup and restore, account, version, the weekly food check, deleted recipes and foods. Plan history: the 14 original plans, untranslated, loadable into the planner |
+
+Settings is reachable **signed out**, on purpose: targets, the backup file and the
+version live on the device, and signing out should not take away the screen you
+signed out in order to reach.
 
 ---
 
@@ -90,15 +107,15 @@ Nine screens. Routes are hash-based so the app works offline.
 
 | Group | Components | Notes |
 |---|---|---|
-| **Navigation** | Sidebar (9 items) · bottom bar (5 items) · segmented tabs | The phone bar shows only 5 of 9 screens, which 5 is worth revisiting |
-| **Surfaces** | Card · soft card · bottom sheet · centred dialog · full-screen error | Sheets slide from the bottom on phone, centre on desktop. Five exist. |
-| **Actions** | Primary · secondary · ghost · danger · icon-only · filter chip (on/off) · text link | Currently pill-shaped, primary has a pressed-down effect |
-| **Forms** | Text · number with unit suffix · select · checkbox · date · time · file · search | Number inputs are used constantly (grams, kcal, body stats) and deserve their own treatment |
-| **Data display** | Calorie ring (radial progress) · macro bar with target · 7-bar chart · sparkline · linear progress · stat block | The ring and bars appear together on the busiest screen and should read as one family |
-| **Content rows** | Recipe card · food row · meal-slot row · grocery row · plan-day row · session card | Each pairs a name, an optional second-language line, and right-aligned figures |
-| **Markers** | Tier badge (4 levels) · tag · category heading · favourite star · language flag | Tier is a four-step scale, currently colour-only |
-| **Feedback** | Empty state · error screen · storage warning banner · XP toast · copied confirmation · countdown timer | The logo has three moods and carries the empty and error states |
-| **Brand** | Logo (3 moods) · wordmark lockup · app icon · favicon | All inline SVG, theme-coloured, used from 30px to 96px |
+| **Navigation** | Sidebar (9 items) · bottom bar (Home, Plan, add, Recipes, More) · More sheet · segmented tabs · person tabs | The centre add button sits proud of the bar and is the one-handed primary action |
+| **Surfaces** | Card · soft card · bottom sheet · centred dialog · full-screen error | Sheets slide from the bottom on phone, centre on desktop |
+| **Actions** | Primary · secondary · ghost · danger · icon-only · filter chip (on/off) · text link | Pill-shaped, primary has a pressed-down effect |
+| **Forms** | Text · number with unit suffix · unit dropdown (g, kg, ml, l, piece, tsp, tbsp, cup) · select · checkbox · date · time · file · search with grouped results | Number inputs are used constantly and deserve their own treatment |
+| **Data display** | Calorie ring · macro bar with target · seven-bar chart · sparkline · linear progress · stat tile · nutrient summary with partial markers | The ring and the bars appear together on the busiest screens and should read as one family |
+| **Content rows** | Recipe card · food row · meal-slot row · grocery row · plan-day row · session card · workout row · measurement row | Each pairs a name, an optional second-language line, and right-aligned figures |
+| **Markers** | Tier badge (4 levels) · status pill · dish-category label · quick-filter chip · favourite star · provenance card | Tier appears on all 122 food rows, so it has to be quiet and legible at once |
+| **Feedback** | Empty state · error screen · storage warning banner · moment note · copied confirmation · update-available reload | Zig has three moods and carries the empty and error states |
+| **Brand** | Zig the mascot (3 moods) · wordmark lockup · app icon · favicon | All inline SVG, theme-coloured, used from 30px to 96px |
 
 ---
 
@@ -106,41 +123,48 @@ Nine screens. Routes are hash-based so the app works offline.
 
 All of these exist in code today. A redesign has to account for each.
 
-**Data states**, populated · empty (first run) · empty (filtered to nothing) · partial week · someone else's plan
+**Data states**, populated · empty (first run) · empty (filtered to nothing) · partial
+week · deleted but still referenced by an archived week · merged into another item ·
+imported with provenance · imported with a nutrient the source did not know
 
-**Target states**, under target · slightly over (105–130%) · well over (130%+) · no target set
+**Target states**, under target · slightly over (105 to 130%) · well over (130%+) · no
+target set
 
-**System states**, loading (nutrition lookup) · offline · storage full · corrupt data recovery · render error
+**System states**, loading (nutrition lookup) · offline · storage full · corrupt data
+recovery · render error · a new build is waiting to take over · signed out
 
-**Interaction states**, default · hover · focus-visible · pressed · disabled · favourited · checked off · session completed · timer running · timer finished
+**Interaction states**, default · hover · focus-visible · pressed · disabled ·
+favourited · checked off · session completed · person selected
 
-**Calendar states**, today · selected day · day with no meals
+**Calendar states**, today · selected day · day with no meals · day outside the
+current month (month view)
 
-**Preference states**, reduced motion · XP layer shown/hidden
+**Preference states**, reduced motion · week start (any of the seven)
 
 ---
 
 ## 6. Content you're designing around
 
-Real measurements from the shipped data, not estimates.
+Real measurements from the shipped data, not estimates. Regenerate with
+`npm run data:check`.
 
 | What | Figure | Why it matters |
 |---|---|---|
-| Recipes | **275** | 71 base dishes + 204 meals taken from the plans |
-| Recipe name length | **5–77 chars**, median 41 | Cards must handle two-line names without breaking the grid |
+| Recipes | **275** | 71 base dishes plus 204 meals taken from the plans, grouped into far fewer cards by variant |
+| Recipe name length | **5 to 77 chars**, median 41 | Cards must handle two-line names without breaking the grid |
 | Source lines | **up to 187 chars** | Shown under the name; truncates on cards, wraps in detail |
 | Foods | **122** | Across 16 categories, each row carrying up to three language names |
-| Food categories | **17 defined, 16 in use** | Used as group headings on two screens |
-| Filter tags | **13** + favourites | 14 chips in one horizontally scrolling row |
-| Meal slots | **5 × 7 = 35** | A slot can hold several entries |
-| Grocery items | **~46** | For a full seven-day week |
+| Dish categories | **38 defined, 19 in use** | Describe what the food is, never when it is eaten |
+| Quick filters | **14** | One horizontally scrolling chip row |
+| Meal types | **4** | Breakfast, Lunch, Dinner, Snack. A recipe can belong to several |
+| Meal slots | **5 x 7 = 35** | A slot can hold several entries |
+| Food categories | **17 defined, 16 in use** | Group headings on the Foods screen |
 | Plan archive | **14 plans / 97 days** | All with untranslated source text |
-| Typical day | **~1,258 kcal** | Range 869–2,651, bars need headroom well past target |
+| People | **2** | Arany and Oli, fixed ids, both always on screen |
+| Body measurements | **5** | Waist, hips, chest, arms, thighs, each with its own history and trend |
+| Typical day | **~1,258 kcal** | Range 869 to 2,651, bars need headroom well past target |
 
 **The five meal slots**, in order: Breakfast · Snack 1 · Lunch · Snack 2 · Dinner.
-
-**The 13 recipe tags:** batch, breakfast, dinner, high-protein, low-carb, lunch,
-pescatarian, quick, salad, soup, spread, vegan, vegetarian.
 
 **The 17 food categories:** vegetables, legumes, fruits, grains, nuts-seeds,
 herbs-spices, fats-vinegars, dairy, fish-seafood, poultry, eggs, red-meat, pantry,
@@ -152,71 +176,67 @@ spreads-sauces, treats, sweeteners, beverages.
 
 ## 7. Tokens in place today
 
-Replace, extend or ignore, this is the starting point, not a constraint. Everything is
-CSS custom properties in one file (`src/index.css`), so a palette swap is a single edit.
+Everything is CSS custom properties in one file (`src/index.css`), inside an
+`@theme { }` block, so a palette swap is a single edit. Full specs live in
+[`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md).
 
 ### Colour
 
-**Sage**, primary. Muted and leafy, never neon.
+**Bite**, primary. A confident violet, the brand colour and the focus ring.
 
 | 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 |
 |---|---|---|---|---|---|---|---|---|---|
-| `#f2f7f1` | `#e2eede` | `#c6dcbf` | `#a2c497` | `#7faa72` | `#628f55` | `#4c7442` | `#3d5c36` | `#33492e` | `#2b3d28` |
+| `#f5f2ff` | `#e9e4ff` | `#c9c0f1` | `#aa9ce8` | `#8b7add` | `#6d5bd0` | `#5947be` | `#4938a7` | `#3b2d85` | `#2c2166` |
 
-**Peach (clay)**, warmth, highlights, and anything gently over target.
+**Coral**, warnings, destructive actions, well over target. `#fff3f3` … `#ff6868` … `#8a2a2a`
 
-| 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 |
-|---|---|---|---|---|---|---|---|---|---|
-| `#fff5f0` | `#ffe8dc` | `#ffd2bb` | `#ffb492` | `#fb9068` | `#ef7048` | `#d85632` | `#b34327` | `#923a25` | `#793322` |
+**Teal**, the positive counterweight: on target, completed, synced. `#ebfaf8` … `#00b8a9` … `#08504a`
 
-**Cream (sand)**, page and card grounds. Paper, not plaster.
+**Mustard**, the third accent, highlights and gentle attention. `#fffcf2` … `#ffd166` … `#82601b`
 
-| 50 | 100 | 200 | 300 | 400 | 500 |
-|---|---|---|---|---|---|
-| `#fffbf4` | `#fdf4e7` | `#f6e8d5` | `#ecd8bd` | `#dcc09a` | `#c8a67b` |
+**Grounds and text**
 
-**Butter**, soft third accent. `#fff6d9` `#ffecb0` `#ffdd7a` `#fdca45` `#edb122`
-
-**Berry (xp)**, streaks and celebratory moments. `#fdf3f7` … `#d84f88` … `#6e2440`
-
-**Ink**, `#33231c`. The logo outline. A deep warm brown rather than black, so the
-chunky outline stays warm against the cream.
-
-Text currently uses Tailwind's `stone` ramp (`stone-700` body, `stone-400/500`
-secondary). That is the one part of the palette that was inherited rather than chosen,
-and is the most obvious thing to replace with a warm neutral of your own.
+| Token | Value | Use |
+|---|---|---|
+| `--color-cream-50` | `#faf7f0` | App background |
+| `--color-paper` | `#fffdf9` | Primary card surface |
+| `--color-ink-900` | `#2d2320` | Main text |
+| `--color-ink-700` | `#514744` | Secondary text |
+| `--color-ink-500` | `#817774` | Muted text |
+| `--color-ink-300` | `#a79d9a` | Placeholders |
+| `--color-border-100` / `200` | `#f0eae2` / `#e6ded5` | Hairlines and card edges |
 
 ### Type
 
 | Role | Face | Usage |
 |---|---|---|
-| Display | **Fredoka Variable** (300–700) | Wordmark, page titles (`h1`, `h2`) only |
-| Body | **Nunito Variable** (200–1000) | Everything else |
-| Numeric | Nunito with `font-variant-numeric: tabular-nums` | Set globally on `body` |
+| Display | **Bungee** | The `display` utility only: wordmark, page titles, big moments. Never long copy, never data |
+| Body | **Plus Jakarta Sans Variable** | Everything else, `body` weight 500 |
+| Numeric | Plus Jakarta Sans with `font-variant-numeric: tabular-nums` | Set globally |
 
-Both are bundled via `@fontsource-variable`, not fetched from a CDN. There is no true
-monospace, `--font-mono` points at Nunito, and alignment comes from tabular figures.
+Both are bundled via `@fontsource`, not fetched from a CDN. There is no true
+monospace; `--font-mono` points at Plus Jakarta Sans and alignment comes from tabular
+figures.
 
 ### Shape, elevation, motion
 
 | Token | Value |
 |---|---|
-| `--radius-xl` | `0.875rem` (14px) |
-| `--radius-2xl` | `1.25rem` (20px) |
-| `--radius-3xl` | `1.75rem` (28px), cards |
+| `--radius-sm` … `--radius-xl` | 8, 12, 16, 20px |
+| `--radius-card` | 24px |
 | Buttons | Fully pill (`rounded-full`) |
-| Inputs | 20px radius, 2px border |
-| Shadow | One soft warm-toned shadow. **No elevation scale yet.** |
+| `--shadow-e1` / `e2` / `e3` | A three-step warm-toned elevation scale |
+| Focus | `3px solid var(--color-bite-500)`, offset 2px, everywhere |
 | Spacing | Tailwind's default 4px scale, unmodified |
-| Motion | 150ms on interaction, 500–700ms on bars and rings |
+| Motion | 150ms on interaction, 500 to 700ms on bars and rings, plus `pop` and `wiggle` for personality |
 
-### Currently missing
+### Still open
 
-- **Dark mode**, not built, not designed
-- **Elevation scale**, a single shadow does all the work
-- **Focus-visible treatment**, browser default in most places
-- **Semantic colour** separate from the accent, over-target reuses peach
-- **Density variants**, desktop uses phone-sized cards in a wider grid
+- **Density variants**, desktop still uses phone-sized cards in a wider grid
+- **Contrast**, never formally audited against WCAG
+- **Semantic colour**, over-target reuses coral rather than having its own scale
+- **Charts**, the seven-bar chart and the sparkline were drawn ad hoc rather than
+  specified
 
 ---
 
@@ -228,59 +248,71 @@ The app should read like a kitchen notebook, not an analytics dashboard.
 - Errors are calm and reassuring: *"Oops, something spilled. This screen tripped over
   itself. Your recipes and plans are safe."*
 - Never scolding about food. Going over target is information, not a failure.
+- Nothing counts and nothing resets. There are no points, streaks or levels; Zig
+  notices a handful of firsts and then goes quiet.
 - British spelling (*favourites*, *fibre*, *cosy*).
+- **No em dashes.** House rule, enforced by `npm run text:check` and documented in
+  `.claude/skills/no-em-dashes/`. Use a comma, a colon, a full stop or brackets.
 
 > **Note:** several e2e tests assert on exact copy. Changing user-facing strings means
-> updating `e2e/smoke.spec.ts` in the same commit.
+> updating the specs in `e2e/` in the same commit.
 
 ---
 
 ## 9. Accessibility requirements
 
-- Minimum 40×32 tap target on coarse pointers, enforced by test
+- Minimum 40x32 tap target on coarse pointers, enforced by test
 - `prefers-reduced-motion` respected globally
+- One visible focus treatment everywhere, not the browser default
 - Every icon-only control has an `aria-label`
 - No horizontal scroll at any viewport
-- **Not yet done:** contrast has not been formally audited, focus-visible is mostly the
-  browser default, and over-target status is signalled by hue alone
+- **Not yet done:** contrast has not been formally audited, and over-target status is
+  still signalled largely by hue
 
 ---
 
 ## 10. Implementation notes
 
+React 19 with TypeScript, Vite, Zustand with `persist`, React Router on a hash
+history, Supabase for optional sync, Workbox for the service worker.
+
 Tailwind CSS v4, CSS-first, **there is no `tailwind.config.js`**.
 
 - **Design tokens** are custom properties in an `@theme { }` block. Adding
-  `--color-foo-500` makes `bg-foo-500`, `text-foo-500` etc. available automatically.
+  `--color-foo-500` makes `bg-foo-500`, `text-foo-500` and so on available
+  automatically.
 - **Components** are `@utility` classes (`btn-primary`, `card`, `chip-on`, `tab-off`,
-  `input`, `nav-item`…). Note that `@utility` *inlines* a composed base rather than
-  adding its class to the element, so a rule targeting `.btn` will not match an element
-  with `class="btn-primary"`, media-query overrides must list each variant.
+  `input`, `nav-item`, `meal-slot`). Note that `@utility` *inlines* a composed base
+  rather than adding its class to the element, so a rule targeting `.btn` will not
+  match an element with `class="btn-primary"`; media-query overrides must list each
+  variant.
 - **Touch sizing** lives in an unlayered `@media (pointer: coarse)` block at the end of
   the stylesheet so it takes precedence over the utilities it widens.
+- **Nutrition is always derived**, never stored. A recipe holds components; calories
+  and macros are computed from them at every level: ingredient, recipe, serving.
+- **A weekly GitHub Action** re-checks the food database for macro, micronutrient,
+  category and how-often problems and reports them rather than editing the data.
 
 A design system can be delivered as: token values (any format), component specs, and
 optionally the `@theme` block itself.
 
 ---
 
-## 11. Decisions I'd like from you
+## 11. Decisions worth taking next
 
-1. **Is dark mode in scope?** There is none today. It is a real ask for an app opened in
-   a kitchen at night, and it doubles the token work, better decided before the palette
-   is fixed than after.
-2. **How should over-target read without relying on colour?** Today it is a hue shift on
-   a bar. That fails for anyone who cannot separate the hues, and it is the single
-   most-read signal in the app.
-3. **What carries the four-step Mediterranean tier?** It appears on all 122 food rows,
-   so it must be legible at a glance and quiet enough to sit in a dense list.
-4. **Should desktop get its own density?** Right now desktop uses phone-sized cards in a
-   wider grid, which wastes a lot of screen, but a denser mode doubles the layout work.
-5. **How much should the second language show?** The Romanian and Hungarian source text
-   is the app's whole provenance story, but it is also visual noise on every row. It
-   could be secondary, on hover, or behind a toggle.
+1. **Should desktop get its own density?** Phone-sized cards in a wider grid waste a
+   lot of screen on the planner and the recipe list, but a denser mode doubles the
+   layout work.
+2. **How should over-target read without relying on colour?** It is the single
+   most-read signal in the app and today it is mostly a hue shift.
+3. **What should a partial figure look like?** `12 g +` is honest but plain, and it
+   appears wherever an ingredient did not know a nutrient.
+4. **How much should the second language show?** The Romanian and Hungarian source
+   text is the app's whole provenance story, and it is also visual noise on every row.
+5. **Do the two people need visual identity?** Arany and Oli are currently just tab
+   labels. A colour or an initial each would make a shared screen readable at a glance,
+   at the cost of two more committed hues.
 
 ---
 
-*Anything missing here, ask, the numbers above all come from the shipped data and can
-be regenerated with `npm run data:check`.*
+*Anything missing here, ask. The numbers above all come from the shipped data.*
