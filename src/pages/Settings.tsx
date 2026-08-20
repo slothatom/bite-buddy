@@ -22,7 +22,7 @@ const WEEKDAYS: { value: WeekStart; label: string }[] = [
 ]
 
 export default function Settings() {
-  const { profile, setName, setTargets, setTdee, setWeekStart, setShowGamification } = useUserStore()
+  const { profile, setName, setTargets, setTdee, setWeekStart, setShowGamification, setTheme } = useUserStore()
   const ctx = useNutritionContext()
 
   const planAverage = useMemo(() => averagePlanDay(SOURCE_PLANS, ctx), [ctx])
@@ -202,6 +202,18 @@ export default function Settings() {
                 Tuesday; loading one lines its days up by weekday either way.
               </p>
             </div>
+            <div>
+              <label className="label">Appearance</label>
+              <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
+                {([['system', 'Match device'], ['light', 'Light'], ['dark', 'Dark']] as const).map(([value, label]) => (
+                  <button key={value} onClick={() => setTheme(value)}
+                    className={profile.theme === value ? 'tab-on' : 'tab-off'}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" checked={profile.showGamification}
                 onChange={(e) => setShowGamification(e.target.checked)}

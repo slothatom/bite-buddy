@@ -107,6 +107,58 @@
   }
 }
 
+/* ─── Dark ─────────────────────────────────────────────────────────────────
+   Eight neutral tokens carry every surface and every piece of text, so dark
+   mode is those eight redefined plus the accent steps that are used as text —
+   a mid-tone that reads well on cream is unreadable on near-black.
+
+   Three states, not two: an explicit choice sets data-theme, and the default
+   "system" sets nothing, where only prefers-color-scheme separates them. So the
+   media query is guarded against an explicit light choice, and the attribute
+   rule repeats the palette so the toggle wins in both directions. */
+
+@layer theme {
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --color-cream-50: #17131a;
+      --color-paper: #201a24;
+      --color-ink-900: #f6f0ea;
+      --color-ink-700: #d0c5c9;
+      --color-ink-500: #9d9298;
+      --color-ink-300: #6f656b;
+      --color-border-100: #2a232e;
+      --color-border-200: #3a3140;
+
+      --color-bite-100: #2f2650;
+      --color-bite-600: #a091f2;
+      --color-bite-700: #b9abf8;
+      --color-teal-600: #35cdba;
+      --color-teal-700: #57d9c8;
+      --color-coral-600: #ff8a70;
+      --color-mustard-700: #e9bb55;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --color-cream-50: #17131a;
+    --color-paper: #201a24;
+    --color-ink-900: #f6f0ea;
+    --color-ink-700: #d0c5c9;
+    --color-ink-500: #9d9298;
+    --color-ink-300: #6f656b;
+    --color-border-100: #2a232e;
+    --color-border-200: #3a3140;
+
+    --color-bite-100: #2f2650;
+    --color-bite-600: #a091f2;
+    --color-bite-700: #b9abf8;
+    --color-teal-600: #35cdba;
+    --color-teal-700: #57d9c8;
+    --color-coral-600: #ff8a70;
+    --color-mustard-700: #e9bb55;
+  }
+}
+
 @layer base {
   *, ::after, ::before, ::backdrop, ::file-selector-button {
     border-color: var(--color-border-200);
