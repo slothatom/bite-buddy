@@ -180,12 +180,25 @@ export default function Home() {
 }
 
 function SyncLine() {
-  const { state, at } = useSyncStatus()
+  const { state, at, unsaved, schemaMismatch } = useSyncStatus()
 
+  // Unsaved changes outrank everything else: it is the only state where what
+  // you are looking at is not what the other person will see.
   const [Icon, text, tone] =
-    state === 'live' ? [Cloud, at ? `Everything shared · last synced ${timeOf(at)}` : 'Everything shared', 'text-teal-600']
-    : state === 'connecting' ? [RefreshCw, 'Connecting…', 'text-ink-500']
-    : state === 'error' ? [AlertTriangle, "Can't reach the server — your changes are saved on this device and will go up when it's back.", 'text-coral-600']
+    schemaMismatch
+      ? [AlertTriangle,
+         'The other device is running a different version of the app. Nothing has been overwritten — reload this page to pick up the latest.',
+         'text-coral-600']
+    : unsaved
+      ? [CloudOff,
+         `${unsaved} ${unsaved === 1 ? 'change' : 'changes'} not saved yet — kept on this device and retried automatically.`,
+         'text-mustard-700']
+    : state === 'live'
+      ? [Cloud, at ? `Everything shared · last synced ${timeOf(at)}` : 'Everything shared', 'text-teal-600']
+    : state === 'connecting'
+      ? [RefreshCw, 'Connecting…', 'text-ink-500']
+    : state === 'error'
+      ? [AlertTriangle, "Can't reach the server — your changes are safe here and will go up when it's back.", 'text-coral-600']
     : [CloudOff, 'Working offline on this device only.', 'text-ink-500']
 
   return (
