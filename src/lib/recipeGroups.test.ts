@@ -35,7 +35,7 @@ describe('groups', () => {
     expect(groupForTime(new Date('2026-08-20T19:00:00'))).toBe('dinner')
   })
 
-  it('covers the whole library — no recipe falls off the end', () => {
+  it('covers the whole library, no recipe falls off the end', () => {
     for (const r of ALL_RECIPES) {
       const groups = groupsOf(r)
       expect(groups.length).toBeGreaterThan(0)

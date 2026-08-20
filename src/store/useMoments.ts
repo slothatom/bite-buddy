@@ -2,7 +2,7 @@
  * Watching for the things Zig notices.
  *
  * Mounted once, on the welcome screen. It derives everything from state that
- * already exists rather than being called from all over the app — a moment is
+ * already exists rather than being called from all over the app, a moment is
  * an observation about how things are, not an event fired at the instant you
  * do something.
  */

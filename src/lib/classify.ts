@@ -5,7 +5,7 @@ import { recipePerServing, type NutritionContext } from './nutrition'
  * Working out what a recipe is, from what goes in it.
  *
  * The 275 shipped recipes were generated from the dietician's lines, which
- * never say "this is a soup" — they say "350 g supă de fasole verde, 25 g pâine
+ * never say "this is a soup", they say "350 g supă de fasole verde, 25 g pâine
  * int". So the category has to be read off the food, and the rules below are
  * the reading. They are checked in rather than run once and forgotten, so the
  * classification of the whole library can be re-derived and argued with.
@@ -13,8 +13,8 @@ import { recipePerServing, type NutritionContext } from './nutrition'
  * Three rules decide almost everything:
  *
  *  - **Only the head of the name counts.** Every generated meal is named
- *    "PRIMARY with SIDE & SIDE" — "Roasted vegetables with salmon & yogurt
- *    garlic sauce" — so the part before " with " is the dish and the rest is
+ *    "PRIMARY with SIDE & SIDE", "Roasted vegetables with salmon & yogurt
+ *    garlic sauce", so the part before " with " is the dish and the rest is
  *    what came alongside. Reading the whole name made that a sauce.
  *  - **English only.** The Romanian lines are full of false friends: "pastă de
  *    brânză" is a cheese *spread*, and matching "pasta" on it filed fifteen
@@ -25,7 +25,7 @@ import { recipePerServing, type NutritionContext } from './nutrition'
  *
  * Grain is the category the original list did not have. Rice, Pasta and Noodles
  * were there, but this library runs on bulgur, couscous and quinoa, and without
- * somewhere to put them those dishes fell through to their protein — "Bulgur
+ * somewhere to put them those dishes fell through to their protein, "Bulgur
  * with chicken breast" read as a meat dish, which is not wrong but left no way
  * to ask for a grain bowl. Porridge stays separate: mămăligă and oats at
  * breakfast are a different thing from bulgur under a chicken breast.
@@ -123,8 +123,8 @@ export function categorise(recipe: Recipe, ctx: NutritionContext): DishCategory 
   // dairy food that is a meal in its own right at breakfast.
   const weights = weighFoods(recipe, ctx)
   const ranked = [...weights.entries()].sort((a, b) => b[1] - a[1])
-  // Sides are set aside first, but a dish that is *only* sides — "Roasted
-  // vegetables" — still has to be something, so they come back rather than
+  // Sides are set aside first, but a dish that is *only* sides, "Roasted
+  // vegetables", still has to be something, so they come back rather than
   // falling through to a meaningless "snack".
   const lead = ranked.find(([id]) => !ALWAYS_A_SIDE.has(id)) ?? ranked[0]
 
@@ -190,12 +190,12 @@ const PANTRY_FOODS = new Set(['tuna-canned'])
  *
  * Deliberately not all fourteen. Lazy Meals, Leftovers, Fridge Clean-Out and
  * Special Occasion are judgements about a particular week in a particular
- * kitchen, and there is nothing in a component list that implies them —
+ * kitchen, and there is nothing in a component list that implies them -
  * inventing them would fill the library with confident nonsense that is tedious
  * to undo. They stay empty until somebody says otherwise.
  *
  * Budget Friendly is the same, for a different reason: the app holds no prices.
- * The nearest guess — "contains nothing expensive" — was true of 83% of the
+ * The nearest guess, "contains nothing expensive", was true of 83% of the
  * library, because Mediterranean home cooking out of a Romanian supermarket is
  * cheap almost by definition. A filter that matches four recipes in five
  * narrows nothing, so it is left for you to apply where it means something.
@@ -232,7 +232,7 @@ export function deriveQuickFilters(
   }
 
   // A soup is one pot whether or not anybody wrote the method down. Where there
-  // is a method, it can also say so — and can rule it out.
+  // is a method, it can also say so, and can rule it out.
   const steps = recipe.steps.map((s) => s.instruction.toLowerCase()).join(' ')
   const twoVessels = /\b(another|second|separate) (pan|pot|tray)/.test(steps)
   if (!twoVessels && (ONE_VESSEL.includes(category) || /\b(pan|pot|skillet|tray)\b/.test(steps))) {

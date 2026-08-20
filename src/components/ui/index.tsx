@@ -12,7 +12,7 @@ import Zig, { type ZigMood } from '../brand/Mascot'
  *
  * The target is drawn as an explicit line rather than being inferred from where
  * the fill stops, and anything over target is labelled in words as well as
- * coloured — the design system forbids carrying that state by hue alone.
+ * coloured, the design system forbids carrying that state by hue alone.
  */
 export function MacroBar({
   label, value, target, unit = 'g',
@@ -66,7 +66,7 @@ export function MacroBar({
   )
 }
 
-/** Calorie dial — a single day's overview. The one number read at a glance. */
+/** Calorie dial, a single day's overview. The one number read at a glance. */
 export function CalorieRing({ value, target, size = 132 }: { value: number; target: number; size?: number }) {
   const status = targetStatus(value, target)
   const styles = STATUS_STYLES[status.level]
@@ -108,7 +108,7 @@ export function CalorieRing({ value, target, size = 132 }: { value: number; targ
   )
 }
 
-/** Status as a labelled pill — colour plus icon plus words, never colour alone. */
+/** Status as a labelled pill, colour plus icon plus words, never colour alone. */
 export function StatusPill({ level, label }: { level: StatusLevel; label: string }) {
   const styles = STATUS_STYLES[level]
   const Icon = level === 'over' ? AlertTriangle : level === 'on-track' ? Check : null
@@ -205,17 +205,17 @@ export function TierBadge({ tier }: { tier: MedTier }) {
  * The second language.
  *
  * The dietician's original Romanian or Hungarian is provenance, not metadata to
- * bury: it gets a real treatment — a small language badge and readable muted
- * text — rather than italic, near-invisible grey.
+ * bury: it gets a real treatment, a small language badge and readable muted
+ * text, rather than italic, near-invisible grey.
  */
 export function SourceLine({
   text, lang, truncate = false, clamp,
 }: {
   text: string
   lang?: 'ro' | 'hu'
-  /** One line with an ellipsis — for dense lists where the line is a hint. */
+  /** One line with an ellipsis, for dense lists where the line is a hint. */
   truncate?: boolean
-  /** Up to this many lines — for places where the original wording is the point. */
+  /** Up to this many lines, for places where the original wording is the point. */
   clamp?: 2 | 3
 }) {
   const wrap = clamp ? (clamp === 2 ? 'line-clamp-2' : 'line-clamp-3') : truncate ? 'truncate' : ''
@@ -266,7 +266,7 @@ export function SectionHeading({ children, action }: { children: ReactNode; acti
  * A row of filter chips that wraps instead of scrolling out of sight.
  *
  * These rows previously scrolled horizontally, which hid most of the filters:
- * 829px of chips on Recipes, 1,578px on Foods — about three of seventeen
+ * 829px of chips on Recipes, 1,578px on Foods, about three of seventeen
  * categories visible, with nothing on screen to say the rest existed. Wrapping
  * shows everything, and collapsing to the first few keeps it from taking over
  * the top of the page.

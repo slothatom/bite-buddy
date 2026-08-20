@@ -8,14 +8,14 @@
  *
  * The week is now merged a day at a time. Two people working on different days
  * both keep their work, which is the common case and previously the broken one.
- * The same day changed on both sides still has to pick one — there is no way to
- * combine two different dinners — so it takes the one edited later and reports
+ * The same day changed on both sides still has to pick one, there is no way to
+ * combine two different dinners, so it takes the one edited later and reports
  * that it happened, rather than losing it quietly.
  *
  * "Changed on both sides" needs a reference point. A day where only one side
  * moved is not a conflict, it is the other side being out of date, and calling
  * that a conflict would warn about every ordinary edit. So the caller passes
- * `since` — when the two copies last agreed — and a day counts as contested
+ * `since`, when the two copies last agreed, and a day counts as contested
  * only if both were edited after it.
  *
  * Everything else stays last-write-wins: they are lists you each append to
@@ -50,7 +50,7 @@ function editedAt(day: DayPlan): number {
  * Merges the week day by day.
  *
  * `local` wins ties, because the person whose device this is has just been
- * looking at it — an edit that vanishes under your cursor is worse than one
+ * looking at it, an edit that vanishes under your cursor is worse than one
  * that vanishes on the other side of the room.
  */
 export function mergeMealPlan(
@@ -87,7 +87,7 @@ export function mergeMealPlan(
     if (editedAt(mine) >= editedAt(theirs)) byDate.set(mine.date, mine)
 
     // Only contested if both moved since the copies last agreed. One side
-    // moving is just the other being out of date — the ordinary case, and
+    // moving is just the other being out of date, the ordinary case, and
     // warning about it would make the warning meaningless.
     if (editedAt(mine) > since && editedAt(theirs) > since) conflicts.push(mine.date)
   }
@@ -107,7 +107,7 @@ export function mergeMealPlan(
  * Merges one store's document.
  *
  * Only the meal plan has a real merge. Everything else takes the remote copy,
- * which is what it did before — the difference is that this is now a decision
+ * which is what it did before, the difference is that this is now a decision
  * with a name rather than the only behaviour available.
  */
 export function mergeStore(

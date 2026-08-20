@@ -112,7 +112,7 @@ export default function GroceryList() {
         {groceryItems.length > 0 && (
           <p className="flex items-start gap-2 text-xs text-ink-500">
             <ShoppingBasket size={14} className="shrink-0 mt-0.5" />
-            Weights are raw, the way your plans are written — grains and meat before cooking.
+            Weights are raw, the way your plans are written: grains and meat before cooking.
           </p>
         )}
       </div>

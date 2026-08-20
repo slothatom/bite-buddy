@@ -3,7 +3,7 @@ import type { ZigMood } from '../components/brand/Mascot'
 /**
  * Little things Zig notices.
  *
- * This replaces XP, levels, streaks and achievements — machinery that was built
+ * This replaces XP, levels, streaks and achievements, machinery that was built
  * here, then hidden behind a Settings toggle because it fought everything else
  * about the app. The reason it fought is worth writing down, because it decides
  * what this is allowed to be.
@@ -47,7 +47,7 @@ export interface MomentDefinition {
 /**
  * Eight, and that is the whole list.
  *
- * Written as observations rather than praise — "look at that" rather than
+ * Written as observations rather than praise, "look at that" rather than
  * "great job!". Zig is a creature who lives in the app and noticed something,
  * not a coach with a clipboard.
  */
@@ -120,7 +120,7 @@ export const EMPTY_CONTEXT: MomentContext = {
 /**
  * Which moments the current state warrants.
  *
- * Pure, and says nothing about what has already been noticed — the store owns
+ * Pure, and says nothing about what has already been noticed, the store owns
  * that. Keeping the two apart is what makes "once, ever" simple: this can
  * return the same answer every render without it meaning anything.
  */

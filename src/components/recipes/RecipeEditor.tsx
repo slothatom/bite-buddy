@@ -23,13 +23,13 @@ import { UNIT_LABELS, unitsFor, toGrams, fromGrams, defaultUnit, APPROXIMATE_UNI
  * Editing a recipe, whether it came from the dietician or from you.
  *
  * The 275 shipped recipes live in code, so "editing" one really means keeping
- * your own copy of it — the store does that on the first change and the original
+ * your own copy of it, the store does that on the first change and the original
  * stays available to come back to. That is why this offers Revert as well as
  * Delete: undoing your edits and getting rid of the recipe are different
  * intentions, and one button cannot mean both.
  *
  * Nothing here types in calories. Ingredients are weighed foods or other
- * recipes, and the numbers at the bottom are derived as you go — the same
+ * recipes, and the numbers at the bottom are derived as you go, the same
  * derivation the planner uses, so a recipe cannot disagree with its own totals.
  */
 export default function RecipeEditor({
@@ -56,7 +56,7 @@ export default function RecipeEditor({
   const perServing = roundNutrients(report.total)
   const groups = groupsOf(draft)
 
-  /** How many planned meals point at this recipe — deleting it would blank them. */
+  /** How many planned meals point at this recipe, deleting it would blank them. */
   const usedInPlan = useMemo(
     () => plan.reduce(
       (n, day) => n + day.meals.reduce(
@@ -83,7 +83,7 @@ export default function RecipeEditor({
   }
 
   /**
-   * Choosing what a dish *is* suggests when you eat it — but only ever suggests.
+   * Choosing what a dish *is* suggests when you eat it, but only ever suggests.
    * On a recipe that already has meal times, whether from the plans or from you,
    * they are left exactly as they are.
    */
@@ -204,7 +204,7 @@ export default function RecipeEditor({
               ))}
             </select>
             <p className="text-xs text-ink-500 mt-2">
-              What the food is — not when you eat it or how it is served.
+              What the food is, not when you eat it or how it is served.
             </p>
           </Field>
 
@@ -247,7 +247,7 @@ export default function RecipeEditor({
               ))}
               {!draft.components.length && (
                 <p className="text-sm text-ink-500 py-2">
-                  Nothing yet — add a food or another recipe and the numbers below fill themselves in.
+                  Nothing yet. Add a food or another recipe and the numbers below fill themselves in.
                 </p>
               )}
             </div>
@@ -324,7 +324,7 @@ export default function RecipeEditor({
                     This recipe will be removed from your recipes, and from search, the planner
                     and your favourites.{' '}
                     {usedInPlan > 0
-                      ? `The ${usedInPlan} ${usedInPlan === 1 ? 'day' : 'days'} you have already planned with it keep it, marked as deleted — historical meal data is not affected.`
+                      ? `The ${usedInPlan} ${usedInPlan === 1 ? 'day' : 'days'} you have already planned with it keep it, marked as deleted. Historical meal data is not affected.`
                       : 'Historical meal data will not be affected.'}{' '}
                     You can restore it from Settings.
                   </p>
@@ -369,7 +369,7 @@ export default function RecipeEditor({
  * One ingredient line: what it is, how much of it, and what that costs.
  *
  * The amount can be entered in any unit and is stored in grams, because grams
- * are the only thing the rest of the app can work with — the grocery list adds
+ * are the only thing the rest of the app can work with, the grocery list adds
  * weights together and a recipe has to scale. The unit you picked is remembered
  * for the row so the number you typed is the number you see, but nothing
  * downstream ever has to know about cups.
@@ -406,7 +406,7 @@ function ComponentRow({
   }
 
   function changeUnit(next: PortionUnit) {
-    // The weight does not change when you change how you are describing it —
+    // The weight does not change when you change how you are describing it -
     // 100 g stays 100 g and simply reads as 0.42 cup.
     setUnit(next)
   }
@@ -450,7 +450,7 @@ function ComponentRow({
       </div>
       {component.kind === 'food' && APPROXIMATE_UNITS.includes(unit) && (
         <p className="text-[11px] text-ink-500 pl-6">
-          {unit === 'piece' ? 'A piece of this is taken as its usual size.' : 'A rough measure — weigh it if it matters.'}
+          {unit === 'piece' ? 'A piece of this is taken as its usual size.' : 'A rough measure. Weigh it if it matters.'}
         </p>
       )}
     </div>
@@ -461,7 +461,7 @@ function ComponentRow({
  * One search for anything an ingredient could be.
  *
  * Your own foods and recipes first, because they are instant and work with no
- * signal. USDA and Open Food Facts underneath a moment later, in that order —
+ * signal. USDA and Open Food Facts underneath a moment later, in that order -
  * USDA is the reference for a generic ingredient, Open Food Facts is where a
  * branded yogurt lives. Picking an online one saves it to your foods, with its
  * source and id, and drops it into the recipe in a single tap; you never have
@@ -512,7 +512,7 @@ function IngredientPicker({
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
             <input
               className="input pl-9 pr-9" autoFocus
-              placeholder="Anything — yours, USDA, Open Food Facts…"
+              placeholder="Anything: yours, USDA, Open Food Facts…"
               value={query} onChange={(e) => setQuery(e.target.value)}
             />
             {searching && (
@@ -635,7 +635,7 @@ function lookupMessage(problems: IngredientSearch['problems'], query: string): s
     return 'No signal, so only your own foods were searched.'
   }
   if (problems.some((p) => p.reason === 'rate-limited')) {
-    return 'The food databases are rate-limiting us — worth trying again in a minute.'
+    return 'The food databases are rate-limiting us. Worth trying again in a minute.'
   }
   if (problems.length === 2) {
     return 'Both food databases are unreachable just now.'

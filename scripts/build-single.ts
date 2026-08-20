@@ -2,8 +2,8 @@
  * Bundles the built app into one self-contained HTML file.
  *
  * The normal build is a directory of assets served over HTTP. Some places you
- * might want to open the app — a published page with a strict CSP, a file on a
- * phone, an email attachment — will only take a single document and refuse
+ * might want to open the app, a published page with a strict CSP, a file on a
+ * phone, an email attachment, will only take a single document and refuse
  * every subresource request. So the CSS, the JavaScript and the fonts are
  * inlined, and the service worker is dropped: it cannot register without its
  * own separately-fetched script, and it has nothing to cache here anyway.
@@ -33,7 +33,7 @@ const MIME: Record<string, string> = {
 function dataUri(file: string): string {
   const ext = file.split('.').pop() ?? ''
   const mime = MIME[ext]
-  if (!mime) throw new Error(`No MIME type known for ${file} — add one to MIME.`)
+  if (!mime) throw new Error(`No MIME type known for ${file}, add one to MIME.`)
   return `data:${mime};base64,${readFileSync(join(DIST, file)).toString('base64')}`
 }
 

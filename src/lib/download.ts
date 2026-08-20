@@ -3,7 +3,7 @@
  *
  * Normally an anchor with `download` is all this takes. Inside an embedded
  * viewer it isn't: the frame is sandboxed and a download it starts itself is
- * silently inert — the click appears to work and no file arrives. Hosts that
+ * silently inert, the click appears to work and no file arrives. Hosts that
  * sandbox the page expose a bridge instead, which asks the viewer to confirm.
  *
  * So: use the bridge when there is one, fall back to the anchor when there
@@ -46,7 +46,7 @@ export async function saveTextFile(
       }
     } catch (e) {
       // The viewer saying no is a normal outcome, not a failure to report as
-      // one — and it must never be retried through the fallback path.
+      // one, and it must never be retried through the fallback path.
       if (errorCode(e) === 'declined') return 'declined'
       return 'failed'
     }

@@ -102,7 +102,7 @@ export default function Settings() {
                       <label className="label">Sex</label>
                       <select className="input" value={profile.tdee.sex ?? ''}
                         onChange={(e) => setTdee({ ...profile.tdee, sex: (e.target.value || undefined) as Sex })}>
-                        <option value="">—</option>
+                        <option value="">Not set</option>
                         <option value="female">Female</option>
                         <option value="male">Male</option>
                       </select>
@@ -283,7 +283,7 @@ function BackupPanel() {
   return (
     <div className="card p-4 space-y-4">
       <p className="text-sm text-ink-700">
-        Everything you plan, log and add lives in this browser and nowhere else — there's no
+        Everything you plan, log and add lives in this browser and nowhere else. There's no
         account behind it. A backup is the only copy that survives clearing your browser data,
         switching phone, or a browser that won't let this page save anything at all.
       </p>
@@ -463,7 +463,7 @@ function AccountPanel() {
  * The app is served from the device by a service worker, so a deploy and the
  * thing on your screen are two different questions. This answers the second
  * one: if the commit here matches the one that was deployed, you are looking at
- * the new version. If it does not, "Check now" fetches the worker again — and
+ * the new version. If it does not, "Check now" fetches the worker again, and
  * if there is a newer one, the page reloads itself onto it.
  */
 function VersionPanel() {
@@ -477,7 +477,7 @@ function VersionPanel() {
       const registration = await navigator.serviceWorker?.ready
       await registration?.update()
     } catch {
-      // No worker here — nothing to check, and nothing that can be stale.
+      // No worker here, nothing to check, and nothing that can be stale.
     } finally {
       setChecking(false)
       setChecked(true)
@@ -510,7 +510,7 @@ function VersionPanel() {
  * Recipes you deleted, and the way back.
  *
  * Deleting takes a recipe out of every list, search and picker, but does not
- * destroy it — a day you planned months ago names it by id, and throwing it away
+ * destroy it, a day you planned months ago names it by id, and throwing it away
  * would blank that day. This is where they wait. It disappears when there is
  * nothing in it, so it is not a permanent reminder of things you got rid of on
  * purpose.
@@ -562,7 +562,7 @@ function DeletedFoodsPanel() {
         ))}
       </div>
       <p className="text-xs text-ink-500 mt-2 px-1">
-        Recipes and planned days that already use one of these keep their numbers — a food is
+        Recipes and planned days that already use one of these keep their numbers. A food is
         named by everything that contains it, so losing it would blank them all at once.
       </p>
     </section>

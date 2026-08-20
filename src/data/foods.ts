@@ -981,7 +981,7 @@ export const FOODS: Food[] = [
     names: { en: 'Dark chocolate', ro: 'ciocolată neagră', hu: 'étcsokoládé' },
     aliases: ['ciocolata neagra', 'etcsokolade'],
     category: 'treats', medTier: 'rare', state: 'as-sold',
-    // USDA "chocolate, dark, 70–85% cacao" — the strength the plans specify.
+    // USDA "chocolate, dark, 70–85% cacao", the strength the plans specify.
     per100g: { calories: 598, protein: 7.8, carbs: 45.9, fat: 42.6, fiber: 10.9, iron: 11.9 },
     units: [{ label: 'square', grams: 10 }],
     source: 'curated',

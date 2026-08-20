@@ -29,7 +29,7 @@ export default function AddEntryModal({
   const [query, setQuery] = useState('')
   // Snacks open on foods. The plans write them as lines rather than dishes
   // ("150 g mere, 10 g caju"), so the recipe tab for a snack slot was reliably
-  // empty — an empty list is a worse answer than the right list.
+  // empty, an empty list is a worse answer than the right list.
   const isSnack = slot === 'snack1' || slot === 'snack2'
   const [tab, setTab] = useState<'recipes' | 'foods'>(isSnack ? 'foods' : 'recipes')
   const [grams, setGrams] = useState<Record<string, number>>({})

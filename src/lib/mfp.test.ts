@@ -4,7 +4,7 @@ import { parseMfpCsv, quickAddLine } from './mfp'
 describe('quickAddLine', () => {
   it('formats a line that can be pasted straight into a Quick Add', () => {
     expect(quickAddLine('Lunch', { calories: 612.4, protein: 41.2, carbs: 58.44, fat: 22 }))
-      .toBe('Lunch — 612 kcal · 41.2g protein · 58.4g carbs · 22g fat')
+      .toBe('Lunch: 612 kcal · 41.2g protein · 58.4g carbs · 22g fat')
   })
 })
 

@@ -7,7 +7,7 @@ import Zig from '../components/brand/Mascot'
 /**
  * The one screen you see when signed out.
  *
- * No password, no account creation, no "forgot your login" — you type the
+ * No password, no account creation, no "forgot your login", you type the
  * address you were invited with and a link arrives. Anyone not on the guest
  * list in the database cannot create an account at all, so this screen does not
  * need to reject them; it simply never leads anywhere.
@@ -29,7 +29,7 @@ export default function SignIn() {
     <div className="min-h-dvh flex items-center justify-center bg-cream-50 px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center text-center mb-7">
-          {/* Zig alone here — Wordmark carries its own small mascot, and two of
+          {/* Zig alone here, Wordmark carries its own small mascot, and two of
               him on one screen reads as a mistake. */}
           <Zig mood={linkSentTo ? 'celebrate' : 'happy'} size={84} />
           <h1 className="display text-2xl text-ink-900 mt-3">Bite Buddy</h1>
@@ -46,7 +46,7 @@ export default function SignIn() {
               link is on its way. It works once and expires in an hour.
             </p>
             <p className="text-xs text-ink-500">
-              Open it on the device you want to use — the link signs in the browser that opens it.
+              Open it on the device you want to use. The link signs in the browser that opens it.
             </p>
           </div>
         ) : (
@@ -80,7 +80,7 @@ export default function SignIn() {
             </p>
 
             {/* Settings are a property of this device rather than of an account,
-                so they stay reachable without signing in — which is the state
+                so they stay reachable without signing in, which is the state
                 you are in when you want to restore a backup. */}
             <Link to="/settings" className="btn-ghost w-full justify-center text-ink-500">
               <SlidersHorizontal size={15} /> Settings and backups

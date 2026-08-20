@@ -1,9 +1,9 @@
-# Bite Buddy — Bold & Playful Design System
+# Bite Buddy, Bold & Playful Design System
 
 > **Design direction:** funky, cosy, energetic, useful.  
-> Bite Buddy should feel like a very competent meal planner that happens to have a personality — not a clinical nutrition dashboard and not a children's food app.
+> Bite Buddy should feel like a very competent meal planner that happens to have a personality, not a clinical nutrition dashboard and not a children's food app.
 
-This design system builds on **Option 3 — Bold & Playful** while respecting the shipped product constraints and content model in `DESIGNBRIEF.md`.
+This design system builds on **Option 3, Bold & Playful** while respecting the shipped product constraints and content model in `DESIGNBRIEF.md`.
 
 ---
 
@@ -13,7 +13,7 @@ This design system builds on **Option 3 — Bold & Playful** while respecting th
 Nutrition data is important, but food remains the protagonist. Calories and macros should be easy to scan without making every screen feel like an analytics product.
 
 ### 1.2 Playful, never chaotic
-Bold colour, chunky headings, doodles and Zig give Bite Buddy personality. Dense working areas — recipe lists, food tables, grocery rows and meal entries — stay calm and highly legible.
+Bold colour, chunky headings, doodles and Zig give Bite Buddy personality. Dense working areas, recipe lists, food tables, grocery rows and meal entries, stay calm and highly legible.
 
 ### 1.3 Inform, never judge
 Going over a calorie target is information, not failure. Status is communicated through copy, iconography, pattern/shape and colour together.
@@ -405,7 +405,7 @@ These badges must remain quiet enough for 122-row food lists.
 
 ---
 
-# 16. Zig — Bite Buddy character
+# 16. Zig, Bite Buddy character
 
 Zig is an **abstract bite-shaped creature**, not a bowl or literal food.
 
@@ -507,7 +507,7 @@ Zig may appear.
 ### Error
 Oops Zig.
 
-`Oops — something spilled.`  
+`Oops, something spilled.`  
 `This screen tripped over itself. Your recipes and plans are safe.`
 
 ### Offline

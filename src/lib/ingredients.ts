@@ -2,7 +2,7 @@
  * Resolving a recipe down to the things you actually handle.
  *
  * A component can be a food or another recipe, so anything that needs a real
- * ingredient list — the grocery list, the weigh-out before cooking — has to
+ * ingredient list, the grocery list, the weigh-out before cooking, has to
  * walk the tree, scale by servings, and merge duplicates. That walk used to
  * live inside the grocery list and nowhere else, which is why Prep had nothing
  * to show.

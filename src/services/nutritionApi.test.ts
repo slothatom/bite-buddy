@@ -204,7 +204,7 @@ describe('what comes back from a source', () => {
 describe('rounding on the way in', () => {
   it('does not round a micronutrient away to nothing', async () => {
     // B12 arrives in micrograms and a portion holds a fraction of one. Rounding
-    // to a whole number turned a reported 0.21 into 0 — a value the source had,
+    // to a whole number turned a reported 0.21 into 0, a value the source had,
     // thrown away between the API and the food.
     mockFetch((url) => (url.includes('nal.usda.gov')
       ? json({ foods: [] })

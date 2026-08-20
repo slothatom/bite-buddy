@@ -18,7 +18,7 @@ import { recipePerServing, roundNutrients } from './nutrition'
 
 export function quickAddLine(label: string, macros: Macros): string {
   const m = roundNutrients({ ...macros })
-  return `${label} — ${Math.round(m.calories)} kcal · ${m.protein}g protein · ${m.carbs}g carbs · ${m.fat}g fat`
+  return `${label}: ${Math.round(m.calories)} kcal · ${m.protein}g protein · ${m.carbs}g carbs · ${m.fat}g fat`
 }
 
 const SLOT_NAMES: Record<MealSlot, string> = {

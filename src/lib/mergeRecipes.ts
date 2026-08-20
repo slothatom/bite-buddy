@@ -11,7 +11,7 @@ import type { RecipeVariants } from './recipeGroups'
  * Merging collapses a group for real.
  *
  * Nothing is deleted. A merge records "this recipe is really that one", and
- * every lookup follows the note — which is what makes it safe to merge
+ * every lookup follows the note, which is what makes it safe to merge
  * something your plan already points at, or something one of the fourteen
  * archived weeks refers to. Those references live in code and cannot be
  * rewritten; they resolve through the note instead, and undoing the merge puts
@@ -22,7 +22,7 @@ import type { RecipeVariants } from './recipeGroups'
  * What a version amounts to, once cooked.
  *
  * Two versions with the same signature are the same food by every measure the
- * app has — merging them cannot lose anything. Rounded because a gram of
+ * app has, merging them cannot lose anything. Rounded because a gram of
  * rounding drift between two ways of writing the same meal is not a difference
  * anybody eats.
  */
@@ -34,7 +34,7 @@ export function recipeSignature(recipe: Recipe, ctx: NutritionContext): string {
 /**
  * The groups where merging needs no decision from you.
  *
- * A group whose versions differ — 259 kcal against 408 — is a real choice about
+ * A group whose versions differ, 259 kcal against 408, is a real choice about
  * which portion to keep, so it is left alone and offered one at a time instead.
  */
 export function interchangeableGroups(
@@ -51,7 +51,7 @@ export function interchangeableGroups(
 /**
  * Follows the notes to whatever a recipe id really means now.
  *
- * Chains are possible — merge A into B, then B into C — so this walks until it
+ * Chains are possible, merge A into B, then B into C, so this walks until it
  * stops moving, with a bound in case a bad write ever makes a cycle. A cycle
  * would otherwise hang every screen that resolves a recipe.
  */
@@ -97,7 +97,7 @@ export function planMerge(
   return next
 }
 
-/** Everything merged into this recipe — what an "undo" would bring back. */
+/** Everything merged into this recipe, what an "undo" would bring back. */
 export function mergedIntoRecipe(merged: Record<string, string>, winnerId: string): string[] {
   return Object.keys(merged).filter((id) => resolveMerged(merged, id) === winnerId)
 }

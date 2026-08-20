@@ -11,7 +11,7 @@ import { CATEGORY_LABELS, CATEGORY_ORDER } from '../../lib/categories'
  * Editing a food, whether it came with the app or from a search.
  *
  * The 122 curated foods live in code, so editing one keeps your own copy of it
- * with the original underneath — the same copy-on-write the recipes use, and
+ * with the original underneath, the same copy-on-write the recipes use, and
  * the same reason Revert and Delete are separate buttons: undoing your changes
  * and getting rid of the food are different intentions.
  *
@@ -29,7 +29,7 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
   const edited = custom.some((f) => f.id === food.id)
   const canRevert = edited && isCuratedFood(food.id)
 
-  /** What would be left pointing at nothing — recipes and planned snack lines. */
+  /** What would be left pointing at nothing, recipes and planned snack lines. */
   const usedBy = useMemo(() => {
     const inRecipes = recipes.filter((r) =>
       r.components.some((c) => c.kind === 'food' && c.foodId === food.id)).length
@@ -160,7 +160,7 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
             <p className="text-xs text-ink-500 -mt-1">About {salt.toFixed(2)} g of salt.</p>
           )}
           <p className="text-xs text-ink-500">
-            Leave anything you do not know blank — a zero here says there is none of it, which is a
+            Leave anything you do not know blank. A zero here says there is none of it, which is a
             different claim.
           </p>
 
@@ -191,7 +191,7 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
                 <p className="text-xs text-ink-700">
                   It will be removed from your foods and from every search and picker.{' '}
                   {usedBy.inRecipes || usedBy.inPlan
-                    ? `The ${usedBy.inRecipes} ${usedBy.inRecipes === 1 ? 'recipe' : 'recipes'} and ${usedBy.inPlan} planned ${usedBy.inPlan === 1 ? 'line' : 'lines'} that use it keep their numbers — nothing you have already eaten is affected.`
+                    ? `The ${usedBy.inRecipes} ${usedBy.inRecipes === 1 ? 'recipe' : 'recipes'} and ${usedBy.inPlan} planned ${usedBy.inPlan === 1 ? 'line' : 'lines'} that use it keep their numbers. Nothing you have already eaten is affected.`
                     : 'Nothing uses it, so nothing else changes.'}{' '}
                   You can restore it from Settings.
                 </p>

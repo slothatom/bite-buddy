@@ -7,8 +7,8 @@ import { EmptyState } from '../components/ui'
 /**
  * Batch-cook sessions.
  *
- * The dietician's plans repeat a dish across several days on purpose — one pot
- * of lentil stew covers Friday and Saturday — so the useful unit here is a
+ * The dietician's plans repeat a dish across several days on purpose, one pot
+ * of lentil stew covers Friday and Saturday, so the useful unit here is a
  * cooking session with several recipes attached, not one meal at a time.
  */
 export default function Schedule() {

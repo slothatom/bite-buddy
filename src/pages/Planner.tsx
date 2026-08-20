@@ -15,7 +15,7 @@ import { dayQuickAdd, copyToClipboard } from '../lib/mfp'
 /**
  * The weekly planner.
  *
- * The grid runs from the user's chosen week start — Wednesday by default,
+ * The grid runs from the user's chosen week start, Wednesday by default,
  * matching how every one of the dietician's plans is laid out.
  */
 export default function Planner() {
@@ -41,7 +41,7 @@ export default function Planner() {
   const plannedDays = plan.filter((d) => d.meals.length).length
 
   // The bottom bar's centre button lands here. Rather than syncing that intent
-  // into local state from an effect — which costs a second render — the open
+  // into local state from an effect, which costs a second render, the open
   // modal is derived from either source.
   const filledSlots = new Set(selectedDay.meals.map((m) => m.slot))
   const openAdd = adding ?? (quickAdd
@@ -279,7 +279,7 @@ function EntryLine({ entry }: { entry: Component }) {
     : `${Math.round(entry.grams)} g`
   const emoji = entry.kind === 'recipe' ? ctx.recipes.get(entry.recipeId)?.emoji ?? '🍽️' : '·'
 
-  // The names are long — 46 characters at the median, 77 at the longest — and a
+  // The names are long, 46 characters at the median, 77 at the longest, and a
   // phone gives this row about 150px. Truncating turned most of them into
   // "Potatoes with egg, Teleme…", so the name wraps and the numbers hold their
   // own column instead. w-14 was two digits wider than four digits need.

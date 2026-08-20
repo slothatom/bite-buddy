@@ -10,7 +10,7 @@ permissions:
   pages: write
   id-token: write
 
-# One deploy at a time, and never cancel one midway — a half-published site is
+# One deploy at a time, and never cancel one midway, a half-published site is
 # worse than a slightly stale one.
 concurrency:
   group: pages
@@ -35,6 +35,7 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run data:check
+      - run: npm run text:check
 
       - name: Build
         env:

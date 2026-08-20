@@ -6,7 +6,7 @@ import { onStorageFailure, storageFailure } from '../../store/persist'
  * Tells the user when their changes are not being saved.
  *
  * Everything here lives in browser storage, so a failed write means silent data
- * loss — the app keeps working, the numbers look right, and nothing survives a
+ * loss, the app keeps working, the numbers look right, and nothing survives a
  * refresh. That is the one failure that must not be quiet.
  */
 export default function StorageBanner() {

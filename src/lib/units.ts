@@ -17,14 +17,14 @@ import type { FoodState } from '../types'
  * them as portions of fat and dairy, and a gram figure is what we need.
  */
 const SPOON_GRAMS: Record<string, number> = {
-  // Romanian — lingurita = teaspoon, lingura = tablespoon
+  // Romanian, lingurita = teaspoon, lingura = tablespoon
   'lingurita': 5,
   'lingurite': 5,
   'lingura': 15,
   'linguri': 15,
   'lg': 15,
   'lgt': 5,
-  // Hungarian — teáskanál = teaspoon, evőkanál = tablespoon
+  // Hungarian, teáskanál = teaspoon, evőkanál = tablespoon
   'tk': 5,
   'tk.': 5,
   'teaskanal': 5,
@@ -35,11 +35,11 @@ const SPOON_GRAMS: Record<string, number> = {
 
 /**
  * Vague portions the dietician uses freely. Each resolves to a gram estimate.
- * These are deliberately generous on vegetables — the guide's whole point is
+ * These are deliberately generous on vegetables, the guide's whole point is
  * that vegetables are the base of the plate and are not tightly weighed.
  */
 export const VAGUE_PORTIONS: { match: RegExp; grams: number; term: string }[] = [
-  // "jumatate de farfurie de legume" / "fel tanyer zoldseg" — half a plate of veg
+  // "jumatate de farfurie de legume" / "fel tanyer zoldseg", half a plate of veg
   { match: /(jum[aă]tate|1\/2|½)\s+(de\s+)?farfurie\s+(de\s+)?legume/i, grams: 150, term: 'mixed vegetables' },
   { match: /f[eé]l\s+t[aá]ny[eé]r\s+z[oö]lds[eé]g/i,                    grams: 150, term: 'mixed vegetables' },
   { match: /salat[aă]\s+de\s+crudit[aă][tțt]i/i,                        grams: 200, term: 'raw vegetable salad' },
@@ -134,7 +134,7 @@ export function parseFragment(fragment: string): ParsedQuantity {
 
   const state = detectState(text)
 
-  // 1. Vague portions win outright — they name their own food.
+  // 1. Vague portions win outright, they name their own food.
   for (const v of VAGUE_PORTIONS) {
     if (v.match.test(text)) {
       return { grams: v.grams, term: v.term, state, estimated: true, raw }
@@ -179,7 +179,7 @@ export function parseFragment(fragment: string): ParsedQuantity {
     }
   }
 
-  // 5. No quantity at all — a bare food name, or a dish referenced by name.
+  // 5. No quantity at all, a bare food name, or a dish referenced by name.
   return { term: cleanTerm(text), state, estimated: true, raw }
 }
 
@@ -198,7 +198,7 @@ export function splitComponents(line: string): string[] {
     if (ch === '(') depth++
     if (ch === ')') depth = Math.max(0, depth - 1)
     if (depth === 0 && (ch === ',' || ch === '+')) {
-      // A comma between two digits is a decimal point, not a separator —
+      // A comma between two digits is a decimal point, not a separator -
       // "iaurt 1,5-3,5%" is one component, not three.
       const isDecimal = ch === ',' && /\d/.test(line[i - 1] ?? '') && /\d/.test(line[i + 1] ?? '')
       if (!isDecimal) {

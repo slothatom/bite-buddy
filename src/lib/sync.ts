@@ -1,7 +1,7 @@
 /**
  * Keeping the two of you looking at the same week.
  *
- * The app's stores stay exactly as they are — local-first, writing to
+ * The app's stores stay exactly as they are, local-first, writing to
  * localStorage. This layer sits beside them: it pushes every local change up as
  * a document, and applies anything the other person changes as it arrives.
  *
@@ -10,7 +10,7 @@
  *  - **Documents, not tables.** Each store is one `app_state` row holding what
  *    a backup would contain. The app's own model stays the authority and this
  *    file stays small. The cost is last-write-wins per store, which with two
- *    people is rare and — because realtime pushes changes immediately — visible
+ *    people is rare and, because realtime pushes changes immediately, visible
  *    when it happens.
  *  - **A remote apply must not echo.** Writing a store triggers its subscriber,
  *    which would push straight back up. `applying` suppresses that for the
@@ -77,7 +77,7 @@ function applyRemote(key: StoreKey, data: unknown, schema: number) {
   if (!store || typeof data !== 'object' || data === null) return
 
   // A row written by a different version of the app would be misread rather
-  // than rejected — the one outcome worth refusing outright. Refusing silently
+  // than rejected, the one outcome worth refusing outright. Refusing silently
   // is not good enough though: the two devices then disagree forever with
   // nothing on screen to say why, so this surfaces.
   if (schema !== SCHEMA_VERSION) {
@@ -110,7 +110,7 @@ export function acknowledgeConflicts(): void {
 /**
  * Starts syncing, and returns a function that stops it.
  *
- * Call once a session exists. Safe to call when Supabase is not configured —
+ * Call once a session exists. Safe to call when Supabase is not configured -
  * it does nothing and reports `off`.
  */
 export function startSync(userId: string): () => void {

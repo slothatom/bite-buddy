@@ -39,7 +39,7 @@ describe('the taxonomy itself', () => {
   })
 
   it('says plainly which filters it cannot work out for itself', () => {
-    // Lazy, Leftovers, Fridge Clean-Out, Special Occasion — and Budget, which
+    // Lazy, Leftovers, Fridge Clean-Out, Special Occasion, and Budget, which
     // needs prices the app does not hold.
     expect(HAND_APPLIED_FILTERS).toEqual(
       expect.arrayContaining(['lazy', 'leftovers', 'budget', 'fridge-clearout', 'special']),
@@ -118,7 +118,7 @@ describe('reading a category off a recipe', () => {
   })
 
   it('files a grain dish under Grain, and a grain side under its dish', () => {
-    // The category the brief was missing. It means "the grain is the dish" —
+    // The category the brief was missing. It means "the grain is the dish" -
     // "Bulgur with chicken breast" is one; "Zucchini patties with bulgur" is
     // not, and stays a vegetable dish.
     expect(categorise(find('Bulgur with chicken breast & avocado'), ctx)).toBe('grain')

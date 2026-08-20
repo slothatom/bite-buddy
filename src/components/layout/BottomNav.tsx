@@ -11,7 +11,7 @@ import { useUiStore } from '../../store/useUiStore'
  * The phone navigation: Home · Plan · + · Recipes · More.
  *
  * Only four destinations sit on the bar because the centre slot is the
- * creation action — the thing most often reached for one-handed. Grocery moved
+ * creation action, the thing most often reached for one-handed. Grocery moved
  * behind More when Home arrived: it is a once-a-week screen you open at the
  * shop, where Recipes is browsed daily.
  */

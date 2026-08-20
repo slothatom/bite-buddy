@@ -20,7 +20,7 @@ import { MOMENTS } from '../lib/moments'
 import { useWatchForMoments } from '../store/useMoments'
 
 /**
- * The welcome screen — what you land on, before the planner.
+ * The welcome screen, what you land on, before the planner.
  *
  * It answers three questions in order: what am I eating today, how is the week
  * going, and is the other person's copy the same as mine. Everything else is a
@@ -189,7 +189,7 @@ export default function Home() {
  * One thing Zig noticed, shown once.
  *
  * Above the greeting so it is the first thing you see, and gone the moment you
- * acknowledge it. There is no history to browse and no total to admire — see
+ * acknowledge it. There is no history to browse and no total to admire, see
  * lib/moments.ts for why that is the point.
  */
 function MomentNote() {
@@ -225,22 +225,22 @@ function SyncLine() {
   const [Icon, text, tone] =
     conflicts.length
       ? [AlertTriangle,
-         `You and someone else both changed ${conflicts.length === 1 ? formatDay(conflicts[0]) : `${conflicts.length} days`} — the later edit was kept. Worth a look.`,
+         `You and someone else both changed ${conflicts.length === 1 ? formatDay(conflicts[0]) : `${conflicts.length} days`}. The later edit was kept. Worth a look.`,
          'text-mustard-700']
     : schemaMismatch
       ? [AlertTriangle,
-         'The other device is running a different version of the app. Nothing has been overwritten — reload this page to pick up the latest.',
+         'The other device is running a different version of the app. Nothing has been overwritten. Reload this page to pick up the latest.',
          'text-coral-600']
     : unsaved
       ? [CloudOff,
-         `${unsaved} ${unsaved === 1 ? 'change' : 'changes'} not saved yet — kept on this device and retried automatically.`,
+         `${unsaved} ${unsaved === 1 ? 'change' : 'changes'} not saved yet, kept on this device and retried automatically.`,
          'text-mustard-700']
     : state === 'live'
       ? [Cloud, at ? `Everything shared · last synced ${timeOf(at)}` : 'Everything shared', 'text-teal-600']
     : state === 'connecting'
       ? [RefreshCw, 'Connecting…', 'text-ink-500']
     : state === 'error'
-      ? [AlertTriangle, "Can't reach the server — your changes are safe here and will go up when it's back.", 'text-coral-600']
+      ? [AlertTriangle, "Can't reach the server. Your changes are safe here and will go up when it's back.", 'text-coral-600']
     : [CloudOff, 'Working offline on this device only.', 'text-ink-500']
 
   return (

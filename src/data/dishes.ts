@@ -8,8 +8,8 @@ import type { Component, Recipe, RecipeTag } from '../types'
  * component list, scaled so that the weight the dietician *does* state matches
  * one serving here.
  *
- * Quantities follow the plans' own conventions — a teaspoon of olive oil per
- * portion, vegetables by the half-plate — so that a dish's calories reflect how
+ * Quantities follow the plans' own conventions, a teaspoon of olive oil per
+ * portion, vegetables by the half-plate, so that a dish's calories reflect how
  * these meals were actually built rather than a generic restaurant version.
  *
  * These are the building blocks; the 481 planned meals reference them by name.
@@ -32,7 +32,7 @@ interface DishSpec {
   aliases: string[]
   /**
    * True when the plans state a portion of this dish by weight
-   * ("350 g ciorba a la grec", "200 g piure de telina") — soups, purées and
+   * ("350 g ciorba a la grec", "200 g piure de telina"), soups, purées and
    * stews. For everything else a stated weight names an ingredient rather than
    * the dish ("tigaie picanta: 100 g piept de pui"), so the weight must not be
    * read as a portion size.

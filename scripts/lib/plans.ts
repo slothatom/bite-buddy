@@ -20,7 +20,7 @@ const SLOT_KEYS: Record<string, MealSlot> = {
 }
 
 const DAY_NAMES: Record<string, number> = {
-  // Romanian — 0 = Sunday
+  // Romanian, 0 = Sunday
   duminica: 0, luni: 1, marti: 2, miercuri: 3, joi: 4, vineri: 5, sambata: 6,
   // Hungarian
   vasarnap: 0, hetfo: 1, kedd: 2, szerda: 3, csutortok: 4, pentek: 5, szombat: 6,
@@ -33,11 +33,11 @@ export interface RawFragment {
   grams?: number
   state?: string
   estimated: boolean
-  /** Text inside parentheses — recipe internals, e.g. "pt 2 portii: 135 g ton…". */
+  /** Text inside parentheses, recipe internals, e.g. "pt 2 portii: 135 g ton…". */
   inner?: string
   /**
    * The parenthetical parsed as components. The dietician often spells out
-   * extras there that a dish definition does not cover — "cartofi cu ou (…,
+   * extras there that a dish definition does not cover, "cartofi cu ou (…,
    * sos: 100 g iaurt, 50 g telemea)" adds a sauce worth 200 kcal.
    */
   innerFragments: Omit<RawFragment, 'inner' | 'innerFragments'>[]
@@ -80,7 +80,7 @@ function describeFile(file: string): Omit<RawPlan, 'days' | 'id' | 'file'> {
     ? `Week of ${new Date(issuedOn + 'T12:00:00').toLocaleDateString('en-GB', {
         day: 'numeric', month: 'short', year: 'numeric',
       })}`
-    : other ? 'Olivia — week 1' : 'Undated week'
+    : other ? 'Olivia, week 1' : 'Undated week'
 
   return {
     label: other ? `${label} (Olivia)` : label,

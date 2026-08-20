@@ -79,7 +79,7 @@ export const useUserStore = create<UserStore>()(
           // v1 → v2: the profile shape is unchanged.
           1: (s) => s,
           // v2 → v3: XP, levels, streaks and achievements are gone. Their
-          // values are dropped rather than translated — there is nothing in a
+          // values are dropped rather than translated, there is nothing in a
           // point total worth carrying into a thing that does not count.
           2: (s) => {
             const profile = { ...(s.profile as Record<string, unknown>) }
@@ -92,7 +92,7 @@ export const useUserStore = create<UserStore>()(
         if (!carried?.profile) return carried
         // The week used to default to Wednesday, following the dietician's own
         // plans. It is Monday now, and a stored 3 is that old default rather
-        // than a deliberate choice — the setting is still there to change it.
+        // than a deliberate choice, the setting is still there to change it.
         return carried.profile.weekStartsOn === 3
           ? { ...carried, profile: { ...carried.profile, weekStartsOn: DEFAULT_WEEK_START } }
           : carried

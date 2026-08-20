@@ -26,7 +26,7 @@ import { interchangeableGroups } from '../lib/mergeRecipes'
  * The recipe library.
  *
  * This used to be one alphabetical grid of 275 cards behind thirteen filter
- * chips — every recipe in the app, in one undifferentiated wall, sorted by a
+ * chips, every recipe in the app, in one undifferentiated wall, sorted by a
  * property nobody thinks in. Finding tomorrow's dinner meant scrolling past two
  * hundred things that were not dinner.
  *
@@ -35,7 +35,7 @@ import { interchangeableGroups } from '../lib/mergeRecipes'
  * the two axes they are.
  */
 
-/** "Yours" is a shelf too, but a different kind — it cuts across the meals. */
+/** "Yours" is a shelf too, but a different kind, it cuts across the meals. */
 type Tab = RecipeGroup | 'mine'
 
 export default function Recipes() {
@@ -77,8 +77,8 @@ export default function Recipes() {
   /**
    * The number on a tab counts cards, not recipes.
    *
-   * Grouping the repeats means the two differ — Breakfast holds 77 recipes but
-   * shows 49 cards — and a tab promising 77 things that then shows 49 is a tab
+   * Grouping the repeats means the two differ, Breakfast holds 77 recipes but
+   * shows 49 cards, and a tab promising 77 things that then shows 49 is a tab
    * that lies. It counts what you will see.
    */
   const counts = useMemo(() => {
@@ -111,7 +111,7 @@ export default function Recipes() {
   /**
    * Only the categories that are actually on this shelf, with their counts.
    *
-   * Thirty-seven categories exist, and this library uses eighteen of them —
+   * Thirty-seven categories exist, and this library uses eighteen of them -
    * offering the other nineteen would be offering nineteen ways to see an empty
    * screen, which is the wall this page was rebuilt to get rid of. The full list
    * is still there when you are writing a recipe, where it belongs.
@@ -136,7 +136,7 @@ export default function Recipes() {
   )
 
   /**
-   * Repeats across the whole library — not just this shelf — where every
+   * Repeats across the whole library, not just this shelf, where every
    * version comes to the same numbers. Those can be folded together without
    * anyone having to decide which portion to keep.
    */
@@ -157,7 +157,7 @@ export default function Recipes() {
             </p>
           </div>
           {/* The label collapses to the icon on a phone, so the button keeps an
-              explicit name — otherwise it has none at all for a screen reader. */}
+              explicit name, otherwise it has none at all for a screen reader. */}
           <button className="btn-primary shrink-0" aria-label="New recipe" onClick={() => setEditing(null)}>
             <Plus size={16} /> <span className="hidden sm:inline">New recipe</span>
           </button>
@@ -434,7 +434,7 @@ function PickerSheet({
 /**
  * The offer to tidy up the repeats that are only repeats.
  *
- * Only appears for groups whose versions come to the same numbers — a dish
+ * Only appears for groups whose versions come to the same numbers, a dish
  * written at 259 kcal and 408 kcal is a real choice about portions and is never
  * swept up here. It disappears once there is nothing left to fold, which is the
  * point: this is a chore, not a feature you are meant to keep visiting.
@@ -455,7 +455,7 @@ function TidyBanner({ groups, onTidy }: { groups: RecipeVariants[]; onTidy: () =
           {groups.length} {groups.length === 1 ? 'dish is' : 'dishes are'} written down more than once
         </p>
         <p className="text-xs text-ink-700 mt-0.5">
-          Same ingredients, same numbers — just worded differently from one week to the next.
+          Same ingredients, same numbers, just worded differently from one week to the next.
           Folding them together removes {extra} {extra === 1 ? 'copy' : 'copies'}. Days you have
           already planned keep working, and each one can be undone.
         </p>
@@ -479,7 +479,7 @@ function EmptyShelf({
 }) {
   if (filtered) {
     // Three dimensions can combine into a corner with nothing in it and no
-    // shelf to move to — every tab reading zero. Telling you to try another
+    // shelf to move to, every tab reading zero. Telling you to try another
     // shelf would be useless advice, so there is a way straight out.
     return (
       <EmptyState title="Nothing matching that just yet">
@@ -492,7 +492,7 @@ function EmptyShelf({
   if (tab === 'mine') {
     return (
       <EmptyState title="Nothing of your own yet" mood="thinking">
-        <p>Every recipe here can be edited — change one and your version lands on this shelf, with the original safe underneath.</p>
+        <p>Every recipe here can be edited. Change one and your version lands on this shelf, with the original safe underneath.</p>
         <button className="btn-primary mt-4" onClick={onNew}><Plus size={16} /> Write one</button>
       </EmptyState>
     )
@@ -502,7 +502,7 @@ function EmptyShelf({
     return (
       <EmptyState title="Snacks are not recipes here" mood="thinking">
         <p>
-          Your plans write them as lines rather than dishes — 150 g apple, 10 g cashews — so they
+          Your plans write them as lines rather than dishes (150 g apple, 10 g cashews), so they
           are added straight to a day in the planner. Write one as a recipe if you would rather
           reuse it.
         </p>
@@ -568,7 +568,7 @@ function RecipeDetail({
         </header>
 
         <div className="p-5 space-y-5">
-          {/* The plans write the same dish more than once — sometimes at a
+          {/* The plans write the same dish more than once, sometimes at a
               different portion, more often just worded differently ("supă de
               fasole verde" one week, "ciorbă de fasole verde" the next). One
               card, and the wordings live in here. */}
@@ -594,7 +594,7 @@ function RecipeDetail({
               </div>
 
               {/* Keeping the one you are looking at is the only sensible
-                  default — you chose it by flipping to it. */}
+                  default, you chose it by flipping to it. */}
               {confirmMerge ? (
                 <div className="card-soft p-3 mt-3 space-y-2">
                   <p className="text-sm text-ink-900">
@@ -602,7 +602,7 @@ function RecipeDetail({
                   </p>
                   <p className="text-xs text-ink-700">
                     Days already planned with the others will show this one instead. Nothing is
-                    deleted — you can put them back.
+                    deleted, so you can put them back.
                   </p>
                   <div className="flex gap-2">
                     <button
@@ -664,7 +664,7 @@ function RecipeDetail({
             <NutrientSummary n={perServing} partial={report.partial} />
           </div>
 
-          {/* What it is, and what it asks of you — the two axes that are not
+          {/* What it is, and what it asks of you, the two axes that are not
               the shelf it sits on. */}
           <div className="flex flex-wrap gap-1.5">
             {recipe.category && (

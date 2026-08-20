@@ -11,7 +11,7 @@ import {
   searchFoods as lookupOnline, lookupBarcode,
   type NutritionResult, type LookupOutcome, type LookupProblem,
 } from '../services/nutritionApi'
-// @zxing is 477 kB — bigger than the rest of the app put together. Loading it
+// @zxing is 477 kB, bigger than the rest of the app put together. Loading it
 // only when the Scan tab is opened keeps it out of everyone else's way.
 const BarcodeScanner = lazy(() => import('../components/recipes/BarcodeScanner'))
 
@@ -54,7 +54,7 @@ export default function Foods() {
           <div>
             <h1 className="display text-xl sm:text-2xl text-ink-900">Foods</h1>
             <p className="text-sm text-ink-700">
-              Everything the recipes are built from — {foods.length} foods, with calories per 100 g.
+              Everything the recipes are built from. {foods.length} foods, with calories per 100 g.
             </p>
           </div>
           <button className="btn-primary shrink-0" onClick={() => setAdding(true)}>
@@ -67,7 +67,7 @@ export default function Foods() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
             <input
               className="input pl-9"
-              placeholder="Search — telemea, paine int, zabpehely, olive oil…"
+              placeholder="Search telemea, paine int, zabpehely, olive oil…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -149,7 +149,7 @@ export default function Foods() {
  *
  * The lookup goes through the existing USDA and Open Food Facts clients. Those
  * databases are thin on Romanian and Hungarian staples, which is exactly why
- * the curated list exists — so manual entry is a first-class path, not a fallback.
+ * the curated list exists, so manual entry is a first-class path, not a fallback.
  */
 function AddFoodModal({ onClose }: { onClose: () => void }) {
   const { addFood } = useFoodStore()
@@ -291,7 +291,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                 {!searching && !results.length && (
                   <p className="text-sm text-ink-500 text-center py-4">
                     {!searched
-                      ? 'Nothing yet — search above, or just type it in by hand.'
+                      ? 'Nothing yet. Search above, or just type it in by hand.'
                       : lookupMessage(problems)}
                   </p>
                 )}
@@ -309,7 +309,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
           {tab === 'scan' && (
             <div className="space-y-3">
               <p className="text-sm text-ink-700">
-                Point the camera at a barcode. Packaged goods only — Open Food Facts has no
+                Point the camera at a barcode. Packaged goods only, since Open Food Facts has no
                 barcode for a carrot.
               </p>
               <Suspense fallback={<p className="text-sm text-ink-500">Starting the camera…</p>}>
@@ -389,7 +389,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                 </p>
               )}
               <p className="text-xs text-ink-500">
-                Leave anything you do not know blank — a zero here means there is none of it,
+                Leave anything you do not know blank. A zero here means there is none of it,
                 which is a different claim.
               </p>
 
@@ -427,7 +427,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
  * results", which sends you off to type in numbers it already had.
  */
 function lookupMessage(problems: LookupOutcome['problems']): string {
-  if (!problems.length) return 'No matches — try another spelling, or type it in by hand.'
+  if (!problems.length) return 'No matches. Try another spelling, or type it in by hand.'
 
   if (problems.every((p) => p.reason === 'offline')) {
     return "You're offline, so the food databases can't be reached. Type it in by hand and it'll work the same."
@@ -446,7 +446,7 @@ function barcodeMessage(reason: 'unknown-product' | LookupProblem): string {
     case 'offline':
       return "You're offline, so the barcode can't be looked up. The label has the same numbers on it."
     case 'rate-limited':
-      return 'Too many lookups just now — wait a moment and scan again.'
+      return 'Too many lookups just now. Wait a moment and scan again.'
     default:
       return 'Open Food Facts is not responding. Try again shortly, or type it in.'
   }

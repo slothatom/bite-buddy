@@ -2,11 +2,11 @@
  * Picking up a new version of the app.
  *
  * The service worker serves the app from the device, which is what makes it
- * work in a shop with no signal — and it is also why a deploy could land
+ * work in a shop with no signal, and it is also why a deploy could land
  * without you ever seeing it. The registration the build injects does one
  * thing: it registers the worker. So after a deploy the sequence was
  *
- *   1. you open the app — the old files are served from the cache, instantly;
+ *   1. you open the app, the old files are served from the cache, instantly;
  *   2. the new worker downloads in the background and takes over;
  *   3. the page you are looking at is still running the old JavaScript.
  *
@@ -24,7 +24,7 @@
  * Whether a worker taking over means a new version, or just the first install.
  *
  * On a device that has never run this app there is no controller yet, and the
- * first worker claiming the page is not an update — reloading there would be a
+ * first worker claiming the page is not an update, reloading there would be a
  * reload on every first visit, and a reload loop if anything went wrong.
  */
 export function isUpgrade(hadController: boolean): boolean {
@@ -58,6 +58,6 @@ export function watchForUpdates(): void {
       if (document.visibilityState === 'visible') check()
     })
   }).catch(() => {
-    // No worker on this device — nothing to keep up to date.
+    // No worker on this device, nothing to keep up to date.
   })
 }
