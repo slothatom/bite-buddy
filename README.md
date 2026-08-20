@@ -208,8 +208,20 @@ all. A backup from a different `SCHEMA_VERSION` is refused rather than merged in
 no longer fits.
 
 ### Progress
-Weekly calories against target, Mediterranean serving goals (≥3 veg/day, ≥3 legumes/week…),
-and a weight log.
+The week's calories and macros, Mediterranean serving goals against the guide, and body
+tracking — which is **the one thing in the app that is not shared**.
+
+The week, the targets, the recipes and the grocery list are shared on purpose: you eat the
+same dinners. A waist measurement is not that, and averaging two people into one trend line
+is a graph of nothing. Every weight and measurement carries the id of whoever it belongs to,
+and the Body tab shows one person at a time. The rows still sync, so either of you can log
+from either phone — shared storage, separate histories.
+
+Weight, plus waist, hips, chest, arms and thighs, each with its own trend. Fill in whichever
+you took: a blank means not measured that day, so it gets no card and never reads as a change.
+Entries logged before the app knew who was who stay unclaimed rather than being handed to
+whoever is looking; the screen offers to claim them.
+
 
 ### Prep & Schedule
 A cook session starts with a weigh-out derived from the recipe's components — nested recipes

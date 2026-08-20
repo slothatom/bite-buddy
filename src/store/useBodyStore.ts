@@ -1,8 +1,21 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
+import { useMemo } from 'react'
 import type { WeightEntry, BodyMeasurement } from '../types'
 
+/**
+ * Weight and measurements, per person.
+ *
+ * This is the one store that is not shared. Two people eat the same dinners —
+ * hence one week, one grocery list, one library — but two waists averaged into
+ * a single trend line is a graph of nothing. Every entry carries the id of
+ * whoever it belongs to, and the screen shows one person at a time.
+ *
+ * The rows still sync, because both of you should be able to log from either
+ * phone and not lose anything when one is lost. Shared storage, separate
+ * histories.
+ */
 interface BodyStore {
   weightEntries: WeightEntry[]
   measurements: BodyMeasurement[]
@@ -11,6 +24,8 @@ interface BodyStore {
   addMeasurement: (m: BodyMeasurement) => void
   removeMeasurement: (id: string) => void
   latestWeight: () => WeightEntry | undefined
+  /** Stamps entries logged before the app knew about people. */
+  claimUnassigned: (memberId: string) => void
 }
 
 export const useBodyStore = create<BodyStore>()(
@@ -43,6 +58,12 @@ export const useBodyStore = create<BodyStore>()(
         const entries = get().weightEntries
         return entries[entries.length - 1]
       },
+
+      claimUnassigned: (memberId) =>
+        set((s) => ({
+          weightEntries: s.weightEntries.map((e) => (e.memberId ? e : { ...e, memberId })),
+          measurements: s.measurements.map((m) => (m.memberId ? m : { ...m, memberId })),
+        })),
     }),
     {
       name: 'bite-buddy-body',
@@ -59,3 +80,36 @@ export const useBodyStore = create<BodyStore>()(
     }
   )
 )
+
+/**
+ * One person's entries, oldest first.
+ *
+ * `memberId` of undefined asks for the unclaimed ones — entries logged before
+ * the app knew about people, or on a copy running with no account. They are
+ * never folded into somebody's history silently; the screen offers to claim
+ * them instead.
+ */
+export function useWeightFor(memberId: string | undefined): WeightEntry[] {
+  const entries = useBodyStore((s) => s.weightEntries)
+  return useMemo(
+    () => entries.filter((e) => e.memberId === memberId).sort((a, b) => a.date.localeCompare(b.date)),
+    [entries, memberId],
+  )
+}
+
+export function useMeasurementsFor(memberId: string | undefined): BodyMeasurement[] {
+  const measurements = useBodyStore((s) => s.measurements)
+  return useMemo(
+    () => measurements.filter((m) => m.memberId === memberId).sort((a, b) => a.date.localeCompare(b.date)),
+    [measurements, memberId],
+  )
+}
+
+/** How many entries belong to nobody yet, for offering to claim them. */
+export function useUnassignedCount(): number {
+  const { weightEntries, measurements } = useBodyStore()
+  return useMemo(
+    () => weightEntries.filter((e) => !e.memberId).length + measurements.filter((m) => !m.memberId).length,
+    [weightEntries, measurements],
+  )
+}

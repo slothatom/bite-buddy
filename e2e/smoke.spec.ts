@@ -598,6 +598,42 @@ test.describe('building a recipe from the food database', () => {
   })
 })
 
+test.describe('progress, per person', () => {
+  test('weight and the five measurements are logged and shown separately', async ({ page }) => {
+    await goto(page, '/analytics')
+    await page.getByRole('button', { name: 'Body' }).click()
+
+    await page.getByLabel('Weight').fill('68.4')
+    await page.getByRole('button', { name: /^Log$/ }).click()
+    await expect(page.getByText('68.4 kg')).toBeVisible()
+
+    // Only what was actually measured: a blank is not a zero.
+    await page.getByLabel('Waist').fill('80')
+    await page.getByLabel('Thighs').fill('55')
+    await page.getByRole('button', { name: /Log measurements/ }).click()
+
+    await expect(page.getByText('waist 80 · thighs 55')).toBeVisible()
+
+    // A summary card per measurement taken. Anchored to the start of the card's
+    // text, since the entry form and the history list mention the same words.
+    await expect(page.locator('.card').filter({ hasText: /^Waist\d/ })).toBeVisible()
+    await expect(page.locator('.card').filter({ hasText: /^Thighs\d/ })).toBeVisible()
+    // Chest was left blank, so it gets no card: a blank is not a zero.
+    await expect(page.locator('.card').filter({ hasText: /^Chest\d/ })).toHaveCount(0)
+  })
+
+  test('a measurement can be taken back off', async ({ page }) => {
+    await goto(page, '/analytics')
+    await page.getByRole('button', { name: 'Body' }).click()
+    await page.getByLabel('Hips').fill('95')
+    await page.getByRole('button', { name: /Log measurements/ }).click()
+    await expect(page.getByText('hips 95')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Remove' }).first().click()
+    await expect(page.getByText('hips 95')).toHaveCount(0)
+  })
+})
+
 test.describe('the food library', () => {
   test('a food can be edited, and the edit sticks', async ({ page }) => {
     await goto(page, '/foods')

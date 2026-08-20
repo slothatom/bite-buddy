@@ -2,7 +2,11 @@ import { useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { useUserStore } from '../store/useUserStore'
-import { useBodyStore } from '../store/useBodyStore'
+import {
+  useBodyStore, useWeightFor, useMeasurementsFor, useUnassignedCount,
+} from '../store/useBodyStore'
+import { useAuthStore } from '../store/useAuth'
+import { MEASUREMENT_KEYS, MEASUREMENT_LABELS, type MeasurementKey } from '../types'
 import { useNutritionContext } from '../store/useNutrition'
 import { dayNutrients } from '../lib/nutrition'
 import { scoreWeek } from '../lib/mediterranean'
@@ -165,20 +169,63 @@ function MediterraneanTab() {
 }
 
 function BodyTab() {
-  const { weightEntries, addWeightEntry, removeWeightEntry } = useBodyStore()
+  const {
+    addWeightEntry, removeWeightEntry, addMeasurement, removeMeasurement, claimUnassigned,
+  } = useBodyStore()
   const { profile } = useUserStore()
-  const [value, setValue] = useState('')
+  const me = useAuthStore((s) => s.user)
+  const members = useAuthStore((s) => s.members)
 
-  const sorted = [...weightEntries].sort((a, b) => a.date.localeCompare(b.date))
-  const change = sorted.length > 1 ? sorted[sorted.length - 1].weight - sorted[0].weight : 0
+  // Signed out — a local clone or the test suite — there is one person and no
+  // ids, so everything sits under the unclaimed heading and simply works.
+  const [who, setWho] = useState<string | undefined>(() => me?.id)
+  const unassigned = useUnassignedCount()
+
+  const weights = useWeightFor(who)
+  const measurements = useMeasurementsFor(who)
+
+  const [value, setValue] = useState('')
+  const [sizes, setSizes] = useState<Partial<Record<MeasurementKey, string>>>({})
+
+  const change = weights.length > 1 ? weights[weights.length - 1].weight - weights[0].weight : 0
+  const anySize = MEASUREMENT_KEYS.some((k) => Number(sizes[k]))
 
   return (
     <div className="space-y-5">
+      {/* Whose body. Only worth showing when there is more than one person. */}
+      {members.length > 1 && (
+        <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
+          {members.map((m) => (
+            <button
+              key={m.id}
+              onClick={() => setWho(m.id)}
+              className={who === m.id ? 'tab-on' : 'tab-off'}
+            >
+              {m.id === me?.id ? 'You' : (m.display_name || m.email.split('@')[0])}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {unassigned > 0 && me && (
+        <div className="rounded-2xl border border-bite-200 bg-bite-50 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+          <p className="flex-1 min-w-0 text-sm text-ink-900">
+            {unassigned} {unassigned === 1 ? 'entry was' : 'entries were'} logged before the app
+            knew who was who. They are nobody's until you say so.
+          </p>
+          <button className="btn-primary shrink-0" onClick={() => claimUnassigned(me.id)}>
+            These are mine
+          </button>
+        </div>
+      )}
+
+      {/* ─── Weight ──────────────────────────────────────────────────────── */}
       <div className="card p-4">
         <label className="label">Log today's weight ({profile.weightUnit})</label>
         <div className="flex gap-2">
           <input
             type="number" step="0.1" className="input" placeholder="e.g. 68.4"
+            aria-label="Weight"
             value={value} onChange={(e) => setValue(e.target.value)}
           />
           <button
@@ -190,6 +237,7 @@ function BodyTab() {
                 date: new Date().toISOString().slice(0, 10),
                 weight: Number(value),
                 unit: profile.weightUnit,
+                memberId: who,
               })
               setValue('')
             }}
@@ -199,7 +247,7 @@ function BodyTab() {
         </div>
       </div>
 
-      {sorted.length === 0 ? (
+      {weights.length === 0 ? (
         <EmptyState title="No weight logged yet" />
       ) : (
         <>
@@ -209,15 +257,13 @@ function BodyTab() {
               {change > 0 ? '+' : ''}{change.toFixed(1)}
               <span className="text-base text-ink-500 font-semibold ml-1">{profile.weightUnit}</span>
             </p>
-            <Sparkline values={sorted.map((w) => w.weight)} />
+            <Sparkline values={weights.map((w) => w.weight)} />
           </div>
 
           <div className="card divide-y divide-border-100">
-            {[...sorted].reverse().map((w) => (
+            {[...weights].reverse().map((w) => (
               <div key={w.id} className="flex items-center justify-between px-4 py-2.5">
-                <span className="text-sm text-ink-700">
-                  {new Date(w.date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </span>
+                <span className="text-sm text-ink-700">{formatDay(w.date)}</span>
                 <span className="flex items-center gap-3">
                   <span className="text-sm font-mono font-semibold text-ink-900">{w.weight} {w.unit}</span>
                   <button className="text-xs text-ink-300 hover:text-coral-600" onClick={() => removeWeightEntry(w.id)}>
@@ -229,8 +275,112 @@ function BodyTab() {
           </div>
         </>
       )}
+
+      {/* ─── The tape measure ────────────────────────────────────────────── */}
+      <SectionHeading>Measurements</SectionHeading>
+      <div className="card p-4 space-y-3">
+        <p className="text-xs text-ink-500">
+          In centimetres. Fill in whichever you took — a blank is simply not measured that day,
+          and the trend below skips it rather than reading it as a change.
+        </p>
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+          {MEASUREMENT_KEYS.map((key) => (
+            <div key={key}>
+              <label className="label">{MEASUREMENT_LABELS[key]}</label>
+              <input
+                type="number" step="0.5" min={0} className="input px-2"
+                aria-label={MEASUREMENT_LABELS[key]}
+                value={sizes[key] ?? ''}
+                onChange={(e) => setSizes((s) => ({ ...s, [key]: e.target.value }))}
+              />
+            </div>
+          ))}
+        </div>
+        <button
+          className="btn-primary w-fit"
+          disabled={!anySize}
+          onClick={() => {
+            const taken: Partial<Record<MeasurementKey, number>> = {}
+            for (const key of MEASUREMENT_KEYS) {
+              const n = Number(sizes[key])
+              if (n > 0) taken[key] = n
+            }
+            addMeasurement({
+              id: `${Date.now()}`,
+              date: new Date().toISOString().slice(0, 10),
+              measurements: taken,
+              unit: 'cm',
+              memberId: who,
+            })
+            setSizes({})
+          }}
+        >
+          <Plus size={16} /> Log measurements
+        </button>
+      </div>
+
+      {measurements.length === 0 ? (
+        <EmptyState title="Nothing measured yet" mood="thinking">
+          Waist, hips, chest, arms and thighs — each one its own line, because they move at
+          different times and an average of the five says nothing.
+        </EmptyState>
+      ) : (
+        <>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {MEASUREMENT_KEYS.map((key) => {
+              const series = measurements
+                .map((m) => m.measurements[key])
+                .filter((v): v is number => v != null)
+              if (!series.length) return null
+
+              const delta = series.length > 1 ? series[series.length - 1] - series[0] : 0
+              return (
+                <div key={key} className="card p-4">
+                  <p className="text-xs font-bold uppercase tracking-wide text-ink-500">
+                    {MEASUREMENT_LABELS[key]}
+                  </p>
+                  <p className="text-2xl font-extrabold font-mono text-ink-900">
+                    {series[series.length - 1]}<span className="text-sm text-ink-500 font-semibold ml-1">cm</span>
+                    {series.length > 1 && (
+                      <span className={`text-sm font-semibold ml-2 ${delta <= 0 ? 'text-bite-700' : 'text-coral-600'}`}>
+                        {delta > 0 ? '+' : ''}{delta.toFixed(1)}
+                      </span>
+                    )}
+                  </p>
+                  {series.length > 1 && <Sparkline values={series} />}
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="card divide-y divide-border-100">
+            {[...measurements].reverse().map((m) => (
+              <div key={m.id} className="flex items-start justify-between gap-3 px-4 py-2.5">
+                <span className="min-w-0">
+                  <span className="block text-sm text-ink-700">{formatDay(m.date)}</span>
+                  <span className="block text-xs font-mono text-ink-500">
+                    {MEASUREMENT_KEYS
+                      .filter((k) => m.measurements[k] != null)
+                      .map((k) => `${MEASUREMENT_LABELS[k].toLowerCase()} ${m.measurements[k]}`)
+                      .join(' · ')}
+                  </span>
+                </span>
+                <button className="text-xs text-ink-300 hover:text-coral-600 shrink-0"
+                  onClick={() => removeMeasurement(m.id)}>
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
+}
+
+function formatDay(date: string): string {
+  return new Date(date + 'T12:00:00')
+    .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 function Sparkline({ values }: { values: number[] }) {
