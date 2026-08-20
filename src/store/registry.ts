@@ -21,20 +21,34 @@ export interface PersistedStore {
   read: () => unknown
   write: (state: object) => void
   subscribe: (fn: () => void) => () => void
+  /**
+   * Brings state written by an older version forward, or returns undefined if
+   * it cannot. This is the store's own persistence migration, reused: a backup
+   * file and a localStorage entry are the same shape, so an old backup should
+   * restore for exactly the same reason an old device keeps its data.
+   */
+  upgrade: (state: unknown, fromVersion: number) => unknown
 }
 
 function persisted<T extends object>(store: {
   getState: () => T
   setState: (partial: Partial<T>) => void
   subscribe: (fn: (state: T) => void) => () => void
-  persist: { getOptions: () => { name?: string; partialize?: (state: T) => unknown } }
+  persist: {
+    getOptions: () => {
+      name?: string
+      partialize?: (state: T) => unknown
+      migrate?: (state: unknown, version: number) => unknown
+    }
+  }
 }): PersistedStore {
-  const { name, partialize } = store.persist.getOptions()
+  const { name, partialize, migrate } = store.persist.getOptions()
   return {
     name,
     read: () => (partialize ? partialize(store.getState()) : store.getState()),
     write: (state) => store.setState(state as Partial<T>),
     subscribe: (fn) => store.subscribe(() => fn()),
+    upgrade: (state, fromVersion) => (migrate ? migrate(state, fromVersion) : state),
   }
 }
 
