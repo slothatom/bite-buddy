@@ -22,29 +22,34 @@ import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { SCHEMA_VERSION } from '../store/persist'
 import { STORES, type StoreKey } from '../store/registry'
-
-const PUSH_DELAY_MS = 800
+import { PushQueue } from './pushQueue'
 
 export type SyncState = 'off' | 'connecting' | 'live' | 'error'
 
 export interface SyncSnapshot {
   state: SyncState
   at: Date | null
+  /** Stores changed here that the server has not accepted yet. */
+  unsaved: number
+  /** Set when a row was written by a version of the app this one cannot read. */
+  schemaMismatch: boolean
 }
 
 let applying = false
 const listeners = new Set<() => void>()
-let lastSyncedAt: Date | null = null
 
 // One frozen object, replaced only when something actually changes. React's
 // useSyncExternalStore compares snapshots by identity, so returning a fresh
 // object per read would re-render forever.
-let snapshot: SyncSnapshot = { state: 'off', at: null }
+let snapshot: SyncSnapshot = { state: 'off', at: null, unsaved: 0, schemaMismatch: false }
 
-function announce(state: SyncState, at: Date | null = lastSyncedAt) {
-  lastSyncedAt = at
-  if (snapshot.state === state && snapshot.at === at) return
-  snapshot = { state, at }
+function announce(next: Partial<SyncSnapshot>) {
+  const merged = { ...snapshot, ...next }
+  if (
+    merged.state === snapshot.state && merged.at === snapshot.at &&
+    merged.unsaved === snapshot.unsaved && merged.schemaMismatch === snapshot.schemaMismatch
+  ) return
+  snapshot = merged
   for (const fn of listeners) fn()
 }
 
@@ -59,9 +64,17 @@ export function onSyncChange(fn: () => void): () => void {
 
 function applyRemote(key: StoreKey, data: unknown, schema: number) {
   const store = STORES.find((s) => s.name === key)
-  // A row written by a newer version of the app would be misread rather than
-  // rejected, which is the one outcome worth refusing outright.
-  if (!store || schema !== SCHEMA_VERSION || typeof data !== 'object' || data === null) return
+  if (!store || typeof data !== 'object' || data === null) return
+
+  // A row written by a different version of the app would be misread rather
+  // than rejected — the one outcome worth refusing outright. Refusing silently
+  // is not good enough though: the two devices then disagree forever with
+  // nothing on screen to say why, so this surfaces.
+  if (schema !== SCHEMA_VERSION) {
+    announce({ schemaMismatch: true, state: 'error' })
+    return
+  }
+
   applying = true
   try {
     store.write(data as object)
@@ -79,33 +92,21 @@ function applyRemote(key: StoreKey, data: unknown, schema: number) {
 export function startSync(userId: string): () => void {
   const db = supabase
   if (!db) {
-    announce('off', null)
+    announce({ state: 'off', at: null, unsaved: 0 })
     return () => {}
   }
 
-  announce('connecting', null)
-  const timers = new Map<StoreKey, ReturnType<typeof setTimeout>>()
-  const unsubscribers: Array<() => void> = []
+  announce({ state: 'connecting', at: null })
   let stopped = false
+  const unsubscribers: Array<() => void> = []
 
-  // 1. Take whatever the household already has before pushing anything, so a
-  //    fresh device joins the existing state instead of overwriting it.
-  const pullAll = async () => {
-    const { data, error } = await db.from('app_state').select('key, data, schema')
-    if (error) {
-      announce('error', null)
-      return false
-    }
-    for (const row of data ?? []) applyRemote(row.key as StoreKey, row.data, row.schema)
-    return true
-  }
-
-  const push = (key: StoreKey) => {
-    const store = STORES.find((s) => s.name === key)
-    if (!store) return
-    void db
-      .from('app_state')
-      .upsert(
+  // Delivery, retries and "what is still unsaved" all live in the queue. It
+  // rejects rather than swallowing, so a failed push stays pending.
+  const queue = new PushQueue({
+    push: async (key) => {
+      const store = STORES.find((s) => s.name === key)
+      if (!store) return
+      const { error } = await db.from('app_state').upsert(
         {
           key,
           data: JSON.parse(JSON.stringify(store.read())) as unknown,
@@ -115,22 +116,37 @@ export function startSync(userId: string): () => void {
         },
         { onConflict: 'key' },
       )
-      .then(({ error }) => announce(error ? 'error' : 'live', error ? lastSyncedAt : new Date()))
+      if (error) throw new Error(error.message)
+    },
+    onChange: (s) => announce({
+      unsaved: s.pending.length,
+      state: s.pending.length && s.failures ? 'error' : snapshot.state === 'error' && !s.pending.length ? 'live' : snapshot.state,
+      at: s.pending.length ? snapshot.at : new Date(),
+    }),
+  })
+
+  // 1. Take whatever the household already has before pushing anything, so a
+  //    fresh device joins the existing state instead of overwriting it.
+  const pullAll = async () => {
+    const { data, error } = await db.from('app_state').select('key, data, schema')
+    if (error) {
+      announce({ state: 'error' })
+      return false
+    }
+    for (const row of data ?? []) applyRemote(row.key as StoreKey, row.data, row.schema)
+    return true
   }
 
   void pullAll().then((ok) => {
     if (stopped || !ok) return
 
-    // 2. Push local changes, debounced.
+    // 2. Mark local changes; the queue decides when they go.
     for (const store of STORES) {
       const key = store.name as StoreKey
-      unsubscribers.push(
-        store.subscribe(() => {
-          if (applying) return
-          clearTimeout(timers.get(key))
-          timers.set(key, setTimeout(() => push(key), PUSH_DELAY_MS))
-        }),
-      )
+      unsubscribers.push(store.subscribe(() => {
+        if (applying) return
+        queue.mark(key)
+      }))
     }
 
     // 3. Apply the other person's changes as they land.
@@ -143,21 +159,35 @@ export function startSync(userId: string): () => void {
           const row = payload.new as { key?: string; data?: unknown; schema?: number; updated_by?: string }
           if (!row?.key || row.updated_by === userId) return
           applyRemote(row.key as StoreKey, row.data, row.schema ?? -1)
-          announce('live', new Date())
+          announce({ state: 'live', at: new Date() })
         },
       )
       .subscribe((status) => {
-        if (status === 'SUBSCRIBED') announce('live', new Date())
-        else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') announce('error')
+        if (status === 'SUBSCRIBED') announce({ state: 'live', at: new Date() })
+        else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') announce({ state: 'error' })
       })
 
     unsubscribers.push(() => void db.removeChannel(channel))
   })
 
+  // 4. Anything that suggests the network is back, or that the tab is about to
+  //    go away, is a reason to stop waiting out the backoff and try now.
+  const retryNow = () => void queue.flush()
+  const onVisible = () => { if (document.visibilityState === 'visible') retryNow() }
+
+  window.addEventListener('online', retryNow)
+  document.addEventListener('visibilitychange', onVisible)
+  window.addEventListener('pagehide', retryNow)
+  unsubscribers.push(() => {
+    window.removeEventListener('online', retryNow)
+    document.removeEventListener('visibilitychange', onVisible)
+    window.removeEventListener('pagehide', retryNow)
+  })
+
   return () => {
     stopped = true
-    for (const t of timers.values()) clearTimeout(t)
+    queue.stop()
     for (const off of unsubscribers) off()
-    announce('off', null)
+    announce({ state: 'off', at: null, unsaved: 0 })
   }
 }
