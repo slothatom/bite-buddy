@@ -106,8 +106,9 @@ Macros are always derived from components, never stored, so they can't drift out
 
 ### Foods
 122 foods with per-100 g nutrition, each carrying EN/RO/HU names and a Mediterranean tier
-(daily / weekly / moderation / rarely). Add your own by hand or by USDA / Open Food Facts
-lookup — the barcode scanner is still there for packaged goods.
+(daily / weekly / moderation / rarely). Add your own by hand, by USDA / Open Food Facts
+lookup, or by scanning a barcode. A lookup that fails says why — rate-limited, offline, or
+the service being down — rather than reporting "no results" for a food the database has.
 
 ### History
 All 14 plans as a browsable archive with the original Romanian and Hungarian preserved
