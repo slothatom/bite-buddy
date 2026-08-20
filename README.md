@@ -197,9 +197,12 @@ npm run preview    # http://localhost:4173
 leaves gaps. ESLint 10 is the tightest constraint at
 `^20.19.0 || ^22.13.0 || >=24`, which rules out every odd-numbered release
 along with 20.0–20.18 and 22.0–22.12. Vite 8 and Vitest 4 exclude much the same
-set. Node 24 is the simplest answer and what CI runs; `package.json` now
-declares the range, so npm warns instead of letting you find out from a
-confusing build error.
+set. `package.json` declares the range, so npm warns instead of letting you find
+out from a confusing build error.
+
+CI runs **Node 26**, the current release — even-numbered, so it becomes LTS in
+October 2026. Node 24 is the conservative choice if you would rather stay on a
+line that is already LTS; both satisfy the range above.
 
 (`@zxing/library`, pulled in by the barcode scanner, declares
 `engines.node >= 24`. It doesn't bind here — it is browser code that Vite

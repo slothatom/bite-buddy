@@ -9,6 +9,7 @@ import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { useAuthStore } from '../store/useAuth'
 import { useSyncStatus } from '../store/useSync'
+import { acknowledgeConflicts } from '../lib/sync'
 import { dayNutrients, componentsNutrients } from '../lib/nutrition'
 import { targetStatus, STATUS_STYLES } from '../lib/status'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
@@ -180,12 +181,16 @@ export default function Home() {
 }
 
 function SyncLine() {
-  const { state, at, unsaved, schemaMismatch } = useSyncStatus()
+  const { state, at, unsaved, schemaMismatch, conflicts } = useSyncStatus()
 
   // Unsaved changes outrank everything else: it is the only state where what
   // you are looking at is not what the other person will see.
   const [Icon, text, tone] =
-    schemaMismatch
+    conflicts.length
+      ? [AlertTriangle,
+         `You and someone else both changed ${conflicts.length === 1 ? formatDay(conflicts[0]) : `${conflicts.length} days`} — the later edit was kept. Worth a look.`,
+         'text-mustard-700']
+    : schemaMismatch
       ? [AlertTriangle,
          'The other device is running a different version of the app. Nothing has been overwritten — reload this page to pick up the latest.',
          'text-coral-600']
@@ -204,8 +209,17 @@ function SyncLine() {
   return (
     <p className={`flex items-start gap-2 mt-2 px-1 text-xs ${tone}`}>
       <Icon size={14} className="shrink-0 mt-px" /> {text}
+      {conflicts.length > 0 && (
+        <button className="underline shrink-0" onClick={() => acknowledgeConflicts()}>
+          Dismiss
+        </button>
+      )}
     </p>
   )
+}
+
+function formatDay(date: string): string {
+  return new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long' })
 }
 
 function greeting(now = new Date()): string {

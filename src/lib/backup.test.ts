@@ -71,7 +71,25 @@ describe('restoreBackup', () => {
     expect(useUserStore.getState().profile.name).toBe('Still callable')
   })
 
-  it('refuses a backup from another schema rather than misreading it', () => {
+  it('restores a backup from an older version by migrating it', () => {
+    // Your existing backups have to keep working across a schema change, or
+    // the safety net disappears exactly when a version bump makes it matter.
+    const backup = {
+      app: 'bite-buddy',
+      schema: SCHEMA_VERSION - 1,
+      exportedAt: new Date().toISOString(),
+      stores: {
+        'bite-buddy-mealplan-v2': { plan: [{ date: '2026-08-20', meals: [] }], groceryItems: [] },
+        'bite-buddy-body': { weightEntries: [{ id: '9', date: '2026-08-20', weight: 70, unit: 'kg' }] },
+      },
+    }
+
+    const result = restoreBackup(JSON.stringify(backup))
+    expect(result.ok).toBe(true)
+    expect(useBodyStore.getState().weightEntries).toHaveLength(1)
+  })
+
+  it('refuses a backup from a newer version rather than misreading it', () => {
     const backup = { ...createBackup(), schema: SCHEMA_VERSION + 1 }
     useUserStore.getState().setName('Untouched')
 
