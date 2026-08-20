@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate, Link } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import Sidebar from './components/layout/Sidebar'
 import BottomNav from './components/layout/BottomNav'
 import ErrorBoundary from './components/layout/ErrorBoundary'
@@ -10,7 +11,6 @@ import SignIn from './pages/SignIn'
 
 import { useAuthStore } from './store/useAuth'
 import { useSyncSession } from './store/useSync'
-import { useTheme } from './store/useTheme'
 import { isConfigured } from './lib/supabase'
 import Zig from './components/brand/Mascot'
 
@@ -78,6 +78,29 @@ function Shell() {
 }
 
 /**
+ * Settings, without being signed in.
+ *
+ * Everything on that screen is a property of this device, not of an account:
+ * your targets, the shape of your week, the backup file, which build is
+ * running, the recipes you deleted. Locking it behind a session meant that
+ * signing out took away the one screen you might sign out in order to reach —
+ * restoring a backup, or checking a version before deciding to log back in.
+ */
+function SignedOutSettings() {
+  return (
+    <div className="min-h-dvh flex flex-col bg-cream-50">
+      <header className="flex items-center gap-3 px-4 sm:px-6 py-3 border-b border-border-200 bg-paper">
+        <Link to="/" className="btn-secondary"><ArrowLeft size={15} /> Sign in</Link>
+        <p className="text-sm text-ink-500">Signed out — everything here is kept on this device.</p>
+      </header>
+      <Suspense fallback={<ScreenLoading />}>
+        <Settings />
+      </Suspense>
+    </div>
+  )
+}
+
+/**
  * Decides between the sign-in screen and the app.
  *
  * When Supabase is not configured — a local clone, the one-file build, the test
@@ -86,9 +109,6 @@ function Shell() {
  * needs an account, running it yourself does not.
  */
 function Gate() {
-  // Applied above the sign-in screen too — the theme is a device preference,
-  // not something that should wait for a session.
-  useTheme()
   const ready = useAuthStore((s) => s.ready)
   const session = useAuthStore((s) => s.session)
 
@@ -105,7 +125,14 @@ function Gate() {
     )
   }
 
-  return session ? <Shell /> : <SignIn />
+  if (session) return <Shell />
+
+  return (
+    <Routes>
+      <Route path="/settings" element={<SignedOutSettings />} />
+      <Route path="*" element={<SignIn />} />
+    </Routes>
+  )
 }
 
 export default function App() {

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Mail, Check, AlertTriangle } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Mail, Check, AlertTriangle, SlidersHorizontal } from 'lucide-react'
 import { useAuthStore } from '../store/useAuth'
 import Zig from '../components/brand/Mascot'
 
@@ -77,6 +78,13 @@ export default function SignIn() {
             <p className="text-xs text-ink-500">
               This is a private app for two people. No password to remember, and nothing to reset.
             </p>
+
+            {/* Settings are a property of this device rather than of an account,
+                so they stay reachable without signing in — which is the state
+                you are in when you want to restore a backup. */}
+            <Link to="/settings" className="btn-ghost w-full justify-center text-ink-500">
+              <SlidersHorizontal size={15} /> Settings and backups
+            </Link>
           </form>
         )}
       </div>

@@ -1,13 +1,14 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { Search, X, Trash2, Plus, Undo2, GripVertical } from 'lucide-react'
+import { Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download } from 'lucide-react'
 import type { Component, DishCategory, PortionUnit, QuickFilter, Recipe, RecipeTag } from '../../types'
-import { useRecipeStore, useRecipes, isBuiltIn } from '../../store/useRecipeStore'
-import { useFoods } from '../../store/useFoodStore'
+import { useRecipeStore, isBuiltIn } from '../../store/useRecipeStore'
+import { useFoods, useFoodStore } from '../../store/useFoodStore'
+import { useIngredientSearch, type IngredientSearch } from '../../store/useIngredientSearch'
+import { importedFood, alreadyHave } from '../../lib/foodImport'
+import type { NutritionResult } from '../../services/nutritionApi'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
 import { useNutritionContext } from '../../store/useNutrition'
 import { recipePerServing, componentNutrients, reportPerServing, roundNutrients } from '../../lib/nutrition'
-import { buildFoodIndex, searchFoods } from '../../lib/foodSearch'
-import { normaliseTerm } from '../../lib/units'
 import {
   RECIPE_GROUPS, GROUP_LABELS, groupsOf, withGroups, type RecipeGroup,
 } from '../../lib/recipeGroups'
@@ -457,10 +458,15 @@ function ComponentRow({
 }
 
 /**
- * Picks a food or another recipe to add.
+ * One search for anything an ingredient could be.
  *
- * Recipes are offered as well as foods because that is how the dietician's batch
- * cooking works — a lunch is often "one serving of the lentil stew" plus bread.
+ * Your own foods and recipes first, because they are instant and work with no
+ * signal. USDA and Open Food Facts underneath a moment later, in that order —
+ * USDA is the reference for a generic ingredient, Open Food Facts is where a
+ * branded yogurt lives. Picking an online one saves it to your foods, with its
+ * source and id, and drops it into the recipe in a single tap; you never have
+ * to leave a half-written recipe to go and fetch an ingredient.
+ *
  * The recipe being edited is excluded, since a recipe containing itself has no
  * finite calorie count.
  */
@@ -472,20 +478,21 @@ function IngredientPicker({
   onAdd: (component: Component) => void
 }) {
   const [query, setQuery] = useState('')
-  const [tab, setTab] = useState<'foods' | 'recipes'>('foods')
-  const foods = useFoods()
-  const recipes = useRecipes()
   const ctx = useNutritionContext()
+  const addFood = useFoodStore((s) => s.addFood)
+  const foods = useFoods()
+  const { foods: matchedFoods, recipes: matchedRecipes, online, searching, problems, searched } =
+    useIngredientSearch(query, excludeRecipeId)
 
-  const foodIndex = useMemo(() => buildFoodIndex(foods), [foods])
-  const matchedFoods = useMemo(() => searchFoods(query, foodIndex, 40), [query, foodIndex])
-  const matchedRecipes = useMemo(() => {
-    const n = normaliseTerm(query)
-    return recipes
-      .filter((r) => r.id !== excludeRecipeId)
-      .filter((r) => !n || normaliseTerm([r.name.en, r.name.ro, r.name.hu].filter(Boolean).join(' ')).includes(n))
-      .slice(0, 40)
-  }, [recipes, query, excludeRecipeId])
+  /** Saves an online result as a food of yours, then adds it to the recipe. */
+  function takeOnline(result: NutritionResult) {
+    const existing = alreadyHave(foods, result)
+    const food = existing ?? importedFood(result)
+    if (!existing) addFood(food)
+    onAdd({ kind: 'food', foodId: food.id, grams: 100 })
+  }
+
+  const nothing = !matchedFoods.length && !matchedRecipes.length && !online.length
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4"
@@ -500,25 +507,23 @@ function IngredientPicker({
           <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
         </header>
 
-        <div className="px-5 pt-4 space-y-3">
+        <div className="px-5 pt-4">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
             <input
-              className="input pl-9" autoFocus placeholder="Search foods and recipes…"
+              className="input pl-9 pr-9" autoFocus
+              placeholder="Anything — yours, USDA, Open Food Facts…"
               value={query} onChange={(e) => setQuery(e.target.value)}
             />
-          </div>
-          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
-            {(['foods', 'recipes'] as const).map((t) => (
-              <button key={t} onClick={() => setTab(t)} className={`capitalize ${tab === t ? 'tab-on' : 'tab-off'}`}>
-                {t}
-              </button>
-            ))}
+            {searching && (
+              <Loader2 size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-500 animate-spin" />
+            )}
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-3 space-y-0.5">
-          {tab === 'foods' && matchedFoods.map((f) => (
+          {matchedFoods.length > 0 && <ResultHeading>Your foods</ResultHeading>}
+          {matchedFoods.map((f) => (
             <button
               key={f.id}
               className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left"
@@ -533,7 +538,9 @@ function IngredientPicker({
               <Plus size={16} className="shrink-0 text-ink-500" />
             </button>
           ))}
-          {tab === 'recipes' && matchedRecipes.map((r) => (
+
+          {matchedRecipes.length > 0 && <ResultHeading>Your recipes</ResultHeading>}
+          {matchedRecipes.map((r) => (
             <button
               key={r.id}
               className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left"
@@ -549,15 +556,91 @@ function IngredientPicker({
               <Plus size={16} className="shrink-0 text-ink-500" />
             </button>
           ))}
-          {((tab === 'foods' && !matchedFoods.length) || (tab === 'recipes' && !matchedRecipes.length)) && (
+
+          {/* USDA before Open Food Facts: laboratory figures for a generic
+              ingredient beat community-entered label data, and the other way
+              round for a branded product. */}
+          {(['usda', 'openfoodfacts'] as const).map((source) => {
+            const rows = online.filter((r) => r.source === source)
+            if (!rows.length) return null
+            return (
+              <div key={source}>
+                <ResultHeading>
+                  {source === 'usda' ? 'USDA FoodData Central' : 'Open Food Facts'}
+                </ResultHeading>
+                {rows.map((r, i) => (
+                  <button
+                    key={`${r.externalId ?? r.name}-${i}`}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left"
+                    onClick={() => takeOnline(r)}
+                  >
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-sm text-ink-900 line-clamp-2">{r.name}</span>
+                      <span className="block text-xs font-mono text-ink-500">
+                        {Math.round(r.per100g.calories)} kcal / 100 g
+                        {r.micros && Object.keys(r.micros).length
+                          ? ` · ${Object.keys(r.micros).length} nutrients` : ''}
+                      </span>
+                    </span>
+                    <Download size={15} className="shrink-0 text-ink-500" />
+                  </button>
+                ))}
+              </div>
+            )
+          })}
+
+          {searching && nothing && (
+            <p className="text-sm text-ink-500 text-center py-8">Looking it up…</p>
+          )}
+
+          {!searching && nothing && query.trim().length > 0 && (
+            <div className="py-6 text-center space-y-2">
+              <p className="text-sm text-ink-700">
+                {searched ? lookupMessage(problems, query) : `Nothing of yours matches “${query}”.`}
+              </p>
+              <p className="text-xs text-ink-500">
+                Add it on the Foods screen and it will be here next time.
+              </p>
+            </div>
+          )}
+
+          {!query.trim() && (
             <p className="text-sm text-ink-500 text-center py-8">
-              Nothing matching that. Foods can be added on the Foods screen.
+              Type to search your foods, your recipes, and the two open databases at once.
             </p>
           )}
         </div>
       </div>
     </div>
   )
+}
+
+function ResultHeading({ children }: { children: ReactNode }) {
+  return (
+    <p className="text-[10px] font-bold uppercase tracking-wide text-ink-500 px-3 pt-3 pb-1">
+      {children}
+    </p>
+  )
+}
+
+/**
+ * What to say when the online sources came back with nothing.
+ *
+ * Being rate-limited, being offline and genuinely finding nothing are three
+ * different situations with three different next moves, and calling all of them
+ * "no results" sends you off to type in numbers the database already had.
+ */
+function lookupMessage(problems: IngredientSearch['problems'], query: string): string {
+  if (problems.some((p) => p.reason === 'offline')) {
+    return 'No signal, so only your own foods were searched.'
+  }
+  if (problems.some((p) => p.reason === 'rate-limited')) {
+    return 'The food databases are rate-limiting us — worth trying again in a minute.'
+  }
+  if (problems.length === 2) {
+    return 'Both food databases are unreachable just now.'
+  }
+  return `Nothing anywhere matches “${query}”.`
 }
 
 function Field({ label, children }: { label: string; children: ReactNode }) {

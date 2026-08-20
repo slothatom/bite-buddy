@@ -116,56 +116,6 @@ test.describe('layout', () => {
   })
 })
 
-test.describe('dark mode', () => {
-  test.use({ colorScheme: 'dark' })
-
-  test('every screen inverts, and nothing keeps a light-mode colour', async ({ page }) => {
-    await goto(page, '/history')
-    await page.getByRole('button', { name: /^Load$/ }).first().click()
-
-    for (const route of ROUTES) {
-      await goto(page, route)
-
-      // The classic failure is a surface whose colour is only defined in the
-      // light palette, leaving light text on a light card.
-      const problems = await page.evaluate(() => {
-        const luminance = (colour: string) => {
-          const [r, g, b] = (colour.match(/\d+/g) ?? ['255', '255', '255']).map(Number)
-          return (0.299 * r + 0.587 * g + 0.114 * b) / 255
-        }
-        const found: string[] = []
-
-        const body = getComputedStyle(document.body).backgroundColor
-        if (luminance(body) > 0.5) found.push(`body background is light: ${body}`)
-
-        for (const el of document.querySelectorAll('*')) {
-          if (!(el instanceof HTMLElement) || !el.textContent?.trim()) continue
-          if (el.children.length) continue
-          const style = getComputedStyle(el)
-          const box = el.getBoundingClientRect()
-          if (!box.width || !box.height) continue
-
-          // Walk up for the nearest painted background.
-          let node: HTMLElement | null = el
-          let background = 'rgba(0, 0, 0, 0)'
-          while (node) {
-            const bg = getComputedStyle(node).backgroundColor
-            if (bg && !bg.startsWith('rgba(0, 0, 0, 0)')) { background = bg; break }
-            node = node.parentElement
-          }
-          const contrast = Math.abs(luminance(style.color) - luminance(background))
-          if (contrast < 0.15) {
-            found.push(`"${el.textContent.trim().slice(0, 24)}" is ${style.color} on ${background}`)
-          }
-        }
-        return [...new Set(found)].slice(0, 5)
-      })
-
-      expect(problems, `${route} has unreadable text in dark mode`).toEqual([])
-    }
-  })
-})
-
 test.describe('the main flow', () => {
   test('load a dietician week, then build a grocery list from it', async ({ page }) => {
     const errors = trackErrors(page)
@@ -430,8 +380,8 @@ test.describe('the recipe library', () => {
 
     await page.getByLabel('Recipe name').fill('Midnight beans')
     await page.getByRole('button', { name: /Add ingredient/ }).click()
-    await page.getByPlaceholder(/Search foods and recipes/).fill('lentil')
-    await page.locator('.bg-paper button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
+    await page.getByPlaceholder(/Anything — yours/).fill('lentil')
+    await page.locator('button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
 
     // The numbers are derived from what went in, never typed.
     await expect(page.getByText('Per serving')).toBeVisible()
@@ -473,8 +423,8 @@ test.describe('the recipe library', () => {
     await page.getByRole('button', { name: 'New recipe' }).click()
     await page.getByLabel('Recipe name').fill('Doomed dinner')
     await page.getByRole('button', { name: /Add ingredient/ }).click()
-    await page.getByPlaceholder(/Search foods and recipes/).fill('chicken breast')
-    await page.locator('.bg-paper button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
+    await page.getByPlaceholder(/Anything — yours/).fill('chicken breast')
+    await page.locator('button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
     await page.getByRole('button', { name: 'Add recipe' }).click()
 
     // Put it in a day, and remember what that day came to.
@@ -594,8 +544,8 @@ test.describe('building a recipe from the food database', () => {
     await page.getByLabel('Recipe name').fill('Unit test dinner')
 
     await page.getByRole('button', { name: /Add ingredient/ }).click()
-    await page.getByPlaceholder(/Search foods and recipes/).fill('olive oil')
-    await page.locator('.bg-paper button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
+    await page.getByPlaceholder(/Anything — yours/).fill('olive oil')
+    await page.locator('button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
 
     // Switching to tablespoons restates the same weight rather than changing it.
     const amount = page.getByLabel(/Amount of/).first()
@@ -618,8 +568,8 @@ test.describe('building a recipe from the food database', () => {
     await page.getByRole('button', { name: 'New recipe' }).click()
     await page.getByLabel('Recipe name').fill('Recalculation')
     await page.getByRole('button', { name: /Add ingredient/ }).click()
-    await page.getByPlaceholder(/Search foods and recipes/).fill('chicken breast')
-    await page.locator('.bg-paper button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
+    await page.getByPlaceholder(/Anything — yours/).fill('chicken breast')
+    await page.locator('button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
 
     const headline = page.locator('p.text-2xl').first()
     await page.getByLabel(/Amount of/).first().fill('100')
@@ -645,6 +595,47 @@ test.describe('building a recipe from the food database', () => {
     // Either the total is complete, or it is marked — never a bare number that
     // silently treats unknown as zero.
     if (await plus.count() > 0) await expect(note).toBeVisible()
+  })
+})
+
+test.describe('finding an ingredient', () => {
+  test('one search covers your foods, your recipes and the open databases', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: 'New recipe' }).click()
+    await page.getByRole('button', { name: /Add ingredient/ }).click()
+
+    // One box, no tabs to choose between first.
+    await expect(page.getByPlaceholder(/Anything — yours, USDA, Open Food Facts/)).toBeVisible()
+    await page.getByPlaceholder(/Anything — yours/).fill('chicken')
+
+    // Your own things appear immediately, with no network involved.
+    await expect(page.getByText('Your foods')).toBeVisible()
+    await expect(page.getByText('Chicken breast', { exact: false }).first()).toBeVisible()
+  })
+
+  test('says why nothing came back, rather than just showing nothing', async ({ page }) => {
+    // A sandboxed run cannot reach USDA or Open Food Facts, which is the same
+    // situation as being in a shop with no signal — and must not look like
+    // "this food does not exist".
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: 'New recipe' }).click()
+    await page.getByRole('button', { name: /Add ingredient/ }).click()
+    await page.getByPlaceholder(/Anything — yours/).fill('zzzznotafood')
+
+    await expect(page.getByText(/no signal|rate-limiting|unreachable|Nothing anywhere matches/i))
+      .toBeVisible({ timeout: 15_000 })
+  })
+})
+
+test.describe('settings without an account', () => {
+  test('every screen still renders with no dark palette to fall back to', async ({ page }) => {
+    // The theme is gone; what is left has to be legible on its own.
+    const errors = trackErrors(page)
+    for (const route of ROUTES) {
+      await goto(page, route)
+      await expect(page.locator('h1').first()).toBeVisible()
+    }
+    expect(errors).toEqual([])
   })
 })
 
