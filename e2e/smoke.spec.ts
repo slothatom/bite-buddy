@@ -168,6 +168,22 @@ test.describe('the main flow', () => {
     expect(pickable, 'Schedule offers no recipes to batch').toBeGreaterThan(10)
   })
 
+  test('a cook session says when it will email both of you', async ({ page }) => {
+    await goto(page, '/schedule')
+    await page.getByRole('button', { name: /Session/ }).click()
+    await page.getByPlaceholder('Sunday batch cook').fill('Evening cook')
+
+    // Tomorrow, so the reminder is genuinely in the future whatever time the
+    // test runs at.
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+    await page.locator('input[type=date]').fill(tomorrow)
+    await page.getByRole('button', { name: 'Save' }).click()
+
+    await expect(page.getByText(/Both of you get an email at/)).toBeVisible()
+    // Eighteen hundred less a quarter of an hour.
+    await expect(page.getByText(/17:45/)).toBeVisible()
+  })
+
   test('a cook session is built from what is planned, and its buttons stay in the card', async ({ page }) => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()

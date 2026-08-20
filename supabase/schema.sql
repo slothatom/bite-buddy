@@ -162,3 +162,56 @@ insert into public.allowed_emails (email, note) values
   ('you@example.com',  'you'),
   ('them@example.com', 'the other person')
 on conflict (email) do nothing;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Cook session reminders
+--
+-- What has already been emailed, so a reminder goes out once. Sending the same
+-- one twice is worse than sending it late: the second one teaches you to
+-- ignore the first.
+--
+-- Written only by the scheduled function, which runs as the service role and
+-- is not subject to these policies. The client can read it, so the app could
+-- one day show "reminded at", and can write nothing.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+create table if not exists public.reminder_log (
+  session_id text primary key,
+  sent_to    text[] not null,
+  session_at text,
+  sent_at    timestamptz not null default now()
+);
+
+alter table public.reminder_log enable row level security;
+
+drop policy if exists "household members read the reminder log" on public.reminder_log;
+create policy "household members read the reminder log"
+  on public.reminder_log for select
+  using (public.is_member());
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- The schedule
+--
+-- Every five minutes, which is as coarse as a fifteen-minute warning can stand
+-- and still be roughly on time. Requires the pg_cron and pg_net extensions,
+-- both available on Supabase; enable them under Database > Extensions.
+--
+-- Replace the two placeholders before running: the project ref in the URL, and
+-- the service role key. Keep the key out of the repository. If you would
+-- rather not paste it here at all, Supabase's dashboard can schedule an Edge
+-- Function directly instead, under Integrations > Cron.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- select cron.schedule(
+--   'cook-reminders',
+--   '*/5 * * * *',
+--   $$
+--   select net.http_post(
+--     url := 'https://YOUR-PROJECT-REF.supabase.co/functions/v1/cook-reminders',
+--     headers := jsonb_build_object(
+--       'Content-Type', 'application/json',
+--       'Authorization', 'Bearer YOUR-SERVICE-ROLE-KEY'
+--     )
+--   );
+--   $$
+-- );

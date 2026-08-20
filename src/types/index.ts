@@ -311,6 +311,15 @@ export interface CookSession {
   recipeIds: string[]
   label: string
   completed: boolean
+  /**
+   * When to email both of you, as an instant rather than a wall-clock time.
+   *
+   * Worked out in the browser that scheduled it, which is the one place that
+   * definitely knows which timezone "18:00" meant. The job that sends the
+   * emails runs on a server whose idea of local time is nobody's, and a
+   * reminder three hours late is worse than no reminder.
+   */
+  remindAt?: string
 }
 
 // ─── Grocery ─────────────────────────────────────────────────────────────────

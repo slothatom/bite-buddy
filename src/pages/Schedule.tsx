@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Plus, Check, Trash2, Search } from 'lucide-react'
+import { Plus, Check, Trash2, Search, Mail } from 'lucide-react'
+import type { CookSession } from '../types'
 import { useCookStore } from '../store/useCookStore'
 import { useRecipes } from '../store/useRecipeStore'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { EmptyState } from '../components/ui'
+import { LEAD_MINUTES, reminderAt, reminderLabel } from '../lib/cookReminder'
 
 /**
  * Batch-cook sessions.
@@ -60,6 +62,11 @@ export default function Schedule() {
                       {new Date(s.date + 'T12:00:00').toLocaleDateString('en-GB', {
                         weekday: 'long', day: 'numeric', month: 'long' })} · {s.time}
                     </p>
+                    {s.remindAt && !s.completed && (
+                      <p className="text-xs text-ink-500 flex items-center gap-1 mt-1">
+                        <Mail size={12} /> Both of you get an email at {reminderLabel(s.remindAt)}
+                      </p>
+                    )}
                     {s.recipeIds.length > 0 && (
                       <ul className="mt-2 flex flex-wrap gap-1.5">
                         {s.recipeIds.map((id) => {
@@ -96,7 +103,7 @@ function SessionDialog({
 }: {
   recipes: ReturnType<typeof useRecipes>
   onClose: () => void
-  onSave: (s: { id: string; date: string; time: string; recipeIds: string[]; label: string; completed: boolean }) => void
+  onSave: (s: CookSession) => void
 }) {
   const plan = useMealPlanStore((s) => s.plan)
   const [label, setLabel] = useState('')
@@ -104,6 +111,7 @@ function SessionDialog({
   const [time, setTime] = useState('18:00')
   const [picked, setPicked] = useState<string[]>([])
   const [query, setQuery] = useState('')
+  const [remind, setRemind] = useState(true)
 
   /**
    * What you are actually cooking this week, first.
@@ -166,6 +174,22 @@ function SessionDialog({
             </div>
           </div>
 
+          <label className="flex items-start gap-2.5 cursor-pointer">
+            <input
+              type="checkbox" className="w-4 h-4 accent-bite-500 mt-0.5 shrink-0"
+              checked={remind} onChange={() => setRemind(!remind)}
+            />
+            <span className="min-w-0">
+              <span className="block text-sm text-ink-900">
+                Email both of us {LEAD_MINUTES} minutes before
+              </span>
+              <span className="block text-xs text-ink-500">
+                Goes to everyone in the household. Needs the reminder job set up on the server;
+                see the README.
+              </span>
+            </span>
+          </label>
+
           <div>
             <label className="label">Dishes ({picked.length} picked)</label>
             <div className="relative">
@@ -217,6 +241,9 @@ function SessionDialog({
             onClick={() => onSave({
               id: `${Date.now()}`, date, time, recipeIds: picked,
               label: label.trim() || 'Cook session', completed: false,
+              // Worked out here rather than on the server: this is the device
+              // that knows what timezone "18:00" was typed in.
+              remindAt: remind ? reminderAt(date, time) : undefined,
             })}
           >
             Save

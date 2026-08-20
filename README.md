@@ -272,6 +272,33 @@ Setup is four steps, all in [`docs/DEPLOY.md`](docs/DEPLOY.md): make the repo
 public, create the Supabase project, run `supabase/schema.sql`, add two
 repository secrets. Every push then deploys itself.
 
+### Cook session reminders
+
+Optional, and the one feature that needs something running when nobody is
+looking at the app: a browser that is closed sends no email. It is an Edge
+Function on a five-minute schedule.
+
+```bash
+supabase functions deploy cook-reminders
+supabase secrets set RESEND_API_KEY=...        # a free Resend account
+supabase secrets set REMINDER_FROM="Bite Buddy <hello@yourdomain>"
+```
+
+Then uncomment the `cron.schedule` block at the bottom of
+`supabase/schema.sql`, fill in the project ref, and run it. Supabase's own
+dashboard can schedule the function instead, under Integrations > Cron, which
+avoids putting a key in SQL at all.
+
+The email goes to everyone on the household list, fifteen minutes before the
+session. The time is worked out by the browser that scheduled it: "18:00" is
+an instant only once you know where the person typing it was standing, and the
+server does not. Each reminder is recorded in `reminder_log` so it is sent
+once; sending it twice is worse than sending it late, because the second one
+teaches you to ignore the first.
+
+Without any of this the toggle still saves, the app just never emails. Nothing
+else depends on it.
+
 ---
 
 ## Running it
