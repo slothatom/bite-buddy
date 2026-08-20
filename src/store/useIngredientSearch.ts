@@ -17,12 +17,12 @@ import {
  * The library and the two online sources used to be different places you went
  * to: local foods in the recipe editor, USDA and Open Food Facts on the Foods
  * screen. Which meant that to put a food the app did not know into a recipe you
- * had to abandon the recipe, go and add the food, and come back — for something
+ * had to abandon the recipe, go and add the food, and come back, for something
  * the app could have found in a second.
  *
  * So it is one box now. What you already have appears instantly and works with
  * no signal; the online sources arrive a moment later underneath, in the order
- * the brief asks for — USDA first for generic ingredients, then Open Food Facts
+ * the brief asks for, USDA first for generic ingredients, then Open Food Facts
  * for the branded ones, then adding it by hand.
  */
 
@@ -39,7 +39,7 @@ export interface IngredientSearch {
   online: NutritionResult[]
   /** True while the online sources are still being asked. */
   searching: boolean
-  /** Which sources failed and why — never silently nothing. */
+  /** Which sources failed and why, never silently nothing. */
   problems: LookupOutcome['problems']
   /** True once an online search has actually been run for this query. */
   searched: boolean

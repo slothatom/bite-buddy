@@ -15,8 +15,8 @@ interface RecipeStore {
    * "This recipe is really that one", written as loser id → winner id.
    *
    * A merge hides nothing and deletes nothing: every lookup resolves through
-   * this map, so a day you already planned — or one of the fourteen archived
-   * weeks, which live in code and cannot be rewritten — still finds a recipe.
+   * this map, so a day you already planned, or one of the fourteen archived
+   * weeks, which live in code and cannot be rewritten, still finds a recipe.
    */
   mergedInto: Record<string, string>
 
@@ -66,14 +66,14 @@ export const useRecipeStore = create<RecipeStore>()(
        *
        * Nothing is dropped, and that is deliberate. A recipe you deleted may
        * still be named by a day you planned in March, and the plan stores an id
-       * rather than a copy — so throwing the recipe away turned that day's
+       * rather than a copy, so throwing the recipe away turned that day's
        * dinner into a blank worth zero calories, quietly rewriting your own
        * history. It goes on the hidden list instead: gone from every list,
        * search, picker and filter, still resolvable by anything that already
        * refers to it, and restorable.
        *
        * The favourite goes, because a star you cannot see is a star you cannot
-       * clear. Ingredients are untouched — other recipes use them.
+       * clear. Ingredients are untouched, other recipes use them.
        */
       removeRecipe: (id) =>
         set((s) => ({
@@ -143,7 +143,7 @@ export function libraryWith(custom: Recipe[]): Recipe[] {
 
 /**
  * What you can actually browse: the library, minus what you deleted and what
- * you merged away. Exported so nothing has to reimplement it — a second copy of
+ * you merged away. Exported so nothing has to reimplement it, a second copy of
  * this rule in a test is a second copy that can drift out of step with the app.
  */
 export function visibleRecipes(state: Pick<RecipeStore, 'custom' | 'hidden' | 'mergedInto'>): Recipe[] {
@@ -159,7 +159,7 @@ export function useRecipes(): Recipe[] {
   const mergedInto = useRecipeStore((s) => s.mergedInto)
 
   // Deleted and merged-away recipes both leave the library and both keep
-  // resolving — see useResolvableRecipes.
+  // resolving, see useResolvableRecipes.
   return useMemo(() => visibleRecipes({ custom, hidden, mergedInto }), [custom, hidden, mergedInto])
 }
 
@@ -168,7 +168,7 @@ export function useRecipes(): Recipe[] {
  *
  * This is what the nutrition context is built from. A day you planned in March
  * stores a recipe id, not a copy of the recipe, so deleting that recipe must not
- * be able to reach back and blank the day — the historical record stays whole
+ * be able to reach back and blank the day, the historical record stays whole
  * even though the recipe is gone from every list you can browse.
  */
 export function useResolvableRecipes(): Recipe[] {

@@ -7,7 +7,7 @@ import type { Recipe } from '../types'
 
 const BUILT_IN = ALL_RECIPES[0]
 
-/** The app's own rule, not a copy of it — see visibleRecipes. */
+/** The app's own rule, not a copy of it, see visibleRecipes. */
 function visible(): Recipe[] {
   return visibleRecipes(useRecipeStore.getState())
 }
@@ -120,7 +120,7 @@ describe('deleting a recipe', () => {
 
   it('leaves a day you already planned with it intact', () => {
     // The plan stores an id, not a copy. Destroying the recipe turned that day's
-    // dinner into a blank worth zero calories — quietly rewriting your history.
+    // dinner into a blank worth zero calories, quietly rewriting your history.
     const before = componentsNutrients(
       [{ kind: 'recipe', recipeId: BUILT_IN.id, servings: 1 }],
       buildContext(FOODS, resolvable()),

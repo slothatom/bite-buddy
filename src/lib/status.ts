@@ -3,7 +3,7 @@
  *
  * The design system is explicit that going over a target is information, not
  * failure, and that the state must never be carried by hue alone. So this
- * returns a label, a symbol and a signed delta alongside the colour level —
+ * returns a label, a symbol and a signed delta alongside the colour level -
  * every consumer is expected to render at least the label or the symbol, not
  * just the colour.
  *
@@ -19,7 +19,7 @@ export interface TargetStatus {
   label: string
   /** Signed difference from target, rounded. */
   delta: number
-  /** "+120 kcal" — empty when on track or untargeted. */
+  /** "+120 kcal", empty when on track or untargeted. */
   deltaLabel: string
   /** A non-colour cue: nothing, a plus, or an alert. */
   symbol: '' | '+' | '!'

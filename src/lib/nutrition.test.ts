@@ -160,7 +160,7 @@ describe('unknown is not zero', () => {
     expect(report.partial).toEqual([])
   })
 
-  it('does not mark a nutrient nobody knew — there is no figure to qualify', () => {
+  it('does not mark a nutrient nobody knew, there is no figure to qualify', () => {
     const report = reportNutrients([{ kind: 'food', foodId: 'says-nothing', grams: 100 }], ctx)
     expect(report.partial).not.toContain('fiber')
   })

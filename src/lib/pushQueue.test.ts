@@ -3,7 +3,7 @@ import { PushQueue, type PushQueueState } from './pushQueue'
 
 /**
  * The queue's whole job is what happens when delivery fails, so that is what
- * these exercise. Time is injected rather than waited on — a test that sleeps
+ * these exercise. Time is injected rather than waited on, a test that sleeps
  * for a 60-second backoff is a test nobody runs.
  */
 

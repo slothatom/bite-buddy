@@ -112,7 +112,7 @@ export type Upgrade = (state: Record<string, unknown>) => Record<string, unknown
  * Migrates stored state forward one version at a time.
  *
  * Discarding is the safe default and was the only option here, but it costs the
- * user everything they have entered — acceptable while this app was a local
+ * user everything they have entered, acceptable while this app was a local
  * experiment, not once a real week lives in it. So a store can now describe how
  * to move between versions, and only falls back to discarding when it cannot:
  * an unknown gap, or state written by a *newer* app than this one, which cannot

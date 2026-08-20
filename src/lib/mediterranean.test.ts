@@ -7,7 +7,7 @@ import type { DayPlan, Food, Recipe } from '../types'
  * The serving goals are the one place the app makes a judgement about whether
  * you ate well, so a wrong number here is worse than no number: it is a
  * confident wrong answer. Every case below is one where the arithmetic could be
- * quietly off — nested recipes, part-planned weeks, the categories where less
+ * quietly off, nested recipes, part-planned weeks, the categories where less
  * is the goal.
  */
 
@@ -97,7 +97,7 @@ describe('gramsByCategory', () => {
 describe('scoreWeek', () => {
   it('scales daily goals to the days actually planned', () => {
     // Three vegetable servings a day, but only two days planned, so the target
-    // is six servings — not twenty-one. Scoring a part-planned week against a
+    // is six servings, not twenty-one. Scoring a part-planned week against a
     // full one would make every Wednesday look like a failure.
     const days = [
       day('2026-08-20', [{ kind: 'food', foodId: 'spinach', grams: 240 }]),
@@ -124,7 +124,7 @@ describe('scoreWeek', () => {
     const meat = scoreWeek(days, ctx).find((g) => g.category === 'red-meat')!
 
     expect(meat.isLimit).toBe(true)
-    // Three times the weekly limit — the ratio has to keep going past 1 or
+    // Three times the weekly limit, the ratio has to keep going past 1 or
     // there is no way to tell "at the limit" from "well over it".
     expect(meat.ratio).toBe(3)
   })

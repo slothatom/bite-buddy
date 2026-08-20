@@ -19,8 +19,8 @@ export interface NutritionContext {
 
 /**
  * `aliases` maps a recipe id that is no longer in the library to the one it was
- * merged into. Those entries go into the same map, so every caller — planner
- * totals, meal labels, the grocery list, the fourteen archived weeks — resolves
+ * merged into. Those entries go into the same map, so every caller, planner
+ * totals, meal labels, the grocery list, the fourteen archived weeks, resolves
  * an old id without knowing merging exists.
  */
 export function buildContext(
@@ -48,8 +48,8 @@ export function emptyNutrients(): Nutrients {
  * Adds two sets of figures, keeping "unknown" out of the arithmetic.
  *
  * A micronutrient neither side knows stays unknown rather than becoming zero.
- * One that only one side knows is summed anyway — dropping it would be worse,
- * since "at least this much" is real information — but the total is then
+ * One that only one side knows is summed anyway, dropping it would be worse,
+ * since "at least this much" is real information, but the total is then
  * incomplete, and `reportNutrients` is how a screen finds that out and says so.
  */
 export function addNutrients(a: Nutrients, b: Nutrients): Nutrients {
@@ -166,7 +166,7 @@ export function weekNutrients(days: DayPlan[], ctx: NutritionContext): Nutrients
  * Calories implied by the macros.
  *
  * Plain 4/4/9 Atwater over-counts fibrous foods, because fibre sits inside the
- * carbohydrate figure but yields far less energy — spinach comes out 30%
+ * carbohydrate figure but yields far less energy, spinach comes out 30%
  * high, which would make every vegetable look mis-keyed. Fibre is therefore
  * counted at 2 kcal/g and removed from the carbohydrate total, which is the
  * convention EU labelling uses.
@@ -237,7 +237,7 @@ export interface NutrientReport {
   total: Nutrients
   /**
    * Micronutrients at least one ingredient said nothing about. The total for
-   * these is a floor, not a figure — the screen shows them as "12 g +".
+   * these is a floor, not a figure, the screen shows them as "12 g +".
    */
   partial: MicroKey[]
   /** How many ingredients went into this, for explaining a partial total. */
@@ -247,7 +247,7 @@ export interface NutrientReport {
 /**
  * A total, plus an honest account of how much of it is actually known.
  *
- * Missing nutrient data means unknown, not zero — so a recipe of five
+ * Missing nutrient data means unknown, not zero, so a recipe of five
  * ingredients where two never mention fibre cannot claim a fibre figure as if
  * it were complete. It still shows the figure, because "at least this much" is
  * worth knowing, but it is marked.

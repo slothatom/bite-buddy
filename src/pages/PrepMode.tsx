@@ -12,7 +12,7 @@ import Zig from '../components/brand/Mascot'
 /**
  * Cooking, one thing at a time.
  *
- * This screen used to offer only recipes carrying a written method — and since
+ * This screen used to offer only recipes carrying a written method, and since
  * the dietician wrote portions rather than instructions, not one of the 275 has
  * any, so it was permanently empty.
  *
@@ -94,7 +94,7 @@ function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void })
     notice({ ...EMPTY_CONTEXT, cookedSomething: true })
   }
 
-  /** Writing the method as you cook it — it is kept on the recipe for next time. */
+  /** Writing the method as you cook it, it is kept on the recipe for next time. */
   function addStep() {
     const instruction = newStep.trim()
     if (!instruction) return
@@ -181,10 +181,10 @@ function PrepSession({ recipe, onExit }: { recipe: Recipe; onExit: () => void })
         </div>
 
         {/* The dietician wrote portions, not method. This is where the method
-            gets written — once, by whoever cooks it first. */}
+            gets written, once, by whoever cooks it first. */}
         <details className="card p-4" open={!recipe.steps.length}>
           <summary className="text-sm font-semibold text-ink-900 cursor-pointer">
-            {recipe.steps.length ? 'Add another step' : 'No method written yet — add one'}
+            {recipe.steps.length ? 'Add another step' : 'No method written yet. Add one'}
           </summary>
           <div className="flex gap-2 mt-3">
             <input

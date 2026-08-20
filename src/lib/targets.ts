@@ -20,11 +20,11 @@ const ACTIVITY_FACTORS: Record<ActivityLevel, number> = {
 }
 
 export const ACTIVITY_LABELS: Record<ActivityLevel, string> = {
-  sedentary: 'Sedentary — desk job, little exercise',
-  light: 'Light — exercise 1–3 days a week',
-  moderate: 'Moderate — exercise 3–5 days a week',
-  active: 'Active — exercise 6–7 days a week',
-  'very-active': 'Very active — physical job or twice-daily training',
+  sedentary: 'Sedentary: desk job, little exercise',
+  light: 'Light: exercise 1 to 3 days a week',
+  moderate: 'Moderate: exercise 3 to 5 days a week',
+  active: 'Active: exercise 6 to 7 days a week',
+  'very-active': 'Very active: physical job or twice-daily training',
 }
 
 /** Fibre target scales with intake: the common guideline is 14 g per 1000 kcal. */
@@ -35,8 +35,8 @@ function fibreFor(calories: number): number {
 /**
  * Splits a calorie figure into macros.
  *
- * Protein is set per kilogram of body weight where known — the useful anchor on
- * a reduced-calorie plan — with fat at 30% of energy and carbohydrate taking the
+ * Protein is set per kilogram of body weight where known, the useful anchor on
+ * a reduced-calorie plan, with fat at 30% of energy and carbohydrate taking the
  * remainder, which is roughly how the dietician's own plans distribute.
  */
 function splitMacros(calories: number, weightKg?: number): Macros {

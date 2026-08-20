@@ -18,7 +18,7 @@ export interface Member {
 }
 
 interface AuthStore {
-  /** Null until the first session check finishes — the app waits on this. */
+  /** Null until the first session check finishes, the app waits on this. */
   ready: boolean
   session: Session | null
   user: User | null
@@ -82,7 +82,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
  * Announce this user to the household.
  *
  * The row is created on first sign-in rather than by a database trigger, so
- * signing in is the only thing that puts someone on the members list — an
+ * signing in is the only thing that puts someone on the members list, an
  * account that exists but has never been used does not appear.
  */
 async function recordPresence(user: User) {

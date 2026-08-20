@@ -6,7 +6,7 @@ import { flattenComponents } from './ingredients'
  * Scoring a week against the Mediterranean Diet guide's serving goals.
  *
  * The guide states goals per category and defines a serving in grams-equivalent
- * terms — "1 serving = ½ cup cooked or chopped raw vegetables" and so on. Those
+ * terms, "1 serving = ½ cup cooked or chopped raw vegetables" and so on. Those
  * definitions are turned into gram weights here so a planned week can be scored
  * without asking the user to count cups.
  */

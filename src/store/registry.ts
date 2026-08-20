@@ -16,7 +16,7 @@ import { useBodyStore } from './useBodyStore'
 import { useCookStore } from './useCookStore'
 
 export interface PersistedStore {
-  /** The store's persist key — also its key in a backup file and in the database. */
+  /** The store's persist key, also its key in a backup file and in the database. */
   name: string | undefined
   read: () => unknown
   write: (state: object) => void

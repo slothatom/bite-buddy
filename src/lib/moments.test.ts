@@ -40,7 +40,7 @@ describe('noticeMoments', () => {
     for (const kind of everything) expect(MOMENTS[kind]).toBeDefined()
   })
 
-  it('is finite — there is no ninth thing to chase', () => {
+  it('is finite, there is no ninth thing to chase', () => {
     expect(Object.keys(MOMENTS)).toHaveLength(8)
   })
 })
@@ -70,7 +70,7 @@ describe('the store side', () => {
   })
 
   it('keeps a moment after it has been seen', () => {
-    // Nothing here is spent or lost — that is the whole difference from points.
+    // Nothing here is spent or lost, that is the whole difference from points.
     const { notice, markMomentSeen } = useUserStore.getState()
     notice({ ...EMPTY_CONTEXT, plannedDays: 1 })
     markMomentSeen('first-day')

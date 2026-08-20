@@ -9,8 +9,8 @@ export interface NutritionResult {
   source: 'usda' | 'openfoodfacts'
   /**
    * Enough to trace the numbers back and to never fetch them twice: the
-   * source's own id and name, what the figures are per, and — because European
-   * labels state salt where USDA states sodium — which of the two was given.
+   * source's own id and name, what the figures are per, and, because European
+   * labels state salt where USDA states sodium, which of the two was given.
    */
   externalId?: string
   sourceName?: string
@@ -111,7 +111,7 @@ function parseUSDAFood(food: USDAFood): NutritionResult {
  *
  * The precision is not decoration. Vitamin B12 arrives in micrograms and a
  * portion holds a fraction of one, so rounding it to a whole number rounds it
- * to nothing — a nutrient the source did report, discarded on the way in.
+ * to nothing, a nutrient the source did report, discarded on the way in.
  */
 const OFF_KEYS: [keyof MicroPer100g, string, number][] = [
   ['fiber', 'fiber_100g', 10],
@@ -194,7 +194,7 @@ export interface LookupOutcome {
    *
    * Both lookups used to swallow every failure and return an empty array, so
    * being rate-limited, being offline and genuinely finding nothing all looked
-   * identical — "no results" — and the obvious next move was to type the
+   * identical, "no results", and the obvious next move was to type the
    * numbers in by hand for a food the database knew perfectly well.
    */
   problems: Array<{ source: 'usda' | 'openfoodfacts'; reason: LookupProblem }>
@@ -237,7 +237,7 @@ export async function searchFoods(query: string, signal?: AbortSignal): Promise<
   const problems: LookupOutcome['problems'] = []
 
   // Both are asked at once, but USDA comes first in the list: it is the
-  // reference source for generic ingredients — chicken, rice, a tomato — and its
+  // reference source for generic ingredients, chicken, rice, a tomato, and its
   // figures are laboratory measurements. Open Food Facts is community-entered
   // label data, which is exactly what you want for a branded yogurt and not what
   // you want for a potato.

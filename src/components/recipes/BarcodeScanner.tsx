@@ -81,7 +81,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
       )}
 
       <div className="px-4 py-3 text-center">
-        <p className="text-white/40 text-xs">Point camera at barcode — detects automatically</p>
+        <p className="text-white/40 text-xs">Point camera at barcode. Detects automatically</p>
       </div>
     </div>
   )

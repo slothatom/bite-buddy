@@ -12,7 +12,7 @@ import type { Recipe } from '../src/types/index.js'
  *
  * Run: npx tsx scripts/check-data.ts
  *
- * These guard the failure modes that would otherwise be invisible — a component
+ * These guard the failure modes that would otherwise be invisible, a component
  * pointing at a food that no longer exists, a recipe that nests itself, or a
  * mis-keyed nutrition value that makes a food's calories disagree with its own
  * macros. All of those produce plausible-looking numbers rather than crashes.
@@ -83,7 +83,7 @@ for (const plan of SOURCE_PLANS) {
       lines++
       if (!meal.entries.length) {
         empty++
-        problems.push(`${plan.file} ${day.dayName} ${meal.slot}: unmapped — "${meal.text}"`)
+        problems.push(`${plan.file} ${day.dayName} ${meal.slot}: unmapped, "${meal.text}"`)
       }
     }
   }
@@ -104,12 +104,12 @@ for (const [name, count] of names) {
 }
 
 // 5. Every recipe knows what kind of food it is, and the file saying so is not
-//    stale — a category the classifier no longer produces would silently filter
+//    stale, a category the classifier no longer produces would silently filter
 //    to nothing on the Recipes screen.
 for (const recipe of recipes) {
   const classified = RECIPE_CLASSIFICATION[recipe.id]
   if (!classified) {
-    problems.push(`${recipe.id} (${recipe.name.en}): no category — re-run scripts/classify-recipes.ts`)
+    problems.push(`${recipe.id} (${recipe.name.en}): no category, re-run scripts/classify-recipes.ts`)
     continue
   }
   if (!DISH_CATEGORIES.includes(classified.category)) {

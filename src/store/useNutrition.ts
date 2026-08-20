@@ -7,7 +7,7 @@ import { useResolvableRecipes, useRecipeStore } from './useRecipeStore'
 /**
  * The lookup tables every nutrition calculation needs.
  *
- * Rebuilt only when the food or recipe lists actually change — the library is
+ * Rebuilt only when the food or recipe lists actually change, the library is
  * ~120 foods and ~275 recipes, so rebuilding on every render would be wasteful
  * on the weekly planner where totals are computed for 35 meal slots at once.
  */

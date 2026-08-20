@@ -49,7 +49,7 @@ export const useFoodStore = create<FoodStore>()(
        *
        * Same reason as recipes, and it bites harder here: a food is named by
        * every recipe that uses it *and* directly by the snack lines in your
-       * plan — "150 g apple, 10 g cashews" is two food references, not a recipe.
+       * plan, "150 g apple, 10 g cashews" is two food references, not a recipe.
        * Dropping the food would blank all of them at once. It goes on the hidden
        * list instead: gone from the library, from search and from every picker,
        * still resolvable by anything that already refers to it.
@@ -90,7 +90,7 @@ export function foodLibraryWith(custom: Food[]): Food[] {
 }
 
 /**
- * What you can browse. Exported so nothing reimplements the rule — a second
+ * What you can browse. Exported so nothing reimplements the rule, a second
  * copy of it is a copy that drifts the moment the rule changes.
  */
 export function visibleFoods(state: Pick<FoodStore, 'custom' | 'hidden'>): Food[] {
@@ -105,7 +105,7 @@ export function visibleFoods(state: Pick<FoodStore, 'custom' | 'hidden'>): Food[
 export function useFoods(): Food[] {
   // Memoised on the two arrays it derives from. Without this the result is a
   // new array on every render, which defeats every useMemo downstream that
-  // takes it as a dependency — including the nutrition context, which was
+  // takes it as a dependency, including the nutrition context, which was
   // being rebuilt on every render despite a comment saying otherwise.
   const custom = useFoodStore((s) => s.custom)
   const hidden = useFoodStore((s) => s.hidden)

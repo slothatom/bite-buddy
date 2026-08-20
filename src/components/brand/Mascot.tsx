@@ -1,7 +1,7 @@
 import { useId } from 'react'
 
 /**
- * Zig — Bite Buddy's companion.
+ * Zig, Bite Buddy's companion.
  *
  * An abstract bite-shaped creature, deliberately not a bowl, a plate or a piece
  * of food: the silhouette is a lumpy blob with a bite taken out of one shoulder,
@@ -9,7 +9,7 @@ import { useId } from 'react'
  *
  * Drawn inline as SVG so it inherits theme colours and stays crisp from 30px in
  * the sidebar to 96px in an empty state. The bite is cut from two offset copies
- * — the ink body takes a smaller cut than the purple body — so the bitten edge
+ *, the ink body takes a smaller cut than the purple body, so the bitten edge
  * keeps the same outline weight as the rest of the silhouette.
  *
  * Zig appears in onboarding, empty states, errors and moments of delight. He
@@ -58,7 +58,7 @@ export default function Zig({
       </mask>
 
       {/* Limbs sit behind the body so the joins never show. Deliberately thin
-          and slightly uneven — the system asks for imperfect geometry. */}
+          and slightly uneven, the system asks for imperfect geometry. */}
       <g stroke="var(--color-ink-900)" strokeWidth="2.6" strokeLinecap="round" fill="none">
         <path d={armsUp ? 'M15 34 6 25' : 'M15 35 7 41'} />
         <path d={armsUp ? 'M49 36 58 27' : mood === 'thinking' ? 'M48 36 55 30' : 'M49 37 57 43'} />
@@ -119,7 +119,7 @@ export default function Zig({
         </g>
       )}
 
-      {/* Props — a small, characterful addition rather than a costume. */}
+      {/* Props, a small, characterful addition rather than a costume. */}
       {mood === 'chef' && (
         <g>
           <path

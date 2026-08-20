@@ -1,10 +1,10 @@
 @import 'tailwindcss';
 
 /*
- * Bite Buddy — Bold & Playful.
+ * Bite Buddy, Bold & Playful.
  *
  * Implements docs/DESIGN-SYSTEM.md. The balance the system asks for is roughly
- * 70% calm (paper, ink, whitespace), 20% functional colour, 10% chaos — so the
+ * 70% calm (paper, ink, whitespace), 20% functional colour, 10% chaos, so the
  * bold accents are concentrated in navigation, headings, empty states and
  * moments of delight, while dense working areas stay quiet.
  */
@@ -72,7 +72,7 @@
   --color-border-200: #e6ded5;
 
   /* ─── Type ─────────────────────────────────────────────────────────────────
-     Bungee is a display face only — wordmark, H1, and short expressive labels.
+     Bungee is a display face only, wordmark, H1, and short expressive labels.
      It is never used for recipe names, tables or numeric data. */
   --font-display: 'Bungee', ui-rounded, system-ui, sans-serif;
   --font-sans: 'Plus Jakarta Sans Variable', system-ui, sans-serif;
@@ -207,7 +207,7 @@
   @apply bg-paper rounded-card border border-border-200 shadow-e1;
 }
 
-/** Level 0 — flat, for nested panels inside a card. */
+/** Level 0, flat, for nested panels inside a card. */
 @utility card-soft {
   @apply bg-cream-50 rounded-xl border border-border-200;
 }
@@ -263,7 +263,7 @@
    Applied only where the pointer is coarse, so phones get the 44px minimum that
    fingers need while pointer devices keep the denser desktop proportions.
    These sit outside `@layer` deliberately so they take precedence over the
-   utilities they widen — and they list every variant because Tailwind's
+   utilities they widen, and they list every variant because Tailwind's
    `@utility` inlines the composed base rather than adding `.btn` to the element. */
 @media (pointer: coarse) {
   .btn, .btn-primary, .btn-secondary, .btn-ghost, .btn-danger,

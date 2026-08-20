@@ -67,10 +67,10 @@ export type MedCategory =
 
 /**
  * How often the guide says to eat this group:
- *  daily    — "Eat More", the base of every meal
- *  weekly   — several times a week (legumes, fish)
- *  moderate — "Eat in Moderation" (dairy, poultry, eggs)
- *  rare     — "Eat Rarely or Limit" (red meat, sweets)
+ *  daily   , "Eat More", the base of every meal
+ *  weekly  , several times a week (legumes, fish)
+ *  moderate, "Eat in Moderation" (dairy, poultry, eggs)
+ *  rare    , "Eat Rarely or Limit" (red meat, sweets)
  */
 export type MedTier = 'daily' | 'weekly' | 'moderate' | 'rare'
 
@@ -108,7 +108,7 @@ export interface FoodProvenance {
   externalId?: string
   /** The name the source used, which is often not the name you gave it. */
   sourceName?: string
-  /** What the figures are per — almost always 100 g. */
+  /** What the figures are per, almost always 100 g. */
   basePortion: { amount: number; unit: PortionUnit }
   /** ISO date the figures were fetched. Nutrition data gets revised. */
   retrievedAt?: string
@@ -157,7 +157,7 @@ export interface PrepStep {
 }
 
 /**
- * What the food actually is — not when it is eaten, how it is served, or how it
+ * What the food actually is, not when it is eaten, how it is served, or how it
  * was cooked. "Main", "Side" and "Bowl" are deliberately absent: they describe a
  * role at the table rather than a food, so they tell you nothing when you are
  * looking for something to cook.
@@ -176,7 +176,7 @@ export type DishCategory =
 /**
  * How a recipe fits into a day that is already busy.
  *
- * These are about circumstance rather than food — whether you have twenty
+ * These are about circumstance rather than food, whether you have twenty
  * minutes, whether the fridge needs emptying, whether you want to be looked
  * after. A recipe can carry any number of them.
  */
@@ -203,7 +203,7 @@ export interface Recipe {
   tags: RecipeTag[]
   /** What the food is. Every shipped recipe has one; yours can wait. */
   category?: DishCategory
-  /** Circumstance rather than food — see QuickFilter. */
+  /** Circumstance rather than food, see QuickFilter. */
   quickFilters?: QuickFilter[]
   /**
    * The dietician's original line, kept verbatim. Shown as provenance in the UI
@@ -264,7 +264,7 @@ export type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6
  *
  * The dietician's own plans all run Wednesday to Tuesday, but the app's week is
  * the ordinary one. Loading a plan lines its days up by weekday, so a Wednesday
- * meal still lands on Wednesday — it just sits mid-week instead of first.
+ * meal still lands on Wednesday, it just sits mid-week instead of first.
  */
 export const DEFAULT_WEEK_START: WeekStart = 1
 
@@ -297,7 +297,7 @@ export interface SourcePlan {
   language: PlanLanguage
   /** ISO date the plan was issued, parsed from the filename where present. */
   issuedOn?: string
-  /** Whose plan this is — one week was written for a different person. */
+  /** Whose plan this is, one week was written for a different person. */
   subject: 'self' | 'other'
   days: SourceDay[]
 }
@@ -332,7 +332,7 @@ export interface GroceryItem {
  * Body entries belong to a person, unlike everything else in this app.
  *
  * The week, the targets, the recipes and the grocery list are shared between
- * the two of you on purpose — you eat the same dinners. A waist measurement is
+ * the two of you on purpose, you eat the same dinners. A waist measurement is
  * not that: pooling two people's bodies into one trend line makes a graph of
  * nothing. `memberId` is the id of whoever it belongs to.
  *

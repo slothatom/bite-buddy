@@ -76,7 +76,7 @@ function WeekTab() {
         <SectionHeading>Calories by day</SectionHeading>
         <div className="card p-5">
           {/* The target used to be labelled on the line itself, where it sat on
-              top of any bar reaching a similar height — measured 24px of overlap
+              top of any bar reaching a similar height, measured 24px of overlap
               on a phone. It reads as a legend instead, and the line stays bare. */}
           <p className="flex items-center gap-2 mb-3 text-xs text-ink-500">
             <span className="w-6 border-t-2 border-dashed border-ink-900/25" aria-hidden="true" />
@@ -176,7 +176,7 @@ function BodyTab() {
   const me = useAuthStore((s) => s.user)
   const members = useAuthStore((s) => s.members)
 
-  // Signed out — a local clone or the test suite — there is one person and no
+  // Signed out, a local clone or the test suite, there is one person and no
   // ids, so everything sits under the unclaimed heading and simply works.
   const [who, setWho] = useState<string | undefined>(() => me?.id)
   const unassigned = useUnassignedCount()
@@ -280,7 +280,7 @@ function BodyTab() {
       <SectionHeading>Measurements</SectionHeading>
       <div className="card p-4 space-y-3">
         <p className="text-xs text-ink-500">
-          In centimetres. Fill in whichever you took — a blank is simply not measured that day,
+          In centimetres. Fill in whichever you took. A blank is simply not measured that day,
           and the trend below skips it rather than reading it as a change.
         </p>
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
@@ -321,7 +321,7 @@ function BodyTab() {
 
       {measurements.length === 0 ? (
         <EmptyState title="Nothing measured yet" mood="thinking">
-          Waist, hips, chest, arms and thighs — each one its own line, because they move at
+          Waist, hips, chest, arms and thighs, each one its own line, because they move at
           different times and an average of the five says nothing.
         </EmptyState>
       ) : (

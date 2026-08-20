@@ -158,8 +158,8 @@ test.describe('the main flow', () => {
 
   test('every screen that lists things actually lists something', async ({ page }) => {
     // Prep and Schedule both filtered their lists on recipes having a written
-    // method. Not one of the 275 does — the dietician wrote portions, not
-    // instructions — so both screens shipped permanently empty and rendered
+    // method. Not one of the 275 does, the dietician wrote portions, not
+    // instructions, so both screens shipped permanently empty and rendered
     // fine while doing it. Nothing caught that, because "renders without
     // errors" is exactly what an empty state does.
     await goto(page, '/prep')
@@ -196,7 +196,7 @@ test.describe('the main flow', () => {
 test.describe('the recipe library', () => {
   test('opens on one shelf rather than all 275', async ({ page }) => {
     // The screen this replaced showed every recipe at once, sorted
-    // alphabetically — a wall you had to scroll past to reach anything.
+    // alphabetically, a wall you had to scroll past to reach anything.
     await goto(page, '/recipes')
 
     const shown = await page.locator('.card').count()
@@ -204,7 +204,7 @@ test.describe('the recipe library', () => {
     expect(shown, 'the opening shelf is empty').toBeGreaterThan(5)
 
     // The number on a tab is the number of cards you then see, not the number
-    // of recipes behind them. Read off whichever tab is open — which shelf that
+    // of recipes behind them. Read off whichever tab is open, which shelf that
     // is depends on the time of day, and hardcoding Breakfast made this pass
     // only before eleven in the morning.
     const label = await page.locator('button.tab-on').textContent()
@@ -380,7 +380,7 @@ test.describe('the recipe library', () => {
 
     await page.getByLabel('Recipe name').fill('Midnight beans')
     await page.getByRole('button', { name: /Add ingredient/ }).click()
-    await page.getByPlaceholder(/Anything — yours/).fill('lentil')
+    await page.getByPlaceholder(/Anything: yours/).fill('lentil')
     await page.locator('button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
 
     // The numbers are derived from what went in, never typed.
@@ -423,7 +423,7 @@ test.describe('the recipe library', () => {
     await page.getByRole('button', { name: 'New recipe' }).click()
     await page.getByLabel('Recipe name').fill('Doomed dinner')
     await page.getByRole('button', { name: /Add ingredient/ }).click()
-    await page.getByPlaceholder(/Anything — yours/).fill('chicken breast')
+    await page.getByPlaceholder(/Anything: yours/).fill('chicken breast')
     await page.locator('button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
     await page.getByRole('button', { name: 'Add recipe' }).click()
 
@@ -457,7 +457,7 @@ test.describe('the recipe library', () => {
     await expect(page.getByText('Doomed dinner')).toHaveCount(0)
 
     // Gone from the planner's picker. Scoped to the sheet, since the plan
-    // behind it still shows the meal — that is the point of the next assertion.
+    // behind it still shows the meal, that is the point of the next assertion.
     await goto(page, '/plan')
     await page.getByRole('button', { name: /Pop something in/ }).first().click()
     await page.getByRole('button', { name: 'recipes' }).click()
@@ -544,7 +544,7 @@ test.describe('building a recipe from the food database', () => {
     await page.getByLabel('Recipe name').fill('Unit test dinner')
 
     await page.getByRole('button', { name: /Add ingredient/ }).click()
-    await page.getByPlaceholder(/Anything — yours/).fill('olive oil')
+    await page.getByPlaceholder(/Anything: yours/).fill('olive oil')
     await page.locator('button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
 
     // Switching to tablespoons restates the same weight rather than changing it.
@@ -568,7 +568,7 @@ test.describe('building a recipe from the food database', () => {
     await page.getByRole('button', { name: 'New recipe' }).click()
     await page.getByLabel('Recipe name').fill('Recalculation')
     await page.getByRole('button', { name: /Add ingredient/ }).click()
-    await page.getByPlaceholder(/Anything — yours/).fill('chicken breast')
+    await page.getByPlaceholder(/Anything: yours/).fill('chicken breast')
     await page.locator('button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
 
     const headline = page.locator('p.text-2xl').first()
@@ -592,7 +592,7 @@ test.describe('building a recipe from the food database', () => {
 
     const note = page.getByText(/at least one ingredient had nothing to say/)
     const plus = page.locator('text=/\\d+(\\.\\d+)? g\\u2009\\+/')
-    // Either the total is complete, or it is marked — never a bare number that
+    // Either the total is complete, or it is marked, never a bare number that
     // silently treats unknown as zero.
     if (await plus.count() > 0) await expect(note).toBeVisible()
   })
@@ -698,8 +698,8 @@ test.describe('finding an ingredient', () => {
     await page.getByRole('button', { name: /Add ingredient/ }).click()
 
     // One box, no tabs to choose between first.
-    await expect(page.getByPlaceholder(/Anything — yours, USDA, Open Food Facts/)).toBeVisible()
-    await page.getByPlaceholder(/Anything — yours/).fill('chicken')
+    await expect(page.getByPlaceholder(/Anything: yours, USDA, Open Food Facts/)).toBeVisible()
+    await page.getByPlaceholder(/Anything: yours/).fill('chicken')
 
     // Your own things appear immediately, with no network involved.
     await expect(page.getByText('Your foods')).toBeVisible()
@@ -708,12 +708,12 @@ test.describe('finding an ingredient', () => {
 
   test('says why nothing came back, rather than just showing nothing', async ({ page }) => {
     // A sandboxed run cannot reach USDA or Open Food Facts, which is the same
-    // situation as being in a shop with no signal — and must not look like
+    // situation as being in a shop with no signal, and must not look like
     // "this food does not exist".
     await goto(page, '/recipes')
     await page.getByRole('button', { name: 'New recipe' }).click()
     await page.getByRole('button', { name: /Add ingredient/ }).click()
-    await page.getByPlaceholder(/Anything — yours/).fill('zzzznotafood')
+    await page.getByPlaceholder(/Anything: yours/).fill('zzzznotafood')
 
     await expect(page.getByText(/no signal|rate-limiting|unreachable|Nothing anywhere matches/i))
       .toBeVisible({ timeout: 15_000 })

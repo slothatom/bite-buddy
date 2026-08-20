@@ -12,7 +12,7 @@ import { componentsNutrients } from '../lib/nutrition'
 /**
  * The archive of the dietician's plans.
  *
- * The original Romanian and Hungarian wording is kept verbatim — it is the
+ * The original Romanian and Hungarian wording is kept verbatim, it is the
  * record of what was actually prescribed, and the calorie figures beside it are
  * this app's interpretation, not the dietician's.
  */

@@ -7,8 +7,8 @@ import type { WeightEntry, BodyMeasurement } from '../types'
 /**
  * Weight and measurements, per person.
  *
- * This is the one store that is not shared. Two people eat the same dinners —
- * hence one week, one grocery list, one library — but two waists averaged into
+ * This is the one store that is not shared. Two people eat the same dinners -
+ * hence one week, one grocery list, one library, but two waists averaged into
  * a single trend line is a graph of nothing. Every entry carries the id of
  * whoever it belongs to, and the screen shows one person at a time.
  *
@@ -84,7 +84,7 @@ export const useBodyStore = create<BodyStore>()(
 /**
  * One person's entries, oldest first.
  *
- * `memberId` of undefined asks for the unclaimed ones — entries logged before
+ * `memberId` of undefined asks for the unclaimed ones, entries logged before
  * the app knew about people, or on a copy running with no account. They are
  * never folded into somebody's history silently; the screen offers to claim
  * them instead.

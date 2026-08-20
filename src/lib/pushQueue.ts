@@ -3,7 +3,7 @@
  *
  * This exists because of a specific hole in the first version of sync: a push
  * that failed was announced as an error and then forgotten. Go offline, change
- * a meal, close the tab — and unless you happened to change something else
+ * a meal, close the tab, and unless you happened to change something else
  * later, that edit never left the device. Nothing retried it.
  *
  * So changes are now *marked* rather than pushed directly, and the queue owns
@@ -11,7 +11,7 @@
  * to anything it could not deliver. It reports what is still pending so the app
  * can say so rather than implying everything is saved.
  *
- * Kept free of Supabase and of real timers so it can be tested properly — the
+ * Kept free of Supabase and of real timers so it can be tested properly, the
  * failure modes here are all about time and retries, which are miserable to
  * exercise through a network client.
  */
@@ -80,8 +80,8 @@ export class PushQueue {
   /**
    * Attempts every pending key now, ignoring the debounce.
    *
-   * Call when something suggests the network is back — coming online, the tab
-   * becoming visible again — rather than waiting out the backoff.
+   * Call when something suggests the network is back, coming online, the tab
+   * becoming visible again, rather than waiting out the backoff.
    */
   async flush(): Promise<void> {
     if (this.stopped || this.sending || !this.dirty.size) return
@@ -96,7 +96,7 @@ export class PushQueue {
     for (const [key, revision] of attempting) {
       try {
         await this.opts.push(key)
-        // Only clear it if nothing changed while the push was in flight — the
+        // Only clear it if nothing changed while the push was in flight, the
         // request that just succeeded did not contain a later edit.
         if (this.dirty.get(key) === revision) this.dirty.delete(key)
       } catch {

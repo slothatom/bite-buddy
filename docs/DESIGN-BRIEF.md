@@ -1,4 +1,4 @@
-# Bite Buddy — design brief
+# Bite Buddy, design brief
 
 Everything a design system for this app has to cover: the screens, the components,
 the states, the content that flows through them, and the constraints that bind the
@@ -7,7 +7,7 @@ design decisions.
 Written to be handed to a designer, or fed to a tool, as the source of truth.
 
 > **Superseded.** This brief was the input that produced
-> [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md), which is now the authority — and the two
+> [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md), which is now the authority, and the two
 > disagree. Section 10's typography (Fredoka + Nunito) belongs to the earlier
 > "cute and cozy" round; the app ships Bungee + Plus Jakarta Sans, and the Fredoka
 > and Nunito packages have been uninstalled. Read this for the screen, state and
@@ -18,13 +18,13 @@ Written to be handed to a designer, or fed to a tool, as the source of truth.
 
 ## 1. What the app is
 
-An **offline, single-user meal planner**. No accounts, no server, no sync — everything
+An **offline, single-user meal planner**. No accounts, no server, no sync, everything
 lives in the browser. It plans a week of eating, keeps a recipe library, and turns that
 week into a shopping list.
 
 **What makes it unlike other meal apps:** the content was not invented. The library was
 parsed out of **14 real dietician plan documents** written in Romanian and Hungarian
-across 2021–22 — 97 days, 481 individual meals. A second source, an 89-page
+across 2021–22, 97 days, 481 individual meals. A second source, an 89-page
 Mediterranean Diet guide, supplies the food taxonomy: 17 categories, each with a
 how-often tier and weekly serving goals the app scores against.
 
@@ -33,7 +33,7 @@ Three properties of that source data shape the whole product, and therefore the 
 | Property | Consequence for design |
 |---|---|
 | The dietician wrote **weighed portion lines**, not recipes (`50 g paine int + 100 g humus, jumatate de farfurie de legume`) | A meal is a *list of entries*, not one recipe. A snack is two food lines. Rows must handle 1–6 entries. |
-| Weights are stated **uncooked** (`50 g bulgur nefiert`, `100 g piept de pui crud`) | Every food carries a state — raw / dry / cooked / as-sold — that sometimes needs surfacing |
+| Weights are stated **uncooked** (`50 g bulgur nefiert`, `100 g piept de pui crud`) | Every food carries a state, raw / dry / cooked / as-sold, that sometimes needs surfacing |
 | Every plan week ran **Wednesday → Tuesday** | No calendar component may assume a Monday or Sunday start. It is configurable, but Wednesday is the default. |
 
 The dietician never wrote a single calorie. Supplying them is what the app adds.
@@ -60,8 +60,8 @@ satisfy them rather than discover them later.
 | **Two primary form factors** | Sidebar (9 items) on desktop becomes a bottom bar (5 items) on phone. Both need to feel deliberate. |
 | **44px touch targets** | Applied under `(pointer: coarse)` **only**, so phones get thumb-sized controls while pointer devices keep compact ones. A test fails the build if any control drops below 40×32. |
 | **No horizontal scroll** | Asserted per screen at 390px. Long recipe names and 187-character source lines are the usual culprits. |
-| **Fully offline** | Installable PWA. No CDN anything — fonts are bundled as files, icons are inline SVG. Any asset a design needs must ship in the build. |
-| **Numbers are the content** | Calories plus four macros, per meal, per day, per week. Figures must align in columns — tabular numerals are not optional. |
+| **Fully offline** | Installable PWA. No CDN anything, fonts are bundled as files, icons are inline SVG. Any asset a design needs must ship in the build. |
+| **Numbers are the content** | Calories plus four macros, per meal, per day, per week. Figures must align in columns, tabular numerals are not optional. |
 | **Two languages on one row** | Nearly every recipe shows an English name with the dietician's original Romanian or Hungarian beneath it. This pairing needs a real typographic treatment, not just smaller grey text. |
 | **Over target is normal** | These are real days, not a game. Slightly over should read as information; only well over should read as a signal. Colour alone should not carry it. |
 | **Reduced motion** | All animation is disabled under `prefers-reduced-motion: reduce`. |
@@ -90,7 +90,7 @@ Nine screens. Routes are hash-based so the app works offline.
 
 | Group | Components | Notes |
 |---|---|---|
-| **Navigation** | Sidebar (9 items) · bottom bar (5 items) · segmented tabs | The phone bar shows only 5 of 9 screens — which 5 is worth revisiting |
+| **Navigation** | Sidebar (9 items) · bottom bar (5 items) · segmented tabs | The phone bar shows only 5 of 9 screens, which 5 is worth revisiting |
 | **Surfaces** | Card · soft card · bottom sheet · centred dialog · full-screen error | Sheets slide from the bottom on phone, centre on desktop. Five exist. |
 | **Actions** | Primary · secondary · ghost · danger · icon-only · filter chip (on/off) · text link | Currently pill-shaped, primary has a pressed-down effect |
 | **Forms** | Text · number with unit suffix · select · checkbox · date · time · file · search | Number inputs are used constantly (grams, kcal, body stats) and deserve their own treatment |
@@ -106,17 +106,17 @@ Nine screens. Routes are hash-based so the app works offline.
 
 All of these exist in code today. A redesign has to account for each.
 
-**Data states** — populated · empty (first run) · empty (filtered to nothing) · partial week · someone else's plan
+**Data states**, populated · empty (first run) · empty (filtered to nothing) · partial week · someone else's plan
 
-**Target states** — under target · slightly over (105–130%) · well over (130%+) · no target set
+**Target states**, under target · slightly over (105–130%) · well over (130%+) · no target set
 
-**System states** — loading (nutrition lookup) · offline · storage full · corrupt data recovery · render error
+**System states**, loading (nutrition lookup) · offline · storage full · corrupt data recovery · render error
 
-**Interaction states** — default · hover · focus-visible · pressed · disabled · favourited · checked off · session completed · timer running · timer finished
+**Interaction states**, default · hover · focus-visible · pressed · disabled · favourited · checked off · session completed · timer running · timer finished
 
-**Calendar states** — today · selected day · day with no meals
+**Calendar states**, today · selected day · day with no meals
 
-**Preference states** — reduced motion · XP layer shown/hidden
+**Preference states**, reduced motion · XP layer shown/hidden
 
 ---
 
@@ -135,7 +135,7 @@ Real measurements from the shipped data, not estimates.
 | Meal slots | **5 × 7 = 35** | A slot can hold several entries |
 | Grocery items | **~46** | For a full seven-day week |
 | Plan archive | **14 plans / 97 days** | All with untranslated source text |
-| Typical day | **~1,258 kcal** | Range 869–2,651 — bars need headroom well past target |
+| Typical day | **~1,258 kcal** | Range 869–2,651, bars need headroom well past target |
 
 **The five meal slots**, in order: Breakfast · Snack 1 · Lunch · Snack 2 · Dinner.
 
@@ -152,34 +152,34 @@ spreads-sauces, treats, sweeteners, beverages.
 
 ## 7. Tokens in place today
 
-Replace, extend or ignore — this is the starting point, not a constraint. Everything is
+Replace, extend or ignore, this is the starting point, not a constraint. Everything is
 CSS custom properties in one file (`src/index.css`), so a palette swap is a single edit.
 
 ### Colour
 
-**Sage** — primary. Muted and leafy, never neon.
+**Sage**, primary. Muted and leafy, never neon.
 
 | 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 |
 |---|---|---|---|---|---|---|---|---|---|
 | `#f2f7f1` | `#e2eede` | `#c6dcbf` | `#a2c497` | `#7faa72` | `#628f55` | `#4c7442` | `#3d5c36` | `#33492e` | `#2b3d28` |
 
-**Peach (clay)** — warmth, highlights, and anything gently over target.
+**Peach (clay)**, warmth, highlights, and anything gently over target.
 
 | 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 |
 |---|---|---|---|---|---|---|---|---|---|
 | `#fff5f0` | `#ffe8dc` | `#ffd2bb` | `#ffb492` | `#fb9068` | `#ef7048` | `#d85632` | `#b34327` | `#923a25` | `#793322` |
 
-**Cream (sand)** — page and card grounds. Paper, not plaster.
+**Cream (sand)**, page and card grounds. Paper, not plaster.
 
 | 50 | 100 | 200 | 300 | 400 | 500 |
 |---|---|---|---|---|---|
 | `#fffbf4` | `#fdf4e7` | `#f6e8d5` | `#ecd8bd` | `#dcc09a` | `#c8a67b` |
 
-**Butter** — soft third accent. `#fff6d9` `#ffecb0` `#ffdd7a` `#fdca45` `#edb122`
+**Butter**, soft third accent. `#fff6d9` `#ffecb0` `#ffdd7a` `#fdca45` `#edb122`
 
-**Berry (xp)** — streaks and celebratory moments. `#fdf3f7` … `#d84f88` … `#6e2440`
+**Berry (xp)**, streaks and celebratory moments. `#fdf3f7` … `#d84f88` … `#6e2440`
 
-**Ink** — `#33231c`. The logo outline. A deep warm brown rather than black, so the
+**Ink**, `#33231c`. The logo outline. A deep warm brown rather than black, so the
 chunky outline stays warm against the cream.
 
 Text currently uses Tailwind's `stone` ramp (`stone-700` body, `stone-400/500`
@@ -195,7 +195,7 @@ and is the most obvious thing to replace with a warm neutral of your own.
 | Numeric | Nunito with `font-variant-numeric: tabular-nums` | Set globally on `body` |
 
 Both are bundled via `@fontsource-variable`, not fetched from a CDN. There is no true
-monospace — `--font-mono` points at Nunito, and alignment comes from tabular figures.
+monospace, `--font-mono` points at Nunito, and alignment comes from tabular figures.
 
 ### Shape, elevation, motion
 
@@ -203,7 +203,7 @@ monospace — `--font-mono` points at Nunito, and alignment comes from tabular f
 |---|---|
 | `--radius-xl` | `0.875rem` (14px) |
 | `--radius-2xl` | `1.25rem` (20px) |
-| `--radius-3xl` | `1.75rem` (28px) — cards |
+| `--radius-3xl` | `1.75rem` (28px), cards |
 | Buttons | Fully pill (`rounded-full`) |
 | Inputs | 20px radius, 2px border |
 | Shadow | One soft warm-toned shadow. **No elevation scale yet.** |
@@ -212,11 +212,11 @@ monospace — `--font-mono` points at Nunito, and alignment comes from tabular f
 
 ### Currently missing
 
-- **Dark mode** — not built, not designed
-- **Elevation scale** — a single shadow does all the work
-- **Focus-visible treatment** — browser default in most places
-- **Semantic colour** separate from the accent — over-target reuses peach
-- **Density variants** — desktop uses phone-sized cards in a wider grid
+- **Dark mode**, not built, not designed
+- **Elevation scale**, a single shadow does all the work
+- **Focus-visible treatment**, browser default in most places
+- **Semantic colour** separate from the accent, over-target reuses peach
+- **Density variants**, desktop uses phone-sized cards in a wider grid
 
 ---
 
@@ -225,7 +225,7 @@ monospace — `--font-mono` points at Nunito, and alignment comes from tabular f
 The app should read like a kitchen notebook, not an analytics dashboard.
 
 - Warm and plain. "Your week", "Pop something in", "What are we having?"
-- Errors are calm and reassuring: *"Oops — something spilled. This screen tripped over
+- Errors are calm and reassuring: *"Oops, something spilled. This screen tripped over
   itself. Your recipes and plans are safe."*
 - Never scolding about food. Going over target is information, not a failure.
 - British spelling (*favourites*, *fibre*, *cosy*).
@@ -248,14 +248,14 @@ The app should read like a kitchen notebook, not an analytics dashboard.
 
 ## 10. Implementation notes
 
-Tailwind CSS v4, CSS-first — **there is no `tailwind.config.js`**.
+Tailwind CSS v4, CSS-first, **there is no `tailwind.config.js`**.
 
 - **Design tokens** are custom properties in an `@theme { }` block. Adding
   `--color-foo-500` makes `bg-foo-500`, `text-foo-500` etc. available automatically.
 - **Components** are `@utility` classes (`btn-primary`, `card`, `chip-on`, `tab-off`,
   `input`, `nav-item`…). Note that `@utility` *inlines* a composed base rather than
   adding its class to the element, so a rule targeting `.btn` will not match an element
-  with `class="btn-primary"` — media-query overrides must list each variant.
+  with `class="btn-primary"`, media-query overrides must list each variant.
 - **Touch sizing** lives in an unlayered `@media (pointer: coarse)` block at the end of
   the stylesheet so it takes precedence over the utilities it widens.
 
@@ -267,7 +267,7 @@ optionally the `@theme` block itself.
 ## 11. Decisions I'd like from you
 
 1. **Is dark mode in scope?** There is none today. It is a real ask for an app opened in
-   a kitchen at night, and it doubles the token work — better decided before the palette
+   a kitchen at night, and it doubles the token work, better decided before the palette
    is fixed than after.
 2. **How should over-target read without relying on colour?** Today it is a hue shift on
    a bar. That fails for anyone who cannot separate the hues, and it is the single
@@ -275,12 +275,12 @@ optionally the `@theme` block itself.
 3. **What carries the four-step Mediterranean tier?** It appears on all 122 food rows,
    so it must be legible at a glance and quiet enough to sit in a dense list.
 4. **Should desktop get its own density?** Right now desktop uses phone-sized cards in a
-   wider grid, which wastes a lot of screen — but a denser mode doubles the layout work.
+   wider grid, which wastes a lot of screen, but a denser mode doubles the layout work.
 5. **How much should the second language show?** The Romanian and Hungarian source text
    is the app's whole provenance story, but it is also visual noise on every row. It
    could be secondary, on hover, or behind a toggle.
 
 ---
 
-*Anything missing here, ask — the numbers above all come from the shipped data and can
+*Anything missing here, ask, the numbers above all come from the shipped data and can
 be regenerated with `npm run data:check`.*

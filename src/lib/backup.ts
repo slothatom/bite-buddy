@@ -101,7 +101,7 @@ export function restoreBackup(text: string): RestoreResult {
     }
 
     // setState merges over the actions, and persistence writes through on its
-    // own — so this restores the running app and the saved copy together.
+    // own, so this restores the running app and the saved copy together.
     store.write(upgraded)
     restored.push(key)
   }

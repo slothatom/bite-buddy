@@ -1,10 +1,10 @@
--- Bite Buddy — database schema
+-- Bite Buddy, database schema
 --
 -- Paste this whole file into the Supabase SQL editor and run it once.
 -- Re-running is safe: everything here is idempotent.
 --
 -- The shape follows one decision: the two of you share everything. There is no
--- per-user data, so there is no per-user partitioning to get wrong — a row is
+-- per-user data, so there is no per-user partitioning to get wrong, a row is
 -- either readable by household members or by nobody.
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -107,7 +107,7 @@ create policy "you may edit your own member row"
 -- migration.
 --
 -- The cost is last-write-wins per document. With two people that is rare and
--- visible — realtime pushes every change to the other screen immediately — but
+-- visible, realtime pushes every change to the other screen immediately, but
 -- it is a real limitation, not an oversight.
 -- ─────────────────────────────────────────────────────────────────────────────
 
@@ -152,7 +152,7 @@ $$;
 -- The guest list itself
 --
 -- Put the real addresses in before running this, and keep them out of the
--- repository — it is public, and an address committed here is an address
+-- repository, it is public, and an address committed here is an address
 -- published. Adding someone later is a one-line insert in the SQL editor.
 --
 -- Anyone not listed cannot create an account, even with the URL and the key.

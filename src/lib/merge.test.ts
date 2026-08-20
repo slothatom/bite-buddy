@@ -20,7 +20,7 @@ describe('mergeMealPlan', () => {
     const local = { plan: [day('2026-08-20', [meal('mine')], at(5)), day('2026-08-21', [], at(1))] }
     const remote = { plan: [day('2026-08-20', [], at(1)), day('2026-08-21', [meal('theirs')], at(4))] }
 
-    // The copies last agreed at :03 — each day moved on exactly one side since.
+    // The copies last agreed at :03, each day moved on exactly one side since.
     const { merged, conflicts } = mergeMealPlan(local, remote, Date.parse(at(3)))
     const days = merged.plan as DayPlan[]
 

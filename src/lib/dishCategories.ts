@@ -4,15 +4,15 @@ import { groupsOf, type RecipeGroup } from './recipeGroups'
 /**
  * The three axes a recipe is described by.
  *
- *   meal time  — when you eat it. Several, and it comes from the plans.
- *   category   — what the food is. Exactly one.
- *   filters    — what it asks of you. Any number.
+ *   meal time , when you eat it. Several, and it comes from the plans.
+ *   category  , what the food is. Exactly one.
+ *   filters   , what it asks of you. Any number.
  *
  * Keeping them apart is the whole point. The old single row of tags mixed all
  * three, so "dinner", "soup" and "quick" sat side by side as if they answered
  * the same question, and none of them narrowed anything usefully.
  *
- * A category says what the food *is* — never when it is eaten, how it is served
+ * A category says what the food *is*, never when it is eaten, how it is served
  * or how it was cooked. That rules out "Main", "Side", "Starter" and "Bowl":
  * those describe a role at a table, and a role tells you nothing when you are
  * standing in a kitchen deciding what to make.
@@ -48,7 +48,7 @@ export const CATEGORY_LABELS: Record<DishCategory, string> = {
  * When each kind of food usually gets eaten.
  *
  * This is a *default*, never an override. A recipe's own meal times come from
- * the fourteen plans — actual evidence of when it was actually eaten — and
+ * the fourteen plans, actual evidence of when it was actually eaten, and
  * always win. The mapping fills the gap in the two places there is no evidence:
  * choosing the meal times for a recipe you are writing, and offering the
  * batch-cooked dishes, which carry no meal time of their own, in the planner's
@@ -62,7 +62,7 @@ export const CATEGORY_MEAL_TIMES: Record<DishCategory, RecipeGroup[]> = {
   pasta: ['lunch', 'dinner'],
   noodles: ['lunch', 'dinner'],
   rice: ['lunch', 'dinner'],
-  // Bulgur, couscous, quinoa — and mămăligă when it is a side rather than a
+  // Bulgur, couscous, quinoa, and mămăligă when it is a side rather than a
   // breakfast bowl, which is why Porridge is a separate category.
   grain: ['lunch', 'dinner'],
   sandwich: ['breakfast', 'lunch', 'dinner', 'snack'],
@@ -109,7 +109,7 @@ export const QUICK_FILTERS: QuickFilter[] = [
  * The emoji are part of the label, not decoration: at chip size on a phone this
  * row is scanned rather than read, and the picture lands before the words do.
  *
- * `derived` marks the ones the app can work out for itself from the recipe —
+ * `derived` marks the ones the app can work out for itself from the recipe -
  * time, macros, what goes in. The rest are judgements about your week that no
  * amount of nutrition data can supply, so they start empty and are yours to
  * apply. Guessing at them would fill the library with confident nonsense.

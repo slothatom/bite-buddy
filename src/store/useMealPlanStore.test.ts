@@ -8,7 +8,7 @@ import { getWeekDates } from './useMealPlanStore'
 describe('getWeekDates', () => {
   it('runs Monday to Sunday by default', () => {
     // 2026-08-16 is a Sunday, so it is the last day of the week that began
-    // on Monday the 10th — not the first day of a new one.
+    // on Monday the 10th, not the first day of a new one.
     const week = getWeekDates(new Date('2026-08-16T12:00:00'))
     expect(week[0]).toBe('2026-08-10')
     expect(week[6]).toBe('2026-08-16')

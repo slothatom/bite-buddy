@@ -16,8 +16,8 @@ export { MEAL_RECIPES } from './generated/mealRecipes'
  */
 export const ALL_RECIPES: Recipe[] = [...DISHES, ...MEAL_RECIPES].map((recipe) => ({
   ...recipe,
-  // Category and quick filters are generated separately — see
-  // scripts/classify-recipes.ts — so re-deriving them never touches the much
+  // Category and quick filters are generated separately, see
+  // scripts/classify-recipes.ts, so re-deriving them never touches the much
   // larger recipe file and its diffs stay readable.
   ...RECIPE_CLASSIFICATION[recipe.id],
 }))

@@ -4,8 +4,8 @@ import type { NutritionResult } from '../services/nutritionApi'
 /**
  * Turning a search result into a food the app owns.
  *
- * One place, because there are two ways in — the Foods screen and the recipe
- * editor's ingredient search — and they have to store the same thing. A food
+ * One place, because there are two ways in, the Foods screen and the recipe
+ * editor's ingredient search, and they have to store the same thing. A food
  * saved from a recipe that lacked its source id would be a food that has to be
  * looked up again, and a wrong number with nothing to trace it to.
  */

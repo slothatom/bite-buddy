@@ -18,7 +18,7 @@ import Zig from './components/brand/Mascot'
  * Home and Planner load with the app; everything else on demand.
  *
  * One bundle meant the first screen waited on the barcode scanner, the whole
- * plan archive and every other screen before it could paint — 561 kB of it,
+ * plan archive and every other screen before it could paint, 561 kB of it,
  * which is the difference between usable and not when you open this on mobile
  * data in a shop. The service worker precaches the split chunks too, so being
  * offline is unaffected: they are already on the device.
@@ -83,7 +83,7 @@ function Shell() {
  * Everything on that screen is a property of this device, not of an account:
  * your targets, the shape of your week, the backup file, which build is
  * running, the recipes you deleted. Locking it behind a session meant that
- * signing out took away the one screen you might sign out in order to reach —
+ * signing out took away the one screen you might sign out in order to reach -
  * restoring a backup, or checking a version before deciding to log back in.
  */
 function SignedOutSettings() {
@@ -91,7 +91,7 @@ function SignedOutSettings() {
     <div className="min-h-dvh flex flex-col bg-cream-50">
       <header className="flex items-center gap-3 px-4 sm:px-6 py-3 border-b border-border-200 bg-paper">
         <Link to="/" className="btn-secondary"><ArrowLeft size={15} /> Sign in</Link>
-        <p className="text-sm text-ink-500">Signed out — everything here is kept on this device.</p>
+        <p className="text-sm text-ink-500">Signed out. Everything here is kept on this device.</p>
       </header>
       <Suspense fallback={<ScreenLoading />}>
         <Settings />
@@ -103,8 +103,8 @@ function SignedOutSettings() {
 /**
  * Decides between the sign-in screen and the app.
  *
- * When Supabase is not configured — a local clone, the one-file build, the test
- * suite — `ready` starts true and `session` stays null, and the app renders
+ * When Supabase is not configured, a local clone, the one-file build, the test
+ * suite, `ready` starts true and `session` stays null, and the app renders
  * straight through with no login at all. That is the point: the deployment
  * needs an account, running it yourself does not.
  */

@@ -20,8 +20,8 @@ import type { Food, PortionUnit } from '../types'
  *    cannot know which you meant. The values below are for liquids, which is
  *    what spoons are usually used for here; anything dry is better weighed.
  *
- * A "piece" is the one unit that depends on the food — a piece of an egg is
- * 55 g and a piece of an apple is 150 g — so it is read off the food's own
+ * A "piece" is the one unit that depends on the food, a piece of an egg is
+ * 55 g and a piece of an apple is 150 g, so it is read off the food's own
  * named portions and offered only when the food has one.
  */
 
@@ -48,7 +48,7 @@ export const APPROXIMATE_UNITS: PortionUnit[] = ['ml', 'l', 'tsp', 'tbsp', 'cup'
 /**
  * What one piece of this food weighs, if it is the sort of food that has pieces.
  *
- * Taken from the food's own named portions — "1 medium apple", "o lingurita" —
+ * Taken from the food's own named portions, "1 medium apple", "o lingurita" -
  * preferring one that sounds like a single item over a spoon measure.
  */
 export function gramsPerPiece(food: Pick<Food, 'units'>): number | undefined {
@@ -69,7 +69,7 @@ export function unitsFor(food: Pick<Food, 'units'>): PortionUnit[] {
 /**
  * An amount in some unit, as grams.
  *
- * Returns undefined rather than guessing when the unit cannot be resolved —
+ * Returns undefined rather than guessing when the unit cannot be resolved -
  * asking for a piece of olive oil, say. Silently falling back to grams there
  * would turn "1 piece" into 1 g and put a plausible wrong number in a recipe.
  */

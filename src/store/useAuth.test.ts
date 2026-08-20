@@ -83,7 +83,7 @@ describe('signOut', () => {
     const state = useAuthStore.getState()
     expect(state.session).toBeNull()
     expect(state.user).toBeNull()
-    // The household list is other people's names — it must not survive a sign-out.
+    // The household list is other people's names, it must not survive a sign-out.
     expect(state.members).toEqual([])
     expect(state.linkSentTo).toBeNull()
   })
