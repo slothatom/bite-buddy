@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import { useMemo } from 'react'
 import type { WeightEntry, BodyMeasurement } from '../types'
+import { isPersonId } from '../lib/people'
 
 /**
  * Weight and measurements, per person.
@@ -61,8 +62,10 @@ export const useBodyStore = create<BodyStore>()(
 
       claimUnassigned: (memberId) =>
         set((s) => ({
-          weightEntries: s.weightEntries.map((e) => (e.memberId ? e : { ...e, memberId })),
-          measurements: s.measurements.map((m) => (m.memberId ? m : { ...m, memberId })),
+          weightEntries: s.weightEntries.map((e) =>
+            (isPersonId(e.memberId) ? e : { ...e, memberId })),
+          measurements: s.measurements.map((m) =>
+            (isPersonId(m.memberId) ? m : { ...m, memberId })),
         })),
     }),
     {
@@ -84,9 +87,9 @@ export const useBodyStore = create<BodyStore>()(
 /**
  * One person's entries, oldest first.
  *
- * `memberId` of undefined asks for the unclaimed ones, entries logged before
- * the app knew about people, or on a copy running with no account. They are
- * never folded into somebody's history silently; the screen offers to claim
+ * Anything stamped with something that is not one of the two people, an
+ * account id from before this changed, or nothing at all, belongs to nobody.
+ * Those are never folded into a history silently; the screen offers to claim
  * them instead.
  */
 export function useWeightFor(memberId: string | undefined): WeightEntry[] {
@@ -109,7 +112,8 @@ export function useMeasurementsFor(memberId: string | undefined): BodyMeasuremen
 export function useUnassignedCount(): number {
   const { weightEntries, measurements } = useBodyStore()
   return useMemo(
-    () => weightEntries.filter((e) => !e.memberId).length + measurements.filter((m) => !m.memberId).length,
+    () => weightEntries.filter((e) => !isPersonId(e.memberId)).length
+      + measurements.filter((m) => !isPersonId(m.memberId)).length,
     [weightEntries, measurements],
   )
 }
