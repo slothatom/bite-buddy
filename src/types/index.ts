@@ -94,6 +94,35 @@ export interface PrepStep {
   timerSeconds: number // 0 = no timer
 }
 
+/**
+ * What the food actually is — not when it is eaten, how it is served, or how it
+ * was cooked. "Main", "Side" and "Bowl" are deliberately absent: they describe a
+ * role at the table rather than a food, so they tell you nothing when you are
+ * looking for something to cook.
+ *
+ * A recipe has one of these. Meal times and the quick filters are the two
+ * multi-select axes; this is the single-valued one.
+ */
+export type DishCategory =
+  | 'soup' | 'salad' | 'pasta' | 'noodles' | 'rice' | 'curry' | 'stew'
+  | 'sandwich' | 'wrap' | 'burger' | 'pizza' | 'taco' | 'quesadilla'
+  | 'omelette' | 'pancake' | 'waffle' | 'porridge' | 'cereal'
+  | 'bread' | 'toast' | 'pastry' | 'cake' | 'cookie' | 'dessert'
+  | 'snack' | 'fruit' | 'vegetable' | 'meat' | 'fish' | 'seafood'
+  | 'egg' | 'cheese' | 'yogurt' | 'dip' | 'sauce' | 'smoothie' | 'drink'
+
+/**
+ * How a recipe fits into a day that is already busy.
+ *
+ * These are about circumstance rather than food — whether you have twenty
+ * minutes, whether the fridge needs emptying, whether you want to be looked
+ * after. A recipe can carry any number of them.
+ */
+export type QuickFilter =
+  | 'quick' | 'lazy' | 'meal-prep' | 'leftovers' | 'one-pan' | 'freezer'
+  | 'light' | 'cozy' | 'high-protein' | 'veggie-packed' | 'budget'
+  | 'pantry' | 'fridge-clearout' | 'special'
+
 export type RecipeTag =
   | 'high-protein' | 'low-carb' | 'vegan' | 'vegetarian' | 'pescatarian'
   | 'quick' | 'batch' | 'breakfast' | 'lunch' | 'dinner'
@@ -110,6 +139,10 @@ export interface Recipe {
   components: Component[]
   steps: PrepStep[]
   tags: RecipeTag[]
+  /** What the food is. Every shipped recipe has one; yours can wait. */
+  category?: DishCategory
+  /** Circumstance rather than food — see QuickFilter. */
+  quickFilters?: QuickFilter[]
   /**
    * The dietician's original line, kept verbatim. Shown as provenance in the UI
    * and used to verify that every source line maps to something.

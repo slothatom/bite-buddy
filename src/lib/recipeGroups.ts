@@ -14,15 +14,17 @@ import type { Recipe, RecipeTag } from '../types'
  *  - **Group** — when you eat it. Breakfast, Lunch, Dinner, Snacks, and Dishes
  *    for the batch-cooked things that are components of meals rather than meals.
  *    This is the shelf a recipe sits on, and every recipe sits on one.
- *  - **Label** — four optional notes about the cooking: quick, batch, veggie,
- *    high protein. These are filters, not shelves.
+ *  - **Category** — what the food is, one per recipe. See lib/dishCategories.ts.
+ *  - **Quick filters** — what a recipe asks of you. Any number.
  *
- * Everything else a recipe is tagged with (soup, salad, spread, low-carb…)
- * survives untouched and is shown on the recipe itself, but no longer competes
- * for space at the top of the screen. Nothing is stored differently — this is a
- * reading of the tags that already exist, so the 275 generated recipes did not
- * need re-tagging and any tag this file does not know about round-trips through
- * the editor unharmed.
+ * The old tag list carried a fourth idea, a handful of "labels" (quick, batch,
+ * veggie, high protein), which the quick filters replace outright — keeping both
+ * would mean two ways to ask the same question. The dish-shaped tags it also
+ * carried (soup, salad, spread) are now said better by the category.
+ *
+ * Nothing here is stored differently: this is a reading of the meal tags the
+ * generated library already has, so the 275 recipes did not need re-tagging and
+ * a tag this file has never heard of round-trips through the editor unharmed.
  */
 
 // ─── Groups ──────────────────────────────────────────────────────────────────
@@ -85,42 +87,6 @@ export function groupForTime(now = new Date()): RecipeGroup {
   return 'dinner'
 }
 
-// ─── Labels ──────────────────────────────────────────────────────────────────
-
-export type RecipeLabel = 'quick' | 'batch' | 'veggie' | 'high-protein'
-
-export const RECIPE_LABELS: RecipeLabel[] = ['quick', 'batch', 'veggie', 'high-protein']
-
-/**
- * Four, deliberately.
- *
- * "Veggie" covers both vegan and vegetarian: the difference matters when you are
- * cooking for someone else, and neither of the two people using this is vegan,
- * so as a filter it only ever split one small pile into two smaller ones.
- */
-export const LABEL_DEFINITIONS: Record<RecipeLabel, { label: string; tags: RecipeTag[] }> = {
-  quick: { label: 'Quick', tags: ['quick'] },
-  batch: { label: 'Batch cook', tags: ['batch'] },
-  veggie: { label: 'Veggie', tags: ['vegan', 'vegetarian'] },
-  'high-protein': { label: 'High protein', tags: ['high-protein'] },
-}
-
-export function hasLabel(recipe: Pick<Recipe, 'tags'>, label: RecipeLabel): boolean {
-  return LABEL_DEFINITIONS[label].tags.some((t) => recipe.tags.includes(t))
-}
-
-/**
- * Tags that are neither a group nor a label — soup, salad, spread, low-carb,
- * pescatarian, dessert. Shown on the recipe, never as a filter chip.
- */
-export function otherTags(recipe: Pick<Recipe, 'tags'>): RecipeTag[] {
-  const claimed = new Set<string>([
-    ...Object.values(GROUP_TAGS),
-    ...RECIPE_LABELS.flatMap((l) => LABEL_DEFINITIONS[l].tags),
-  ])
-  return recipe.tags.filter((t) => !claimed.has(t))
-}
-
 // ─── Editing ─────────────────────────────────────────────────────────────────
 
 /**
@@ -138,24 +104,6 @@ export function withGroups(tags: RecipeTag[], groups: RecipeGroup[]): RecipeTag[
     .map((g) => GROUP_TAGS[g])
 
   return [...added, ...kept]
-}
-
-/**
- * Turns one label on or off.
- *
- * Turning "veggie" on adds `vegetarian` — the safe half of the pair — unless the
- * recipe is already tagged `vegan`, which is the stronger claim and is kept.
- * Turning it off removes both, because leaving one behind would mean the chip
- * you just switched off is still lit.
- */
-export function withLabel(tags: RecipeTag[], label: RecipeLabel, on: boolean): RecipeTag[] {
-  const definition = LABEL_DEFINITIONS[label]
-  const without = tags.filter((t) => !definition.tags.includes(t))
-  if (!on) return without
-  if (definition.tags.some((t) => tags.includes(t))) return tags
-
-  // The last tag of a pair is the default: vegetarian rather than vegan.
-  return [...without, definition.tags[definition.tags.length - 1]]
 }
 
 // ─── Variants ────────────────────────────────────────────────────────────────

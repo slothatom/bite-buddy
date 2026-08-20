@@ -7,7 +7,7 @@ import { useFoods } from '../../store/useFoodStore'
 import { useNutritionContext } from '../../store/useNutrition'
 import { recipePerServing, componentsNutrients } from '../../lib/nutrition'
 import { normaliseTerm } from '../../lib/units'
-import { groupsOf } from '../../lib/recipeGroups'
+import { mealTimesOf } from '../../lib/dishCategories'
 import { searchFoods } from '../../lib/foodSearch'
 import { buildFoodIndex } from '../../lib/foodSearch'
 
@@ -41,8 +41,11 @@ export default function AddEntryModal({
 
   const matchedRecipes = useMemo(() => {
     const n = normaliseTerm(query)
+    // mealTimesOf rather than the recipe's own tags: the batch-cooked dishes
+    // were never a meal in a plan and carry no meal time, so without the
+    // category's fallback the lentil stew could never be picked for a lunch.
     const slotMatch = (r: Recipe) =>
-      groupsOf(r).includes(isSnack ? 'snack' : slot)
+      mealTimesOf(r).includes(isSnack ? 'snack' : slot)
 
     const pool = recipes.filter((r) => {
       if (!n) return slotMatch(r)
