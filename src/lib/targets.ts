@@ -11,14 +11,6 @@ import { componentsNutrients, type NutritionContext } from './nutrition'
  * Neither is authoritative, so both are offered and either can be overridden.
  */
 
-const ACTIVITY_FACTORS: Record<ActivityLevel, number> = {
-  sedentary: 1.2,
-  light: 1.375,
-  moderate: 1.55,
-  active: 1.725,
-  'very-active': 1.9,
-}
-
 export const ACTIVITY_LABELS: Record<ActivityLevel, string> = {
   sedentary: 'Sedentary: desk job, little exercise',
   light: 'Light: exercise 1 to 3 days a week',
@@ -27,9 +19,32 @@ export const ACTIVITY_LABELS: Record<ActivityLevel, string> = {
   'very-active': 'Very active: physical job or twice-daily training',
 }
 
+/**
+ * Every constant this file applies, in one place, with where it comes from.
+ *
+ * Written out because a number with no source is indistinguishable from a
+ * number somebody made up, and these decide what you eat. Change one here and
+ * it changes everywhere, including the working shown on screen.
+ */
+export const RULES = {
+  /** Mifflin-St Jeor (1990), the estimate most clinical guidance uses. */
+  bmr: 'Mifflin-St Jeor',
+  /** The activity multipliers published alongside it, applied to resting rate. */
+  activity: { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725, 'very-active': 1.9 },
+  /** A 20% cut is the usual sustainable rate of loss; gaining uses a smaller surplus. */
+  deficit: 0.8,
+  surplus: 1.1,
+  /** Grams of protein per kg of body weight, the amount that preserves lean mass in a deficit. */
+  proteinPerKg: 1.6,
+  /** Share of energy from fat, leaving carbohydrate the remainder. */
+  fatShare: 0.3,
+  /** Grams of fibre per 1000 kcal, the figure in the dietary reference intakes. */
+  fibrePer1000: 14,
+} as const
+
 /** Fibre target scales with intake: the common guideline is 14 g per 1000 kcal. */
 function fibreFor(calories: number): number {
-  return Math.round((calories / 1000) * 14)
+  return Math.round((calories / 1000) * RULES.fibrePer1000)
 }
 
 /**
@@ -40,8 +55,10 @@ function fibreFor(calories: number): number {
  * remainder, which is roughly how the dietician's own plans distribute.
  */
 function splitMacros(calories: number, weightKg?: number): Macros {
-  const protein = weightKg ? Math.round(weightKg * 1.6) : Math.round((calories * 0.25) / 4)
-  const fat = Math.round((calories * 0.3) / 9)
+  const protein = weightKg
+    ? Math.round(weightKg * RULES.proteinPerKg)
+    : Math.round((calories * 0.25) / 4)
+  const fat = Math.round((calories * RULES.fatShare) / 9)
   const carbs = Math.max(0, Math.round((calories - protein * 4 - fat * 9) / 4))
   return { calories: Math.round(calories), protein, carbs, fat }
 }
@@ -56,17 +73,16 @@ export function basalMetabolicRate(p: TdeeProfile): number | undefined {
 export function totalDailyEnergy(p: TdeeProfile): number | undefined {
   const bmr = basalMetabolicRate(p)
   if (!bmr) return undefined
-  return bmr * ACTIVITY_FACTORS[p.activity ?? 'light']
+  return bmr * RULES.activity[p.activity ?? 'light']
 }
 
 export function fromTdee(p: TdeeProfile): Targets | undefined {
   const tdee = totalDailyEnergy(p)
   if (!tdee) return undefined
 
-  // A 20% deficit is the usual sustainable rate; gaining uses a smaller surplus.
   const adjusted =
-    p.goal === 'lose' ? tdee * 0.8 :
-    p.goal === 'gain' ? tdee * 1.1 :
+    p.goal === 'lose' ? tdee * RULES.deficit :
+    p.goal === 'gain' ? tdee * RULES.surplus :
     tdee
 
   const macros = splitMacros(adjusted, p.weightKg)
@@ -140,4 +156,73 @@ export function fromPlans(plans: SourcePlan[], ctx: NutritionContext): Targets |
 
 export const FALLBACK_TARGETS: Targets = {
   calories: 1400, protein: 90, carbs: 140, fat: 50, fiber: 25, source: 'manual',
+}
+
+export interface TdeeStep {
+  label: string
+  /** The arithmetic, with this person's own numbers in it. */
+  working: string
+  result: string
+}
+
+/**
+ * The calculation, step by step, in the numbers you entered.
+ *
+ * A single figure with a formula name next to it asks to be taken on trust,
+ * and nobody should take a calorie target on trust. Every line here is one
+ * multiplication you can check by hand.
+ */
+export function explainTdee(p: TdeeProfile): TdeeStep[] {
+  const bmr = basalMetabolicRate(p)
+  if (!bmr || !p.weightKg || !p.heightCm || !p.age || !p.sex) return []
+
+  const activity = p.activity ?? 'light'
+  const factor = RULES.activity[activity]
+  const tdee = bmr * factor
+  const goalFactor = p.goal === 'lose' ? RULES.deficit : p.goal === 'gain' ? RULES.surplus : 1
+  const target = tdee * goalFactor
+  const protein = Math.round(p.weightKg * RULES.proteinPerKg)
+  const fat = Math.round((target * RULES.fatShare) / 9)
+  const carbs = Math.max(0, Math.round((target - protein * 4 - fat * 9) / 4))
+  const sexTerm = p.sex === 'male' ? '+ 5' : '- 161'
+
+  return [
+    {
+      label: 'Resting rate, Mifflin-St Jeor',
+      working: `10 x ${p.weightKg} kg + 6.25 x ${p.heightCm} cm - 5 x ${p.age} ${sexTerm}`,
+      result: `${Math.round(bmr)} kcal`,
+    },
+    {
+      label: `Times the ${activity.replace('-', ' ')} activity factor`,
+      working: `${Math.round(bmr)} x ${factor}`,
+      result: `${Math.round(tdee)} kcal`,
+    },
+    {
+      label: goalFactor === 1
+        ? 'Holding steady, so no adjustment'
+        : goalFactor < 1 ? 'Less 20% to lose weight' : 'Plus 10% to gain weight',
+      working: goalFactor === 1 ? `${Math.round(tdee)}` : `${Math.round(tdee)} x ${goalFactor}`,
+      result: `${Math.round(target)} kcal`,
+    },
+    {
+      label: 'Protein at 1.6 g per kg you weigh',
+      working: `${p.weightKg} x ${RULES.proteinPerKg}`,
+      result: `${protein} g`,
+    },
+    {
+      label: 'Fat at 30% of those calories, at 9 kcal a gram',
+      working: `${Math.round(target)} x 0.3 / 9`,
+      result: `${fat} g`,
+    },
+    {
+      label: 'Carbohydrate takes what is left, at 4 kcal a gram',
+      working: `(${Math.round(target)} - ${protein} x 4 - ${fat} x 9) / 4`,
+      result: `${carbs} g`,
+    },
+    {
+      label: 'Fibre at 14 g per 1000 kcal',
+      working: `${Math.round(target)} / 1000 x ${RULES.fibrePer1000}`,
+      result: `${fibreFor(Math.round(target))} g`,
+    },
+  ]
 }
