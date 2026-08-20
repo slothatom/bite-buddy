@@ -16,7 +16,10 @@ export default function Schedule() {
   const recipes = useRecipes()
   const [adding, setAdding] = useState(false)
 
-  const batchable = recipes.filter((r) => r.steps.length > 0)
+  // Every recipe with ingredients can be batch-cooked. This used to require a
+  // written method, and since none of the imported meals carry one, the picker
+  // was always empty and no session could be built.
+  const batchable = recipes.filter((r) => r.components.length > 0)
 
   return (
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
