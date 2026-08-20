@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { discardOlderThan, safeStorage, SCHEMA_VERSION } from './persist'
+import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import type { Recipe } from '../types'
 import { ALL_RECIPES } from '../data'
 
@@ -54,7 +54,12 @@ export const useRecipeStore = create<RecipeStore>()(
       name: 'bite-buddy-recipes-v2',
       version: SCHEMA_VERSION,
       storage: safeStorage<RecipeStore>(),
-      migrate: discardOlderThan<RecipeStore>(SCHEMA_VERSION),
+      migrate: upgradeThrough<RecipeStore>(SCHEMA_VERSION, {
+        // v1 → v2: this store's shape did not change. Only the meal plan gained
+        // a field, and discarding everything else over that would cost the user
+        // their foods, recipes and logs for nothing.
+        1: (state) => state,
+      }),
     },
   ),
 )

@@ -20,7 +20,7 @@ import type { PersistStorage, StorageValue } from 'zustand/middleware'
  * misinterpreted.
  */
 
-export const SCHEMA_VERSION = 1
+export const SCHEMA_VERSION = 2
 
 /** Set when a write has failed, so the UI can tell the user their data isn't saving. */
 let storageFailed: string | null = null
@@ -102,5 +102,37 @@ export function discardOlderThan<T>(current: number) {
   return (persisted: unknown, version: number): T | undefined => {
     if (version === current) return persisted as T
     return undefined
+  }
+}
+
+/** Turns one stored version into the next. */
+export type Upgrade = (state: Record<string, unknown>) => Record<string, unknown>
+
+/**
+ * Migrates stored state forward one version at a time.
+ *
+ * Discarding is the safe default and was the only option here, but it costs the
+ * user everything they have entered — acceptable while this app was a local
+ * experiment, not once a real week lives in it. So a store can now describe how
+ * to move between versions, and only falls back to discarding when it cannot:
+ * an unknown gap, or state written by a *newer* app than this one, which cannot
+ * be reasoned about at all.
+ *
+ * `upgrades[n]` turns version `n` into version `n + 1`.
+ */
+export function upgradeThrough<T>(current: number, upgrades: Record<number, Upgrade>) {
+  return (persisted: unknown, version: number): T | undefined => {
+    if (version === current) return persisted as T
+    if (version > current) return undefined
+    if (typeof persisted !== 'object' || persisted === null) return undefined
+
+    let state = persisted as Record<string, unknown>
+    for (let v = version; v < current; v++) {
+      const step = upgrades[v]
+      // A gap in the chain means this state cannot be brought forward safely.
+      if (!step) return undefined
+      state = step(state)
+    }
+    return state as T
   }
 }

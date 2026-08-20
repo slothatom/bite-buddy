@@ -1,5 +1,6 @@
-import type { Component, DayPlan, MedCategory } from '../types'
+import type { DayPlan, MedCategory } from '../types'
 import type { NutritionContext } from './nutrition'
+import { flattenComponents } from './ingredients'
 
 /**
  * Scoring a week against the Mediterranean Diet guide's serving goals.
@@ -35,25 +36,15 @@ export const LIMIT_CATEGORIES: MedCategory[] = ['red-meat', 'treats']
 
 /** Total grams eaten per category, resolving nested recipes down to foods. */
 export function gramsByCategory(days: DayPlan[], ctx: NutritionContext): Map<MedCategory, number> {
+  // Third copy of this tree walk, before it moved to lib/ingredients. Water is
+  // skipped for the same reason it is left off a shopping list: nobody is
+  // counting it towards a serving goal.
+  const entries = days.flatMap((day) => day.meals.flatMap((meal) => meal.entries))
   const totals = new Map<MedCategory, number>()
 
-  const walk = (components: Component[], scale: number, depth = 0) => {
-    if (depth > 6) return
-    for (const c of components) {
-      if (c.kind === 'food') {
-        const food = ctx.foods.get(c.foodId)
-        if (!food || food.id === 'water') continue
-        totals.set(food.category, (totals.get(food.category) ?? 0) + c.grams * scale)
-      } else {
-        const recipe = ctx.recipes.get(c.recipeId)
-        if (!recipe) continue
-        walk(recipe.components, scale * (c.servings / Math.max(1, recipe.servings)), depth + 1)
-      }
-    }
-  }
-
-  for (const day of days) {
-    for (const meal of day.meals) walk(meal.entries, 1)
+  for (const ingredient of flattenComponents(entries, ctx, { skip: ['water'] })) {
+    const category = ingredient.food.category
+    totals.set(category, (totals.get(category) ?? 0) + ingredient.grams)
   }
   return totals
 }
