@@ -2,8 +2,9 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import type {
-  Component, DayPlan, GroceryItem, MealSlot, PlannedMeal, SourcePlan, WeekStart,
+  Component, DayPlan, GroceryItem, MealSlot, MedCategory, PlannedMeal, SourcePlan, WeekStart,
 } from '../types'
+import { parseAmount } from '../lib/grocery'
 import { DEFAULT_WEEK_START } from '../types'
 import type { NutritionContext } from '../lib/nutrition'
 
@@ -121,6 +122,13 @@ function newId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+export interface GroceryOptions {
+  /** Only these days. Everything the plan holds, if left out. */
+  dates?: string[]
+  /** Only these recipes, for shopping for one batch cook. */
+  recipeIds?: string[]
+}
+
 export interface MealPlanExport {
   version: 2
   exportedAt: string
@@ -143,8 +151,19 @@ interface MealPlanStore {
   loadSourcePlan: (source: SourcePlan) => void
   importWeek: (data: MealPlanExport) => void
 
-  generateGroceryList: (ctx: NutritionContext, recipeIds?: string[]) => void
+  /**
+   * Works the list out from the plan.
+   *
+   * `dates` limits it to the days you are actually shopping for, which is the
+   * usual case: you buy for the next four days, not for every day the app has
+   * ever held. Without it the list covers the whole plan, which now runs to
+   * months.
+   */
+  generateGroceryList: (ctx: NutritionContext, opts?: GroceryOptions) => void
   toggleGroceryItem: (id: string) => void
+  addGroceryItem: (item: { name: string; amount: string; category?: MedCategory }) => void
+  updateGroceryItem: (id: string, updates: { name?: string; amount?: string }) => void
+  removeGroceryItem: (id: string) => void
   clearCheckedItems: () => void
   clearGroceryList: () => void
 }
@@ -251,9 +270,10 @@ export const useMealPlanStore = create<MealPlanStore>()(
           })
         },
 
-        generateGroceryList: (ctx, recipeIds) => {
-          const { plan } = get()
-          const filter = recipeIds ? new Set(recipeIds) : null
+        generateGroceryList: (ctx, opts) => {
+          const { plan, groceryItems } = get()
+          const filter = opts?.recipeIds ? new Set(opts.recipeIds) : null
+          const days = opts?.dates ? new Set(opts.dates) : null
           const items = new Map<string, GroceryItem>()
 
           /** Walks nested recipes down to the foods that actually get bought. */
@@ -293,6 +313,7 @@ export const useMealPlanStore = create<MealPlanStore>()(
           }
 
           for (const day of plan) {
+            if (days && !days.has(day.date)) continue
             for (const meal of day.meals) {
               const entries = filter
                 ? meal.entries.filter((e) => e.kind === 'recipe' && filter.has(e.recipeId))
@@ -301,8 +322,19 @@ export const useMealPlanStore = create<MealPlanStore>()(
             }
           }
 
+          // Rebuilding keeps two things: the lines you added yourself, which
+          // were never in the plan and would vanish otherwise, and the ticks
+          // against anything you have already put in the trolley.
+          const ticked = new Set(groceryItems.filter((i) => i.checked).map((i) => i.id))
+          const mine = groceryItems.filter((i) => i.manual)
+
           set({
-            groceryItems: [...items.values()].map((i) => ({ ...i, grams: Math.round(i.grams) })),
+            groceryItems: [
+              ...[...items.values()].map((i) => ({
+                ...i, grams: Math.round(i.grams), checked: ticked.has(i.id),
+              })),
+              ...mine,
+            ],
           })
         },
 
@@ -310,6 +342,41 @@ export const useMealPlanStore = create<MealPlanStore>()(
           set((s) => ({
             groceryItems: s.groceryItems.map((i) => (i.id === id ? { ...i, checked: !i.checked } : i)),
           })),
+
+        addGroceryItem: ({ name, amount, category }) => {
+          const parsed = parseAmount(amount)
+          set((s) => ({
+            groceryItems: [...s.groceryItems, {
+              id: `manual-${newId()}`,
+              foodId: '',
+              name: name.trim(),
+              grams: parsed.grams ?? 0,
+              amount: parsed.text,
+              category: category ?? 'pantry',
+              checked: false,
+              fromRecipeIds: [],
+              manual: true,
+            }],
+          }))
+        },
+
+        updateGroceryItem: (id, updates) =>
+          set((s) => ({
+            groceryItems: s.groceryItems.map((i) => {
+              if (i.id !== id) return i
+              const next = { ...i }
+              if (updates.name !== undefined) next.name = updates.name.trim() || i.name
+              if (updates.amount !== undefined) {
+                const parsed = parseAmount(updates.amount)
+                next.grams = parsed.grams ?? 0
+                next.amount = parsed.text
+              }
+              return next
+            }),
+          })),
+
+        removeGroceryItem: (id) =>
+          set((s) => ({ groceryItems: s.groceryItems.filter((i) => i.id !== id) })),
 
         clearCheckedItems: () =>
           set((s) => ({ groceryItems: s.groceryItems.filter((i) => !i.checked) })),
