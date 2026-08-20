@@ -2,6 +2,7 @@ import { Children, useState, type ReactNode } from 'react'
 import { AlertTriangle, Check } from 'lucide-react'
 import type { Macros, MedTier, Nutrients } from '../../types'
 import { STATUS_STYLES, targetStatus, type StatusLevel } from '../../lib/status'
+import { saltFromSodium } from '../../lib/nutrition'
 import Zig, { type ZigMood } from '../brand/Mascot'
 
 /** Shared display pieces. Kept together because each is a handful of lines. */
@@ -120,13 +121,60 @@ export function StatusPill({ level, label }: { level: StatusLevel; label: string
   )
 }
 
-export function NutrientSummary({ n, targets }: { n: Nutrients; targets?: Macros & { fiber?: number } }) {
+/**
+ * The four macros, then the three you watch across a day.
+ *
+ * Sugar and salt are here rather than buried with the vitamins because they are
+ * the two the app is meant to help you keep an eye on, and salt rather than
+ * sodium because that is what a label says and what anyone actually thinks in.
+ *
+ * `partial` names the nutrients at least one ingredient said nothing about;
+ * those are shown as "12 g +", because the figure is a floor rather than a
+ * total and printing it plain would be a claim the data cannot support.
+ */
+export function NutrientSummary({
+  n, targets, partial = [],
+}: {
+  n: Nutrients
+  targets?: Macros & { fiber?: number }
+  partial?: readonly string[]
+}) {
+  const salt = saltFromSodium(n.sodium)
+
   return (
-    <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-      <MacroBar label="Protein" value={n.protein} target={targets?.protein} />
-      <MacroBar label="Carbs" value={n.carbs} target={targets?.carbs} />
-      <MacroBar label="Fat" value={n.fat} target={targets?.fat} />
-      <MacroBar label="Fibre" value={n.fiber ?? 0} target={targets?.fiber} />
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+        <MacroBar label="Protein" value={n.protein} target={targets?.protein} />
+        <MacroBar label="Carbs" value={n.carbs} target={targets?.carbs} />
+        <MacroBar label="Fat" value={n.fat} target={targets?.fat} />
+        <MacroBar label="Fibre" value={n.fiber ?? 0} target={targets?.fiber} />
+      </div>
+
+      {(n.sugar != null || salt != null) && (
+        <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-ink-700 pt-1 border-t border-border-100">
+          {n.sugar != null && (
+            <span>
+              Sugar <strong className="font-mono text-ink-900">
+                {Math.round(n.sugar * 10) / 10} g{partial.includes('sugar') ? '\u2009+' : ''}
+              </strong>
+            </span>
+          )}
+          {salt != null && (
+            <span>
+              Salt <strong className="font-mono text-ink-900">
+                {salt.toFixed(2)} g{partial.includes('sodium') ? '\u2009+' : ''}
+              </strong>
+            </span>
+          )}
+        </div>
+      )}
+
+      {partial.length > 0 && (
+        <p className="text-[11px] text-ink-500">
+          A <strong>+</strong> means at least one ingredient had nothing to say about that
+          nutrient, so the figure is a floor rather than a total.
+        </p>
+      )}
     </div>
   )
 }

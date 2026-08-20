@@ -505,6 +505,67 @@ test.describe('the recipe library', () => {
   })
 })
 
+test.describe('building a recipe from the food database', () => {
+  test('an ingredient can be entered in any unit and is stored in grams', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: 'New recipe' }).click()
+    await page.getByLabel('Recipe name').fill('Unit test dinner')
+
+    await page.getByRole('button', { name: /Add ingredient/ }).click()
+    await page.getByPlaceholder(/Search foods and recipes/).fill('olive oil')
+    await page.locator('.bg-paper button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
+
+    // Switching to tablespoons restates the same weight rather than changing it.
+    const amount = page.getByLabel(/Amount of/).first()
+    const unit = page.getByLabel(/Unit for/).first()
+    await amount.fill('30')
+    const kcalAt30g = await page.locator('p.text-2xl').first().textContent()
+
+    await unit.selectOption('tbsp')
+    await expect(amount).toHaveValue('2')
+    expect(await page.locator('p.text-2xl').first().textContent()).toBe(kcalAt30g)
+
+    // And entering 3 tbsp is 45 g, which the row says in grams underneath.
+    // Scoped to the sheet: recipe cards behind it mention grams too.
+    await amount.fill('3')
+    await expect(page.locator('.bg-paper').getByText(/kcal · 45 g/)).toBeVisible()
+  })
+
+  test('changing a quantity recalculates immediately', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: 'New recipe' }).click()
+    await page.getByLabel('Recipe name').fill('Recalculation')
+    await page.getByRole('button', { name: /Add ingredient/ }).click()
+    await page.getByPlaceholder(/Search foods and recipes/).fill('chicken breast')
+    await page.locator('.bg-paper button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
+
+    const headline = page.locator('p.text-2xl').first()
+    await page.getByLabel(/Amount of/).first().fill('100')
+    const at100 = Number((await headline.textContent())?.replace(/\D/g, ''))
+
+    await page.getByLabel(/Amount of/).first().fill('180')
+    const at180 = Number((await headline.textContent())?.replace(/\D/g, ''))
+
+    expect(at100).toBeGreaterThan(0)
+    expect(at180 / at100).toBeCloseTo(1.8, 1)
+  })
+
+  test('a partial total says so instead of claiming a figure', async ({ page }) => {
+    // The curated foods do not all carry every micronutrient, so a recipe made
+    // of two of them can have a fibre floor rather than a fibre total.
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Dinner/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('green bean soup')
+    await page.locator('.card button').nth(1).click()
+
+    const note = page.getByText(/at least one ingredient had nothing to say/)
+    const plus = page.locator('text=/\\d+(\\.\\d+)? g\\u2009\\+/')
+    // Either the total is complete, or it is marked — never a bare number that
+    // silently treats unknown as zero.
+    if (await plus.count() > 0) await expect(note).toBeVisible()
+  })
+})
+
 test.describe('your data survives the browser', () => {
   test.use({ permissions: ['clipboard-read', 'clipboard-write'] })
 

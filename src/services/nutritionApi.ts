@@ -7,6 +7,15 @@ export interface NutritionResult {
   per100g: MacroPer100g
   micros?: MicroPer100g
   source: 'usda' | 'openfoodfacts'
+  /**
+   * Enough to trace the numbers back and to never fetch them twice: the
+   * source's own id and name, what the figures are per, and — because European
+   * labels state salt where USDA states sodium — which of the two was given.
+   */
+  externalId?: string
+  sourceName?: string
+  basePortion: { amount: number; unit: 'g' | 'ml' }
+  saltAsGiven?: { kind: 'salt' | 'sodium'; value: number; unit: 'g' | 'mg' }
 }
 
 export interface MacroPer100g {
@@ -16,19 +25,15 @@ export interface MacroPer100g {
   fat: number
 }
 
-export interface MicroPer100g {
-  fiber?: number        // g
-  sugar?: number        // g
-  sodium?: number       // mg
-  calcium?: number      // mg
-  iron?: number         // mg
-  vitaminC?: number     // mg
-  vitaminD?: number     // mcg
-  potassium?: number    // mg
-  saturatedFat?: number // g
-}
+/** Undefined means the source did not say, never that the value is zero. */
+export type MicroPer100g = Partial<Record<
+  | 'fiber' | 'sugar' | 'sodium' | 'saturatedFat' | 'cholesterol'
+  | 'calcium' | 'iron' | 'magnesium' | 'potassium' | 'zinc'
+  | 'vitaminA' | 'vitaminB6' | 'vitaminB12' | 'vitaminC' | 'vitaminD' | 'vitaminE' | 'folate',
+  number
+>>
 
-// USDA nutrient IDs
+// USDA nutrient IDs. https://fdc.nal.usda.gov/
 const N = {
   calories:     1008,
   protein:      1003,
@@ -37,63 +42,146 @@ const N = {
   fiber:        1079,
   sugar:        2000,
   sodium:       1093,
+  saturatedFat: 1258,
+  cholesterol:  1253,
   calcium:      1087,
   iron:         1089,
+  magnesium:    1090,
+  potassium:    1092,
+  zinc:         1095,
+  vitaminA:     1106, // RAE
+  vitaminB6:    1175,
+  vitaminB12:   1178,
   vitaminC:     1162,
   vitaminD:     1114,
-  potassium:    1092,
-  saturatedFat: 1258,
+  vitaminE:     1109,
+  folate:       1177, // DFE
+}
+
+/** How many decimals each nutrient is worth keeping. */
+const PRECISION: Record<string, number> = {
+  fiber: 10, sugar: 10, saturatedFat: 10, iron: 10, zinc: 10,
+  vitaminB6: 100, vitaminB12: 100, vitaminC: 10, vitaminD: 10, vitaminE: 10,
+  sodium: 1, cholesterol: 1, calcium: 1, magnesium: 1, potassium: 1,
+  vitaminA: 1, folate: 1,
 }
 
 interface USDANutrient { nutrientId: number; value?: number }
-interface USDAFood { description: string; foodNutrients: USDANutrient[] }
+interface USDAFood { description: string; foodNutrients: USDANutrient[]; fdcId?: number }
 
 function parseUSDAFood(food: USDAFood): NutritionResult {
-  const m: Record<number, number> = {}
-  ;(food.foodNutrients ?? []).forEach((n) => { m[n.nutrientId] = n.value ?? 0 })
+  // A nutrient the response does not carry stays absent from this map, which is
+  // what keeps "not reported" from becoming a zero further down.
+  const m = new Map<number, number>()
+  for (const n of food.foodNutrients ?? []) {
+    if (n.value != null) m.set(n.nutrientId, n.value)
+  }
 
   const r = (v: number, d = 1) => Math.round(v * d) / d
+  const micros: MicroPer100g = {}
+  for (const [key, id] of Object.entries(N)) {
+    if (key === 'calories' || key === 'protein' || key === 'carbs' || key === 'fat') continue
+    const value = m.get(id)
+    if (value != null) {
+      micros[key as keyof MicroPer100g] = r(value, PRECISION[key] ?? 1)
+    }
+  }
+
+  const sodium = m.get(N.sodium)
 
   return {
     name: food.description,
     source: 'usda',
+    externalId: food.fdcId != null ? String(food.fdcId) : undefined,
+    sourceName: food.description,
+    basePortion: { amount: 100, unit: 'g' },
+    saltAsGiven: sodium != null ? { kind: 'sodium', value: r(sodium), unit: 'mg' } : undefined,
     per100g: {
-      calories: r(m[N.calories] ?? 0),
-      protein:  r(m[N.protein]  ?? 0, 10),
-      carbs:    r(m[N.carbs]    ?? 0, 10),
-      fat:      r(m[N.fat]      ?? 0, 10),
+      calories: r(m.get(N.calories) ?? 0),
+      protein:  r(m.get(N.protein)  ?? 0, 10),
+      carbs:    r(m.get(N.carbs)    ?? 0, 10),
+      fat:      r(m.get(N.fat)      ?? 0, 10),
     },
-    micros: {
-      fiber:        m[N.fiber]        ? r(m[N.fiber], 10)        : undefined,
-      sugar:        m[N.sugar]        ? r(m[N.sugar], 10)        : undefined,
-      sodium:       m[N.sodium]       ? r(m[N.sodium])           : undefined,
-      calcium:      m[N.calcium]      ? r(m[N.calcium])          : undefined,
-      iron:         m[N.iron]         ? r(m[N.iron], 10)         : undefined,
-      vitaminC:     m[N.vitaminC]     ? r(m[N.vitaminC], 10)     : undefined,
-      vitaminD:     m[N.vitaminD]     ? r(m[N.vitaminD], 10)     : undefined,
-      potassium:    m[N.potassium]    ? r(m[N.potassium])        : undefined,
-      saturatedFat: m[N.saturatedFat] ? r(m[N.saturatedFat], 10) : undefined,
-    },
+    micros,
   }
 }
 
+/**
+ * Open Food Facts keys, with how many decimals each is worth keeping.
+ *
+ * The precision is not decoration. Vitamin B12 arrives in micrograms and a
+ * portion holds a fraction of one, so rounding it to a whole number rounds it
+ * to nothing — a nutrient the source did report, discarded on the way in.
+ */
+const OFF_KEYS: [keyof MicroPer100g, string, number][] = [
+  ['fiber', 'fiber_100g', 10],
+  ['sugar', 'sugars_100g', 10],
+  ['saturatedFat', 'saturated-fat_100g', 10],
+  ['cholesterol', 'cholesterol_100g', 1],   // mg after conversion
+  ['calcium', 'calcium_100g', 1],           // mg
+  ['iron', 'iron_100g', 10],                // mg, small
+  ['magnesium', 'magnesium_100g', 1],       // mg
+  ['potassium', 'potassium_100g', 1],       // mg
+  ['zinc', 'zinc_100g', 10],                // mg, small
+  ['vitaminA', 'vitamin-a_100g', 1],        // mcg RAE, hundreds
+  ['vitaminB6', 'vitamin-b6_100g', 100],    // mg, tiny
+  ['vitaminB12', 'vitamin-b12_100g', 100],  // mcg, tiny
+  ['vitaminC', 'vitamin-c_100g', 10],       // mg
+  ['vitaminD', 'vitamin-d_100g', 10],       // mcg, small
+  ['vitaminE', 'vitamin-e_100g', 10],       // mg
+  ['folate', 'vitamin-b9_100g', 1],         // mcg DFE, hundreds
+]
+
+/** Minerals and vitamins Open Food Facts reports in grams, not milligrams. */
+const IN_GRAMS = new Set<keyof MicroPer100g>([
+  'cholesterol', 'calcium', 'iron', 'magnesium', 'potassium', 'zinc',
+  'vitaminB6', 'vitaminC', 'vitaminE',
+])
+/** …and the ones it reports in grams that the app keeps in micrograms. */
+const IN_GRAMS_TO_MCG = new Set<keyof MicroPer100g>(['vitaminA', 'vitaminB12', 'vitaminD', 'folate'])
+
 function parseOFFProduct(p: Record<string, unknown>): NutritionResult {
   const n = (p.nutriments ?? {}) as Record<string, number>
+  const micros: MicroPer100g = {}
+
+  for (const [key, offKey, precision] of OFF_KEYS) {
+    const value = n[offKey]
+    if (value == null) continue
+    const scaled = IN_GRAMS.has(key) ? value * 1000
+      : IN_GRAMS_TO_MCG.has(key) ? value * 1_000_000
+      : value
+    micros[key] = Math.round(scaled * precision) / precision
+  }
+
+  // Salt or sodium, whichever the label carried. European products state salt.
+  const saltGrams = n['salt_100g']
+  const sodiumGrams = n['sodium_100g']
+  const saltAsGiven = sodiumGrams != null
+    ? { kind: 'sodium' as const, value: Math.round(sodiumGrams * 1000), unit: 'mg' as const }
+    : saltGrams != null
+      ? { kind: 'salt' as const, value: Math.round(saltGrams * 100) / 100, unit: 'g' as const }
+      : undefined
+
+  if (sodiumGrams != null) micros.sodium = Math.round(sodiumGrams * 1000)
+  else if (saltGrams != null) micros.sodium = Math.round((saltGrams / 2.5) * 1000)
+
+  const barcode = p.code ?? p._id
+  const name = String(p.product_name || p.generic_name || '')
+
   return {
-    name: String(p.product_name || p.generic_name || ''),
+    name,
     source: 'openfoodfacts',
+    externalId: barcode != null ? String(barcode) : undefined,
+    sourceName: name,
+    basePortion: { amount: 100, unit: 'g' },
+    saltAsGiven,
     per100g: {
       calories: Math.round(n['energy-kcal_100g'] ?? 0),
       protein:  Math.round((n['proteins_100g']      ?? 0) * 10) / 10,
       carbs:    Math.round((n['carbohydrates_100g'] ?? 0) * 10) / 10,
       fat:      Math.round((n['fat_100g']           ?? 0) * 10) / 10,
     },
-    micros: {
-      fiber:        n['fiber_100g']          ? Math.round(n['fiber_100g'] * 10) / 10         : undefined,
-      sugar:        n['sugars_100g']         ? Math.round(n['sugars_100g'] * 10) / 10        : undefined,
-      sodium:       n['sodium_100g']         ? Math.round(n['sodium_100g'] * 1000)           : undefined,
-      saturatedFat: n['saturated-fat_100g']  ? Math.round(n['saturated-fat_100g'] * 10) / 10 : undefined,
-    },
+    micros,
   }
 }
 
@@ -148,6 +236,11 @@ export async function searchFoods(query: string, signal?: AbortSignal): Promise<
   const results: NutritionResult[] = []
   const problems: LookupOutcome['problems'] = []
 
+  // Both are asked at once, but USDA comes first in the list: it is the
+  // reference source for generic ingredients — chicken, rice, a tomato — and its
+  // figures are laboratory measurements. Open Food Facts is community-entered
+  // label data, which is exactly what you want for a branded yogurt and not what
+  // you want for a potato.
   if (usda.status === 'fulfilled') results.push(...usda.value)
   else problems.push({ source: 'usda', reason: reasonFor(usda.reason) })
 
@@ -173,7 +266,7 @@ async function searchOFF(query: string, signal?: AbortSignal): Promise<Nutrition
     search_terms: query,
     json: '1',
     page_size: '7',
-    fields: 'product_name,generic_name,nutriments',
+    fields: 'code,product_name,generic_name,nutriments',
   })
   const data = await fetchJson(`${OFF_BASE}/cgi/search.pl?${params}`, signal) as {
     products?: Record<string, unknown>[]
@@ -199,7 +292,8 @@ export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
       product?: Record<string, unknown>
     }
     if (data.status !== 1 || !data.product) return { found: false, reason: 'unknown-product' }
-    return { found: true, food: parseOFFProduct(data.product) }
+    // The barcode is the id worth keeping, whatever the payload calls itself.
+    return { found: true, food: { ...parseOFFProduct(data.product), externalId: barcode } }
   } catch (error) {
     return { found: false, reason: reasonFor(error) }
   }

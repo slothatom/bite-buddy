@@ -1,6 +1,7 @@
 import type {
-  Component, DayPlan, Food, Macros, Micros, Nutrients, PlannedMeal, Recipe,
+  Component, DayPlan, Food, Macros, MicroKey, Micros, Nutrients, PlannedMeal, Recipe,
 } from '../types'
+import { MICRO_KEYS } from '../types'
 
 /**
  * The single place where nutrition numbers are produced.
@@ -38,15 +39,19 @@ export function buildContext(
 }
 
 const MACRO_KEYS = ['calories', 'protein', 'carbs', 'fat'] as const
-const MICRO_KEYS = [
-  'fiber', 'sugar', 'sodium', 'calcium', 'iron',
-  'vitaminC', 'vitaminD', 'potassium', 'saturatedFat',
-] as const
 
 export function emptyNutrients(): Nutrients {
   return { calories: 0, protein: 0, carbs: 0, fat: 0 }
 }
 
+/**
+ * Adds two sets of figures, keeping "unknown" out of the arithmetic.
+ *
+ * A micronutrient neither side knows stays unknown rather than becoming zero.
+ * One that only one side knows is summed anyway — dropping it would be worse,
+ * since "at least this much" is real information — but the total is then
+ * incomplete, and `reportNutrients` is how a screen finds that out and says so.
+ */
 export function addNutrients(a: Nutrients, b: Nutrients): Nutrients {
   const out: Nutrients = {
     calories: a.calories + b.calories,
@@ -55,8 +60,8 @@ export function addNutrients(a: Nutrients, b: Nutrients): Nutrients {
     fat:      a.fat      + b.fat,
   }
   for (const k of MICRO_KEYS) {
-    const sum = (a[k] ?? 0) + (b[k] ?? 0)
-    if (sum > 0) out[k] = sum
+    if (a[k] == null && b[k] == null) continue
+    out[k] = (a[k] ?? 0) + (b[k] ?? 0)
   }
   return out
 }
@@ -207,3 +212,77 @@ export function pickMicros(n: Nutrients): Micros {
 }
 
 export { MACRO_KEYS, MICRO_KEYS }
+
+// ─── Unknown is not zero ──────────────────────────────────────────────────────
+
+/**
+ * Salt from sodium, in grams.
+ *
+ * Labels in Europe state salt; USDA states sodium. Showing both as if they were
+ * different things to keep an eye on is how you end up watching one number
+ * twice, so sodium in milligrams is what the app stores and this is the one
+ * conversion between them.
+ */
+export const SALT_PER_SODIUM = 2.5
+
+export function saltFromSodium(sodiumMg: number | undefined): number | undefined {
+  return sodiumMg == null ? undefined : (sodiumMg / 1000) * SALT_PER_SODIUM
+}
+
+export function sodiumFromSalt(saltGrams: number): number {
+  return (saltGrams / SALT_PER_SODIUM) * 1000
+}
+
+export interface NutrientReport {
+  total: Nutrients
+  /**
+   * Micronutrients at least one ingredient said nothing about. The total for
+   * these is a floor, not a figure — the screen shows them as "12 g +".
+   */
+  partial: MicroKey[]
+  /** How many ingredients went into this, for explaining a partial total. */
+  sources: number
+}
+
+/**
+ * A total, plus an honest account of how much of it is actually known.
+ *
+ * Missing nutrient data means unknown, not zero — so a recipe of five
+ * ingredients where two never mention fibre cannot claim a fibre figure as if
+ * it were complete. It still shows the figure, because "at least this much" is
+ * worth knowing, but it is marked.
+ */
+export function reportNutrients(
+  components: Component[],
+  ctx: NutritionContext,
+  visiting?: Set<string>,
+): NutrientReport {
+  const known = new Map<MicroKey, number>()
+  let sources = 0
+  let total = emptyNutrients()
+
+  for (const c of components) {
+    const n = componentNutrients(c, ctx, visiting)
+    total = addNutrients(total, n)
+    sources++
+    for (const k of MICRO_KEYS) {
+      if (n[k] != null) known.set(k, (known.get(k) ?? 0) + 1)
+    }
+  }
+
+  // A nutrient nobody mentioned is absent from the total already; one that only
+  // some mentioned is there but incomplete.
+  const partial = MICRO_KEYS.filter((k) => {
+    const count = known.get(k) ?? 0
+    return count > 0 && count < sources
+  })
+
+  return { total, partial, sources }
+}
+
+/** The same, for a whole recipe, per serving. */
+export function reportPerServing(recipe: Recipe, ctx: NutritionContext): NutrientReport {
+  const report = reportNutrients(recipe.components, ctx)
+  const servings = recipe.servings > 0 ? recipe.servings : 1
+  return { ...report, total: scaleNutrients(report.total, 1 / servings) }
+}
