@@ -298,13 +298,13 @@ Designed for one-handed supermarket use:
 ## Desktop
 Persistent sidebar with all nine destinations:
 
-1. Planner
-2. Recipes
-3. Foods
-4. Grocery
-5. History
-6. Prep
-7. Schedule
+1. Home
+2. Planner
+3. Recipes
+4. Foods
+5. Grocery
+6. Schedule
+7. Movement
 8. Progress
 9. Settings
 
@@ -313,11 +313,12 @@ Desktop sidebar should be compact enough to leave room for working content.
 ## Mobile
 Five-item bottom bar:
 
-**Plan · Recipes · + · Grocery · More**
+**Home · Plan · + · Recipes · More**
 
 The centre `+` opens the most contextually useful creation action.
 
-`More` exposes Foods, History, Prep, Schedule, Progress and Settings.
+`More` exposes Grocery, Foods, Schedule, Movement, Progress and Settings. The plan
+archive is a tab inside Settings rather than a destination of its own.
 
 The bar remains reachable one-handed and respects safe-area insets.
 
@@ -434,7 +435,7 @@ curious · energetic · slightly chaotic · supportive · never judgemental.
 - Thinking Zig
 - Celebration Zig
 - Oops Zig
-- Sleeping / prep-timer Zig
+- Sleeping Zig
 
 Illustration style: bold irregular silhouette, black/ink hand-drawn outline, simple facial features, tiny imperfect limbs.
 
@@ -532,11 +533,13 @@ Touch sizing overrides remain limited to coarse pointers.
 
 # 22. Dark mode
 
-**Recommended: yes, but Phase 2 of the visual implementation.**
+**Decided: no. There is no dark theme and no theme switch.**
 
-The app is realistically used in kitchens at night, so dark mode adds value. However, stabilise the light palette and semantic tokens first.
-
-Dark mode should be warm charcoal/aubergine rather than pure black and should preserve the playful accent palette without turning neon.
+One was built and then removed. A second surface doubled every contrast decision and
+every screenshot for an app whose whole palette is warm paper, and the two never looked
+like the same product. If it is ever revisited it should be warm charcoal or aubergine
+rather than pure black, and it should keep the accent palette without turning neon, but
+nothing in the system assumes it is coming.
 
 ---
 
@@ -625,6 +628,6 @@ Food is data and enjoyment, not morality.
 5. Mediterranean tiers use symbol + text + optional colour.
 6. Original Romanian/Hungarian content remains visible as deliberately styled provenance.
 7. Desktop gets a compact density.
-8. Wednesday remains the default week start and all calendar components support configurable starts.
-9. Light mode is the initial implementation target; dark mode is recommended as a follow-up.
+8. Calendar components support a configurable week start, any of the seven. Monday is the default; the dietician's own plans ran Wednesday to Tuesday and line up by weekday when loaded.
+9. Light mode is the only mode. Dark mode was built, removed, and is not planned.
 10. Personality concentrates around navigation, headings, empty states, illustrations and moments of delight. Dense data remains calm.

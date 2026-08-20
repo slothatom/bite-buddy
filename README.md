@@ -123,9 +123,10 @@ else is in the household and when they were last here. On the deployed app it al
 whether your copy and theirs are in step.
 
 ### Planner
-Mon→Sun week grid, five slots a day (breakfast, two snacks, lunch, dinner), live totals against
-your targets, copy a day to another day, and one-tap copy of a whole day formatted for
-MyFitnessPal.
+A week, a fortnight or a whole month at a time, five slots a day (breakfast, two snacks,
+lunch, dinner), live totals against your targets, and copy a day onto another day. The week
+starts on Monday by default and can start on any of the seven; loading an archived plan lines
+its days up by weekday, so a Wednesday meal still lands on a Wednesday.
 
 ### Recipes
 275 recipes on six shelves, opening on the meal you are most likely looking for at this hour.
@@ -223,27 +224,17 @@ Entries logged before the app knew who was who stay unclaimed rather than being 
 whoever is looking; the screen offers to claim them.
 
 
-### Prep & Schedule
-A cook session starts with a weigh-out derived from the recipe's components, nested recipes
-resolved, duplicates merged, because the dietician wrote portions, not instructions. Any
-written method follows, and you can add steps as you cook; they're saved onto the recipe for
-whoever cooks it next. Batch-cook sessions group dishes, since the plans deliberately repeat
-one across several days.
+### Movement
+Exercise and sleep, one person at a time. Workouts are built from an exercise search and
+costed against that person's own body weight, steps are logged per day, and a Garmin CSV
+export can be imported rather than retyped. Like the Body tab, none of it is shared: every
+row carries whose it is.
 
----
-
-## MyFitnessPal
-
-**MyFitnessPal has no usable public API.** It was withdrawn in 2019 and they don't grant new
-developer access. Nothing can write to your diary programmatically, and any app claiming
-otherwise is either a paid B2B aggregator or scraping.
-
-What Bite Buddy does instead:
-
-| Direction | How |
-|---|---|
-| Bite Buddy → MFP | **Copy for MyFitnessPal** on any day or recipe, a Quick Add line, or a recipe as a pasteable ingredient list for MFP's recipe importer |
-| MFP → Bite Buddy | **Import diary CSV** in Settings, from MyFitnessPal's own nutrition export |
+### Schedule
+Batch-cook sessions, since the plans deliberately repeat one dish across several days. A
+session holds a date, a time and the dishes it covers, with a weigh-out derived from each
+recipe's components, nested recipes resolved and duplicates merged, because the dietician
+wrote portions rather than instructions. Both people get an email before a session starts.
 
 ---
 
@@ -441,11 +432,10 @@ src/
 │   ├── targets.ts        # plan averages + TDEE
 │   ├── mediterranean.ts  # serving goals from the guide
 │   ├── recipeGroups.ts   # shelves, labels and the repeated-dish grouping
-│   ├── dishCategories.ts # the 37 categories, 14 filters, and the meal-time map
+│   ├── dishCategories.ts # the 38 categories, 14 filters, and the meal-time map
 │   ├── classify.ts       # reading a category off a recipe's components
-│   ├── mergeRecipes.ts   # folding repeats together without losing references
-│   └── mfp.ts            # clipboard + diary CSV
-├── pages/                # Planner, Recipes, Foods, Grocery, History, Prep, Schedule, Progress, Settings
+│   └── mergeRecipes.ts   # folding repeats together without losing references
+├── pages/                # Home, Planner, Recipes, Foods, Grocery, Schedule, Movement, Progress, Settings
 └── store/                # zustand stores
 ```
 
@@ -568,9 +558,8 @@ collision visible.
 "my plan" and "their plan", which is what keeps the permission model down to a
 single question: are you a member of this household.
 
-**Nothing is published publicly.** The site is public; your data is not. That
-also rules out publishing recipes at public URLs for MyFitnessPal's importer to
-scrape, clipboard and CSV cover that direction.
+**Nothing is published publicly.** The site is public; your data is not. No
+recipe, plan or measurement is served at a public URL for anything else to read.
 
 ## Not done yet
 

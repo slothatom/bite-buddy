@@ -130,8 +130,8 @@ export default function Recipes() {
   /**
    * Only the categories that are actually on this shelf, with their counts.
    *
-   * Thirty-seven categories exist, and this library uses eighteen of them -
-   * offering the other nineteen would be offering nineteen ways to see an empty
+   * Thirty-eight categories exist and this library uses nineteen of them.
+   * Offering the other nineteen would be offering nineteen ways to see an empty
    * screen, which is the wall this page was rebuilt to get rid of. The full list
    * is still there when you are writing a recipe, where it belongs.
    */
@@ -211,7 +211,7 @@ export default function Recipes() {
           </div>
 
           {/*
-            Two buttons rather than fifty chips. Thirty-seven categories and
+            Two buttons rather than fifty chips. Thirty-eight categories and
             fourteen filters laid out flat would be a wall taller than the
             recipes underneath it, so each opens a sheet and what you have picked
             comes back as a chip you can take off.
