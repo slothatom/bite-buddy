@@ -30,7 +30,7 @@ export default tseslint.config(
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
 
-      // `any` erases exactly the guarantees this codebase leans on — that a
+      // `any` erases exactly the guarantees this codebase leans on: that a
       // Component is either a food or a recipe, and nothing else.
       '@typescript-eslint/no-explicit-any': 'error',
 

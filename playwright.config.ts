@@ -4,7 +4,7 @@ import { defineConfig, devices } from '@playwright/test'
  * End-to-end configuration.
  *
  * The app is tested on a phone viewport as well as a desktop one, because it is
- * used on both and the layouts diverge — the sidebar is replaced by a bottom
+ * used on both and the layouts diverge: the sidebar is replaced by a bottom
  * nav, and every control has to grow to a thumb-sized target.
  *
  * `PLAYWRIGHT_CHROMIUM_PATH` lets a sandboxed environment point at a
@@ -36,7 +36,7 @@ export default defineConfig({
         ...devices['iPhone 13'],
         // The iPhone profile defaults to WebKit. Chromium is the browser
         // available everywhere this runs, and the viewport, touch support and
-        // coarse pointer — which is what the mobile assertions actually test —
+        // coarse pointer, which is what the mobile assertions actually test,
         // come from the device descriptor regardless of engine.
         browserName: 'chromium',
         defaultBrowserType: 'chromium',
@@ -53,7 +53,7 @@ export default defineConfig({
     command: 'npm run build && npm run preview -- --port 4173 --strictPort',
     url: 'http://localhost:4173/',
     // Never reuse a server that is already up. Reusing it skips the build in
-    // the command above, so the suite silently tests whatever was in dist/ —
+    // the command above, so the suite silently tests whatever was in dist/,
     // which produced a false pass while writing the name-clipping check. If the
     // port is busy, failing loudly is the correct outcome.
     reuseExistingServer: false,

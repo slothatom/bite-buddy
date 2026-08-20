@@ -72,9 +72,19 @@ export function onSyncChange(fn: () => void): () => void {
 /** When the local copy and the server last agreed, per store. */
 const agreedAt = new Map<StoreKey, number>()
 
-function applyRemote(key: StoreKey, data: unknown, schema: number) {
+/**
+ * What happened to a row that arrived from the server.
+ *
+ * `diverged` is the only one that has to go back up: the merge produced
+ * something the sender does not have, their days plus ours. `same` means what
+ * we now hold is exactly what they sent, and pushing that back would start a
+ * conversation with no end, their write waking ours, ours waking theirs.
+ */
+type Applied = 'refused' | 'same' | 'diverged'
+
+function applyRemote(key: StoreKey, data: unknown, schema: number): Applied {
   const store = STORES.find((s) => s.name === key)
-  if (!store || typeof data !== 'object' || data === null) return
+  if (!store || typeof data !== 'object' || data === null) return 'refused'
 
   // A row written by a different version of the app would be misread rather
   // than rejected, the one outcome worth refusing outright. Refusing silently
@@ -82,7 +92,7 @@ function applyRemote(key: StoreKey, data: unknown, schema: number) {
   // nothing on screen to say why, so this surfaces.
   if (schema !== SCHEMA_VERSION) {
     announce({ schemaMismatch: true, state: 'error' })
-    return
+    return 'refused'
   }
 
   // Merge rather than overwrite. The week is combined a day at a time, so an
@@ -99,6 +109,23 @@ function applyRemote(key: StoreKey, data: unknown, schema: number) {
 
   if (conflicts.length) {
     announce({ conflicts: [...new Set([...snapshot.conflicts, ...conflicts])] })
+  }
+
+  return same(merged, data) ? 'same' : 'diverged'
+}
+
+/**
+ * Whether the merge changed anything, compared as the database stores it.
+ *
+ * Both sides are serialised before comparing because that is the form the row
+ * takes: a key order difference is not a difference the server would ever see,
+ * and neither is a `Date` that becomes the same string.
+ */
+function same(merged: unknown, remote: unknown): boolean {
+  try {
+    return JSON.stringify(merged) === JSON.stringify(remote)
+  } catch {
+    return false
   }
 }
 
@@ -182,12 +209,15 @@ export function startSync(userId: string): () => void {
         (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           const row = payload.new as { key?: string; data?: unknown; schema?: number; updated_by?: string }
           if (!row?.key || row.updated_by === userId) return
-          applyRemote(row.key as StoreKey, row.data, row.schema ?? -1)
-          // The merge may have produced something neither side has: our days
-          // plus theirs. That result has to go back, or their device keeps a
-          // week missing ours.
-          queue.mark(row.key as StoreKey)
-          announce({ state: 'live', at: new Date() })
+          const applied = applyRemote(row.key as StoreKey, row.data, row.schema ?? -1)
+          // Only a merge that produced something neither side has, our days
+          // plus theirs, has to go back; otherwise their device keeps a week
+          // missing ours. Sending back a row identical to the one that just
+          // arrived would instead have the two phones answering each other
+          // every second for as long as both are open.
+          if (applied === 'diverged') queue.mark(row.key as StoreKey)
+          // A refusal has already said why, and it outranks "live".
+          if (applied !== 'refused') announce({ state: 'live', at: new Date() })
         },
       )
       .subscribe((status) => {
