@@ -254,8 +254,10 @@ test.describe('the recipe library', () => {
     expect(shown, 'the opening shelf is empty').toBeGreaterThan(5)
 
     // The number on a tab is the number of cards you then see, not the number
-    // of recipes behind them.
-    const label = await page.getByRole('button', { name: /^Breakfast/ }).textContent()
+    // of recipes behind them. Read off whichever tab is open — which shelf that
+    // is depends on the time of day, and hardcoding Breakfast made this pass
+    // only before eleven in the morning.
+    const label = await page.locator('button.tab-on').textContent()
     expect(Number(label?.replace(/\D/g, ''))).toBe(shown)
 
     // And the other shelves are one tap away.
@@ -345,14 +347,61 @@ test.describe('the recipe library', () => {
     await expect(page.getByText('Unknown')).toHaveCount(0)
   })
 
-  test('filters down to four, and they narrow the shelf', async ({ page }) => {
+  test('the filter sheet admits what the app cannot work out', async ({ page }) => {
     await goto(page, '/recipes')
-    const before = await page.locator('.card').count()
+    await page.getByRole('button', { name: 'Filters' }).click()
 
-    await page.getByRole('button', { name: 'Quick', exact: true }).click()
-    const after = await page.locator('.card').count()
-    expect(after).toBeGreaterThan(0)
-    expect(after, 'the Quick filter changed nothing').toBeLessThan(before)
+    // Budget Friendly, Lazy, Leftovers, Fridge Clean-Out and Special Occasion
+    // are judgements the data cannot supply, and the sheet says so rather than
+    // pre-filling them with a guess.
+    await expect(page.getByText('yours to apply').first()).toBeVisible()
+    expect(await page.getByText('yours to apply').count()).toBe(5)
+  })
+
+  test('the three dimensions narrow together', async ({ page }) => {
+    // Meal time + dish category + quick filters, combined.
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Dinner/ }).click()
+    const all = await page.locator('.card').count()
+
+    await page.getByRole('button', { name: 'Any dish' }).click()
+    await page.getByRole('button', { name: /^Soup/ }).click()
+    const soups = await page.locator('.card').count()
+    expect(soups).toBeGreaterThan(0)
+    expect(soups).toBeLessThan(all)
+
+    await page.getByRole('button', { name: 'Filters' }).click()
+    await page.getByText('High Protein').click()
+    await page.getByRole('button', { name: 'Close' }).click()
+    const highProteinSoups = await page.locator('.card').count()
+    expect(highProteinSoups).toBeLessThan(soups)
+
+    // And what you picked is visible and removable, not hidden in a sheet.
+    await expect(page.getByRole('button', { name: /Soup/ })).toBeVisible()
+    await page.getByRole('button', { name: /High Protein/ }).click()
+    expect(await page.locator('.card').count()).toBe(soups)
+  })
+
+  test('only offers categories that have something in them', async ({ page }) => {
+    // Thirty-seven exist; this library uses eighteen. Offering the rest would be
+    // offering nineteen ways to see an empty screen.
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: 'Any dish' }).click()
+
+    const offered = await page.locator('.bg-paper button').count()
+    expect(offered).toBeGreaterThan(3)
+    expect(offered).toBeLessThan(37)
+    await expect(page.getByRole('button', { name: /^Taco/ })).toHaveCount(0)
+  })
+
+  test('a recipe says what it is and what it asks of you', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Dinner/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('green bean soup')
+    await page.locator('.card button').nth(1).click()
+
+    await expect(page.getByText('Soup', { exact: true })).toBeVisible()
+    await expect(page.getByText(/Cozy & Comforting/)).toBeVisible()
   })
 
   test('a recipe of your own can be written and lands on your shelf', async ({ page }) => {

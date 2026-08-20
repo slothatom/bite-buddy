@@ -1,9 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import type { RecipeTag } from '../types'
 import {
-  groupsOf, primaryGroupOf, groupForTime, hasLabel, otherTags,
-  withGroups, withLabel, baseName, groupVariants,
-  RECIPE_GROUPS, RECIPE_LABELS,
+  groupsOf, primaryGroupOf, groupForTime, withGroups, baseName, groupVariants,
+  RECIPE_GROUPS,
 } from './recipeGroups'
 import type { Recipe } from '../types'
 import { ALL_RECIPES } from '../data'
@@ -57,22 +56,6 @@ describe('groups', () => {
   })
 })
 
-describe('labels', () => {
-  it('reads veggie from either half of the pair', () => {
-    expect(hasLabel(tagged('vegan'), 'veggie')).toBe(true)
-    expect(hasLabel(tagged('vegetarian'), 'veggie')).toBe(true)
-    expect(hasLabel(tagged('pescatarian'), 'veggie')).toBe(false)
-  })
-
-  it('keeps the four filters down to four', () => {
-    expect(RECIPE_LABELS).toHaveLength(4)
-  })
-
-  it('hands the leftovers back rather than losing them', () => {
-    expect(otherTags(tagged('lunch', 'soup', 'vegan', 'batch'))).toEqual(['soup'])
-  })
-})
-
 describe('editing tags through the simplified axes', () => {
   it('swaps the meal without touching anything else', () => {
     const after = withGroups(['breakfast', 'quick', 'soup'], ['dinner'])
@@ -85,22 +68,10 @@ describe('editing tags through the simplified axes', () => {
     expect(withGroups(['lunch', 'batch'], ['dish'])).toEqual(['batch'])
   })
 
-  it('adds the gentler half of the veggie pair', () => {
-    expect(withLabel(['lunch'], 'veggie', true)).toContain('vegetarian')
-  })
-
-  it('does not demote a vegan recipe to vegetarian', () => {
-    expect(withLabel(['vegan', 'lunch'], 'veggie', true)).toEqual(['vegan', 'lunch'])
-  })
-
-  it('clears both halves when switched off, so the chip really goes dark', () => {
-    expect(withLabel(['vegan', 'vegetarian', 'lunch'], 'veggie', false)).toEqual(['lunch'])
-  })
 
   it('round-trips a tag it has never heard of', () => {
     const exotic = ['dessert', 'lunch'] as RecipeTag[]
-    const after = withLabel(withGroups(exotic, ['dinner']), 'quick', true)
-    expect(after).toContain('dessert')
+    expect(withGroups(exotic, ['dinner'])).toContain('dessert')
   })
 })
 

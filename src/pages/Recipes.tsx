@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import {
   Search, Star, ClipboardCopy, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
+  ChevronDown, SlidersHorizontal,
 } from 'lucide-react'
-import type { Recipe } from '../types'
+import type { DishCategory, QuickFilter, Recipe } from '../types'
 import { useRecipes, useRecipeStore, useMergedInto } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { recipePerServing, roundNutrients } from '../lib/nutrition'
@@ -11,10 +12,14 @@ import { NutrientSummary, EmptyState, SourceLine } from '../components/ui'
 import { recipeForMfp, copyToClipboard } from '../lib/mfp'
 import RecipeEditor from '../components/recipes/RecipeEditor'
 import {
-  RECIPE_GROUPS, GROUP_LABELS, GROUP_BLURBS, RECIPE_LABELS, LABEL_DEFINITIONS,
-  groupsOf, hasLabel, otherTags, groupForTime, groupVariants,
-  type RecipeGroup, type RecipeLabel, type RecipeVariants,
+  RECIPE_GROUPS, GROUP_LABELS, GROUP_BLURBS,
+  groupsOf, groupForTime, groupVariants,
+  type RecipeGroup, type RecipeVariants,
 } from '../lib/recipeGroups'
+import {
+  DISH_CATEGORIES, CATEGORY_LABELS, QUICK_FILTERS, QUICK_FILTER_DEFINITIONS,
+  hasQuickFilter, quickFilterLabel,
+} from '../lib/dishCategories'
 import { interchangeableGroups } from '../lib/mergeRecipes'
 
 /**
@@ -40,8 +45,10 @@ export default function Recipes() {
 
   const [tab, setTab] = useState<Tab>(() => groupForTime())
   const [query, setQuery] = useState('')
-  const [labels, setLabels] = useState<RecipeLabel[]>([])
+  const [category, setCategory] = useState<DishCategory | null>(null)
+  const [filters, setFilters] = useState<QuickFilter[]>([])
   const [favesOnly, setFavesOnly] = useState(false)
+  const [sheet, setSheet] = useState<'category' | 'filters' | null>(null)
   // The name rather than the group itself: merging changes what the group
   // contains, and a sheet holding a snapshot went on listing versions that had
   // just been folded away.
@@ -55,7 +62,9 @@ export default function Recipes() {
     const n = normaliseTerm(query)
     return recipes.filter((r) => {
       if (favesOnly && !favouriteIds.includes(r.id)) return false
-      if (labels.some((l) => !hasLabel(r, l))) return false
+      if (category && r.category !== category) return false
+      // Every ticked filter has to hold: they narrow together, they do not pile up.
+      if (filters.some((f) => !hasQuickFilter(r, f))) return false
       if (!n) return true
       // The dietician's own line is searched too, so "telemea" finds the meals
       // that were written in Romanian.
@@ -63,7 +72,7 @@ export default function Recipes() {
         [r.name.en, r.name.ro, r.name.hu, r.sourceLine].filter(Boolean).join(' '))
       return haystack.includes(n)
     })
-  }, [recipes, query, labels, favesOnly, favouriteIds])
+  }, [recipes, query, category, filters, favesOnly, favouriteIds])
 
   /**
    * The number on a tab counts cards, not recipes.
@@ -97,7 +106,27 @@ export default function Recipes() {
   /** One card per dish, not one per portion. */
   const cards = useMemo(() => groupVariants(shown), [shown])
 
-  const filtered = Boolean(query || labels.length || favesOnly)
+  const filtered = Boolean(query || category || filters.length || favesOnly)
+
+  /**
+   * Only the categories that are actually on this shelf, with their counts.
+   *
+   * Thirty-seven categories exist, and this library uses eighteen of them —
+   * offering the other nineteen would be offering nineteen ways to see an empty
+   * screen, which is the wall this page was rebuilt to get rid of. The full list
+   * is still there when you are writing a recipe, where it belongs.
+   */
+  const categoryCounts = useMemo(() => {
+    const onShelf = tab === 'mine'
+      ? recipes.filter((r) => mine.has(r.id))
+      : recipes.filter((r) => groupsOf(r).includes(tab))
+
+    const counted = new Map<DishCategory, number>()
+    for (const r of onShelf) {
+      if (r.category) counted.set(r.category, (counted.get(r.category) ?? 0) + 1)
+    }
+    return DISH_CATEGORIES.filter((c) => counted.has(c)).map((c) => [c, counted.get(c)!] as const)
+  }, [recipes, tab, mine])
 
   // Looked up across the whole library, not the current shelf, so changing a
   // filter underneath an open recipe does not shut it.
@@ -162,21 +191,32 @@ export default function Recipes() {
             </div>
           </div>
 
-          {/* Four notes about the cooking, and the star. Not thirteen. */}
-          <div className="flex flex-wrap gap-1.5">
+          {/*
+            Two buttons rather than fifty chips. Thirty-seven categories and
+            fourteen filters laid out flat would be a wall taller than the
+            recipes underneath it, so each opens a sheet and what you have picked
+            comes back as a chip you can take off.
+          */}
+          <div className="flex flex-wrap items-center gap-1.5">
             <button
               onClick={() => setFavesOnly((v) => !v)}
               className={favesOnly ? 'chip bg-coral-500 text-white border border-coral-500' : 'chip-off'}
             >
               <Star size={12} className={favesOnly ? 'fill-current' : ''} /> Favourites
             </button>
-            {RECIPE_LABELS.map((l) => (
-              <button
-                key={l}
-                onClick={() => setLabels((s) => (s.includes(l) ? s.filter((x) => x !== l) : [...s, l]))}
-                className={labels.includes(l) ? 'chip-on' : 'chip-off'}
-              >
-                {LABEL_DEFINITIONS[l].label}
+
+            <button className={category ? 'chip-on' : 'chip-off'} onClick={() => setSheet('category')}>
+              {category ? CATEGORY_LABELS[category] : 'Any dish'} <ChevronDown size={13} />
+            </button>
+
+            <button className={filters.length ? 'chip-on' : 'chip-off'} onClick={() => setSheet('filters')}>
+              <SlidersHorizontal size={12} />
+              {filters.length ? `${filters.length} filter${filters.length === 1 ? '' : 's'}` : 'Filters'}
+            </button>
+
+            {filters.map((f) => (
+              <button key={f} className="chip-on" onClick={() => setFilters((s) => s.filter((x) => x !== f))}>
+                {quickFilterLabel(f)} <X size={12} />
               </button>
             ))}
           </div>
@@ -230,6 +270,58 @@ export default function Recipes() {
           onEdit={(r) => { setEditing(r); setOpenName(null) }}
           onClose={() => setOpenName(null)}
         />
+      )}
+
+      {sheet === 'category' && (
+        <PickerSheet title="What kind of dish?" onClose={() => setSheet(null)}>
+          <button
+            className={`w-full text-left px-4 py-3 rounded-xl ${category ? 'hover:bg-cream-50' : 'bg-cream-50 font-semibold'}`}
+            onClick={() => { setCategory(null); setSheet(null) }}
+          >
+            Any dish
+          </button>
+          {categoryCounts.map(([c, n]) => (
+            <button
+              key={c}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${category === c ? 'bg-cream-50 font-semibold' : 'hover:bg-cream-50'}`}
+              onClick={() => { setCategory(category === c ? null : c); setSheet(null) }}
+            >
+              <span className="flex-1 min-w-0 text-left text-ink-900">{CATEGORY_LABELS[c]}</span>
+              <span className="text-xs font-mono text-ink-500">{n}</span>
+            </button>
+          ))}
+          {!categoryCounts.length && (
+            <p className="px-4 py-6 text-sm text-ink-500 text-center">Nothing on this shelf yet.</p>
+          )}
+        </PickerSheet>
+      )}
+
+      {sheet === 'filters' && (
+        <PickerSheet title="Filters" onClose={() => setSheet(null)}>
+          {QUICK_FILTERS.map((f) => {
+            const d = QUICK_FILTER_DEFINITIONS[f]
+            const on = filters.includes(f)
+            return (
+              <button
+                key={f}
+                className={`w-full flex items-start gap-3 px-4 py-3 rounded-xl text-left ${on ? 'bg-bite-50' : 'hover:bg-cream-50'}`}
+                onClick={() => setFilters((s) => (on ? s.filter((x) => x !== f) : [...s, f]))}
+              >
+                <span className="text-lg leading-none mt-0.5">{d.emoji}</span>
+                <span className="flex-1 min-w-0">
+                  <span className={`block text-sm ${on ? 'font-bold text-bite-700' : 'text-ink-900'}`}>{d.label}</span>
+                  <span className="block text-xs text-ink-500">{d.note}</span>
+                </span>
+                {!d.derived && (
+                  <span className="text-[10px] text-ink-500 shrink-0 mt-1">yours to apply</span>
+                )}
+              </button>
+            )
+          })}
+          {filters.length > 0 && (
+            <button className="btn-secondary w-full mt-2" onClick={() => setFilters([])}>Clear all</button>
+          )}
+        </PickerSheet>
       )}
 
       {editing !== undefined && (
@@ -296,6 +388,40 @@ function RecipeCard({
           {mine && <span className="badge bg-bite-100 text-bite-700 not-italic">yours</span>}
         </span>
       </button>
+    </div>
+  )
+}
+
+/**
+ * A list you pick from, on a sheet.
+ *
+ * On a phone this comes up from the bottom where a thumb is; on a desktop it is
+ * a centred dialog. Same component, because the content is a list either way and
+ * two implementations would drift.
+ */
+function PickerSheet({
+  title, children, onClose,
+}: {
+  title: string
+  children: ReactNode
+  onClose: () => void
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-paper w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[80vh] flex flex-col shadow-xl"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="flex items-center justify-between px-5 py-4 border-b border-border-200">
+          <h2 className="text-base font-extrabold text-ink-900">{title}</h2>
+          <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
+        </header>
+        <div className="flex-1 overflow-y-auto p-3 space-y-0.5">{children}</div>
+      </div>
     </div>
   )
 }
@@ -394,7 +520,6 @@ function RecipeDetail({
   const folded = useMergedInto(recipe.id)
   const mine = isMine(recipe)
   const perServing = roundNutrients(recipePerServing(recipe, ctx))
-  const extras = otherTags(recipe)
 
   async function copyForMfp() {
     const ok = await copyToClipboard(recipeForMfp(recipe, ctx))
@@ -522,15 +647,18 @@ function RecipeDetail({
             <NutrientSummary n={perServing} />
           </div>
 
-          {/* The tags that are not shelves and not filters still describe the
-              dish, so they live here rather than at the top of the screen. */}
-          {extras.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {extras.map((t) => (
-                <span key={t} className="chip-off capitalize pointer-events-none">{t.replace('-', ' ')}</span>
-              ))}
-            </div>
-          )}
+          {/* What it is, and what it asks of you — the two axes that are not
+              the shelf it sits on. */}
+          <div className="flex flex-wrap gap-1.5">
+            {recipe.category && (
+              <span className="chip bg-bite-100 text-bite-700 border border-bite-200">
+                {CATEGORY_LABELS[recipe.category]}
+              </span>
+            )}
+            {(recipe.quickFilters ?? []).map((f) => (
+              <span key={f} className="chip-off pointer-events-none">{quickFilterLabel(f)}</span>
+            ))}
+          </div>
 
           <div>
             <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-2">What goes in</p>

@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { Search, X, Trash2, Plus, Undo2, GripVertical } from 'lucide-react'
-import type { Component, Recipe, RecipeTag } from '../../types'
+import type { Component, DishCategory, QuickFilter, Recipe, RecipeTag } from '../../types'
 import { useRecipeStore, useRecipes, isBuiltIn } from '../../store/useRecipeStore'
 import { useFoods } from '../../store/useFoodStore'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
@@ -9,10 +9,12 @@ import { recipePerServing, componentNutrients, roundNutrients } from '../../lib/
 import { buildFoodIndex, searchFoods } from '../../lib/foodSearch'
 import { normaliseTerm } from '../../lib/units'
 import {
-  RECIPE_GROUPS, GROUP_LABELS, RECIPE_LABELS, LABEL_DEFINITIONS,
-  groupsOf, hasLabel, withGroups, withLabel,
-  type RecipeGroup, type RecipeLabel,
+  RECIPE_GROUPS, GROUP_LABELS, groupsOf, withGroups, type RecipeGroup,
 } from '../../lib/recipeGroups'
+import {
+  DISH_CATEGORIES, CATEGORY_LABELS, CATEGORY_MEAL_TIMES,
+  QUICK_FILTERS, QUICK_FILTER_DEFINITIONS, hasQuickFilter, withQuickFilter,
+} from '../../lib/dishCategories'
 import { NutrientSummary } from '../ui'
 
 /**
@@ -73,8 +75,21 @@ export default function RecipeEditor({
     patch({ tags: withGroups(draft.tags, next.length ? next : ['dish']) })
   }
 
-  function toggleLabel(label: RecipeLabel) {
-    patch({ tags: withLabel(draft.tags, label, !hasLabel(draft, label)) })
+  function toggleFilter(filter: QuickFilter) {
+    patch({ quickFilters: withQuickFilter(draft.quickFilters, filter, !hasQuickFilter(draft, filter)) })
+  }
+
+  /**
+   * Choosing what a dish *is* suggests when you eat it — but only ever suggests.
+   * On a recipe that already has meal times, whether from the plans or from you,
+   * they are left exactly as they are.
+   */
+  function chooseCategory(category: DishCategory) {
+    if (groups.includes('dish') && !draft.tags.some((t) => ['breakfast', 'lunch', 'dinner', 'snack'].includes(t))) {
+      patch({ category, tags: withGroups(draft.tags, CATEGORY_MEAL_TIMES[category]) })
+      return
+    }
+    patch({ category })
   }
 
   function save() {
@@ -173,15 +188,33 @@ export default function RecipeEditor({
             )}
           </Field>
 
-          <Field label="Anything worth noting?">
+          <Field label="What kind of dish is it?">
+            <select
+              className="input w-full"
+              value={draft.category ?? ''}
+              onChange={(e) => chooseCategory(e.target.value as DishCategory)}
+              aria-label="Dish category"
+            >
+              <option value="" disabled>Pick one…</option>
+              {DISH_CATEGORIES.map((c) => (
+                <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
+              ))}
+            </select>
+            <p className="text-xs text-ink-500 mt-2">
+              What the food is — not when you eat it or how it is served.
+            </p>
+          </Field>
+
+          <Field label="Filters">
             <div className="flex flex-wrap gap-1.5">
-              {RECIPE_LABELS.map((l) => (
+              {QUICK_FILTERS.map((f) => (
                 <button
-                  key={l}
-                  onClick={() => toggleLabel(l)}
-                  className={hasLabel(draft, l) ? 'chip-on' : 'chip-off'}
+                  key={f}
+                  onClick={() => toggleFilter(f)}
+                  className={hasQuickFilter(draft, f) ? 'chip-on' : 'chip-off'}
+                  title={QUICK_FILTER_DEFINITIONS[f].note}
                 >
-                  {LABEL_DEFINITIONS[l].label}
+                  {QUICK_FILTER_DEFINITIONS[f].emoji} {QUICK_FILTER_DEFINITIONS[f].label}
                 </button>
               ))}
             </div>

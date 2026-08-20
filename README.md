@@ -84,14 +84,27 @@ scroller showed four of them and hid the rest with no affordance. `ChipRow`
 wraps and collapses to the first few behind a `+N more`, and callers sort any
 active filter to the front so a live filter is never behind the toggle.
 
-**Shelves, then filters.** Recipes used to offer thirteen tags side by side —
-meal times, diets and dish shapes as if they were one kind of choice. They are
-read through two axes instead: a *group* (when you eat it: breakfast, lunch,
-dinner, snacks, or dishes) which decides the shelf, and four optional *labels*
-(quick, batch, veggie, high protein) which filter within it. Everything else a
-recipe is tagged with survives and is shown on the recipe, but no longer
-competes for space at the top of the screen. Nothing is stored differently —
-`src/lib/recipeGroups.ts` reads the tags the library already has.
+**Three axes, not one row of tags.** Recipes used to offer thirteen tags side by
+side — meal times, diets and dish shapes as if they answered the same question.
+A recipe is now described by three separate things:
+
+| Axis | Cardinality | Where it comes from |
+|---|---|---|
+| **Meal time** — breakfast, lunch, dinner, snack | several | the fourteen plans |
+| **Dish category** — what the food *is* | exactly one | `scripts/classify-recipes.ts` |
+| **Quick filters** — what it asks of you | any number | derived, or applied by hand |
+
+A category says what the food *is* — never when it is eaten, how it is served or
+how it was cooked, which rules out "Main", "Side" and "Bowl": those describe a
+role at a table and tell you nothing when you are deciding what to make. There
+are 37 of them; this library uses 18, and the filter only offers the ones with
+something behind them.
+
+`CATEGORY_MEAL_TIMES` maps a category to when it is usually eaten, but only ever
+as a *default*: a recipe's own meal times come from the plans, which is actual
+evidence, and always win. The mapping fills the gap for the 71 batch-cooked
+dishes, which were never a meal in a plan and so carry no meal time — without it
+the planner would never offer you the lentil stew for lunch.
 
 ---
 
@@ -128,6 +141,18 @@ A merge deletes nothing. It records "this recipe is really that one", and every 
 through the note — which is what lets you merge something a planned day already names, or
 something one of the fourteen archived weeks refers to, since those ids live in code and cannot
 be rewritten. Undo puts them back.
+
+Filtering combines all three axes — `Dinner` + `Soup` + `💪 High Protein` — with the category
+and the fourteen quick filters behind two buttons rather than fifty chips, and whatever you
+pick coming back as a chip you can take off.
+
+Nine of the fourteen quick filters are derived from the recipe: time, macros, and what goes in.
+The other five are not, and are left empty rather than guessed at. Lazy Meals, Leftovers,
+Fridge Clean-Out and Special Occasion are judgements about a particular week in a particular
+kitchen. **Budget Friendly** is the interesting one: the app holds no prices, and the nearest
+guess — "contains nothing expensive" — was true of 83% of the library, because Mediterranean
+home cooking out of a Romanian supermarket is cheap almost by definition. A filter matching
+four recipes in five narrows nothing, so it is yours to apply.
 
 Every recipe is editable, including the 275 that ship in code: the first change keeps a copy
 of your own and the original stays underneath, so **Revert** and **Delete** are separate
@@ -356,6 +381,8 @@ src/
 │   ├── targets.ts        # plan averages + TDEE
 │   ├── mediterranean.ts  # serving goals from the guide
 │   ├── recipeGroups.ts   # shelves, labels and the repeated-dish grouping
+│   ├── dishCategories.ts # the 37 categories, 14 filters, and the meal-time map
+│   ├── classify.ts       # reading a category off a recipe's components
 │   ├── mergeRecipes.ts   # folding repeats together without losing references
 │   └── mfp.ts            # clipboard + diary CSV
 ├── pages/                # Planner, Recipes, Foods, Grocery, History, Prep, Schedule, Progress, Settings

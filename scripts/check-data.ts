@@ -3,6 +3,8 @@ import { DISHES } from '../src/data/dishes.js'
 import { MEAL_RECIPES } from '../src/data/generated/mealRecipes.js'
 import { SOURCE_PLANS } from '../src/data/generated/sourcePlans.js'
 import { atwaterCalories, buildContext, calorieDrift, calorieGap, recipePerServing } from '../src/lib/nutrition.js'
+import { RECIPE_CLASSIFICATION } from '../src/data/generated/classification.js'
+import { DISH_CATEGORIES, QUICK_FILTERS, HAND_APPLIED_FILTERS } from '../src/lib/dishCategories.js'
 import type { Recipe } from '../src/types/index.js'
 
 /**
@@ -101,6 +103,28 @@ for (const [name, count] of names) {
   if (count > 1) problems.push(`duplicate recipe name: "${name}" ×${count}`)
 }
 
+// 5. Every recipe knows what kind of food it is, and the file saying so is not
+//    stale — a category the classifier no longer produces would silently filter
+//    to nothing on the Recipes screen.
+for (const recipe of recipes) {
+  const classified = RECIPE_CLASSIFICATION[recipe.id]
+  if (!classified) {
+    problems.push(`${recipe.id} (${recipe.name.en}): no category — re-run scripts/classify-recipes.ts`)
+    continue
+  }
+  if (!DISH_CATEGORIES.includes(classified.category)) {
+    problems.push(`${recipe.id}: unknown category "${classified.category}"`)
+  }
+  for (const f of classified.quickFilters) {
+    if (!QUICK_FILTERS.includes(f)) problems.push(`${recipe.id}: unknown quick filter "${f}"`)
+    if (HAND_APPLIED_FILTERS.includes(f)) {
+      problems.push(`${recipe.id}: "${f}" cannot be derived and must not be generated`)
+    }
+  }
+}
+
+const categoriesUsed = new Set(Object.values(RECIPE_CLASSIFICATION).map((c) => c.category))
+
 // ─── Report ───────────────────────────────────────────────────────────────────
 
 const componentCount = recipes.reduce((a, r) => a + r.components.length, 0)
@@ -109,6 +133,7 @@ console.log(`dishes         ${DISHES.length}`)
 console.log(`meal recipes   ${MEAL_RECIPES.length}`)
 console.log(`components     ${componentCount}`)
 console.log(`plan lines     ${lines} (${lines - empty} mapped)`)
+console.log(`categories     ${categoriesUsed.size} of ${DISH_CATEGORIES.length} in use`)
 
 if (notes.length) {
   console.log(`\n${notes.length} note(s):`)
