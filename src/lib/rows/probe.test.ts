@@ -21,6 +21,7 @@ vi.mock('../supabase', () => ({
   isConfigured: true,
   supabase: {
     auth: { getUser: async () => ({ data: { user: state.user } }) },
+    rpc: async () => ({ error: null }),
     from: (table: string) => ({
       select: () => ({
         eq: () => ({

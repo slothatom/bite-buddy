@@ -45,10 +45,27 @@ begin
 end;
 $$;
 
-drop trigger if exists enforce_allowed_email on auth.users;
-create trigger enforce_allowed_email
-  before insert on auth.users
-  for each row execute function public.enforce_allowed_email();
+-- Wrapped, because `auth.users` belongs to Supabase rather than to you, and
+-- newer projects refuse a trigger on it with "must be owner of relation users".
+-- The SQL editor runs this file as one transaction, so an error here does not
+-- stop at this line: it abandons everything below it, including the policies
+-- that decide whether anybody can read their own data. That is exactly what
+-- happened, and the symptom was an app that appeared to save nothing.
+--
+-- If it cannot be created, the guest list still holds. It is enforced by the
+-- redirect allow-list and by the fact that nothing in the database is readable
+-- without a members row.
+do $$
+begin
+  drop trigger if exists enforce_allowed_email on auth.users;
+  create trigger enforce_allowed_email
+    before insert on auth.users
+    for each row execute function public.enforce_allowed_email();
+exception
+  when insufficient_privilege or undefined_table then
+    raise notice 'Could not put the guest list trigger on auth.users (%). Everything else in this file still applies.', sqlerrm;
+end;
+$$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Household members
@@ -140,15 +157,62 @@ begin
 end;
 $$;
 
-drop trigger if exists add_member on auth.users;
-create trigger add_member
-  after insert on auth.users
-  for each row execute function public.add_member();
+do $$
+begin
+  drop trigger if exists add_member on auth.users;
+  create trigger add_member
+    after insert on auth.users
+    for each row execute function public.add_member();
+exception
+  when insufficient_privilege or undefined_table then
+    raise notice 'Could not put the membership trigger on auth.users (%). The app adds itself instead, see join_household below.', sqlerrm;
+end;
+$$;
 
 -- Anyone who signed up before this existed, and was therefore never added.
 insert into public.members (id, email)
 select id, coalesce(email, '') from auth.users
 on conflict (id) do nothing;
+
+/**
+ * The way in, for an app that cannot rely on any of the above having worked.
+ *
+ * Adding yourself to the household through the table means satisfying its
+ * policies, and those policies are the thing most likely to be wrong, since
+ * they are what a person pastes into a SQL editor and hopes ran. This function
+ * runs as its owner, so it needs none of them, and it can add exactly one row:
+ * yours, for the account making the call.
+ *
+ * It cannot be used to add anybody else, or to see anything, and being signed
+ * in at all already required being on the guest list.
+ */
+create or replace function public.join_household()
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Not signed in.' using errcode = 'insufficient_privilege';
+  end if;
+
+  insert into public.members (id, email)
+  select auth.uid(), coalesce((select email from auth.users where id = auth.uid()), '')
+  on conflict (id) do update set last_seen_at = now();
+end;
+$$;
+
+-- `authenticated` is Supabase's role for a signed-in caller. Guarded so this
+-- file still runs on a plain Postgres that has never heard of it.
+do $$
+begin
+  grant execute on function public.join_household() to authenticated;
+exception
+  when undefined_object then
+    raise notice 'No authenticated role here, skipping the grant.';
+end;
+$$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- The shared state
@@ -198,6 +262,11 @@ begin
   alter publication supabase_realtime add table public.app_state;
 exception
   when duplicate_object then null;
+  -- Adding to a publication needs to own it. Realtime is a nicety, the other
+  -- person's screen updating a moment later rather than at once, and it is not
+  -- worth abandoning the rest of this file over.
+  when insufficient_privilege or undefined_object then
+    raise notice 'Could not add app_state to the realtime publication (%).', sqlerrm;
 end;
 $$;
 

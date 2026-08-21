@@ -123,12 +123,23 @@ async function recordPresence(user: User) {
     return
   }
 
+  // Not a member, and writing the row directly was refused. There is one more
+  // way in, and it exists precisely for this: a function that runs as its owner
+  // and so answers to none of the policies that might be wrong. It can add one
+  // row, yours.
+  const { error: joinError } = await supabase.rpc('join_household')
+  if (!joinError) {
+    await useAuthStore.getState().refreshMembers()
+    return
+  }
+
   // Not a member, and the app cannot make itself one. Every policy in the
   // database consults membership, so this account can read and write nothing,
   // which from the inside looks exactly like an app that has stopped saving.
   // Saying so, with the server's own words, is the only useful thing left.
   useAuthStore.setState({
-    error: `Signed in, but this account is not in the household, so nothing can be saved: ${error.message}`,
+    error: 'Signed in, but this account is not in the household, so nothing can be saved. '
+      + `Run supabase/fix-membership.sql in the Supabase SQL editor. The database said: ${joinError.message}`,
   })
 }
 

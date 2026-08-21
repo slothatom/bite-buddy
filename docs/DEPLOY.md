@@ -59,6 +59,15 @@ That list is the whole security model for who gets in. Anyone not on it cannot
 create an account, even knowing the URL and the key, a database trigger
 rejects the signup itself.
 
+> **If the editor shows a red error, read which statement it was.** Some of this
+> file touches `auth.users`, which belongs to Supabase rather than to you, and
+> newer projects refuse to let anything else put a trigger on it. Those parts are
+> wrapped so the rest of the file still runs, but if you see an error and are not
+> sure how much applied, run
+> [`supabase/fix-membership.sql`](../supabase/fix-membership.sql) afterwards. It
+> is short, it is only about who is allowed to read and write, and it ends by
+> printing who is in the household so you can see it worked.
+
 Then paste in all of [`supabase/rows.sql`](../supabase/rows.sql) and run that
 too. It creates the tables the app actually stores your data in, one row per
 meal, weight, recipe or shopping line, with the policies and indexes each of
