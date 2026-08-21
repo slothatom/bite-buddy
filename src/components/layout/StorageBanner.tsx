@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AlertTriangle, X } from 'lucide-react'
 import { onStorageFailure, storageFailure } from '../../store/persist'
 import { useSyncStatus } from '../../store/useSync'
+import { useAuthStore } from '../../store/useAuth'
 
 /**
  * Tells the user when their changes are not being saved.
@@ -16,6 +17,9 @@ import { useSyncStatus } from '../../store/useSync'
  *    which is fine for a tunnel and not fine for a permission that will refuse
  *    every write until somebody fixes it. That one is silent forever otherwise,
  *    and it is what made a refresh look like it emptied the app.
+ *  - **This account never joined the household.** Membership is what every
+ *    database policy checks, so an account without it is signed in and allowed
+ *    to read and write nothing.
  *
  * The server's own words are included when there are any. "new row violates
  * row-level security policy" is not friendly, but it is the difference between
@@ -26,6 +30,7 @@ export default function StorageBanner() {
   const [reason, setReason] = useState<string | null>(storageFailure())
   const [dismissed, setDismissed] = useState(false)
   const { state, unsaved, lastError } = useSyncStatus()
+  const authError = useAuthStore((s) => s.error)
 
   useEffect(() => onStorageFailure(setReason), [])
 
@@ -33,6 +38,7 @@ export default function StorageBanner() {
   // Pending *and* erroring means the server is turning it down.
   const rejected = state === 'error' && unsaved > 0
   const message = reason
+    ?? authError
     ?? (rejected
       ? `${unsaved} ${unsaved === 1 ? 'change is' : 'changes are'} not reaching the shared copy. `
         + `They are safe on this device and will keep retrying.`
@@ -49,7 +55,7 @@ export default function StorageBanner() {
       <AlertTriangle size={16} className="shrink-0 mt-0.5" />
       <p className="flex-1 min-w-0">
         {message}
-        {!reason && lastError ? (
+        {!reason && !authError && lastError ? (
           <span className="block text-white/80 text-xs mt-0.5 break-words">{lastError}</span>
         ) : null}
       </p>

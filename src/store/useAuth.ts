@@ -97,7 +97,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
  */
 async function recordPresence(user: User) {
   if (!supabase) return
-  await supabase.from('members').upsert(
+  const { error } = await supabase.from('members').upsert(
     {
       id: user.id,
       email: user.email ?? '',
@@ -105,6 +105,18 @@ async function recordPresence(user: User) {
     },
     { onConflict: 'id', ignoreDuplicates: false },
   )
+
+  // This row is what every other policy checks. Without it the account is
+  // signed in and allowed to read and write nothing, which looks from the
+  // inside like an app that has stopped saving. It failed silently before, so
+  // the one thing that explains the whole session was the one thing not said.
+  if (error) {
+    useAuthStore.setState({
+      error: `Signed in, but this account could not be added to the household: ${error.message}`,
+    })
+    return
+  }
+
   await useAuthStore.getState().refreshMembers()
 }
 

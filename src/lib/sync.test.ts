@@ -138,6 +138,27 @@ describe('joining a household', () => {
     expect(syncSnapshot().state).toBe('error')
     stop()
   })
+
+  it('keeps asking, rather than giving up on the session', async () => {
+    // A first read refused because this account is not on the members list yet
+    // used to end sync until the page was reloaded, which hit the same wall.
+    // Signing in for the first time is exactly when that happens.
+    select.mockResolvedValue({ data: null, error: { message: 'permission denied' } })
+
+    const stop = startSync('me')
+    await settle()
+    expect(syncSnapshot().state).toBe('error')
+
+    select.mockResolvedValue({ data: [], error: null })
+    await settle(10_000)
+
+    useBodyStore.setState({ weightEntries: [{ id: 'w1', date: '2026-08-20', weight: 70, unit: 'kg' as const }] })
+    await settle()
+
+    expect(upsert).toHaveBeenCalled()
+    expect(syncSnapshot().state).toBe('live')
+    stop()
+  })
 })
 
 describe('a local change', () => {
