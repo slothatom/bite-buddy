@@ -1234,6 +1234,45 @@ test.describe('pasting a recipe', () => {
   })
 })
 
+test.describe('what the kitchen has to say', () => {
+  test('leftovers with nothing planned to eat them reach the home screen', async ({ page }) => {
+    await goto(page, '/schedule')
+    await page.getByRole('button', { name: 'Leftovers' }).click()
+    await page.getByLabel('Or just say what it is').fill('Half a lasagne')
+    await page.getByRole('button', { name: 'Keep it' }).click()
+
+    await goto(page, '/')
+    await expect(page.getByText(/waiting|cooked and waiting/).first()).toBeVisible()
+  })
+
+  test('it stops once something is planned to eat them', async ({ page }) => {
+    await goto(page, '/schedule')
+    await page.getByRole('button', { name: 'Leftovers' }).click()
+    await page.getByLabel('Or just say what it is').fill('Half a lasagne')
+    await page.getByRole('button', { name: 'Keep it' }).click()
+
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: /Pop something in/ }).first().click()
+    await page.locator('button').filter({ hasText: /portions? left/ }).first().click()
+
+    await goto(page, '/')
+    await expect(page.getByText('Half a lasagne is waiting')).toHaveCount(0)
+  })
+
+  test('home never turns into an alert centre', async ({ page }) => {
+    // Four is the cap. A screen that raises five things is one people learn to
+    // scroll past, which costs the one that actually needed saying.
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    await goto(page, '/')
+    const section = page.locator('section').filter({ hasText: 'Worth a thought' })
+    if (await section.count()) {
+      expect(await section.locator('a').count()).toBeLessThanOrEqual(4)
+    }
+  })
+})
+
 test.describe('what you enter is still there tomorrow', () => {
   /**
    * The check that nothing else makes.

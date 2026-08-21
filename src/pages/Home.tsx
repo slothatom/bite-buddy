@@ -24,6 +24,8 @@ import { useCookStore } from '../store/useCookStore'
 import { useBodyStore } from '../store/useBodyStore'
 import { scoreWeek } from '../lib/mediterranean'
 import { suggest } from '../lib/suggestions'
+import { kitchenNudges } from '../lib/kitchen'
+import { usePantry } from '../store/usePantryStore'
 import { PEOPLE } from '../lib/people'
 
 /**
@@ -40,6 +42,8 @@ export default function Home() {
   const sessions = useCookStore((s) => s.sessions)
   const { profile } = useUserStore()
   const portions = useAvailablePortions()
+  const groceryItems = useMealPlanStore((s) => s.groceryItems)
+  const pantry = usePantry()
   const ctx = useNutritionContext()
   const members = useAuthStore((s) => s.members)
   const me = useAuthStore((s) => s.user)
@@ -91,9 +95,36 @@ export default function Home() {
     [sessions, today],
   )
 
+  /**
+   * What the kitchen has to say, and then what the week has to say.
+   *
+   * Two sources on purpose. The kitchen ones are about now: something cooked
+   * and unclaimed, a session tomorrow missing an ingredient, a list that no
+   * longer matches the plan. The week ones are about balance, which matters and
+   * never matters today.
+   *
+   * Capped at four between them. Home is where you land, and a screen that
+   * raises five things is a screen people learn to scroll past, which costs the
+   * one thing that actually needed saying.
+   */
+  const nudges = useMemo(
+    () => kitchenNudges({
+      days: weekPlan, ctx, today, portions, sessions, groceryItems, pantry,
+    }),
+    [weekPlan, ctx, today, portions, sessions, groceryItems, pantry],
+  )
+
   const ideas = useMemo(
     () => suggest({ days: weekPlan, recipes, ctx, today }),
     [weekPlan, recipes, ctx, today],
+  )
+
+  const shown = useMemo(
+    () => [
+      ...nudges.map((n) => ({ id: n.id, title: n.title, reason: n.detail, to: n.to, urgent: n.rank <= 20 })),
+      ...ideas.map((i) => ({ id: i.id, title: i.title, reason: i.reason, to: i.to, urgent: false })),
+    ].slice(0, 4),
+    [nudges, ideas],
   )
 
   return (
@@ -252,17 +283,20 @@ export default function Home() {
         </section>
 
         {/* ─── Ideas ───────────────────────────────────────────────────────── */}
-        {ideas.length > 0 && (
+        {shown.length > 0 && (
           <section>
             <SectionHeading>Worth a thought</SectionHeading>
             <div className="card divide-y divide-border-100">
-              {ideas.map((idea) => (
+              {shown.map((idea) => (
                 <Link
                   key={idea.id}
                   to={idea.to}
                   className="flex items-start gap-3 px-4 py-3 hover:bg-cream-50 transition-colors"
                 >
-                  <Sparkles size={16} className="text-bite-600 shrink-0 mt-0.5" />
+                  <Sparkles
+                    size={16}
+                    className={`shrink-0 mt-0.5 ${idea.urgent ? 'text-mustard-600' : 'text-bite-600'}`}
+                  />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-ink-900">{idea.title}</p>
                     <p className="text-xs text-ink-700 mt-0.5">{idea.reason}</p>

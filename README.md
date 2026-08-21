@@ -122,6 +122,18 @@ Where you land: today's meals against your calorie ring, the week as seven bars,
 else is in the household and when they were last here. On the deployed app it also says
 whether your copy and theirs are in step.
 
+**Worth a thought** is up to four things, and they come from two places. The kitchen ones
+are about now: portions cooked with nothing planned to eat them, something that has been in
+the fridge a few days, a cook session tomorrow with two of its ingredients not in the house,
+a shopping list that no longer matches the plan, three meals this week that all want
+spinach. The week ones are about balance against the Mediterranean guide, which matters and
+never matters today, so they sort below.
+
+Four is a cap rather than a target. A screen that raises five things is one people learn to
+scroll past, which costs the one that actually needed saying. Nothing scolds, and nothing
+passes a verdict on food it cannot see: "in the fridge 6 days" is a fact you can act on,
+"expired" is not the app's to say. `src/lib/kitchen.ts` sets out the rules.
+
 ### Planner
 **Fill the gaps** proposes a meal for every empty breakfast, lunch and dinner on screen, from
 your own library. It is arithmetic rather than a model: it prefers what is already in the
