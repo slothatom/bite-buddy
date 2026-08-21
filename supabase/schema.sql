@@ -81,10 +81,26 @@ as $$
   select exists (select 1 from public.members where id = auth.uid());
 $$;
 
+-- The `or id = auth.uid()` is not a convenience, it is what makes joining
+-- possible at all, and leaving it out was the bug that made this app appear to
+-- save nothing.
+--
+-- The app announces itself with an upsert, which Postgres runs as
+-- `insert ... on conflict do update`, and that statement requires the select
+-- policy to pass so it can look for the conflicting row. With only
+-- `is_member()` there, the check asks "are you already a member" of somebody
+-- whose whole purpose in writing this row is to become one. It refused, every
+-- time, so nobody was ever added; and because every other policy in this file
+-- consults `is_member()`, every read and write of the household's data was then
+-- refused too. One circular policy, and the app looks like it has lost your
+-- data.
+--
+-- Seeing your own row grants nothing else: everything worth reading is behind
+-- `is_member()`, and this row is yours.
 drop policy if exists "members are visible to the household" on public.members;
 create policy "members are visible to the household"
   on public.members for select
-  using (public.is_member());
+  using (public.is_member() or id = auth.uid());
 
 drop policy if exists "you may create your own member row" on public.members;
 create policy "you may create your own member row"
@@ -96,6 +112,43 @@ create policy "you may edit your own member row"
   on public.members for update
   using (id = auth.uid())
   with check (id = auth.uid());
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Joining, without depending on the app to manage it
+--
+-- The row above is also written by the app at sign-in, and that is fine when it
+-- works. This makes it not matter: an account that exists is a member, decided
+-- by the database at the moment the account is created.
+--
+-- Who may create an account is already settled by the guest list and the
+-- trigger that enforces it, so there is nothing this loosens. What it removes
+-- is a whole class of failure where somebody is signed in, allowed to read and
+-- write nothing, and the app can only say that something went wrong.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+create or replace function public.add_member()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.members (id, email)
+  values (new.id, coalesce(new.email, ''))
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists add_member on auth.users;
+create trigger add_member
+  after insert on auth.users
+  for each row execute function public.add_member();
+
+-- Anyone who signed up before this existed, and was therefore never added.
+insert into public.members (id, email)
+select id, coalesce(email, '') from auth.users
+on conflict (id) do nothing;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- The shared state

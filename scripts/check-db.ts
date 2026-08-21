@@ -45,6 +45,84 @@ function check(what: string, ok: boolean, detail = '') {
   if (!ok) problems.push(what)
 }
 
+/**
+ * Can somebody actually join the household?
+ *
+ * Its own database, because it needs the real policies from schema.sql rather
+ * than the permissive stand-in the rest of this file uses, and it needs to run
+ * as an ordinary signed-in person rather than as the owner.
+ *
+ * This is here because of what it missed. Every policy in the app consults
+ * `is_member()`, and membership is one row that the app writes at sign-in as an
+ * upsert. Postgres runs an upsert as `insert ... on conflict do update`, which
+ * requires the select policy to pass so it can look for the conflicting row.
+ * The select policy was `is_member()`. So joining required already having
+ * joined, the write was refused every time, nobody was ever a member, and every
+ * read and write of the household's data was refused after that. The app could
+ * only report that saving had stopped working.
+ */
+async function checkJoining() {
+  console.log('\njoining the household')
+  const fresh = await new PGlite()
+  const schema = readFileSync(resolve(ROOT, 'supabase/schema.sql'), 'utf8')
+
+  await fresh.exec(`
+    create schema auth;
+    create table auth.users (id uuid primary key, email text);
+    create function auth.uid() returns uuid language sql stable as $$
+      select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
+    create publication supabase_realtime;
+  `)
+
+  // schema.sql expects Supabase's own auth trigger machinery; everything else
+  // in it is ours and runs as written.
+  await fresh.exec(schema.replace(/create trigger enforce_allowed_email[\s\S]*?;/, ''))
+
+  await fresh.exec(`
+    create role authenticated;
+    grant usage on schema public, auth to authenticated;
+    grant all on all tables in schema public to authenticated;
+    grant execute on all functions in schema public to authenticated;
+    grant execute on function auth.uid() to authenticated;
+  `)
+
+  // Somebody who has an account and has never opened the app before.
+  const NEWCOMER = '33333333-3333-4333-8333-333333333333'
+  await fresh.query('insert into auth.users (id, email) values ($1, $2)', [NEWCOMER, 'new@example.com'])
+  await fresh.query('delete from public.members where id = $1', [NEWCOMER])
+
+  await fresh.query(`select set_config('request.jwt.claim.sub', $1, false)`, [NEWCOMER])
+  await fresh.exec('set role authenticated')
+
+  try {
+    // Exactly the statement supabase-js sends for .upsert().
+    await fresh.query(
+      `insert into public.members (id, email, last_seen_at) values ($1, $2, now())
+       on conflict (id) do update set email = excluded.email, last_seen_at = excluded.last_seen_at`,
+      [NEWCOMER, 'new@example.com'],
+    )
+    check('a new account can add itself to the household', true)
+  } catch (e) {
+    check('a new account can add itself to the household', false, (e as Error).message)
+  }
+
+  const member = await fresh.query<{ yes: boolean }>('select public.is_member() as yes')
+  check('and is then a member, which every other policy depends on', member.rows[0].yes === true)
+  await fresh.exec('reset role')
+
+  // The database should not need the app's help at all.
+  const SECOND = '44444444-4444-4444-8444-444444444444'
+  await fresh.query('insert into auth.users (id, email) values ($1, $2)', [SECOND, 'second@example.com'])
+  const auto = await fresh.query<{ n: number }>(
+    'select count(*)::int n from public.members where id = $1', [SECOND])
+  check('an account is a member the moment it exists, without the app writing anything',
+    auto.rows[0].n === 1)
+
+  await fresh.close()
+}
+
+await checkJoining()
+
 const db = await new PGlite()
 
 /**
