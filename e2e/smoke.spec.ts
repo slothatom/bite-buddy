@@ -1216,6 +1216,24 @@ test.describe('filling the gaps', () => {
   })
 })
 
+test.describe('pasting a recipe', () => {
+  test('says what is wrong rather than failing silently', async ({ page }) => {
+    // Run locally there is no Supabase, so the assistant is unavailable. That
+    // has to read as a sentence a person can act on, not a dead button.
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /Write one|New recipe|^Recipe$/ }).first().click()
+    await page.getByRole('button', { name: /Paste a recipe/ }).click()
+
+    await page.getByPlaceholder(/chicken thighs/).fill('500 g chicken thighs\n3 sweet potatoes')
+    await page.getByRole('button', { name: 'Read it', exact: true }).click()
+
+    await expect(page.getByText(/runs on its own|not available|not set up/)).toBeVisible()
+    // And what was typed is still there, because losing it would be the worst
+    // possible answer to a failure that was never the person's fault.
+    await expect(page.getByPlaceholder(/chicken thighs/)).toHaveValue(/chicken thighs/)
+  })
+})
+
 test.describe('what you enter is still there tomorrow', () => {
   /**
    * The check that nothing else makes.
