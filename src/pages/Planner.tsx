@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays, MoveRight } from 'lucide-react'
+import {
+  ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays, MoveRight, Sparkles,
+} from 'lucide-react'
 import type { Component, DayPlan, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import {
@@ -15,6 +17,8 @@ import { useUiStore } from '../store/useUiStore'
 import AddEntryModal from '../components/planner/AddEntryModal'
 import { usePortionStore } from '../store/usePortionStore'
 import { portionEntries } from '../lib/portionsUse'
+import FillGaps from '../components/planner/FillGaps'
+import type { Proposal } from '../lib/autoPlan'
 
 /**
  * The weekly planner.
@@ -37,6 +41,7 @@ export default function Planner() {
   const [adding, setAdding] = useState<{ date: string; slot: MealSlot } | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
   const [moving, setMoving] = useState<{ date: string; mealId: string } | null>(null)
+  const [filling, setFilling] = useState<string[] | null>(null)
   const { quickAdd, clearQuickAdd } = useUiStore()
   const { takeFrom, returnTo } = usePortionStore()
 
@@ -59,6 +64,12 @@ export default function Planner() {
     const meal = byDate.get(date)?.meals.find((m) => m.id === mealId)
     for (const p of portionEntries(meal?.entries ?? [])) returnTo(p.portionId, p.servings)
     removeMeal(date, mealId)
+  }
+
+  /** Everything the assistant offered and you kept, in one go. */
+  const applyProposals = (proposals: Proposal[]) => {
+    for (const p of proposals) addEntryTakingPortions(p.date, p.slot, p.entry)
+    setFilling(null)
   }
 
   const clearDayReturningPortions = (date: string) => {
@@ -202,6 +213,12 @@ export default function Planner() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-border-200">
+            {/* Offered here rather than as a headline action: filling the gaps
+                is useful when there are gaps, and the rest of the time it is
+                one more thing between you and your week. */}
+            <button className="btn-secondary" onClick={() => setFilling(dates)}>
+              <Sparkles size={15} /> Fill the gaps
+            </button>
             <button className="btn-secondary" onClick={() => setCopyFrom(selected)}>
               <Copy size={15} /> Copy day to…
             </button>
@@ -250,6 +267,14 @@ export default function Planner() {
           slot={openAdd.slot}
           onClose={closeAdd}
           onAdd={(entry: Component) => addEntryTakingPortions(openAdd.date, openAdd.slot, entry)}
+        />
+      )}
+
+      {filling && (
+        <FillGaps
+          dates={filling}
+          onClose={() => setFilling(null)}
+          onApply={applyProposals}
         />
       )}
 
