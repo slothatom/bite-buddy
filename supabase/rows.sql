@@ -59,6 +59,21 @@ begin
 end;
 $$;
 
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Why `data`, `day` and `slot` are nullable
+--
+-- Because a tombstone is a row too, and a deleted thing has no payload and no
+-- day. The client sends `{ id, deleted_at }` and nothing else, since by then it
+-- no longer holds the thing it is telling you about.
+--
+-- Postgres checks not-null constraints on the proposed row before it goes
+-- looking for a conflicting one, so `insert ... on conflict do update` fails
+-- outright when a required column is missing, even though the row already
+-- exists and the update would have left that column alone. With `not null`
+-- here, every deletion this app ever made would have been refused, forever,
+-- and the only sign would have been a sync error nobody reads.
+-- ─────────────────────────────────────────────────────────────────────────────
+
 /**
  * Creates the sync columns, policies, indexes and trigger for one table.
  *
@@ -115,9 +130,9 @@ $$;
 -- ─────────────────────────────────────────────────────────────────────────────
 create table if not exists public.plan_meals (
   id         text primary key,
-  day        date not null,
-  slot       text not null,
-  data       jsonb not null,
+  day        date,
+  slot       text,
+  data       jsonb,
   updated_at timestamptz not null default now(),
   deleted_at timestamptz,
   updated_by uuid references auth.users on delete set null
@@ -130,7 +145,7 @@ call public.make_syncable('plan_meals');
 -- ─────────────────────────────────────────────────────────────────────────────
 create table if not exists public.grocery_items (
   id         text primary key,
-  data       jsonb not null,
+  data       jsonb,
   updated_at timestamptz not null default now(),
   deleted_at timestamptz,
   updated_by uuid references auth.users on delete set null
@@ -182,8 +197,8 @@ call public.make_syncable('foods');
 create table if not exists public.weights (
   id         text primary key,
   member_id  text,
-  day        date not null,
-  data       jsonb not null,
+  day        date,
+  data       jsonb,
   updated_at timestamptz not null default now(),
   deleted_at timestamptz,
   updated_by uuid references auth.users on delete set null
@@ -194,8 +209,8 @@ call public.make_syncable('weights');
 create table if not exists public.measurements (
   id         text primary key,
   member_id  text,
-  day        date not null,
-  data       jsonb not null,
+  day        date,
+  data       jsonb,
   updated_at timestamptz not null default now(),
   deleted_at timestamptz,
   updated_by uuid references auth.users on delete set null
@@ -206,8 +221,8 @@ call public.make_syncable('measurements');
 create table if not exists public.workouts (
   id         text primary key,
   member_id  text,
-  day        date not null,
-  data       jsonb not null,
+  day        date,
+  data       jsonb,
   updated_at timestamptz not null default now(),
   deleted_at timestamptz,
   updated_by uuid references auth.users on delete set null
@@ -218,8 +233,8 @@ call public.make_syncable('workouts');
 create table if not exists public.steps (
   id         text primary key,
   member_id  text,
-  day        date not null,
-  data       jsonb not null,
+  day        date,
+  data       jsonb,
   updated_at timestamptz not null default now(),
   deleted_at timestamptz,
   updated_by uuid references auth.users on delete set null
@@ -230,8 +245,8 @@ call public.make_syncable('steps');
 create table if not exists public.sleep (
   id         text primary key,
   member_id  text,
-  day        date not null,
-  data       jsonb not null,
+  day        date,
+  data       jsonb,
   updated_at timestamptz not null default now(),
   deleted_at timestamptz,
   updated_by uuid references auth.users on delete set null
@@ -244,8 +259,8 @@ call public.make_syncable('sleep');
 -- ─────────────────────────────────────────────────────────────────────────────
 create table if not exists public.cook_sessions (
   id         text primary key,
-  day        date not null,
-  data       jsonb not null,
+  day        date,
+  data       jsonb,
   updated_at timestamptz not null default now(),
   deleted_at timestamptz,
   updated_by uuid references auth.users on delete set null
@@ -261,7 +276,7 @@ call public.make_syncable('cook_sessions');
 -- ─────────────────────────────────────────────────────────────────────────────
 create table if not exists public.settings (
   id         text primary key,
-  data       jsonb not null,
+  data       jsonb,
   updated_at timestamptz not null default now(),
   deleted_at timestamptz,
   updated_by uuid references auth.users on delete set null
@@ -399,5 +414,33 @@ begin
     insert into public.settings (id, data) values ('profile', doc -> 'profile')
     on conflict (id) do nothing;
   end if;
+end;
+$$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Bringing an existing install up to date
+--
+-- The first version of this file made `data`, `day` and `slot` not null, which
+-- made deletions impossible to record. Dropping a constraint that is already
+-- gone is not an error, so this is safe to re-run and safe on a fresh install.
+-- ─────────────────────────────────────────────────────────────────────────────
+do $$
+declare
+  t text;
+  c text;
+begin
+  foreach t in array array[
+    'plan_meals', 'grocery_items', 'recipes', 'foods', 'weights', 'measurements',
+    'workouts', 'steps', 'sleep', 'cook_sessions', 'settings'
+  ] loop
+    foreach c in array array['data', 'day', 'slot'] loop
+      if exists (
+        select 1 from information_schema.columns
+        where table_schema = 'public' and table_name = t and column_name = c
+      ) then
+        execute format('alter table public.%I alter column %I drop not null', t, c);
+      end if;
+    end loop;
+  end loop;
 end;
 $$;

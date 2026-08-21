@@ -36,6 +36,7 @@ jobs:
       - run: npm test
       - run: npm run data:check
       - run: npm run text:check
+      - run: npm run db:check
 
       - name: Build
         env:

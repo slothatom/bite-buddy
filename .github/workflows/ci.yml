@@ -43,6 +43,9 @@ jobs:
       - name: House style
         run: npm run text:check
 
+      - name: Schema and sync agree
+        run: npm run db:check
+
       - name: Build
         run: npm run build
 

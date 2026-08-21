@@ -42,6 +42,21 @@ export interface EngineHooks {
 const MASS_DELETE_ROWS = 8
 const MASS_DELETE_SHARE = 0.5
 
+/**
+ * A row from the database, in the shape the app produces.
+ *
+ * A `date` column can arrive as a Date rather than the plain day the app deals
+ * in, depending on what is between here and Postgres. Left alone, the same row
+ * compares differently depending on which side it came from, and the two
+ * devices trade it back and forth for as long as they are both open.
+ */
+function asAppRow(row: SyncRow): SyncRow {
+  const day = row.day as unknown
+  if (day instanceof Date) return { ...row, day: day.toISOString().slice(0, 10) }
+  if (typeof day === 'string' && day.length > 10) return { ...row, day: day.slice(0, 10) }
+  return row
+}
+
 export class RowSync {
   private stopped = false
 
@@ -76,7 +91,7 @@ export class RowSync {
     }
     if (this.stopped) return true
 
-    const remote = (data ?? []) as SyncRow[]
+    const remote = ((data ?? []) as SyncRow[]).map(asAppRow)
     if (!remote.length) return true
 
     const local = table.read()
@@ -171,8 +186,9 @@ export class RowSync {
           'postgres_changes',
           { event: '*', schema: 'public', table: table.table },
           (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
-            const row = payload.new as SyncRow & { updated_by?: string }
-            if (!row?.id || row.updated_by === this.userId || this.stopped) return
+            const raw = payload.new as SyncRow & { updated_by?: string }
+            if (!raw?.id || raw.updated_by === this.userId || this.stopped) return
+            const row = asAppRow(raw)
 
             const snapshot = useSyncState.getState().snapshotFor(table.table)
             const owed = localChanges(table.read(), snapshot, new Date().toISOString())

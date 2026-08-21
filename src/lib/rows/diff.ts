@@ -13,9 +13,12 @@ import type { SyncRow, TableSnapshot } from './types'
 /**
  * A stable fingerprint of a row.
  *
- * Keys are sorted, so two objects with the same contents in a different order
- * compare equal. Without that, re-reading a store after a round trip produces a
- * different string and every row looks changed forever.
+ * Three things have to be ignored, or the same row fingerprints differently
+ * depending on where it came from, and then two phones push it at each other
+ * for as long as they are both open, each convinced the other's copy is a
+ * change: when and by whom the server stamped it, the order Postgres happens to
+ * return the keys in, and the difference between a field the app left out and a
+ * column the database returned as null.
  */
 /**
  * What the snapshot records for a row this device has deleted.
@@ -33,10 +36,14 @@ export function fingerprint(row: SyncRow): string {
 }
 
 function stable(value: unknown): string {
-  if (value === null || typeof value !== 'object') return JSON.stringify(value) ?? 'null'
+  if (value === null || value === undefined) return 'null'
+  if (typeof value !== 'object') return JSON.stringify(value) ?? 'null'
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`
   const entries = Object.entries(value as Record<string, unknown>)
-    .filter(([, v]) => v !== undefined)
+    // A field the app leaves out and a column the database returns as null are
+    // the same absence. Treating them as different is what makes two phones
+    // push the same row at each other for as long as they are both open.
+    .filter(([, v]) => v !== undefined && v !== null)
     .sort(([a], [b]) => a.localeCompare(b))
   return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${stable(v)}`).join(',')}}`
 }
