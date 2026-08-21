@@ -31,6 +31,17 @@ export async function draftFromText(text: string, foods: Food[]): Promise<DraftR
     }
   }
 
+  // A link is not a recipe. The assistant reads what you give it and cannot
+  // open a page, so a pasted URL would come back as a confident invention
+  // built from the words in the address. Better to say so before spending
+  // anything than to hand somebody a plausible recipe nobody wrote.
+  if (/^https?:\/\/\S+$/i.test(text.trim())) {
+    return {
+      ok: false,
+      error: 'That is a link, and the assistant cannot open pages. Open it, copy the ingredients and the method, and paste those instead.',
+    }
+  }
+
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
 
@@ -110,7 +121,14 @@ async function readError(error: unknown): Promise<string> {
 
   const message = (error as Error).message ?? ''
   if (message.includes('Failed to send')) {
-    return 'Could not reach the assistant. Either you are offline, or it is not deployed yet.'
+    // The browser blocked the response rather than reading it. Being offline
+    // does that, and so does a function that is not there: a gateway 404
+    // carries no permission for this site to read it, so it never arrives as a
+    // status at all. The browser already knows which of the two this is.
+    const offline = typeof navigator !== 'undefined' && navigator.onLine === false
+    return offline
+      ? 'You are offline. Your text is still here, try again once you are back.'
+      : 'Could not reach the assistant. It is either not deployed, or deployed on a different project than this site points at.'
   }
   return message || 'The assistant could not be reached.'
 }

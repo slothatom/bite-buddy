@@ -87,6 +87,32 @@ describe('when the assistant cannot help', () => {
   })
 })
 
+describe('what it will not even try', () => {
+  it('refuses a bare link rather than inventing a recipe from the address', async () => {
+    const result = await draftFromText(
+      'https://www.delish.com/cooking/recipe-ideas/a46330/skillet-sicilian-chicken-recipe/',
+      [],
+    )
+
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.error).toMatch(/cannot open pages/i)
+    // The point of catching it here is that nothing is spent finding out.
+    expect(invoke).not.toHaveBeenCalled()
+  })
+
+  it('still reads a recipe that merely mentions where it came from', async () => {
+    invoke.mockResolvedValue({ data: { draft: { name: 'Sicilian Chicken' } }, error: null })
+
+    const result = await draftFromText(
+      'From https://example.com/chicken\n200 g chicken thigh\n1 tin tomatoes\nFry, simmer.',
+      [],
+    )
+
+    expect(result.ok).toBe(true)
+    expect(invoke).toHaveBeenCalled()
+  })
+})
+
 describe('when it works', () => {
   it('passes the draft back, and sends ids and names only', async () => {
     invoke.mockResolvedValue({
