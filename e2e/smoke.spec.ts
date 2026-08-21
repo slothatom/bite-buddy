@@ -1355,6 +1355,44 @@ test.describe('a laptop is not a large phone', () => {
   })
 })
 
+test.describe('a recipe of your own, with your own notes on it', () => {
+  test('notes, a link and a difficulty survive being saved and reopened', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /New recipe/ }).first().click()
+
+    await page.getByLabel('Recipe name').fill('Sunday lasagne')
+    await page.getByRole('button', { name: 'A project' }).click()
+    await page.getByLabel('Notes').fill('Oli likes it with more béchamel.')
+    await page.getByLabel('Where it came from').fill('bbcgoodfood.com/recipes/lasagne')
+    await page.getByRole('button', { name: 'Add recipe' }).click()
+
+    await page.getByText('Sunday lasagne').first().click()
+
+    await expect(page.getByText('Oli likes it with more béchamel.')).toBeVisible()
+    await expect(page.getByRole('link', { name: /bbcgoodfood.com/ })).toBeVisible()
+    await expect(page.getByText('A project')).toBeVisible()
+  })
+
+  test('a link that is not a link is refused rather than rendered', async ({ page }) => {
+    // A recipe is data, and data that becomes an href runs on this page with
+    // this session. Only http and https ever get that far.
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /New recipe/ }).first().click()
+
+    await page.getByLabel('Recipe name').fill('Suspicious pie')
+    await page.getByLabel('Where it came from').fill('javascript:alert(1)')
+    await expect(page.getByText(/not a web address/)).toBeVisible()
+
+    await page.getByRole('button', { name: 'Add recipe' }).click()
+    await page.getByText('Suspicious pie').first().click()
+
+    // The property that matters, rather than a count of links: nothing on the
+    // page points at a script, and the recipe shows no outward link at all.
+    await expect(page.locator('a[href^="javascript"]')).toHaveCount(0)
+    await expect(page.locator('a[target="_blank"]')).toHaveCount(0)
+  })
+})
+
 test.describe('what you enter is still there tomorrow', () => {
   /**
    * The check that nothing else makes.

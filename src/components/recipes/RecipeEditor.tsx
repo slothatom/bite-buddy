@@ -2,7 +2,11 @@ import { useMemo, useState, type ReactNode } from 'react'
 import {
   Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download, ClipboardPaste, Sparkles,
 } from 'lucide-react'
-import type { DishCategory, RecipeComponent, PortionUnit, QuickFilter, Recipe, RecipeTag } from '../../types'
+import type {
+  Difficulty, DishCategory, RecipeComponent, PortionUnit, QuickFilter, Recipe, RecipeTag,
+} from '../../types'
+import { DIFFICULTY_LABELS } from '../../types'
+import { safeUrl } from '../../lib/links'
 import { useRecipeStore, isBuiltIn } from '../../store/useRecipeStore'
 import { useFoods, useFoodStore } from '../../store/useFoodStore'
 import { useIngredientSearch, type IngredientSearch } from '../../store/useIngredientSearch'
@@ -122,6 +126,11 @@ export default function RecipeEditor({
       },
       servings: Math.max(1, Math.round(draft.servings) || 1),
       steps: draft.steps.filter((s) => s.instruction.trim()),
+      description: draft.description?.trim() || undefined,
+      // Stored only if it is a link this app would actually follow, so a bad
+      // one is refused at the point of typing rather than kept and skipped
+      // silently at the point of showing.
+      sourceUrl: safeUrl(draft.sourceUrl)?.href,
     }
 
     if (isNew) addRecipe(cleaned)
@@ -291,6 +300,47 @@ export default function RecipeEditor({
             <button className="btn-secondary mt-2" onClick={() => setPicking(true)}>
               <Plus size={15} /> Add ingredient
             </button>
+          </Field>
+
+          {/* ─── Yours to say ───────────────────────────────────────────── */}
+          <Field label="How much of an evening is it?">
+            <div className="flex flex-wrap gap-1.5">
+              {(Object.keys(DIFFICULTY_LABELS) as Difficulty[]).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => patch({ difficulty: draft.difficulty === d ? undefined : d })}
+                  aria-pressed={draft.difficulty === d}
+                  className={draft.difficulty === d ? 'chip-on' : 'chip-off'}
+                >
+                  {DIFFICULTY_LABELS[d]}
+                </button>
+              ))}
+            </div>
+          </Field>
+
+          <Field label="Notes">
+            <textarea
+              className="input min-h-20 resize-y"
+              placeholder="What to watch, what you changed, who liked it"
+              aria-label="Notes"
+              value={draft.description ?? ''}
+              onChange={(e) => patch({ description: e.target.value })}
+            />
+          </Field>
+
+          <Field label="Where it came from">
+            <input
+              className="input"
+              placeholder="bbcgoodfood.com/recipes/..."
+              aria-label="Where it came from"
+              value={draft.sourceUrl ?? ''}
+              onChange={(e) => patch({ sourceUrl: e.target.value })}
+            />
+            {draft.sourceUrl && !safeUrl(draft.sourceUrl) && (
+              <p className="text-xs text-coral-700 mt-1">
+                That is not a web address this app will link to. Only http and https.
+              </p>
+            )}
           </Field>
 
           {/* ─── How to make it ─────────────────────────────────────────── */}
