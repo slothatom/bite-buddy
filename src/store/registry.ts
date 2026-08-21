@@ -15,6 +15,7 @@ import { useFoodStore } from './useFoodStore'
 import { useBodyStore } from './useBodyStore'
 import { useCookStore } from './useCookStore'
 import { useActivityStore } from './useActivityStore'
+import { usePortionStore } from './usePortionStore'
 
 export interface PersistedStore {
   /** The store's persist key, also its key in a backup file and in the database. */
@@ -56,7 +57,7 @@ function persisted<T extends object>(store: {
 export const STORES: PersistedStore[] = [
   persisted(useMealPlanStore), persisted(useUserStore), persisted(useRecipeStore),
   persisted(useFoodStore), persisted(useBodyStore), persisted(useCookStore),
-  persisted(useActivityStore),
+  persisted(useActivityStore), persisted(usePortionStore),
 ]
 
 export type StoreKey = string

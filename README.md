@@ -236,6 +236,21 @@ session holds a date, a time and the dishes it covers, with a weigh-out derived 
 recipe's components, nested recipes resolved and duplicates merged, because the dietician
 wrote portions rather than instructions. Both people get an email before a session starts.
 
+Ticking a session off asks what came out of the pan, because that is the one moment
+anybody knows. Those portions go in the fridge or the freezer and are offered first the
+next time a meal slot needs filling, which is the entire point of cooking in advance and
+the thing the app used to make harder: a batch had to be typed in on each day it covered,
+and the shopping list bought its ingredients again every time.
+
+Leftovers are the same mechanism with a different label. A recipe when it was one, free
+text when it was not, because half a lasagne somebody improvised is a real thing in a real
+fridge.
+
+None of it is an inventory. Nobody weighs what they took out of the tub, so the count is a
+note to yourselves: always editable, allowed to be wrong, and never the reason something
+refuses to work. A planned portion comes off the count, unplanning it puts it back, and a
+portion already eaten stays on record so the day it fed still says what it was.
+
 ---
 
 ## Targets

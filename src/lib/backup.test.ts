@@ -21,6 +21,7 @@ describe('createBackup', () => {
       'bite-buddy-cook',
       'bite-buddy-foods-v2',
       'bite-buddy-mealplan-v2',
+      'bite-buddy-portions',
       'bite-buddy-recipes-v2',
       'bite-buddy-user-v2',
     ])
@@ -118,7 +119,7 @@ describe('restoreBackup', () => {
     expect(result.ok).toBe(true)
     if (result.ok) {
       expect(result.skipped).toEqual(['bite-buddy-from-the-future'])
-      expect(result.restored).toHaveLength(7)
+      expect(result.restored).toHaveLength(8)
     }
   })
 })

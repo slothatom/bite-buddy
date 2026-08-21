@@ -210,7 +210,7 @@ check('running it twice changes nothing',
 
 const TABLES = [
   'plan_meals', 'grocery_items', 'recipes', 'foods', 'weights', 'measurements',
-  'workouts', 'steps', 'sleep', 'cook_sessions', 'settings',
+  'workouts', 'steps', 'sleep', 'portions', 'cook_sessions', 'settings',
 ]
 
 for (const table of TABLES) {

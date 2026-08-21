@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download } from 'lucide-react'
-import type { Component, DishCategory, PortionUnit, QuickFilter, Recipe, RecipeTag } from '../../types'
+import type { DishCategory, RecipeComponent, PortionUnit, QuickFilter, Recipe, RecipeTag } from '../../types'
 import { useRecipeStore, isBuiltIn } from '../../store/useRecipeStore'
 import { useFoods, useFoodStore } from '../../store/useFoodStore'
 import { useIngredientSearch, type IngredientSearch } from '../../store/useIngredientSearch'
@@ -377,8 +377,8 @@ export default function RecipeEditor({
 function ComponentRow({
   component, onChange, onRemove,
 }: {
-  component: Component
-  onChange: (next: Component) => void
+  component: RecipeComponent
+  onChange: (next: RecipeComponent) => void
   onRemove: () => void
 }) {
   const ctx = useNutritionContext()
@@ -475,7 +475,7 @@ function IngredientPicker({
 }: {
   excludeRecipeId: string
   onClose: () => void
-  onAdd: (component: Component) => void
+  onAdd: (component: RecipeComponent) => void
 }) {
   const [query, setQuery] = useState('')
   const ctx = useNutritionContext()

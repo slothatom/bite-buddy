@@ -3,6 +3,7 @@ import { buildContext, type NutritionContext } from '../lib/nutrition'
 import { buildFoodIndex, type FoodIndex } from '../lib/foodSearch'
 import { useFoods, useFoodStore, useResolvableFoods } from './useFoodStore'
 import { useResolvableRecipes, useRecipeStore } from './useRecipeStore'
+import { useAllPortions } from './usePortionStore'
 
 /**
  * The lookup tables every nutrition calculation needs.
@@ -24,10 +25,13 @@ export function useNutritionContext(): NutritionContext {
   // Same for foods: a duplicate you folded away is still named by every recipe
   // and every snack line written before you merged it.
   const foodsMergedInto = useFoodStore((s) => s.mergedInto)
+  // Every portion, including the empty ones: a day you planned from the fridge
+  // names a portion by id, and an eaten tub must still say what that meal was.
+  const portions = useAllPortions()
 
   return useMemo(
-    () => buildContext(foods, recipes, mergedInto, foodsMergedInto),
-    [foods, recipes, mergedInto, foodsMergedInto],
+    () => buildContext(foods, recipes, mergedInto, foodsMergedInto, portions),
+    [foods, recipes, mergedInto, foodsMergedInto, portions],
   )
 }
 

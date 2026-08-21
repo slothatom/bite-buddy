@@ -372,6 +372,12 @@ export const useMealPlanStore = create<MealPlanStore>()(
                     fromRecipeIds: fromRecipe ? [fromRecipe] : [],
                   })
                 }
+              } else if (c.kind === 'portion') {
+                // Already cooked and already in the fridge. Buying its
+                // ingredients again is the exact thing cooking in advance was
+                // meant to avoid, and it is why a portion is its own kind of
+                // entry rather than a recipe with a note on it.
+                continue
               } else {
                 const recipe = ctx.recipes.get(c.recipeId)
                 if (!recipe) continue

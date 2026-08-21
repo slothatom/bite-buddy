@@ -1,5 +1,5 @@
 import type {
-  Component, DayPlan, Food, Macros, MicroKey, Micros, Nutrients, PlannedMeal, Recipe,
+  Component, DayPlan, Food, Macros, MicroKey, Micros, Nutrients, PlannedMeal, Portion, Recipe,
 } from '../types'
 import { MICRO_KEYS } from '../types'
 
@@ -15,6 +15,14 @@ import { MICRO_KEYS } from '../types'
 export interface NutritionContext {
   foods: Map<string, Food>
   recipes: Map<string, Recipe>
+  /**
+   * What is in the fridge and the freezer, so a planned portion can be costed.
+   *
+   * Optional because most callers have no opinion about portions: the recipe
+   * editor, the classifier and the import scripts all deal in ingredients, and
+   * a tub of chilli is not one.
+   */
+  portions?: Map<string, Portion>
 }
 
 /**
@@ -28,6 +36,7 @@ export function buildContext(
   recipes: Recipe[],
   aliases: Record<string, string> = {},
   foodAliases: Record<string, string> = {},
+  portions: Portion[] = [],
 ): NutritionContext {
   const byId = new Map(recipes.map((r) => [r.id, r]))
   for (const [from, to] of Object.entries(aliases)) {
@@ -41,7 +50,7 @@ export function buildContext(
     if (target && !foodsById.has(from)) foodsById.set(from, target)
   }
 
-  return { foods: foodsById, recipes: byId }
+  return { foods: foodsById, recipes: byId, portions: new Map(portions.map((p) => [p.id, p])) }
 }
 
 const MACRO_KEYS = ['calories', 'protein', 'carbs', 'fat'] as const
@@ -114,6 +123,19 @@ export function componentNutrients(
     const food = ctx.foods.get(component.foodId)
     if (!food) return emptyNutrients()
     return scaleNutrients(food.per100g, component.grams / 100)
+  }
+
+  // A portion is a recipe that has already been cooked, so it costs whatever
+  // that recipe costs. One that is not a recipe, half a lasagne somebody made
+  // up, has no numbers and is left as nothing rather than guessed at.
+  if (component.kind === 'portion') {
+    const portion = ctx.portions?.get(component.portionId)
+    if (!portion?.recipeId) return emptyNutrients()
+    return componentNutrients(
+      { kind: 'recipe', recipeId: portion.recipeId, servings: component.servings },
+      ctx,
+      visiting,
+    )
   }
 
   if (visiting.has(component.recipeId)) return emptyNutrients()

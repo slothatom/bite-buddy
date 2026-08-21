@@ -200,7 +200,7 @@ describe('what gets synced at all', () => {
     expect(tables).toEqual(expect.arrayContaining([
       'plan_meals', 'grocery_items', 'recipes', 'foods',
       'weights', 'measurements', 'workouts', 'steps', 'sleep',
-      'cook_sessions', 'settings',
+      'portions', 'cook_sessions', 'settings',
     ]))
   })
 })

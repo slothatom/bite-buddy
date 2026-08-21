@@ -1098,6 +1098,47 @@ test.describe('rearranging the week', () => {
   })
 })
 
+test.describe('cooking once and eating twice', () => {
+  test('a cook session fills the fridge, and the fridge fills a meal slot', async ({ page }) => {
+    await goto(page, '/schedule')
+
+    // Nothing cooked yet, so the app says so rather than showing an empty list.
+    await expect(page.getByText('Nothing cooked and waiting')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Session' }).click()
+    await page.getByPlaceholder('Search your recipes').fill('soup')
+    await page.locator('label').filter({ hasText: /soup/i }).first().click()
+    await page.getByRole('button', { name: 'Save' }).click()
+
+    // Ticking it off asks what came out of the pan.
+    await page.getByRole('button', { name: 'Mark as done' }).first().click()
+    await expect(page.getByText('What came out?')).toBeVisible()
+    await page.getByRole('button', { name: 'Into the fridge' }).click()
+
+    await expect(page.getByText('In the fridge')).toBeVisible()
+
+    // And it is offered first the next time a meal needs filling in.
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: /Pop something in/ }).first().click()
+    await expect(page.getByRole('button', { name: /^fridge/ })).toBeVisible()
+    await page.locator('button').filter({ hasText: /portions? left/ }).first().click()
+
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+    await expect(page.getByText('fridge').first()).toBeVisible()
+  })
+
+  test('leftovers can be written down by hand', async ({ page }) => {
+    await goto(page, '/schedule')
+    await page.getByRole('button', { name: 'Leftovers' }).click()
+
+    await page.getByLabel('Or just say what it is').fill('Half a lasagne')
+    await page.getByRole('button', { name: 'Keep it' }).click()
+
+    await expect(page.getByText('Half a lasagne')).toBeVisible()
+    await expect(page.getByText(/cooked today/)).toBeVisible()
+  })
+})
+
 test.describe('what you enter is still there tomorrow', () => {
   /**
    * The check that nothing else makes.
