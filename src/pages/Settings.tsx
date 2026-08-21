@@ -23,6 +23,7 @@ import { SectionHeading } from '../components/ui'
 import { copyToClipboard } from '../lib/clipboard'
 import { PlanArchive } from '../components/settings/PlanArchive'
 import { useAuthStore } from '../store/useAuth'
+import { useSyncStatus } from '../store/useSync'
 import { isConfigured } from '../lib/supabase'
 
 const WEEKDAYS: { value: WeekStart; label: string }[] = [
@@ -304,6 +305,8 @@ function SettingsPanels() {
 
         {isConfigured && session && <AccountPanel />}
 
+        {isConfigured && session && <SyncPanel />}
+
         <VersionPanel />
     </div>
   )
@@ -483,6 +486,61 @@ function AccountPanel() {
         </button>
       </div>
     </section>
+  )
+}
+
+/**
+ * Whether the shared copy is actually receiving anything.
+ *
+ * Saving is two separate things: writing to this device, which the banner at
+ * the top reports when it fails, and reaching the copy the other person reads.
+ * The second one can be refused indefinitely by a database policy while the app
+ * carries on looking perfectly healthy, and the only honest way to tell is to
+ * put the state and the server's own words on a screen you can go and look at.
+ */
+function SyncPanel() {
+  const { state, at, unsaved, lastError, schemaMismatch } = useSyncStatus()
+
+  const summary =
+    state === 'live' && !unsaved ? 'Everything on this device has reached the shared copy.'
+    : state === 'connecting' ? 'Connecting.'
+    : unsaved ? `${unsaved} ${unsaved === 1 ? 'store has' : 'stores have'} changes waiting to go up.`
+    : state === 'error' ? 'The last attempt was turned down.'
+    : 'Not syncing. This device is working on its own.'
+
+  return (
+    <section>
+      <SectionHeading>Sharing</SectionHeading>
+      <div className="card p-4 space-y-3">
+        <p className="text-sm text-ink-700">{summary}</p>
+
+        <dl className="text-xs space-y-1.5">
+          <Row label="State" value={state} />
+          <Row label="Last agreed" value={at ? at.toLocaleTimeString('en-GB') : 'not yet'} />
+          <Row label="Waiting" value={String(unsaved)} />
+          {schemaMismatch && <Row label="Versions" value="the other device is on a different build" />}
+          {lastError && <Row label="Server said" value={lastError} />}
+        </dl>
+
+        {lastError ? (
+          <p className="text-xs text-ink-500">
+            Whatever this says is the reason, and it is worth reading out to whoever can change it.
+            A message about a policy or a permission means the database is refusing this account
+            rather than anything being wrong with what you typed. Nothing has been lost: it is all
+            still on this device, and it keeps trying.
+          </p>
+        ) : null}
+      </div>
+    </section>
+  )
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex gap-3">
+      <dt className="w-24 shrink-0 font-bold uppercase tracking-wide text-ink-500">{label}</dt>
+      <dd className="flex-1 min-w-0 font-mono text-ink-900 break-words">{value}</dd>
+    </div>
   )
 }
 
