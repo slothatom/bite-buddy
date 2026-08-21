@@ -2,11 +2,13 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import type {
-  Component, DayPlan, GroceryItem, MealSlot, MedCategory, PlannedMeal, SourcePlan, WeekStart,
+  Component, DayPlan, GroceryItem, MealSlot, MedCategory, PantryItem, PlannedMeal, SourcePlan,
+  WeekStart,
 } from '../types'
 import { parseAmount } from '../lib/grocery'
 import { DEFAULT_WEEK_START } from '../types'
 import type { NutritionContext } from '../lib/nutrition'
+import { stillNeeded } from '../lib/pantry'
 
 /**
  * Returns the seven dates of the week containing `reference`.
@@ -127,6 +129,14 @@ export interface GroceryOptions {
   dates?: string[]
   /** Only these recipes, for shopping for one batch cook. */
   recipeIds?: string[]
+  /**
+   * What is already in the cupboard, so the list stops asking for it.
+   *
+   * Left out, the list is what the plan needs. Given, it is what the plan needs
+   * and you do not have, which is the difference between a list you read and a
+   * list of forty lines you read past.
+   */
+  pantry?: Map<string, PantryItem>
 }
 
 export interface MealPlanExport {
@@ -403,9 +413,16 @@ export const useMealPlanStore = create<MealPlanStore>()(
           const ticked = new Set(groceryItems.filter((i) => i.checked).map((i) => i.id))
           const mine = groceryItems.filter((i) => i.manual)
 
+          // What the cupboard already covers comes off the list entirely rather
+          // than appearing ticked: a line you have to read and dismiss is worse
+          // than no line, and the cupboard is the reason it is not needed.
+          const needed = [...items.values()]
+            .map((i) => ({ ...i, grams: stillNeeded(i.grams, opts?.pantry?.get(i.foodId)) }))
+            .filter((i) => i.grams > 0)
+
           set({
             groceryItems: [
-              ...[...items.values()].map((i) => ({
+              ...needed.map((i) => ({
                 ...i, grams: Math.round(i.grams), checked: ticked.has(i.id),
               })),
               ...mine,

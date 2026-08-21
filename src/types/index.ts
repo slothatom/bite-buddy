@@ -336,6 +336,41 @@ export interface Portion {
   sessionId?: string
 }
 
+// ─── What is already in the cupboard ──────────────────────────────────────────
+
+/**
+ * Something you have, so the shopping list stops asking for it.
+ *
+ * Deliberately thin. A full inventory would need a quantity for everything, a
+ * unit for everything, and updating after every meal, and the first time it was
+ * wrong about how much rice was left it would be worse than nothing. So the
+ * only thing this really asserts is "we have this", and everything beyond that
+ * is optional.
+ *
+ * `grams` is the one exception, and it earns its place: 200 g of the 500 g of
+ * lentils a week needs is a real answer, and the difference between buying and
+ * not buying is worth the field. Left out, it means "enough", which is what
+ * anybody means when they say they have olive oil.
+ */
+export interface PantryItem {
+  foodId: string
+  /**
+   * How much, when you happen to know. Missing means enough.
+   */
+  grams?: number
+  /**
+   * Something you always have, so it never appears on a list at all.
+   *
+   * Salt, oil, pepper, flour. Without this a shopping list for a week of real
+   * cooking is thirty lines of things already in the cupboard, and a list you
+   * have to read past is a list you stop reading.
+   */
+  staple?: boolean
+  /** A date you decided. Nothing enforces it, and nothing throws food away. */
+  useBy?: string
+  updatedAt: string
+}
+
 // ─── Source plan archive ──────────────────────────────────────────────────────
 
 export type PlanLanguage = 'ro' | 'hu'

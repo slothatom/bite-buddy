@@ -276,6 +276,21 @@ create table if not exists public.portions (
 call public.make_syncable('portions');
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- The cupboard
+--
+-- Keyed by the food, since there is only ever one entry per food and both
+-- phones then agree about the same jar without reconciling two ids for it.
+-- ─────────────────────────────────────────────────────────────────────────────
+create table if not exists public.pantry (
+  id         text primary key,
+  data       jsonb,
+  updated_at timestamptz not null default now(),
+  deleted_at timestamptz,
+  updated_by uuid references auth.users on delete set null
+);
+call public.make_syncable('pantry');
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- Cooking sessions
 -- ─────────────────────────────────────────────────────────────────────────────
 create table if not exists public.cook_sessions (
@@ -452,7 +467,7 @@ declare
 begin
   foreach t in array array[
     'plan_meals', 'grocery_items', 'recipes', 'foods', 'weights', 'measurements',
-    'workouts', 'steps', 'sleep', 'portions', 'cook_sessions', 'settings'
+    'workouts', 'steps', 'sleep', 'portions', 'pantry', 'cook_sessions', 'settings'
   ] loop
     foreach c in array array['data', 'day', 'slot'] loop
       if exists (

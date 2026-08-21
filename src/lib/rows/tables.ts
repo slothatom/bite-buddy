@@ -1,6 +1,6 @@
 import type {
-  BodyMeasurement, CookSession, DayPlan, Food, GroceryItem, PlannedMeal, Portion, Recipe,
-  SleepEntry, StepEntry, UserProfile, WeightEntry,
+  BodyMeasurement, CookSession, DayPlan, Food, GroceryItem, PantryItem, PlannedMeal, Portion,
+  Recipe, SleepEntry, StepEntry, UserProfile, WeightEntry,
 } from '../../types'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
 import { useRecipeStore } from '../../store/useRecipeStore'
@@ -10,6 +10,7 @@ import { useCookStore } from '../../store/useCookStore'
 import { useActivityStore } from '../../store/useActivityStore'
 import { useUserStore } from '../../store/useUserStore'
 import { usePortionStore } from '../../store/usePortionStore'
+import { usePantryStore } from '../../store/usePantryStore'
 import type { RowTable, SyncRow } from './types'
 
 /**
@@ -195,6 +196,21 @@ const portions = listTable<Portion>(
   (p) => ({ day: p.madeOn }),
 )
 
+/**
+ * The cupboard, keyed by the food rather than by a row id of its own.
+ *
+ * There is only ever one entry per food, so the food's id is the natural key
+ * and using it means both phones agree about the same jar of olives without
+ * anything having to reconcile two ids for it.
+ */
+const pantry: RowTable = {
+  table: 'pantry',
+  read: () => usePantryStore.getState().items.map((i) => ({ id: i.foodId, data: i })),
+  apply: (rows) => usePantryStore.setState({
+    items: rows.map((r) => r.data as PantryItem).filter(Boolean),
+  }),
+}
+
 const cookSessions = listTable<CookSession>(
   'cook_sessions',
   () => useCookStore.getState().sessions,
@@ -223,5 +239,5 @@ const settings: RowTable = {
 export const ROW_TABLES: RowTable[] = [
   planMeals, groceryItems, recipes, foods,
   weights, measurements, workouts, steps, sleep,
-  portions, cookSessions, settings,
+  portions, pantry, cookSessions, settings,
 ]

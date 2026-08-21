@@ -1139,6 +1139,50 @@ test.describe('cooking once and eating twice', () => {
   })
 })
 
+test.describe('the cupboard', () => {
+  test('what you already have comes off the shopping list', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    await goto(page, '/grocery')
+    await page.getByRole('button', { name: /Build list/ }).click()
+
+    const lines = page.locator('.card input[type="checkbox"]')
+    const before = await lines.count()
+    expect(before, 'nothing on the list to test with').toBeGreaterThan(2)
+
+    // Say you have the first thing, which puts it in the cupboard rather than
+    // merely off the list: the difference shows on the next rebuild.
+    const first = page.locator('.card button.text-left').first()
+    const name = ((await first.textContent()) ?? '').trim()
+    await first.click()
+    await page.getByRole('button', { name: /We already have/ }).click()
+
+    await expect(page.locator('.card button.text-left').filter({ hasText: name })).toHaveCount(0)
+
+    await page.getByRole('button', { name: /Rebuild/ }).click()
+    await expect(
+      page.locator('.card button.text-left').filter({ hasText: name }),
+      'the list asked for something the cupboard already has',
+    ).toHaveCount(0)
+
+    // And it is listed as something you have.
+    await page.getByRole('button', { name: /^Cupboard/ }).click()
+    await expect(page.getByText(name, { exact: false }).first()).toBeVisible()
+  })
+
+  test('a staple never appears again', async ({ page }) => {
+    await goto(page, '/grocery')
+    await page.getByRole('button', { name: /^Cupboard/ }).click()
+
+    await page.getByPlaceholder('Search your foods').fill('olive oil')
+    await page.locator('button').filter({ hasText: /olive oil/i }).first().click()
+
+    await page.getByRole('button', { name: /Always have/ }).first().click()
+    await expect(page.getByRole('button', { name: /Always have/ }).first()).toHaveAttribute('aria-pressed', 'true')
+  })
+})
+
 test.describe('what you enter is still there tomorrow', () => {
   /**
    * The check that nothing else makes.

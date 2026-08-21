@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react'
-import { RefreshCw, Trash2, ShoppingBasket, Plus, X, Check } from 'lucide-react'
-import type { GroceryItem, MedCategory } from '../types'
+import { RefreshCw, Trash2, ShoppingBasket, Plus, X, Check, Search } from 'lucide-react'
+import type { GroceryItem, MedCategory, PantryItem } from '../types'
 import { useMealPlanStore, getRangeDates } from '../store/useMealPlanStore'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { EmptyState, SectionHeading } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS } from '../lib/categories'
 import { formatGrams } from '../lib/grocery'
+import { usePantry, usePantryItems, usePantryStore } from '../store/usePantryStore'
+import { useFoods } from '../store/useFoodStore'
 
 /**
  * The shopping list.
@@ -28,6 +30,9 @@ export default function GroceryList() {
   const { profile } = useUserStore()
   const ctx = useNutritionContext()
   const [justBuilt, setJustBuilt] = useState(false)
+  const [tab, setTab] = useState<'list' | 'cupboard'>('list')
+  const pantry = usePantry()
+  const { keep } = usePantryStore()
 
   /** A fortnight of choices: this week and the next, which is as far as a shop reaches. */
   const offered = useMemo(
@@ -61,7 +66,7 @@ export default function GroceryList() {
   const plannedMeals = days.reduce((n, d) => n + (mealsByDate.get(d) ?? 0), 0)
 
   function build() {
-    generateGroceryList(ctx, { dates: days })
+    generateGroceryList(ctx, { dates: days, pantry })
     setJustBuilt(true)
     setTimeout(() => setJustBuilt(false), 1500)
   }
@@ -84,6 +89,21 @@ export default function GroceryList() {
           </button>
         </header>
 
+        <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
+          {(['list', 'cupboard'] as const).map((t) => (
+            <button key={t} onClick={() => setTab(t)} className={`capitalize ${tab === t ? 'tab-on' : 'tab-off'}`}>
+              {t === 'list' ? 'To buy' : 'Cupboard'}
+              {t === 'cupboard' && pantry.size > 0 && (
+                <span className="ml-1.5 text-xs opacity-60 font-mono">{pantry.size}</span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {tab === 'cupboard' && <Cupboard />}
+
+        {tab === 'list' && (
+          <>
         <DayPicker
           dates={offered}
           picked={days}
@@ -133,6 +153,13 @@ export default function GroceryList() {
                     onToggle={() => toggleGroceryItem(item.id)}
                     onSave={(updates) => updateGroceryItem(item.id, updates)}
                     onRemove={() => removeGroceryItem(item.id)}
+                    onHaveIt={item.foodId ? () => {
+                      // Into the cupboard rather than merely off the list, so
+                      // the next list does not ask again. Removing it here would
+                      // last until the next rebuild and no longer.
+                      keep({ foodId: item.foodId })
+                      removeGroceryItem(item.id)
+                    } : undefined}
                   />
                 ))}
               </div>
@@ -148,7 +175,170 @@ export default function GroceryList() {
             Weights are raw, the way your plans are written: grains and meat before cooking.
           </p>
         )}
+          </>
+        )}
       </div>
+    </div>
+  )
+}
+
+/**
+ * What is already in the cupboard.
+ *
+ * Deliberately on this screen rather than one of its own, because it only means
+ * anything next to the list it shortens. Two kinds of entry, and the difference
+ * matters: something you have now, and something you always have.
+ *
+ * A staple never appears on a list again. That is the setting worth having:
+ * without it a week of real cooking produces forty lines, thirty of which are
+ * salt, oil and flour, and a list you read past is a list you stop reading.
+ */
+function Cupboard() {
+  const foods = useFoods()
+  const items = usePantryItems()
+  const { keep, drop, toggleStaple } = usePantryStore()
+  const [query, setQuery] = useState('')
+
+  const byId = useMemo(() => new Map(foods.map((f) => [f.id, f])), [foods])
+
+  const matches = useMemo(() => {
+    const n = query.trim().toLowerCase()
+    if (!n) return []
+    const have = new Set(items.map((i) => i.foodId))
+    return foods.filter((f) => !have.has(f.id) && f.names.en.toLowerCase().includes(n)).slice(0, 8)
+  }, [query, foods, items])
+
+  const staples = items.filter((i) => i.staple)
+  const rest = items.filter((i) => !i.staple)
+
+  return (
+    <div className="space-y-4">
+      <div className="card p-4 space-y-3">
+        <div>
+          <p className="text-sm font-semibold text-ink-900">Add something you have</p>
+          <p className="text-xs text-ink-500">
+            Anything in here comes off the shopping list. Say how much only if you want to:
+            leaving it blank means enough.
+          </p>
+        </div>
+
+        <div className="relative">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
+          <input
+            className="input pl-9"
+            placeholder="Search your foods"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
+
+        {matches.map((f) => (
+          <button
+            key={f.id}
+            onClick={() => { keep({ foodId: f.id }); setQuery('') }}
+            className="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-cream-50 text-left"
+          >
+            <Plus size={14} className="text-ink-500 shrink-0" />
+            <span className="flex-1 min-w-0 text-sm text-ink-900 truncate">{f.names.en}</span>
+          </button>
+        ))}
+      </div>
+
+      {items.length === 0 ? (
+        <EmptyState title="Nothing in the cupboard yet">
+          Add the things you always have, salt, oil, flour, and they stop appearing on every
+          list. Anything else you add comes off the next list you build.
+        </EmptyState>
+      ) : (
+        <>
+          {staples.length > 0 && (
+            <section>
+              <SectionHeading>Always have</SectionHeading>
+              <div className="card divide-y divide-border-100">
+                {staples.map((i) => (
+                  <PantryRow
+                    key={i.foodId}
+                    name={byId.get(i.foodId)?.names.en ?? i.foodId}
+                    item={i}
+                    onAmount={(grams) => keep({ foodId: i.foodId, grams, staple: i.staple })}
+                    onStaple={() => toggleStaple(i.foodId)}
+                    onDrop={() => drop(i.foodId)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {rest.length > 0 && (
+            <section>
+              <SectionHeading>In right now</SectionHeading>
+              <div className="card divide-y divide-border-100">
+                {rest.map((i) => (
+                  <PantryRow
+                    key={i.foodId}
+                    name={byId.get(i.foodId)?.names.en ?? i.foodId}
+                    item={i}
+                    onAmount={(grams) => keep({ foodId: i.foodId, grams })}
+                    onStaple={() => toggleStaple(i.foodId)}
+                    onDrop={() => drop(i.foodId)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+/**
+ * One thing you have.
+ *
+ * The amount is optional and stays optional: blank means enough, which is what
+ * anybody means when they say they have olive oil. A number is believed and
+ * subtracted, because 200 g of the 500 g a week needs is a real answer.
+ */
+function PantryRow({
+  name, item, onAmount, onStaple, onDrop,
+}: {
+  name: string
+  item: PantryItem
+  onAmount: (grams: number | undefined) => void
+  onStaple: () => void
+  onDrop: () => void
+}) {
+  return (
+    <div className="flex items-center gap-2 p-3">
+      <span className="flex-1 min-w-0 text-sm text-ink-900 truncate">{name}</span>
+
+      <input
+        type="number"
+        min={0}
+        className="input w-24 px-2 text-sm"
+        placeholder="enough"
+        aria-label={`How much ${name}`}
+        value={item.grams ?? ''}
+        onChange={(e) => onAmount(e.target.value === '' ? undefined : Number(e.target.value))}
+      />
+      <span className="text-xs text-ink-500 shrink-0 w-4">{item.grams ? 'g' : ''}</span>
+
+      <button
+        onClick={onStaple}
+        aria-pressed={Boolean(item.staple)}
+        aria-label={`Always have ${name}`}
+        className={item.staple ? 'chip-on shrink-0' : 'chip-off shrink-0'}
+      >
+        Always
+      </button>
+
+      <button
+        className="btn-ghost btn-icon text-ink-300 hover:text-coral-600 shrink-0"
+        onClick={onDrop}
+        aria-label={`Remove ${name} from the cupboard`}
+      >
+        <X size={15} />
+      </button>
     </div>
   )
 }
@@ -211,12 +401,14 @@ function DayPicker({
 
 /** One line, which can be ticked off, corrected or thrown away. */
 function ItemRow({
-  item, onToggle, onSave, onRemove,
+  item, onToggle, onSave, onRemove, onHaveIt,
 }: {
   item: GroceryItem
   onToggle: () => void
   onSave: (updates: { name?: string; amount?: string }) => void
   onRemove: () => void
+  /** Only for lines that came from the plan: a typed-in line names no food. */
+  onHaveIt?: () => void
 }) {
   const shown = item.amount ?? (item.grams ? formatGrams(item.grams) : '')
   const [editing, setEditing] = useState(false)
@@ -241,6 +433,15 @@ function ItemRow({
         >
           <Check size={15} />
         </button>
+        {onHaveIt && (
+          <button
+            className="btn-ghost shrink-0 text-xs"
+            aria-label={`We already have ${item.name}`}
+            onClick={onHaveIt}
+          >
+            Have it
+          </button>
+        )}
         <button
           className="btn-ghost btn-icon shrink-0 text-ink-300 hover:text-coral-600"
           aria-label={`Remove ${item.name}`}

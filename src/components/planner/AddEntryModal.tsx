@@ -12,6 +12,8 @@ import { searchFoods } from '../../lib/foodSearch'
 import { buildFoodIndex } from '../../lib/foodSearch'
 import { useAvailablePortions } from '../../store/usePortionStore'
 import { offerOrder, madeWhen, portionLabel } from '../../lib/portionsUse'
+import { usePantry } from '../../store/usePantryStore'
+import { availability, availabilityLabel } from '../../lib/pantry'
 
 /**
  * Adds a recipe, a weighed food, or something already cooked, to a meal slot.
@@ -39,6 +41,7 @@ export default function AddEntryModal({
   // empty, an empty list is a worse answer than the right list.
   const isSnack = slot === 'snack1' || slot === 'snack2'
   const available = useAvailablePortions()
+  const pantry = usePantry()
   const [tab, setTab] = useState<'fridge' | 'recipes' | 'foods'>(
     available.length ? 'fridge' : isSnack ? 'foods' : 'recipes')
   const [grams, setGrams] = useState<Record<string, number>>({})
@@ -149,7 +152,14 @@ export default function AddEntryModal({
                 <span className="text-xl">{r.emoji}</span>
                 <span className="flex-1 min-w-0">
                   <span className="block text-sm font-semibold text-ink-900 truncate">{r.name.en}</span>
-                  {r.sourceLine ? (
+                  {/* What you have matters more at this moment than what the
+                      dietician wrote, so it takes the line when there is
+                      anything in the cupboard to say. */}
+                  {pantry.size > 0 ? (
+                    <span className="block text-xs text-ink-500 truncate">
+                      {availabilityLabel(availability(r, ctx, pantry)) || r.sourceLine}
+                    </span>
+                  ) : r.sourceLine ? (
                     <span className="block text-xs text-ink-500 truncate">{r.sourceLine}</span>
                   ) : null}
                 </span>
