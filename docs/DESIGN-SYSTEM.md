@@ -57,7 +57,7 @@ The visual balance should be approximately:
 | `paper-0` | `#FFFDF9` | Primary card surface |
 | `ink-900` | `#2D2320` | Main text |
 | `ink-700` | `#514744` | Secondary text |
-| `ink-500` | `#817774` | Muted text |
+| `ink-500` | `#79706D` | Muted text, 4.5:1 on cream |
 | `border-200` | `#E6DED5` | Borders / dividers |
 
 ## Semantic colours
@@ -606,7 +606,7 @@ Food is data and enjoyment, not morality.
 
   --color-ink-900: #2D2320;
   --color-ink-700: #514744;
-  --color-ink-500: #817774;
+  --color-ink-500: #79706D;
   --color-border-200: #E6DED5;
 
   --radius-sm: 0.5rem;

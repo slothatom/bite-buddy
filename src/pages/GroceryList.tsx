@@ -390,7 +390,7 @@ function DayPicker({
               className={`rounded-lg py-2 min-h-14 text-center border transition-colors ${
                 on ? 'bg-bite-500 text-white border-bite-500'
                   : meals ? 'bg-paper border-border-200 text-ink-900 hover:border-bite-300'
-                    : 'bg-cream-50 border-transparent text-ink-300'
+                    : 'bg-cream-50 border-transparent text-ink-500'
               }`}
             >
               <span className={`block text-[11px] font-semibold uppercase ${on ? 'text-bite-100' : 'text-ink-500'}`}>
@@ -469,13 +469,13 @@ function ItemRow({
         className="w-4 h-4 accent-bite-500 shrink-0"
       />
       <button
-        className={`flex-1 min-w-0 text-left text-sm ${item.checked ? 'line-through text-ink-300' : 'text-ink-900'}`}
+        className={`flex-1 min-w-0 text-left text-sm ${item.checked ? 'line-through text-ink-500' : 'text-ink-900'}`}
         onClick={() => { setName(item.name); setAmount(shown); setEditing(true) }}
       >
         {item.name}
       </button>
       <button
-        className={`text-sm font-mono shrink-0 ${item.checked ? 'text-ink-300' : 'text-ink-700'}`}
+        className={`text-sm font-mono shrink-0 ${item.checked ? 'text-ink-500' : 'text-ink-700'}`}
         aria-label={`Edit ${item.name}`}
         onClick={() => { setName(item.name); setAmount(shown); setEditing(true) }}
       >

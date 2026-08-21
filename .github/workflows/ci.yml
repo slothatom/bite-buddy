@@ -43,6 +43,9 @@ jobs:
       - name: House style
         run: npm run text:check
 
+      - name: Colour meets WCAG AA
+        run: npm run check:contrast
+
       - name: Schema and sync agree
         run: npm run db:check
 

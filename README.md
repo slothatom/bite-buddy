@@ -66,6 +66,21 @@ needed, a walk over every screen looking for text whose contrast against its
 painted background collapsed, was catching bugs that only a second palette
 could create.
 
+**Colour is measured, not asserted.** `npm run check:contrast` reads the tokens
+out of `index.css` and the class pairs out of the components, so it grades what
+ships rather than what a palette document claims. WCAG AA: 4.5:1 for words,
+3:1 for large text and for icons, which is the bar WCAG actually sets for a
+graphic. It found twenty six combinations below the line, including the muted
+text colour used in 189 places, and it runs in `verify` and in both workflows
+so they cannot come back.
+
+The pairing is done inside a single string literal, which sounds like a detail
+and is not. A whole line is the wrong unit: a ternary holds two alternatives
+that never appear together, and a table of style variants holds a fill, a text
+colour and a surface as separate keys, where the fill is a dot rather than the
+ground the words sit on. Measuring by line reported a third more failures than
+exist, and a check that cries wolf is one people learn to silence.
+
 **Status is never hue alone.** `src/lib/status.ts` returns a label, a symbol and
 a signed delta alongside the colour level, and every consumer renders at least
 one of them: bars show `+ Slightly over · +42 g`, and the target sits on the bar

@@ -57,6 +57,17 @@ const SURFACES = ['cream-50', 'paper', 'white']
 /** Sizes that count as large text, so 3:1 rather than 4.5:1. */
 const LARGE = /\btext-(xl|2xl|3xl|4xl|5xl|6xl)\b/
 
+/**
+ * An icon is not a word.
+ *
+ * WCAG sets 3:1 for a graphical object you need in order to understand the
+ * screen, and 4.5:1 for body text. Holding a delete cross to the text bar
+ * would push every icon in the app to the colour of the text beside it, which
+ * loses the distinction between what you read and what you press, and buys
+ * nobody any legibility. Icons here are lucide components carrying a size.
+ */
+const GRAPHIC = /aria-hidden|<[A-Z][A-Za-z0-9]*\s[^>]*\bsize=\{|\bbtn-icon\b/
+
 function files(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     const path = join(dir, entry)
@@ -93,8 +104,11 @@ function pairs(palette: Map<string, string>): Pair[] {
   for (const file of files(ROOT)) {
     const source = readFileSync(file, 'utf8')
 
-    source.split('\n').forEach((line, index) => {
+    const lines = source.split('\n')
+
+    lines.forEach((line, index) => {
       const where = `${file}:${index + 1}`
+      const inside = lines.slice(index, index + 4).join('\n')
 
       for (const scope of literals(line)) {
         // Opacity variants are read at full strength. That understates rather
@@ -103,7 +117,7 @@ function pairs(palette: Map<string, string>): Pair[] {
         if (!text.length) continue
         const background = [...scope.matchAll(/\bbg-([a-z]+-\d{2,3}|white|paper)(?:\/\d+)?\b/g)]
           .map((m) => m[1]).filter((b) => palette.has(b))
-        const large = LARGE.test(scope)
+        const large = LARGE.test(scope) || GRAPHIC.test(inside)
 
         for (const fg of text) {
           if (!palette.has(fg)) continue
