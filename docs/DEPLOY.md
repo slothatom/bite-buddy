@@ -116,9 +116,16 @@ The one feature that calls a model. Skip it and everything else works; the
 button says it is not set up.
 
 ```bash
+supabase login                                        # once, opens a browser
+supabase link --project-ref <your-project-ref>        # the id in your Supabase URL
+supabase secrets set ANTHROPIC_API_KEY=...            # from console.anthropic.com
 supabase functions deploy recipe-assistant
-supabase secrets set ANTHROPIC_API_KEY=...      # from console.anthropic.com
 ```
+
+This repository holds no `supabase/config.toml`, so the CLI has nothing to
+deduce the project from: without the link step, or a `--project-ref` on each
+command, it stops and asks. The project ref is the subdomain of your Supabase
+URL, and it is not a secret, it is already in the public bundle.
 
 The key stays on the function. It never reaches a browser and it is not one of
 the repository secrets, because those end up in the deployed bundle, which is

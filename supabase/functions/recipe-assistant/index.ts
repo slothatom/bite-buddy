@@ -18,7 +18,7 @@
  */
 
 import { createClient } from 'jsr:@supabase/supabase-js@2'
-import Anthropic from 'npm:@anthropic-ai/sdk@0.71.0'
+import Anthropic from 'npm:@anthropic-ai/sdk@0.120.0'
 
 const MODEL = 'claude-opus-5'
 
@@ -141,7 +141,11 @@ Deno.serve(async (request) => {
   try {
     const response = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 8_000,
+      // Room to spare rather than room to fit. Thinking is counted in here too,
+      // and a request that runs out mid tool call comes back looking like a
+      // model that said nothing, which is the one failure that reads as a bug.
+      // Nothing is charged for headroom that goes unused.
+      max_tokens: 16_000,
       output_config: { effort: 'medium' },
       system: SYSTEM,
       tools: [{

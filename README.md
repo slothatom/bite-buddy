@@ -409,9 +409,16 @@ comes back as a draft: named, weighed in grams, ingredients matched to foods you
 already have, with a method if the paste had one.
 
 ```bash
+supabase login                                        # once, opens a browser
+supabase link --project-ref <your-project-ref>        # the id in your Supabase URL
+supabase secrets set ANTHROPIC_API_KEY=...            # from console.anthropic.com
 supabase functions deploy recipe-assistant
-supabase secrets set ANTHROPIC_API_KEY=...      # from console.anthropic.com
 ```
+
+This repository holds no `supabase/config.toml`, so the CLI has nothing to
+deduce the project from: without the link step, or a `--project-ref` on each
+command, it stops and asks. The project ref is the subdomain of your Supabase
+URL, and it is not a secret, it is already in the public bundle.
 
 The key lives on the function and never reaches a browser, which is the whole
 reason this is a function at all: the site is public, and a key in the bundle is
