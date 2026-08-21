@@ -74,12 +74,42 @@ async function checkJoining() {
     create publication supabase_realtime;
   `)
 
-  // schema.sql expects Supabase's own auth trigger machinery; everything else
-  // in it is ours and runs as written.
-  await fresh.exec(schema.replace(/create trigger enforce_allowed_email[\s\S]*?;/, ''))
-
+  /**
+   * Run as somebody who does not own `auth.users`.
+   *
+   * This is the situation in a real Supabase project, and it is what broke: a
+   * trigger on that table is refused with "must be owner of relation users",
+   * the SQL editor runs the file as one transaction, and so the refusal
+   * abandoned every statement after it, including the policy that decides
+   * whether anybody can join. The file has to survive that, because the person
+   * running it sees a red message and no way to tell how much of it applied.
+   */
   await fresh.exec(`
     create role authenticated;
+    create role installer;
+    grant create, usage on schema public to installer;
+    grant usage on schema auth to installer;
+    -- Enough to write the schema, and not enough to own auth.users, which is
+    -- the whole point: a foreign key needs references, a backfill needs select,
+    -- and a trigger needs ownership, which a real project does not grant.
+    grant select, references on auth.users to installer;
+    grant execute on function auth.uid() to installer;
+  `)
+  await fresh.exec('set role installer')
+  await fresh.exec(schema)
+  await fresh.exec('reset role')
+
+  const trigger = await fresh.query<{ n: number }>(
+    `select count(*)::int n from pg_trigger where tgname = 'add_member'`)
+  check('the trigger on auth.users was refused, as it is in a real project',
+    trigger.rows[0].n === 0)
+
+  const policy = await fresh.query<{ q: string | null }>(
+    `select qual q from pg_policies where tablename = 'members' and cmd = 'SELECT'`)
+  check('and the file carried on to the policy that comes after it',
+    (policy.rows[0]?.q ?? '').includes('uid'))
+
+  await fresh.exec(`
     grant usage on schema public, auth to authenticated;
     grant all on all tables in schema public to authenticated;
     grant execute on all functions in schema public to authenticated;
@@ -108,15 +138,20 @@ async function checkJoining() {
 
   const member = await fresh.query<{ yes: boolean }>('select public.is_member() as yes')
   check('and is then a member, which every other policy depends on', member.rows[0].yes === true)
-  await fresh.exec('reset role')
 
-  // The database should not need the app's help at all.
-  const SECOND = '44444444-4444-4444-8444-444444444444'
-  await fresh.query('insert into auth.users (id, email) values ($1, $2)', [SECOND, 'second@example.com'])
-  const auto = await fresh.query<{ n: number }>(
-    'select count(*)::int n from public.members where id = $1', [SECOND])
-  check('an account is a member the moment it exists, without the app writing anything',
-    auto.rows[0].n === 1)
+  // The last way in: no policy involved, for when the policies are the problem.
+  await fresh.exec('reset role')
+  await fresh.query('delete from public.members where id = $1', [NEWCOMER])
+  await fresh.exec('set role authenticated')
+  try {
+    await fresh.query('select public.join_household()')
+    const joined = await fresh.query<{ yes: boolean }>('select public.is_member() as yes')
+    check('join_household adds an account that the table itself would refuse',
+      joined.rows[0].yes === true)
+  } catch (e) {
+    check('join_household adds an account that the table itself would refuse', false, (e as Error).message)
+  }
+  await fresh.exec('reset role')
 
   await fresh.close()
 }

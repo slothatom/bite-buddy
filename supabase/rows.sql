@@ -113,10 +113,15 @@ begin
        for each row execute function public.touch_row()', table_name);
 
   -- Realtime, so the other phone sees a change rather than waiting for a pull.
+  -- Adding to a publication needs to own it, and that is not worth abandoning
+  -- the rest of this file over: without it the other screen updates on the next
+  -- pull instead of at once.
   begin
     execute format('alter publication supabase_realtime add table public.%I', table_name);
   exception
     when duplicate_object then null;
+    when insufficient_privilege or undefined_object then
+      raise notice 'Could not add % to the realtime publication (%).', table_name, sqlerrm;
   end;
 end;
 $$;
