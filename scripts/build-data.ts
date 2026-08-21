@@ -7,7 +7,7 @@ import { DISHES, DISH_ALIASES, DISH_BY_WEIGHT } from '../src/data/dishes.js'
 import { buildFoodIndex, resolveFood } from '../src/lib/foodSearch.js'
 import { normaliseTerm } from '../src/lib/units.js'
 import { buildContext, componentsNutrients } from '../src/lib/nutrition.js'
-import type { Component, MealSlot, Recipe, RecipeTag, SourcePlan } from '../src/types/index.js'
+import type { RecipeComponent, MealSlot, Recipe, RecipeTag, SourcePlan } from '../src/types/index.js'
 
 /**
  * Builds the app's plan archive and meal recipes from the dietician's .docx files.
@@ -62,7 +62,7 @@ function defaultGrams(foodId: string): number {
 interface Unresolved { term: string; raw: string; slot: MealSlot; file: string }
 const unresolved: Unresolved[] = []
 
-function toComponents(f: RawFragment, slot: MealSlot, file: string): Component[] {
+function toComponents(f: RawFragment, slot: MealSlot, file: string): RecipeComponent[] {
   if (!f.normalised) return []
 
   const dishId = resolveDish(f.term)
@@ -73,14 +73,14 @@ function toComponents(f: RawFragment, slot: MealSlot, file: string): Component[]
     // scaling by it would shrink the meal to a third of its real size.
     const scalable = DISH_BY_WEIGHT.has(dishId) && f.grams && perServing > 0
     const servings = scalable ? Math.round((f.grams! / perServing) * 100) / 100 : 1
-    const out: Component[] = [{ kind: 'recipe', recipeId: dishId, servings: Math.max(0.1, servings) }]
+    const out: RecipeComponent[] = [{ kind: 'recipe', recipeId: dishId, servings: Math.max(0.1, servings) }]
 
     // The parenthetical sometimes names extras the dish definition lacks -
     // "cartofi cu ou (…, sos: 100 g iaurt, 50 g telemea)". Add only what the
     // dish does not already contain, so nothing is counted twice.
     const already = new Set(
       (dishById.get(dishId)?.components ?? [])
-        .filter((c): c is Extract<Component, { kind: 'food' }> => c.kind === 'food')
+        .filter((c): c is Extract<RecipeComponent, { kind: 'food' }> => c.kind === 'food')
         .map((c) => c.foodId),
     )
     for (const inner of f.innerFragments) {
@@ -108,7 +108,7 @@ const SLOT_TAG: Record<MealSlot, RecipeTag> = {
   breakfast: 'breakfast', snack1: 'snack', lunch: 'lunch', snack2: 'snack', dinner: 'dinner',
 }
 
-function labelFor(c: Component): string {
+function labelFor(c: RecipeComponent): string {
   const raw = c.kind === 'recipe'
     ? dishById.get(c.recipeId)?.name.en ?? 'Dish'
     : foodIndex.all.find((f) => f.id === c.foodId)?.names.en ?? 'Food'
@@ -124,7 +124,7 @@ function labelFor(c: Component): string {
  * above raw ingredients, "Lentils with spinach & wholemeal bread" reads better
  * than "Wholemeal bread with lentils", even when the bread carries more calories.
  */
-function nameMeal(components: Component[]): string {
+function nameMeal(components: RecipeComponent[]): string {
   // Anything already inside a dish in this meal must not also appear in the
   // name: "Apple & cinnamon porridge with apple" reads as a mistake, because
   // it is one.
@@ -182,7 +182,7 @@ function lower(s: string): string {
   return s.charAt(0).toLowerCase() + s.slice(1)
 }
 
-function emojiFor(components: Component[], slot: MealSlot): string {
+function emojiFor(components: RecipeComponent[], slot: MealSlot): string {
   for (const c of components) {
     if (c.kind === 'recipe') {
       const e = dishById.get(c.recipeId)?.emoji

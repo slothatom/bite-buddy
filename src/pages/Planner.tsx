@@ -13,6 +13,8 @@ import { componentsNutrients, dayNutrients, emptyNutrients, addNutrients } from 
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
 import { useUiStore } from '../store/useUiStore'
 import AddEntryModal from '../components/planner/AddEntryModal'
+import { usePortionStore } from '../store/usePortionStore'
+import { portionEntries } from '../lib/portionsUse'
 
 /**
  * The weekly planner.
@@ -36,8 +38,36 @@ export default function Planner() {
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
   const [moving, setMoving] = useState<{ date: string; mealId: string } | null>(null)
   const { quickAdd, clearQuickAdd } = useUiStore()
+  const { takeFrom, returnTo } = usePortionStore()
 
   const byDate = useMemo(() => new Map(plan.map((d) => [d.date, d])), [plan])
+
+  /**
+   * Planning from the fridge takes the portion, and unplanning puts it back.
+   *
+   * Done here rather than inside the store because it crosses two of them, and
+   * because "what is left" is only ever an estimate: the count comes down when
+   * you say you will eat something and goes back up when you change your mind,
+   * which is as close to the truth as an app that cannot see the tub can get.
+   */
+  const addEntryTakingPortions = (date: string, slot: MealSlot, entry: Component) => {
+    if (entry.kind === 'portion') takeFrom(entry.portionId, entry.servings)
+    addEntry(date, slot, entry)
+  }
+
+  const removeMealReturningPortions = (date: string, mealId: string) => {
+    const meal = byDate.get(date)?.meals.find((m) => m.id === mealId)
+    for (const p of portionEntries(meal?.entries ?? [])) returnTo(p.portionId, p.servings)
+    removeMeal(date, mealId)
+  }
+
+  const clearDayReturningPortions = (date: string) => {
+    const day = byDate.get(date)
+    for (const meal of day?.meals ?? []) {
+      for (const p of portionEntries(meal.entries)) returnTo(p.portionId, p.servings)
+    }
+    clearDay(date)
+  }
 
   /**
    * The days on screen. A week, a fortnight, or the calendar month padded out
@@ -176,7 +206,7 @@ export default function Planner() {
               <Copy size={15} /> Copy day to…
             </button>
             {selectedDay.meals.length > 0 && (
-              <button className="btn-ghost text-ink-500 hover:text-coral-600" onClick={() => clearDay(selected)}>
+              <button className="btn-ghost text-ink-500 hover:text-coral-600" onClick={() => clearDayReturningPortions(selected)}>
                 <Trash2 size={15} /> Clear day
               </button>
             )}
@@ -193,7 +223,7 @@ export default function Planner() {
                 slot={slot}
                 day={selectedDay}
                 onAdd={() => setAdding({ date: selected, slot })}
-                onRemove={(mealId) => removeMeal(selected, mealId)}
+                onRemove={(mealId) => removeMealReturningPortions(selected, mealId)}
                 onMove={(mealId) => setMoving({ date: selected, mealId })}
               />
             ))}
@@ -219,7 +249,7 @@ export default function Planner() {
           date={openAdd.date}
           slot={openAdd.slot}
           onClose={closeAdd}
-          onAdd={(entry: Component) => addEntry(openAdd.date, openAdd.slot, entry)}
+          onAdd={(entry: Component) => addEntryTakingPortions(openAdd.date, openAdd.slot, entry)}
         />
       )}
 
@@ -323,13 +353,27 @@ function EntryLine({ entry }: { entry: Component }) {
   // silently dropping it would rewrite it.
   const isDeleted = entry.kind === 'recipe' && deleted.has(entry.recipeId)
 
+  // A portion says where it came from rather than what it is made of: the
+  // useful fact when you are reading a plan is that this one is already cooked
+  // and waiting, not that it is a lentil stew.
+  const portion = entry.kind === 'portion' ? ctx.portions?.get(entry.portionId) : undefined
+  const portionRecipe = portion?.recipeId ? ctx.recipes.get(portion.recipeId) : undefined
+
   const label = entry.kind === 'recipe'
     ? ctx.recipes.get(entry.recipeId)?.name.en ?? 'Unknown recipe'
-    : ctx.foods.get(entry.foodId)?.names.en ?? 'Unknown food'
-  const detail = entry.kind === 'recipe'
-    ? entry.servings === 1 ? '' : `${entry.servings}×`
-    : `${Math.round(entry.grams)} g`
-  const emoji = entry.kind === 'recipe' ? ctx.recipes.get(entry.recipeId)?.emoji ?? '🍽️' : '·'
+    : entry.kind === 'portion'
+      ? portionRecipe?.name.en ?? portion?.label ?? 'From the fridge'
+      : ctx.foods.get(entry.foodId)?.names.en ?? 'Unknown food'
+
+  const detail = entry.kind === 'food'
+    ? `${Math.round(entry.grams)} g`
+    : entry.servings === 1 ? '' : `${entry.servings}×`
+
+  const emoji = entry.kind === 'recipe'
+    ? ctx.recipes.get(entry.recipeId)?.emoji ?? '🍽️'
+    : entry.kind === 'portion'
+      ? (portion?.storage === 'freezer' ? '🧊' : '🥡')
+      : '·'
 
   // The names are long, 46 characters at the median, 77 at the longest, and a
   // phone gives this row about 150px. Truncating turned most of them into
@@ -340,6 +384,11 @@ function EntryLine({ entry }: { entry: Component }) {
       <span className="text-base leading-none shrink-0">{emoji}</span>
       <span data-entry-name className={`flex-1 min-w-0 ${isDeleted ? 'text-ink-500' : 'text-ink-900'}`}>
         {label}
+        {entry.kind === 'portion' && (
+          <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-teal-700">
+            {portion?.storage === 'freezer' ? 'freezer' : 'fridge'}
+          </span>
+        )}
         {isDeleted && (
           <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-ink-500">
             deleted

@@ -10,13 +10,20 @@ import { normaliseTerm } from '../../lib/units'
 import { mealTimesOf } from '../../lib/dishCategories'
 import { searchFoods } from '../../lib/foodSearch'
 import { buildFoodIndex } from '../../lib/foodSearch'
+import { useAvailablePortions } from '../../store/usePortionStore'
+import { offerOrder, madeWhen, portionLabel } from '../../lib/portionsUse'
 
 /**
- * Adds either a recipe or a weighed food to a meal slot.
+ * Adds a recipe, a weighed food, or something already cooked, to a meal slot.
  *
- * Both live in one picker because the plans mix them freely: lunch is usually a
- * recipe, while a snack is two food lines and forcing it through a recipe would
- * mean inventing one.
+ * All three live in one picker because the plans mix them freely: lunch is
+ * usually a recipe, a snack is two food lines and forcing it through a recipe
+ * would mean inventing one, and often the honest answer is that Sunday's stew
+ * is still in the fridge.
+ *
+ * The fridge tab comes first when there is anything in it. That is the whole
+ * argument for cooking in advance: the next meal is already decided, and the
+ * app should say so before offering you 275 things to choose between.
  */
 export default function AddEntryModal({
   date, slot, onClose, onAdd,
@@ -31,7 +38,9 @@ export default function AddEntryModal({
   // ("150 g mere, 10 g caju"), so the recipe tab for a snack slot was reliably
   // empty, an empty list is a worse answer than the right list.
   const isSnack = slot === 'snack1' || slot === 'snack2'
-  const [tab, setTab] = useState<'recipes' | 'foods'>(isSnack ? 'foods' : 'recipes')
+  const available = useAvailablePortions()
+  const [tab, setTab] = useState<'fridge' | 'recipes' | 'foods'>(
+    available.length ? 'fridge' : isSnack ? 'foods' : 'recipes')
   const [grams, setGrams] = useState<Record<string, number>>({})
 
   const recipes = useRecipes()
@@ -87,19 +96,48 @@ export default function AddEntryModal({
             />
           </div>
           <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
-            {(['recipes', 'foods'] as const).map((t) => (
+            {([...(available.length ? ['fridge' as const] : []), 'recipes' as const, 'foods' as const]).map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
                 className={`capitalize ${tab === t ? 'tab-on' : 'tab-off'}`}
               >
                 {t}
+                {t === 'fridge' && (
+                  <span className="ml-1.5 text-xs opacity-60 font-mono">{available.length}</span>
+                )}
               </button>
             ))}
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1.5">
+          {tab === 'fridge' && offerOrder(available).map((p) => {
+            const n = componentsNutrients([{ kind: 'portion', portionId: p.id, servings: 1 }], ctx)
+            return (
+              <button
+                key={p.id}
+                onClick={() => { onAdd({ kind: 'portion', portionId: p.id, servings: 1 }); onClose() }}
+                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left transition-colors"
+              >
+                <span className="text-xl">{p.storage === 'freezer' ? '🧊' : '🥡'}</span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-sm font-semibold text-ink-900 truncate">
+                    {portionLabel(p, ctx.recipes)}
+                  </span>
+                  <span className="block text-xs text-ink-500 truncate">
+                    {p.servings === 1 ? '1 portion left' : `${p.servings} portions left`} · {madeWhen(p)}
+                  </span>
+                </span>
+                {n.calories > 0 && (
+                  <span className="text-sm font-mono text-ink-700 shrink-0">
+                    {Math.round(n.calories)} kcal
+                  </span>
+                )}
+              </button>
+            )
+          })}
+
           {tab === 'recipes' && matchedRecipes.map((r) => {
             const n = recipePerServing(r, ctx)
             return (

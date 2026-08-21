@@ -1,5 +1,5 @@
 import type {
-  BodyMeasurement, CookSession, DayPlan, Food, GroceryItem, PlannedMeal, Recipe,
+  BodyMeasurement, CookSession, DayPlan, Food, GroceryItem, PlannedMeal, Portion, Recipe,
   SleepEntry, StepEntry, UserProfile, WeightEntry,
 } from '../../types'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
@@ -9,6 +9,7 @@ import { useBodyStore } from '../../store/useBodyStore'
 import { useCookStore } from '../../store/useCookStore'
 import { useActivityStore } from '../../store/useActivityStore'
 import { useUserStore } from '../../store/useUserStore'
+import { usePortionStore } from '../../store/usePortionStore'
 import type { RowTable, SyncRow } from './types'
 
 /**
@@ -185,6 +186,15 @@ const sleep = listTable<SleepEntry>(
   (s) => ({ day: s.date, member_id: s.personId }),
 )
 
+const portions = listTable<Portion>(
+  'portions',
+  () => usePortionStore.getState().portions,
+  (rows) => usePortionStore.setState({
+    portions: [...rows].sort((a, b) => a.madeOn.localeCompare(b.madeOn)),
+  }),
+  (p) => ({ day: p.madeOn }),
+)
+
 const cookSessions = listTable<CookSession>(
   'cook_sessions',
   () => useCookStore.getState().sessions,
@@ -213,5 +223,5 @@ const settings: RowTable = {
 export const ROW_TABLES: RowTable[] = [
   planMeals, groceryItems, recipes, foods,
   weights, measurements, workouts, steps, sleep,
-  cookSessions, settings,
+  portions, cookSessions, settings,
 ]

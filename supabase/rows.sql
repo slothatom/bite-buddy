@@ -260,6 +260,22 @@ create index if not exists sleep_member_idx on public.sleep (member_id, day);
 call public.make_syncable('sleep');
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- What is cooked and waiting
+--
+-- A batch in the freezer and last night's leftovers, which are the same thing
+-- wearing different labels. Shared, because the fridge is.
+-- ─────────────────────────────────────────────────────────────────────────────
+create table if not exists public.portions (
+  id         text primary key,
+  day        date,
+  data       jsonb,
+  updated_at timestamptz not null default now(),
+  deleted_at timestamptz,
+  updated_by uuid references auth.users on delete set null
+);
+call public.make_syncable('portions');
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- Cooking sessions
 -- ─────────────────────────────────────────────────────────────────────────────
 create table if not exists public.cook_sessions (
@@ -436,7 +452,7 @@ declare
 begin
   foreach t in array array[
     'plan_meals', 'grocery_items', 'recipes', 'foods', 'weights', 'measurements',
-    'workouts', 'steps', 'sleep', 'cook_sessions', 'settings'
+    'workouts', 'steps', 'sleep', 'portions', 'cook_sessions', 'settings'
   ] loop
     foreach c in array array['data', 'day', 'slot'] loop
       if exists (

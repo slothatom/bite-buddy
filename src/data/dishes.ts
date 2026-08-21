@@ -1,4 +1,4 @@
-import type { Component, Recipe, RecipeTag } from '../types'
+import type { Recipe, RecipeComponent, RecipeTag } from '../types'
 
 /**
  * The dishes the dietician names but does not spell out.
@@ -583,7 +583,7 @@ function slug(id: string, i: number): string {
 }
 
 function toRecipe(spec: DishSpec): Recipe {
-  const components: Component[] = spec.parts.map(([foodId, grams]) => ({ kind: 'food', foodId, grams }))
+  const components: RecipeComponent[] = spec.parts.map(([foodId, grams]) => ({ kind: 'food', foodId, grams }))
   return {
     id: spec.id,
     name: { en: spec.en, ro: spec.ro, hu: spec.hu },

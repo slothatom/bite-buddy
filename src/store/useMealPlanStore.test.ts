@@ -164,3 +164,56 @@ describe('rearranging a week', () => {
     expect(JSON.stringify(useMealPlanStore.getState().plan)).toBe(before)
   })
 })
+
+describe('planning from the fridge', () => {
+  it('leaves a portion off the shopping list, because it is already cooked', async () => {
+    // The whole point of cooking in advance, and the thing the app used to get
+    // wrong: a batch meal bought its ingredients again on every day it covered.
+    const { buildContext } = await import('../lib/nutrition')
+    const { FOODS } = await import('../data/foods')
+    const { ALL_RECIPES } = await import('../data')
+
+    const recipe = ALL_RECIPES.find((r) => r.components.some((c) => c.kind === 'food'))!
+    const portion = {
+      id: 'p1', recipeId: recipe.id, servings: 4, madeOn: '2026-08-20',
+      storage: 'fridge' as const, source: 'batch' as const,
+    }
+    const ctx = buildContext(FOODS, ALL_RECIPES, {}, {}, [portion])
+
+    useMealPlanStore.setState({ plan: [], groceryItems: [] })
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-24T12:00:00'), 1)
+
+    store.addEntry('2026-08-25', 'lunch', { kind: 'recipe', recipeId: recipe.id, servings: 1 })
+    store.generateGroceryList(ctx)
+    const fromRecipe = useMealPlanStore.getState().groceryItems.length
+    expect(fromRecipe).toBeGreaterThan(0)
+
+    useMealPlanStore.setState({ plan: [], groceryItems: [] })
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-24T12:00:00'), 1)
+    useMealPlanStore.getState().addEntry('2026-08-25', 'lunch', {
+      kind: 'portion', portionId: 'p1', servings: 1,
+    })
+    useMealPlanStore.getState().generateGroceryList(ctx)
+
+    expect(useMealPlanStore.getState().groceryItems).toHaveLength(0)
+  })
+
+  it('still counts towards the day, because you are eating it', async () => {
+    const { buildContext, dayNutrients } = await import('../lib/nutrition')
+    const { FOODS } = await import('../data/foods')
+    const { ALL_RECIPES } = await import('../data')
+
+    const recipe = ALL_RECIPES.find((r) => r.components.some((c) => c.kind === 'food'))!
+    const ctx = buildContext(FOODS, ALL_RECIPES, {}, {}, [{
+      id: 'p1', recipeId: recipe.id, servings: 4, madeOn: '2026-08-20',
+      storage: 'fridge', source: 'batch',
+    }])
+
+    const day = {
+      date: '2026-08-25',
+      meals: [{ id: 'm1', slot: 'lunch' as const, entries: [{ kind: 'portion' as const, portionId: 'p1', servings: 1 }] }],
+    }
+    expect(dayNutrients(day, ctx).calories).toBeGreaterThan(0)
+  })
+})

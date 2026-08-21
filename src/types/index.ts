@@ -149,6 +149,28 @@ export interface Food {
 export type Component =
   | { kind: 'food';   foodId: string;   grams: number;   note?: string }
   | { kind: 'recipe'; recipeId: string; servings: number; note?: string }
+  /**
+   * Something already cooked, sitting in the fridge or the freezer.
+   *
+   * Its own kind rather than a recipe entry with a note, because two things
+   * have to know the difference. The shopping list must not ask you to buy
+   * ingredients for a meal that is already made, which is the whole point of
+   * having cooked it in advance. And the portion count has to come down when
+   * you plan to eat one, or the app cheerfully offers you the same tub of
+   * chilli four times.
+   */
+  | { kind: 'portion'; portionId: string; servings: number; note?: string }
+
+/**
+ * What a recipe can be made of.
+ *
+ * Not a portion: a tub of chilli from the freezer is a thing you eat, never a
+ * thing you list as an ingredient of something else. Saying so in the type
+ * means every place that reads a recipe's components, the editor, the
+ * classifier, the shopping list, the build scripts, does not have to handle a
+ * case that cannot happen.
+ */
+export type RecipeComponent = Exclude<Component, { kind: 'portion' }>
 
 export interface PrepStep {
   id: string
@@ -198,7 +220,7 @@ export interface Recipe {
   servings: number
   prepMinutes: number
   cookMinutes: number
-  components: Component[]
+  components: RecipeComponent[]
   steps: PrepStep[]
   tags: RecipeTag[]
   /** What the food is. Every shipped recipe has one; yours can wait. */
@@ -267,6 +289,52 @@ export type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6
  * meal still lands on Wednesday, it just sits mid-week instead of first.
  */
 export const DEFAULT_WEEK_START: WeekStart = 1
+
+// ─── Cooked and waiting ───────────────────────────────────────────────────────
+
+/**
+ * Where a cooked portion is kept, which is really a question about how long it
+ * has. The app does not police either: it says what it knows and lets you
+ * decide, because the only person who can see the tub is you.
+ */
+export type PortionStorage = 'fridge' | 'freezer'
+
+/**
+ * How something came to be sitting there, which changes nothing about how it
+ * behaves and quite a lot about how it reads. "Four portions of chilli" is a
+ * plan; "half a lasagne" is a Tuesday.
+ */
+export type PortionSource = 'batch' | 'leftover'
+
+/**
+ * A portion of something already cooked.
+ *
+ * The dietician's plans are built on cooking once and eating three times, and
+ * the app had no way to say so: a batch was a meal you retyped on each of the
+ * days it covered, and the shopping list bought its ingredients again every
+ * time.
+ *
+ * `servings` is what is left, not what was made, and it comes down as you plan
+ * meals from it. It is a count of tubs rather than an inventory: nobody weighs
+ * what they took, so it is always editable by hand and never argued with.
+ */
+export interface Portion {
+  id: string
+  /** The recipe it is, when it is one the app knows. Its nutrition follows. */
+  recipeId?: string
+  /** What to call it when it is not a recipe: "half a lasagne". */
+  label?: string
+  /** How many are left. Zero is kept for a while rather than deleted. */
+  servings: number
+  madeOn: string            // 'YYYY-MM-DD'
+  storage: PortionStorage
+  /** A date you decided, not one the app worked out. Nothing enforces it. */
+  useBy?: string
+  source: PortionSource
+  note?: string
+  /** The cook session it came from, when it came from one. */
+  sessionId?: string
+}
 
 // ─── Source plan archive ──────────────────────────────────────────────────────
 

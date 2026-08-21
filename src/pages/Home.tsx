@@ -9,6 +9,7 @@ import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { useAuthStore } from '../store/useAuth'
 import { useSyncStatus } from '../store/useSync'
+import { useAvailablePortions } from '../store/usePortionStore'
 import { acknowledgeConflicts } from '../lib/sync'
 import { dayNutrients, componentsNutrients } from '../lib/nutrition'
 import { targetStatus, STATUS_STYLES } from '../lib/status'
@@ -38,6 +39,7 @@ export default function Home() {
   const recipes = useRecipes()
   const sessions = useCookStore((s) => s.sessions)
   const { profile } = useUserStore()
+  const portions = useAvailablePortions()
   const ctx = useNutritionContext()
   const members = useAuthStore((s) => s.members)
   const me = useAuthStore((s) => s.user)
@@ -133,7 +135,18 @@ export default function Home() {
             note="of the guide's goals"
             to="/analytics"
           />
-          {nextCook ? (
+          {/* What is already cooked outranks what is planned to be: it is the
+              thing that changes what you do in the next hour. */}
+          {portions.length ? (
+            <Tile
+              label="In the fridge"
+              value={`${portions.reduce((n, p) => n + p.servings, 0)}`}
+              unit={portions.length === 1 ? 'portion' : 'portions'}
+              note={portions.length === 1 ? 'of one thing' : `of ${portions.length} things`}
+              icon={CookingPot}
+              to="/schedule"
+            />
+          ) : nextCook ? (
             <Tile
               label="Next cook"
               value={new Date(nextCook.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })}

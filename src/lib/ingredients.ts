@@ -47,6 +47,16 @@ export function flattenComponents(
         const existing = merged.get(c.foodId)
         if (existing) existing.grams += c.grams * factor
         else merged.set(c.foodId, { foodId: c.foodId, food, grams: c.grams * factor, fromRecipeId })
+      } else if (c.kind === 'portion') {
+        // A portion is made of whatever it was cooked from, so for anything
+        // asking what you actually ate, the Mediterranean goals, a weigh-out,
+        // it counts exactly as the recipe does. Whether it should be *bought*
+        // is a different question, answered where the shopping list is built.
+        const portion = ctx.portions?.get(c.portionId)
+        const recipe = portion?.recipeId ? ctx.recipes.get(portion.recipeId) : undefined
+        if (!recipe) continue
+        const perServing = c.servings / Math.max(1, recipe.servings)
+        walk(recipe.components, factor * perServing, fromRecipeId ?? recipe.id, depth + 1)
       } else {
         const recipe = ctx.recipes.get(c.recipeId)
         if (!recipe) continue
