@@ -46,7 +46,7 @@ export async function draftFromText(text: string, foods: Food[]): Promise<DraftR
       },
     })
 
-    if (error) return { ok: false, error: readError(error) }
+    if (error) return { ok: false, error: await readError(error) }
 
     const draft = readDraft((data as { draft?: unknown })?.draft)
     if (!draft) {
@@ -71,17 +71,46 @@ export async function draftFromText(text: string, foods: Food[]): Promise<DraftR
 /**
  * The server's own words, where they are useful.
  *
- * Supabase wraps a function's response, so the message worth reading is often
- * inside rather than on the surface. "This account is not in the household" is
- * worth showing; "FunctionsHttpError" is not.
+ * Supabase does not hand back the function's reply on a failure. It throws, and
+ * puts the whole `Response` on `error.context`, body unread. Reaching for
+ * `context.error` finds nothing and leaves you showing "Edge Function returned
+ * a non-2xx status code", which tells somebody standing in their kitchen
+ * precisely nothing. The body has to be read, and reading it is asynchronous.
+ *
+ * A clone is read rather than the response itself, so that a body can only be
+ * consumed once here and never at the cost of a caller who wants it later.
  */
-function readError(error: unknown): string {
-  const context = (error as { context?: { error?: string } }).context
-  if (context?.error) return context.error
+async function readError(error: unknown): Promise<string> {
+  const context = (error as { context?: unknown }).context
+
+  // The old shape, kept because a mock or a wrapper may still use it.
+  const plain = (context as { error?: unknown } | undefined)?.error
+  if (typeof plain === 'string' && plain) return plain
+
+  const response = context as Response | undefined
+  if (response && typeof response.clone === 'function') {
+    try {
+      const body = await response.clone().json() as { error?: unknown; message?: unknown }
+      const said = body?.error ?? body?.message
+      if (typeof said === 'string' && said) return said
+    } catch {
+      // Not JSON. The status still says something useful.
+    }
+
+    if (response.status === 404) {
+      return 'The assistant is not deployed on this project yet. See docs/DEPLOY.md.'
+    }
+    if (response.status === 401) {
+      return 'That session has expired. Sign in again and your text will still be here.'
+    }
+    // Anything else, including a gateway that answered in HTML. The status is
+    // the only fact available, so say that much and stop pretending otherwise.
+    return `The assistant answered with an error (${response.status}). Your text is still here.`
+  }
 
   const message = (error as Error).message ?? ''
   if (message.includes('Failed to send')) {
-    return 'The assistant is not set up on this project yet. See docs/DEPLOY.md.'
+    return 'Could not reach the assistant. Either you are offline, or it is not deployed yet.'
   }
   return message || 'The assistant could not be reached.'
 }
