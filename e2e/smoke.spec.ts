@@ -1183,6 +1183,39 @@ test.describe('the cupboard', () => {
   })
 })
 
+test.describe('filling the gaps', () => {
+  test('offers a week, lets you drop one, and only then writes anything', async ({ page }) => {
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+
+    await expect(page.getByText('A week, if you like it')).toBeVisible()
+
+    const rows = page.locator('.card').filter({ hasText: /Breakfast|Lunch|Dinner/ }).locator('button[aria-label^="Not "]')
+    const offered = await rows.count()
+    expect(offered, 'nothing was proposed').toBeGreaterThan(3)
+
+    // Nothing is written while you are still looking at it.
+    await expect(page.locator('[data-entry-name]')).toHaveCount(0)
+
+    await rows.first().click()
+    await expect(page.getByRole('button', { name: `Add these ${offered - 1} meals` })).toBeVisible()
+
+    await page.getByRole('button', { name: /^Add these/ }).click()
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+  })
+
+  test('every proposal says why it is there', async ({ page }) => {
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+
+    // The whole argument for doing this without a model is that each suggestion
+    // can be checked against the plan in front of you.
+    const reasons = page.locator('p.text-xs.text-ink-500')
+    expect(await reasons.count()).toBeGreaterThan(0)
+    await expect(reasons.first()).not.toBeEmpty()
+  })
+})
+
 test.describe('what you enter is still there tomorrow', () => {
   /**
    * The check that nothing else makes.

@@ -123,6 +123,13 @@ else is in the household and when they were last here. On the deployed app it al
 whether your copy and theirs are in step.
 
 ### Planner
+**Fill the gaps** proposes a meal for every empty breakfast, lunch and dinner on screen, from
+your own library. It is arithmetic rather than a model: it prefers what is already in the
+fridge, then what the cupboard covers, avoids what you ate in the last fortnight, aims each
+day near your calorie target, and gives every proposal a reason you can check. Nothing is
+written until you accept it, anything can be dropped first, and it works with no signal
+because there is nothing to phone. `src/lib/autoPlan.ts` explains the scoring.
+
 A week, a fortnight or a whole month at a time, five slots a day (breakfast, two snacks,
 lunch, dinner), live totals against your targets, and copy a day onto another day. The week
 starts on Monday by default and can start on any of the seven; loading an archived plan lines
