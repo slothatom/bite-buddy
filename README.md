@@ -355,6 +355,41 @@ public, create the Supabase project, run `supabase/schema.sql` and then
 `supabase/rows.sql`, add two repository secrets. Every push then deploys
 itself.
 
+### The recipe assistant
+
+Optional, and the only feature in the app that calls a model. You paste a
+recipe, from a website or a message or a few lines of your own shorthand, and it
+comes back as a draft: named, weighed in grams, ingredients matched to foods you
+already have, with a method if the paste had one.
+
+```bash
+supabase functions deploy recipe-assistant
+supabase secrets set ANTHROPIC_API_KEY=...      # from console.anthropic.com
+```
+
+The key lives on the function and never reaches a browser, which is the whole
+reason this is a function at all: the site is public, and a key in the bundle is
+a key anyone can read and spend. The function checks that the caller is in the
+household before it spends anything, using the same membership row every policy
+in the database consults.
+
+Three rules it works under, in `supabase/functions/recipe-assistant/index.ts`
+and enforced again on the way back in `src/lib/recipeDraft.ts`:
+
+- **No nutrition ever comes from the model.** There is no field for a calorie in
+  what it returns. Ingredients are matched to your food database and every
+  number is computed from those, so a model that hallucinates cannot put a
+  figure on a screen about what you eat.
+- **It cannot invent a category or a filter**, only choose from the ones this app
+  has. Anything else is dropped when the reply is read.
+- **A miss is reported, never guessed.** An ingredient it cannot match to a food
+  you have comes back as a name and a weight, listed for you to resolve. A wrong
+  match is a wrong number nobody would ever notice.
+
+Nothing is saved until you press save. Without the key the button is still
+there and says the assistant is not set up, and every other way of writing a
+recipe works exactly as before.
+
 ### Cook session reminders
 
 Optional, and the one feature that needs something running when nobody is
