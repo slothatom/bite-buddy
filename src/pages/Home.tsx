@@ -416,7 +416,7 @@ function MomentNote() {
 }
 
 function SyncLine() {
-  const { state, at, unsaved, schemaMismatch, conflicts } = useSyncStatus()
+  const { state, at, unsaved, schemaMismatch, conflicts, lastError } = useSyncStatus()
 
   // Unsaved changes outrank everything else: it is the only state where what
   // you are looking at is not what the other person will see.
@@ -438,7 +438,11 @@ function SyncLine() {
     : state === 'connecting'
       ? [RefreshCw, 'Connecting…', 'text-ink-500']
     : state === 'error'
-      ? [AlertTriangle, "Can't reach the server. Your changes are safe here and will go up when it's back.", 'text-coral-600']
+      ? [AlertTriangle,
+         lastError
+           ? `The server turned the last write down: ${lastError}. Your changes are safe on this device.`
+           : "Can't reach the server. Your changes are safe here and will go up when it's back.",
+         'text-coral-600']
     : [CloudOff, 'Working offline on this device only.', 'text-ink-500']
 
   return (

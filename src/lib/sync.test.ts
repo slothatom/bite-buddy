@@ -113,7 +113,14 @@ describe('joining a household', () => {
     await settle()
 
     expect(useMealPlanStore.getState().plan).toHaveLength(1)
-    expect(upsert).not.toHaveBeenCalled()
+
+    // It does send, once, after the pull: the device offers whatever it holds
+    // so that anything never delivered gets a go. What it must never send is
+    // the empty plan it started with.
+    const plan = upsert.mock.calls
+      .map(([row]) => row as { key: string; data: { plan?: unknown[] } })
+      .filter((r) => r.key === PLAN_KEY)
+    expect(plan.every((r) => (r.data.plan ?? []).length === 1)).toBe(true)
     stop()
   })
 
@@ -141,8 +148,10 @@ describe('a local change', () => {
     useBodyStore.setState({ weightEntries: [{ id: 'w1', date: '2026-08-20', weight: 70, unit: 'kg' as const, memberId: 'arany' }] })
     await settle()
 
+    // The last body write, not the first: the device also offers what it held
+    // at startup, and that one predates this edit.
     const rows = upsert.mock.calls.map(([row]) => row as Record<string, unknown>)
-    const body = rows.find((r) => String(r.key).includes('body'))
+    const body = rows.filter((r) => String(r.key).includes('body')).at(-1)
     expect(body).toBeDefined()
     expect(body!.schema).toBe(SCHEMA_VERSION)
     expect(body!.updated_by).toBe('me')
@@ -192,8 +201,9 @@ describe('a change from the other person', () => {
     await settle()
 
     expect(useBodyStore.getState().weightEntries).toHaveLength(1)
-    // The body store is replaced wholesale rather than merged, so what landed
-    // here is exactly what they sent. Re-sending it would be an echo.
+    // This device held nothing, so the merge produced exactly what they sent.
+    // Sending that back would be an echo, and two open phones would talk to
+    // each other for as long as they were both open.
     const bodyPushes = upsert.mock.calls
       .map(([row]) => row as { key: string })
       .filter((r) => r.key === 'bite-buddy-body')
@@ -312,5 +322,127 @@ describe('what gets synced at all', () => {
     expect(names).toContain('bite-buddy-cook')
     expect(names).toContain('bite-buddy-activity')
     expect(names.every(Boolean)).toBe(true)
+  })
+})
+
+
+/**
+ * The bug behind "everything disappears when I refresh".
+ *
+ * Every store except the week, the recipes and the foods used to take the
+ * server's copy of itself whole. The pull runs at startup, before anything
+ * typed in on this device has been delivered, so the server's copy replaced the
+ * device's: a weight logged while the push was failing was gone the next time
+ * the app opened, and a refresh looked like it emptied the app.
+ */
+describe('a pull must not delete what only this device has', () => {
+  const BODY_KEY = 'bite-buddy-body'
+
+  function weight(id: string, date: string, kg: number, memberId: string) {
+    return { id, date, weight: kg, unit: 'kg' as const, memberId }
+  }
+
+  it('keeps a weight the server has never heard of', async () => {
+    select.mockResolvedValue({
+      data: [{
+        key: BODY_KEY,
+        schema: SCHEMA_VERSION,
+        data: { weightEntries: [weight('w1', '2026-08-01', 73, 'arany')], measurements: [] },
+      }],
+      error: null,
+    })
+    useBodyStore.setState({
+      weightEntries: [weight('w1', '2026-08-01', 73, 'arany'), weight('w2', '2026-08-20', 72.4, 'arany')],
+      measurements: [],
+    })
+
+    const stop = startSync('me')
+    await settle()
+
+    expect(useBodyStore.getState().weightEntries.map((w) => w.id)).toContain('w2')
+    stop()
+  })
+
+  it('keeps an edit the server refused, across a restart', async () => {
+    // A policy that turns down every write, a paused project, a wrong key: the
+    // push fails every time. The device must still hold the change, and a
+    // restart must not hand it back to the server's older copy.
+    select.mockResolvedValue({
+      data: [{ key: BODY_KEY, schema: SCHEMA_VERSION, data: { weightEntries: [], measurements: [] } }],
+      error: null,
+    })
+    upsert.mockResolvedValue({ error: { message: 'new row violates row-level security policy' } })
+
+    const stop = startSync('me')
+    await settle()
+    useBodyStore.setState({ weightEntries: [weight('w9', '2026-08-21', 71.8, 'arany')], measurements: [] })
+    await settle(5_000)
+    stop()
+
+    expect(useBodyStore.getState().weightEntries).toHaveLength(1)
+
+    const again = startSync('me')
+    await settle()
+    again()
+
+    expect(
+      useBodyStore.getState().weightEntries,
+      'a weight that never reached the server was erased by the server on restart',
+    ).toHaveLength(1)
+  })
+
+  it('says what the server said, rather than only that something went wrong', async () => {
+    select.mockResolvedValue({ data: [], error: null })
+    upsert.mockResolvedValue({ error: { message: 'new row violates row-level security policy' } })
+
+    const stop = startSync('me')
+    await settle()
+    useBodyStore.setState({ weightEntries: [weight('w1', '2026-08-21', 70, 'arany')], measurements: [] })
+    await settle(5_000)
+
+    expect(syncSnapshot().lastError).toContain('row-level security')
+    stop()
+  })
+
+  it('keeps both peoples rows and sends the union back', async () => {
+    select.mockResolvedValue({
+      data: [{
+        key: BODY_KEY,
+        schema: SCHEMA_VERSION,
+        data: { weightEntries: [weight('oli-1', '2026-08-18', 61, 'oli')], measurements: [] },
+      }],
+      error: null,
+    })
+    useBodyStore.setState({
+      weightEntries: [weight('arany-1', '2026-08-19', 72, 'arany')],
+      measurements: [],
+    })
+
+    const stop = startSync('me')
+    await settle()
+
+    expect(useBodyStore.getState().weightEntries.map((w) => w.id).sort())
+      .toEqual(['arany-1', 'oli-1'])
+
+    const sent = upsert.mock.calls
+      .map(([row]) => row as { key: string; data: { weightEntries: { id: string }[] } })
+      .filter((r) => r.key === BODY_KEY)
+      .at(-1)
+    expect(sent?.data.weightEntries.map((w) => w.id).sort()).toEqual(['arany-1', 'oli-1'])
+    stop()
+  })
+
+  it('offers what is on the device even when nothing has changed since it opened', async () => {
+    // The queue only knows about edits made while it is running, and it lives
+    // in memory. Without this, a device holding data the server never got would
+    // never offer it again.
+    select.mockResolvedValue({ data: [], error: null })
+    useBodyStore.setState({ weightEntries: [weight('w1', '2026-08-19', 72, 'arany')], measurements: [] })
+
+    const stop = startSync('me')
+    await settle()
+
+    expect(upsert.mock.calls.some(([row]) => (row as { key: string }).key === BODY_KEY)).toBe(true)
+    stop()
   })
 })

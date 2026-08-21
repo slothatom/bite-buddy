@@ -169,12 +169,91 @@ export function mergeLibrary(local: LibraryState, remote: LibraryState): MergeRe
 }
 
 /**
+ * Merges the logs: weights, measurements, workouts, steps, sleep, cook sessions.
+ *
+ * These used to take the server's copy whole, and that was the bug behind
+ * "everything disappears when I refresh". A pull runs at startup, before
+ * anything on the device has been delivered, so the server's copy replaced the
+ * device's: a weight logged while the push was failing, or while the phone had
+ * no signal, was gone the next time the app opened. The device had it, and the
+ * app threw it away.
+ *
+ * Every one of these is a list of dated rows with ids, so the honest merge is
+ * a union: a row either side knows about is kept, and a row both know about
+ * takes the local copy, since that is the one the person in front of the screen
+ * just looked at.
+ *
+ * The cost is the same one the library merge already accepts: deleting a row on
+ * one device while the other is offline can be undone when it reconnects and
+ * offers the row back. Deleting a weight twice is a small annoyance. Losing a
+ * month of them is not.
+ */
+const LOG_LISTS = [
+  'weightEntries', 'measurements', 'workouts', 'steps', 'sleep', 'sessions',
+] as const
+
+export function mergeLogs(
+  local: Record<string, unknown>,
+  remote: Record<string, unknown>,
+): MergeResult<Record<string, unknown>> {
+  const merged: Record<string, unknown> = { ...remote, ...local }
+
+  for (const field of LOG_LISTS) {
+    const mine = Array.isArray(local[field]) ? (local[field] as unknown[]) : null
+    const theirs = Array.isArray(remote[field]) ? (remote[field] as unknown[]) : null
+    if (!mine && !theirs) continue
+
+    const byId = new Map<string, unknown>()
+    const noId: unknown[] = []
+    for (const row of [...(theirs ?? []), ...(mine ?? [])]) {
+      const id = idOf(row)
+      if (id) byId.set(id, row)
+      else noId.push(row)
+    }
+    merged[field] = [...byId.values(), ...noId]
+  }
+
+  return { merged, conflicts: [] }
+}
+
+/**
+ * Merges the profile: targets, name, week start, the moments Zig has noticed.
+ *
+ * One object rather than a list, so there is nothing to union and one of the
+ * two has to win. It is stamped on every change, and the newer stamp wins.
+ * When neither is stamped, or they are equal, the local copy stays: this device
+ * is where somebody is actually sitting, and a target that reverts while you
+ * are reading it is the worst version of this bug.
+ */
+interface ProfileState {
+  profile?: { updatedAt?: string; [key: string]: unknown }
+  [key: string]: unknown
+}
+
+export function mergeProfile(local: ProfileState, remote: ProfileState): MergeResult<ProfileState> {
+  const mine = local.profile
+  const theirs = remote.profile
+  if (!mine) return { merged: remote, conflicts: [] }
+  if (!theirs) return { merged: local, conflicts: [] }
+
+  const at = (p: { updatedAt?: string }) => (p.updatedAt ? Date.parse(p.updatedAt) : 0)
+  return {
+    merged: at(theirs) > at(mine) ? { ...local, ...remote } : { ...remote, ...local },
+    conflicts: [],
+  }
+}
+
+/**
  * Merges one store's document.
  *
- * The week is merged a day at a time; the libraries union what each side
- * added, hid or folded together. Everything else takes the remote copy, which
- * is what they all used to do, the difference is that this is now a decision
- * with a name rather than the only behaviour available.
+ * The week is merged a day at a time, the libraries union what each side added,
+ * hid or folded together, the logs union their rows, and the profile takes
+ * whichever copy was edited later.
+ *
+ * There is deliberately no branch left that hands the whole document to the
+ * server. Local-first means the device's copy is the one that exists; the
+ * server holds a shared copy of it, and a shared copy is not allowed to delete
+ * rows this device has never managed to send.
  */
 export function mergeStore(
   key: string,
@@ -192,5 +271,8 @@ export function mergeStore(
   if (key.includes('recipes') || key.includes('foods')) {
     return mergeLibrary(local as LibraryState, remote as LibraryState)
   }
-  return { merged: remote, conflicts: [] }
+  if (key.includes('user')) {
+    return mergeProfile(local as ProfileState, remote as ProfileState)
+  }
+  return mergeLogs(local as Record<string, unknown>, remote as Record<string, unknown>)
 }
