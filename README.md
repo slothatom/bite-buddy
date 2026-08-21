@@ -167,6 +167,15 @@ a sensible question. A lens that cannot answer, "from the cupboard" with an empt
 says what is missing rather than showing an empty screen that reads as "you have no
 recipes". `src/lib/discovery.ts` holds the rules.
 
+A recipe of your own can also carry **your notes**, **where it came from** and **how much
+of an evening it is** (easy, some effort, a project). Three levels rather than five,
+because the only thing that has to be told apart is a Tuesday from a Sunday.
+
+A source link is checked before it is stored and again before it is shown. Only http and
+https ever become a link: a recipe is data, it can arrive from a backup, from the other
+phone or from the assistant, and `javascript:` in an href is a script running on your page
+with your session. `src/lib/links.ts` is four lines of that and a test for each way in.
+
 275 recipes on six shelves, opening on the meal you are most likely looking for at this hour.
 Searchable in English, Romanian or Hungarian, typing `telemea` or `zabpehely` finds the right
 thing. Every imported meal shows the original dietician line as provenance. Macros are always

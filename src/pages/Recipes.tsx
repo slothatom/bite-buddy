@@ -1,9 +1,11 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import {
   Search, Star, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
-  ChevronDown, SlidersHorizontal, Minus,
+  ChevronDown, SlidersHorizontal, Minus, ExternalLink,
 } from 'lucide-react'
 import type { DishCategory, QuickFilter, Recipe } from '../types'
+import { DIFFICULTY_LABELS } from '../types'
+import { safeUrl, linkLabel } from '../lib/links'
 import { useRecipes, useRecipeStore, useMergedInto } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { recipePerServing, reportPerServing, roundNutrients } from '../lib/nutrition'
@@ -155,7 +157,7 @@ export default function Recipes() {
       ? lensed.filter((r) => mine.has(r.id))
       : lensed.filter((r) => groupsOf(r).includes(tab))
     return onShelf.length === 0 && matching.length > 0
-  }, [matching, tab, mine, query])
+  }, [lensed, matching, tab, mine, query])
 
   /** One card per dish, not one per portion. */
   const cards = useMemo(() => groupVariants(shown), [shown])
@@ -777,6 +779,30 @@ function RecipeDetail({
             </div>
           ) : null}
 
+          {recipe.description ? (
+            <div className="card-soft p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-ink-500 mb-1">Your notes</p>
+              <p className="text-sm text-ink-900 whitespace-pre-line">{recipe.description}</p>
+            </div>
+          ) : null}
+
+          {/* Checked again here rather than trusted from storage: a recipe can
+              arrive from a backup file, from the other phone, or from the
+              assistant, and only one of those went through the editor. */}
+          {(() => {
+            const link = safeUrl(recipe.sourceUrl)
+            return link ? (
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="btn-secondary w-fit"
+              >
+                <ExternalLink size={15} /> {linkLabel(link)}
+              </a>
+            ) : null
+          })()}
+
           <ShoppingNote recipe={recipe} />
 
           <div>
@@ -799,6 +825,11 @@ function RecipeDetail({
             {recipe.category && (
               <span className="chip bg-bite-100 text-bite-700 border border-bite-200">
                 {CATEGORY_LABELS[recipe.category]}
+              </span>
+            )}
+            {recipe.difficulty && (
+              <span className="chip bg-mustard-100 text-mustard-800 border border-mustard-200">
+                {DIFFICULTY_LABELS[recipe.difficulty]}
               </span>
             )}
             {(recipe.quickFilters ?? []).map((f) => (

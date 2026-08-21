@@ -212,10 +212,29 @@ export type RecipeTag =
   | 'quick' | 'batch' | 'breakfast' | 'lunch' | 'dinner'
   | 'snack' | 'dessert' | 'soup' | 'salad' | 'spread'
 
+/**
+ * How much of an evening it is, in the three answers anybody gives.
+ *
+ * Deliberately three and deliberately vague. A five-point scale invites an
+ * argument about whether something is a 2 or a 3, and the only thing this has
+ * to do is tell a Tuesday from a Sunday.
+ */
+export type Difficulty = 'easy' | 'some-effort' | 'a-project'
+
+export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: 'Easy',
+  'some-effort': 'Some effort',
+  'a-project': 'A project',
+}
+
 export interface Recipe {
   id: string
   name: { en: string; ro?: string; hu?: string }
+  /** Your own notes: what to watch, what you changed, who liked it. */
   description?: string
+  /** Where it came from, when it came from somewhere. Http and https only. */
+  sourceUrl?: string
+  difficulty?: Difficulty
   emoji: string
   servings: number
   prepMinutes: number
