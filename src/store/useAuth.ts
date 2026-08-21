@@ -106,24 +106,41 @@ async function recordPresence(user: User) {
     { onConflict: 'id', ignoreDuplicates: false },
   )
 
-  // This row is what every other policy checks. Without it the account is
-  // signed in and allowed to read and write nothing, which looks from the
-  // inside like an app that has stopped saving. It failed silently before, so
-  // the one thing that explains the whole session was the one thing not said.
-  if (error) {
-    useAuthStore.setState({
-      error: `Signed in, but this account could not be added to the household: ${error.message}`,
-    })
+  if (!error) {
+    await useAuthStore.getState().refreshMembers()
     return
   }
 
-  await useAuthStore.getState().refreshMembers()
+  // The write failing does not necessarily mean anything is wrong. The database
+  // adds an account to the household the moment it is created, so this row
+  // usually exists already and all that was refused is a note of when you were
+  // last here, which nothing depends on.
+  //
+  // What matters is the answer to one question, so ask it rather than guessing.
+  const { data } = await supabase.from('members').select('id').eq('id', user.id).maybeSingle()
+  if (data) {
+    await useAuthStore.getState().refreshMembers()
+    return
+  }
+
+  // Not a member, and the app cannot make itself one. Every policy in the
+  // database consults membership, so this account can read and write nothing,
+  // which from the inside looks exactly like an app that has stopped saving.
+  // Saying so, with the server's own words, is the only useful thing left.
+  useAuthStore.setState({
+    error: `Signed in, but this account is not in the household, so nothing can be saved: ${error.message}`,
+  })
 }
 
 if (supabase) {
   const apply = (session: Session | null) => {
     useAuthStore.setState({ session, user: session?.user ?? null, ready: true })
-    if (session?.user) void recordPresence(session.user)
+    // Deliberately not awaited inside the callback, and deliberately deferred:
+    // Supabase warns that calling back into the client from inside an auth
+    // event can deadlock, and a request made before the session has finished
+    // being stored goes out without a token, which the database sees as nobody
+    // at all.
+    if (session?.user) setTimeout(() => void recordPresence(session.user), 0)
   }
   void supabase.auth.getSession().then(({ data }) => apply(data.session))
   supabase.auth.onAuthStateChange((_event, session) => apply(session))
