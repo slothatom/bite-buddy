@@ -203,8 +203,14 @@ export function startSync(userId: string): () => void {
     return true
   }
 
-  void pullAll().then((ok) => {
-    if (stopped || !ok) return
+  /**
+   * Everything that may only start once the household's copy is in hand.
+   *
+   * Pushing before the pull is how an empty phone overwrites a full one, so
+   * this is deliberately gated on a successful read.
+   */
+  const begin = () => {
+    if (stopped) return
 
     // 2. Mark local changes; the queue decides when they go.
     for (const store of STORES) {
@@ -253,7 +259,38 @@ export function startSync(userId: string): () => void {
       })
 
     unsubscribers.push(() => void db.removeChannel(channel))
-  })
+  }
+
+  /**
+   * Keeps asking for the household's copy until it gets one.
+   *
+   * A failed first read used to end sync for the whole session: no
+   * subscriptions, no pushes, nothing retried, and the only way out was a
+   * reload that hit the same wall. That is a long time to be typing into a
+   * device that is no longer talking to anything.
+   *
+   * The read fails for two very different reasons and both recover on their
+   * own. A phone opened on a bad connection gets one a moment later. A brand
+   * new sign-in can arrive here before its own row on the members list exists,
+   * and until it does, row-level security refuses every read, so retrying is
+   * the difference between syncing a second later and not syncing at all.
+   */
+  let attempts = 0
+  const pullUntilItWorks = async () => {
+    if (stopped) return
+    if (await pullAll()) {
+      begin()
+      return
+    }
+    if (stopped) return
+
+    attempts += 1
+    const wait = Math.min(2_000 * 2 ** (attempts - 1), 60_000)
+    const timer = setTimeout(() => void pullUntilItWorks(), wait)
+    unsubscribers.push(() => clearTimeout(timer))
+  }
+
+  void pullUntilItWorks()
 
   // 4. Anything that suggests the network is back, or that the tab is about to
   //    go away, is a reason to stop waiting out the backoff and try now.
