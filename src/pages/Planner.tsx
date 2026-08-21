@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import {
   ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays, MoveRight, Sparkles,
+  Check, ShoppingBasket,
 } from 'lucide-react'
 import type { Component, DayPlan, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
@@ -17,6 +18,8 @@ import { useUiStore } from '../store/useUiStore'
 import AddEntryModal from '../components/planner/AddEntryModal'
 import { usePortionStore } from '../store/usePortionStore'
 import { portionEntries } from '../lib/portionsUse'
+import { usePantry } from '../store/usePantryStore'
+import { mealAvailability } from '../lib/pantry'
 import FillGaps from '../components/planner/FillGaps'
 import type { Proposal } from '../lib/autoPlan'
 
@@ -340,6 +343,7 @@ function SlotRow({
                     <SourceLine text={meal.note} clamp={2} />
                   </div>
                 ) : null}
+                <ShoppingState entries={meal.entries} />
               </div>
               <div className="flex shrink-0">
                 <button
@@ -368,6 +372,41 @@ function SlotRow({
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * Whether this meal could be cooked tonight.
+ *
+ * Silent when the cupboard is empty, which is not a technicality: with nothing
+ * in it every meal is missing everything, and a line saying so on all thirty
+ * five slots of a week is noise on the scale that teaches people to stop
+ * reading the app. It has something to say only once you have told it what you
+ * have.
+ *
+ * Names what is short rather than counting it, and never says a meal is a
+ * problem. "Onion, spinach" is a fact you can act on in a shop; "not cookable"
+ * is a verdict on a kitchen the app cannot see.
+ */
+function ShoppingState({ entries }: { entries: Component[] }) {
+  const ctx = useNutritionContext()
+  const pantry = usePantry()
+  if (!pantry.size || !entries.length) return null
+
+  const { ready, missing } = mealAvailability(entries, ctx, pantry)
+
+  return (
+    <p className={`flex items-start gap-1.5 pt-1 text-xs ${ready ? 'text-teal-700' : 'text-ink-500'}`}>
+      {ready
+        ? <><Check size={13} className="shrink-0 mt-px" /> Everything in</>
+        : <>
+            <ShoppingBasket size={13} className="shrink-0 mt-px" />
+            <span className="min-w-0">
+              {missing.length === 1 ? 'To buy: ' : `${missing.length} to buy: `}
+              {missing.slice(0, 4).join(', ')}{missing.length > 4 ? ' and more' : ''}
+            </span>
+          </>}
+    </p>
   )
 }
 
