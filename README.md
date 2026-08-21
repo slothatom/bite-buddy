@@ -147,6 +147,13 @@ lunch, dinner), live totals against your targets, and copy a day onto another da
 starts on Monday by default and can start on any of the seven; loading an archived plan lines
 its days up by weekday, so a Wednesday meal still lands on a Wednesday.
 
+Each planned meal also says **whether you can actually cook it tonight**: either everything
+it needs is in, or the two or three things that are short, named rather than counted, since
+"3 missing" sends you to open the cupboard anyway. It stays quiet until the cupboard has
+something in it, because an empty cupboard means the app does not know what you have, not
+that you have nothing. Portions from the fridge are already yours, so they never count as
+shopping. `mealAvailability()` in `src/lib/pantry.ts` does the work.
+
 ### Recipes
 A row of **lenses** across the top, because nobody stands in a kitchen at seven wondering
 about categories. They wonder what is quick, what can be made from what is in, and what

@@ -1,4 +1,4 @@
-import type { Food, PantryItem, Recipe } from '../types'
+import type { Component, Food, PantryItem, Recipe } from '../types'
 import type { NutritionContext } from './nutrition'
 import { flattenComponents } from './ingredients'
 
@@ -83,4 +83,42 @@ export function availabilityLabel(a: Availability): string {
 /** The foods a recipe needs that the cupboard does not cover, named. */
 export function missingFoods(a: Availability, foods: Map<string, Food>): string[] {
   return a.missing.map((id) => foods.get(id)?.names.en ?? id)
+}
+
+
+export interface MealAvailability {
+  /** Named, because "two things" is a worse answer than "spinach and lentils". */
+  missing: string[]
+  /** True when there is nothing to buy, including a meal that is already cooked. */
+  ready: boolean
+}
+
+/**
+ * Whether a planned meal can actually be cooked tonight.
+ *
+ * Portions are skipped rather than checked: something already in the fridge
+ * needs no ingredients, which is the entire point of having cooked it. A meal
+ * made only of portions is always ready.
+ *
+ * Named rather than counted, and quiet rather than alarming. The screen decides
+ * whether to say anything at all, because with an empty cupboard everything is
+ * missing and saying so on every row of every day would be noise on a scale
+ * that teaches people to ignore the app.
+ */
+export function mealAvailability(
+  entries: Component[],
+  ctx: NutritionContext,
+  pantry: Map<string, PantryItem>,
+): MealAvailability {
+  const cookable = entries.filter((e) => e.kind !== 'portion')
+  if (!cookable.length) return { missing: [], ready: true }
+
+  const missing: string[] = []
+  for (const ingredient of flattenComponents(cookable, ctx, { skip: ['water'] })) {
+    if (stillNeeded(ingredient.grams, pantry.get(ingredient.foodId)) === 0) continue
+    const name = ingredient.food.names.en
+    if (!missing.includes(name)) missing.push(name)
+  }
+
+  return { missing, ready: missing.length === 0 }
 }

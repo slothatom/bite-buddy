@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { stillNeeded, availability, availabilityLabel } from './pantry'
+import { stillNeeded, availability, availabilityLabel, mealAvailability } from './pantry'
 import { buildContext } from './nutrition'
 import type { Food, PantryItem, Recipe } from '../types'
 
@@ -99,5 +99,48 @@ describe('how it reads', () => {
     // lot depends on which two, and you are the one who can see them.
     const said = availabilityLabel({ have: [], missing: ['a', 'b'], ratio: 0 })
     expect(said).not.toMatch(/can't|cannot|don't|impossible|skip/i)
+  })
+})
+
+describe('whether a planned meal can be cooked tonight', () => {
+  const recipe: Recipe = {
+    id: 'stew', name: { en: 'Lentil stew' }, emoji: '🍲', servings: 4,
+    prepMinutes: 5, cookMinutes: 30,
+    components: [
+      { kind: 'food', foodId: 'lentils', grams: 300 },
+      { kind: 'food', foodId: 'onion', grams: 150 },
+    ],
+    steps: [], tags: [], createdAt: now,
+  }
+  const ctx = buildContext([food('lentils'), food('onion'), food('oil')], [recipe], {}, {}, [
+    { id: 'tub', recipeId: 'stew', servings: 2, madeOn: '2026-08-20', storage: 'fridge', source: 'batch' },
+  ])
+
+  it('names what is not in, rather than counting it', () => {
+    const pantry = new Map([['lentils', item({ foodId: 'lentils' })]])
+    const state = mealAvailability([{ kind: 'recipe', recipeId: 'stew', servings: 1 }], ctx, pantry)
+    expect(state.ready).toBe(false)
+    expect(state.missing).toEqual(['onion'])
+  })
+
+  it('is ready when the cupboard covers all of it', () => {
+    const pantry = new Map([
+      ['lentils', item({ foodId: 'lentils' })],
+      ['onion', item({ foodId: 'onion' })],
+    ])
+    const state = mealAvailability([{ kind: 'recipe', recipeId: 'stew', servings: 1 }], ctx, pantry)
+    expect(state).toEqual({ ready: true, missing: [] })
+  })
+
+  it('asks nothing of something already cooked', () => {
+    // A portion in the fridge needs no ingredients. That is the whole point of
+    // having cooked it, and checking it would report the stew twice.
+    const state = mealAvailability([{ kind: 'portion', portionId: 'tub', servings: 1 }], ctx, new Map())
+    expect(state).toEqual({ ready: true, missing: [] })
+  })
+
+  it('checks a weighed food on its own', () => {
+    const state = mealAvailability([{ kind: 'food', foodId: 'oil', grams: 10 }], ctx, new Map())
+    expect(state.missing).toEqual(['oil'])
   })
 })

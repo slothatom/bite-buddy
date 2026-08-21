@@ -1393,6 +1393,38 @@ test.describe('a recipe of your own, with your own notes on it', () => {
   })
 })
 
+test.describe('whether tonight can actually be cooked', () => {
+  test('says nothing at all until the cupboard has something in it', async ({ page }) => {
+    // With an empty cupboard every meal is missing everything, and saying so on
+    // thirty five slots is the kind of noise that teaches people to stop
+    // reading an app.
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    await goto(page, '/plan')
+    await expect(page.getByText(/to buy:/i)).toHaveCount(0)
+    await expect(page.getByText('Everything in')).toHaveCount(0)
+  })
+
+  test('names what is short once it knows what you have', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+
+    await goto(page, '/grocery')
+    await page.getByRole('button', { name: /^Cupboard/ }).click()
+    await page.getByPlaceholder('Search your foods').fill('olive oil')
+    await page.locator('button').filter({ hasText: /olive oil/i }).first().click()
+
+    await goto(page, '/plan')
+    await page.locator('button[aria-pressed]').filter({ hasText: /\d\d\d/ }).first().click()
+
+    // Named rather than counted, and never a verdict on the kitchen.
+    const line = page.getByText(/to buy:/i).first()
+    await expect(line).toBeVisible()
+    expect(await line.textContent()).not.toMatch(/cannot|impossible|not cookable/i)
+  })
+})
+
 test.describe('what you enter is still there tomorrow', () => {
   /**
    * The check that nothing else makes.
