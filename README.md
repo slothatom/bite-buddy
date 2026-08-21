@@ -192,7 +192,23 @@ verbatim. Load any week straight into the planner.
 
 ### Grocery list
 Built from the planned week, resolving nested recipes down to what you actually buy, merged by
-food and grouped by category. Weights are raw, matching how the plans are written.
+food and grouped by category. Weights are raw, matching how the plans are written. Anything
+covered by a portion already in the fridge is left off, since it is already cooked.
+
+A second tab holds the cupboard. Two kinds of entry and the difference matters: something you
+have now, and something you always have. A staple never appears on a list again, which is the
+setting that earns its place, without it a week of real cooking produces forty lines and
+thirty of them are salt, oil and flour. An amount is optional: blank means enough, which is
+what anybody means when they say they have olive oil, and a number is believed and subtracted,
+because 200 g of the 500 g a week needs is a different answer.
+
+"Have it" on any line puts it in the cupboard rather than merely removing it, so the next
+rebuild does not ask again. Nothing is ever decremented automatically. The cupboard is in your
+kitchen and the app has never seen it.
+
+The recipe list gains a **Can make now** chip once the cupboard has anything in it, and a
+recipe says what it would still cost you a trip for. Worded as a list rather than a verdict:
+whether three missing things is a lot depends entirely on which three.
 
 ### Moments
 Eight little things Zig notices, a first day planned, a whole week, something actually

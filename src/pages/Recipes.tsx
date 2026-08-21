@@ -20,6 +20,8 @@ import {
   hasQuickFilter, quickFilterLabel,
 } from '../lib/dishCategories'
 import { interchangeableGroups } from '../lib/mergeRecipes'
+import { usePantry } from '../store/usePantryStore'
+import { availability, availabilityLabel, missingFoods } from '../lib/pantry'
 
 /**
  * The recipe library.
@@ -55,6 +57,14 @@ export default function Recipes() {
   const [editing, setEditing] = useState<Recipe | null | undefined>(undefined)
 
   const mine = useMemo(() => new Set(custom.map((r) => r.id)), [custom])
+  const pantry = usePantry()
+
+  /**
+   * "What can I cook right now", which is the question a full cupboard makes
+   * answerable and an empty one makes meaningless, so the chip only appears
+   * once there is something in it.
+   */
+  const [canMake, setCanMake] = useState(false)
 
   /** Everything the search and chips allow, before the shelf is chosen. */
   const matching = useMemo(() => {
@@ -64,6 +74,7 @@ export default function Recipes() {
       if (category && r.category !== category) return false
       // Every ticked filter has to hold: they narrow together, they do not pile up.
       if (filters.some((f) => !hasQuickFilter(r, f))) return false
+      if (canMake && availability(r, ctx, pantry).missing.length) return false
       if (!n) return true
       // The dietician's own line is searched too, so "telemea" finds the meals
       // that were written in Romanian.
@@ -71,7 +82,7 @@ export default function Recipes() {
         [r.name.en, r.name.ro, r.name.hu, r.sourceLine].filter(Boolean).join(' '))
       return haystack.includes(n)
     })
-  }, [recipes, query, category, filters, favesOnly, favouriteIds])
+  }, [recipes, query, category, filters, favesOnly, favouriteIds, canMake, ctx, pantry])
 
   /**
    * The number on a tab counts cards, not recipes.
@@ -224,6 +235,17 @@ export default function Recipes() {
               <Star size={12} className={favesOnly ? 'fill-current' : ''} /> Favourites
             </button>
 
+            {/* Only worth offering once the cupboard has something in it:
+                before that it filters everything out and reads as a bug. */}
+            {pantry.size > 0 && (
+              <button
+                onClick={() => setCanMake((v) => !v)}
+                className={canMake ? 'chip bg-teal-500 text-white border border-teal-500' : 'chip-off'}
+              >
+                🥫 Can make now
+              </button>
+            )}
+
             <button className={category ? 'chip-on' : 'chip-off'} onClick={() => setSheet('category')}>
               {category ? CATEGORY_LABELS[category] : 'Any dish'} <ChevronDown size={13} />
             </button>
@@ -267,7 +289,9 @@ export default function Recipes() {
             tab={tab}
             filtered={filtered}
             onNew={() => setEditing(null)}
-            onClear={() => { setQuery(''); setCategory(null); setFilters([]); setFavesOnly(false) }}
+            onClear={() => {
+              setQuery(''); setCategory(null); setFilters([]); setFavesOnly(false); setCanMake(false)
+            }}
           />
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -543,6 +567,35 @@ function EmptyShelf({
   )
 }
 
+/**
+ * What this recipe would still cost you a trip for.
+ *
+ * Shown only when the cupboard has something to say, and worded as a list
+ * rather than a verdict: whether three missing things is a lot depends
+ * entirely on which three, and you are the one who can see them.
+ */
+function ShoppingNote({ recipe }: { recipe: Recipe }) {
+  const ctx = useNutritionContext()
+  const pantry = usePantry()
+  if (!pantry.size) return null
+
+  const state = availability(recipe, ctx, pantry)
+  if (!state.have.length && !state.missing.length) return null
+
+  const missing = missingFoods(state, ctx.foods)
+
+  return (
+    <div className={`card-soft p-3 ${state.missing.length ? '' : 'bg-teal-50'}`}>
+      <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-1">
+        {availabilityLabel(state)}
+      </p>
+      {missing.length > 0 && (
+        <p className="text-sm text-ink-700">{missing.join(', ')}</p>
+      )}
+    </div>
+  )
+}
+
 function RecipeDetail({
   card, isMine, onEdit, onClose,
 }: {
@@ -680,6 +733,8 @@ function RecipeDetail({
               <SourceLine text={recipe.sourceLine} />
             </div>
           ) : null}
+
+          <ShoppingNote recipe={recipe} />
 
           <div>
             <p className="text-3xl font-extrabold font-mono text-ink-900">
