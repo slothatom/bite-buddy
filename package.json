@@ -22,7 +22,8 @@
     "build:single": "npm run build && tsx scripts/build-single.ts",
     "test:single": "npm run build:single && node scripts/check-single.mjs",
     "text:check": "tsx scripts/check-text.ts",
-    "db:check": "tsx scripts/check-db.ts"
+    "db:check": "tsx scripts/check-db.ts",
+    "check:contrast": "tsx scripts/check-contrast.ts"
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
