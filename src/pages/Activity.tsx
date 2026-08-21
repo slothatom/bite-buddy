@@ -401,7 +401,7 @@ function StepsPanel({ who, steps }: { who: PersonId; steps: StepEntry[] }) {
                 <span>{new Date(s.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
                 <span className="font-mono">
                   {s.steps.toLocaleString()}
-                  {s.source === 'garmin' && <span className="text-ink-300 ml-1">watch</span>}
+                  {s.source === 'garmin' && <span className="text-ink-500 ml-1">watch</span>}
                 </span>
               </li>
             ))}
@@ -554,7 +554,7 @@ function SleepRow({ entry, onRemove }: { entry: SleepEntry; onRemove: () => void
       <span className="text-sm font-mono text-ink-700 shrink-0">
         {entry.hours.toFixed(1)} h
         {entry.quality ? <span className="text-ink-500 ml-2">{entry.quality}/5</span> : null}
-        {entry.source === 'garmin' && <span className="text-ink-300 ml-2 text-xs">watch</span>}
+        {entry.source === 'garmin' && <span className="text-ink-500 ml-2 text-xs">watch</span>}
       </span>
       <button
         className="btn-ghost btn-icon shrink-0 text-ink-300 hover:text-coral-600"

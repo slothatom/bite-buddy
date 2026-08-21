@@ -32,8 +32,8 @@
   --color-coral-300: #ffa8a8;
   --color-coral-400: #ff8888;
   --color-coral-500: #ff6868;
-  --color-coral-600: #ed4f4f;
-  --color-coral-700: #ce3b3b;
+  --color-coral-600: #e11717;
+  --color-coral-700: #ce3a3a;
   --color-coral-800: #a93030;
   --color-coral-900: #8a2a2a;
 
@@ -44,7 +44,7 @@
   --color-teal-300: #6adcd1;
   --color-teal-400: #2ecbbd;
   --color-teal-500: #00b8a9;
-  --color-teal-600: #009c90;
+  --color-teal-600: #008077;
   --color-teal-700: #007e75;
   --color-teal-800: #066259;
   --color-teal-900: #08504a;
@@ -57,8 +57,8 @@
   --color-mustard-400: #ffdd8c;
   --color-mustard-500: #ffd166;
   --color-mustard-600: #eab53f;
-  --color-mustard-700: #c9962b;
-  --color-mustard-800: #a3781f;
+  --color-mustard-700: #906b1f;
+  --color-mustard-800: #8b661a;
   --color-mustard-900: #82601b;
 
   /* ─── Neutrals ─────────────────────────────────────────────────────────── */
@@ -66,8 +66,8 @@
   --color-paper: #fffdf9;      /* primary card surface */
   --color-ink-900: #2d2320;    /* main text */
   --color-ink-700: #514744;    /* secondary text */
-  --color-ink-500: #817774;    /* muted text */
-  --color-ink-300: #a79d9a;    /* faintest text, placeholders */
+  --color-ink-500: #79706d;    /* muted text, 4.5:1 on cream, the AA floor */
+  --color-ink-300: #998d8a;    /* icons and dividers only, 3:1, never words */
   --color-border-100: #f0eae2;
   --color-border-200: #e6ded5;
 
@@ -216,7 +216,7 @@
 
 @utility input {
   @apply w-full px-3.5 py-2.5 rounded-lg border-2 border-border-200 bg-paper
-         text-sm font-semibold text-ink-900 placeholder-ink-300
+         text-sm font-semibold text-ink-900 placeholder-ink-500
          focus:outline-none focus:border-bite-400 focus:ring-4 focus:ring-bite-100
          transition-all;
 }

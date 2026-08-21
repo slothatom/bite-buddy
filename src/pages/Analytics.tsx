@@ -265,7 +265,7 @@ function BodyTab() {
                 <span className="text-sm text-ink-700">{formatDay(w.date)}</span>
                 <span className="flex items-center gap-3">
                   <span className="text-sm font-mono font-semibold text-ink-900">{w.weight} {w.unit}</span>
-                  <button className="text-xs text-ink-300 hover:text-coral-600" onClick={() => removeWeightEntry(w.id)}>
+                  <button className="text-xs text-ink-500 hover:text-coral-600" onClick={() => removeWeightEntry(w.id)}>
                     Remove
                   </button>
                 </span>
@@ -364,7 +364,7 @@ function BodyTab() {
                       .join(' · ')}
                   </span>
                 </span>
-                <button className="text-xs text-ink-300 hover:text-coral-600 shrink-0"
+                <button className="text-xs text-ink-500 hover:text-coral-600 shrink-0"
                   onClick={() => removeMeasurement(m.id)}>
                   Remove
                 </button>

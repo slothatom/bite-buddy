@@ -202,8 +202,8 @@ Everything is CSS custom properties in one file (`src/index.css`), inside an
 | `--color-paper` | `#fffdf9` | Primary card surface |
 | `--color-ink-900` | `#2d2320` | Main text |
 | `--color-ink-700` | `#514744` | Secondary text |
-| `--color-ink-500` | `#817774` | Muted text |
-| `--color-ink-300` | `#a79d9a` | Placeholders |
+| `--color-ink-500` | `#79706d` | Muted text, and the faintest colour any word may use |
+| `--color-ink-300` | `#998d8a` | Icons and dividers only, never words |
 | `--color-border-100` / `200` | `#f0eae2` / `#e6ded5` | Hairlines and card edges |
 
 ### Type
@@ -265,8 +265,11 @@ The app should read like a kitchen notebook, not an analytics dashboard.
 - One visible focus treatment everywhere, not the browser default
 - Every icon-only control has an `aria-label`
 - No horizontal scroll at any viewport
-- **Not yet done:** contrast has not been formally audited, and over-target status is
-  still signalled largely by hue
+- Colour is measured rather than asserted. `npm run check:contrast` reads the tokens
+  out of `index.css` and the class pairs out of the components, and fails the build
+  below WCAG AA: 4.5:1 for words, 3:1 for large text and for icons. It runs in
+  `verify` and in both workflows
+- **Not yet done:** over-target status is still signalled largely by hue
 
 ---
 

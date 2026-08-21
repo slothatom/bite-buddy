@@ -266,7 +266,7 @@ export default function Recipes() {
                     onClick={() => setLens(on ? null : l)}
                     aria-pressed={on}
                     className={`shrink-0 whitespace-nowrap ${
-                      on ? 'chip bg-teal-500 text-white border border-teal-500'
+                      on ? 'chip bg-teal-700 text-white border border-teal-700'
                         : ready ? 'chip-off' : 'chip-off opacity-50'
                     }`}
                   >
@@ -286,7 +286,7 @@ export default function Recipes() {
           <div className="flex flex-wrap items-center gap-1.5">
             <button
               onClick={() => setFavesOnly((v) => !v)}
-              className={favesOnly ? 'chip bg-coral-500 text-white border border-coral-500' : 'chip-off'}
+              className={favesOnly ? 'chip bg-coral-700 text-white border border-coral-700' : 'chip-off'}
             >
               <Star size={12} className={favesOnly ? 'fill-current' : ''} /> Favourites
             </button>
@@ -455,10 +455,10 @@ function RecipeCard({
     <div className="card p-4 md:p-3.5 relative min-w-0 hover:border-bite-300 hover:shadow-e2 transition-all">
       <button
         onClick={onToggleFavourite}
-        className="absolute top-1.5 right-1.5 p-3.5 text-ink-300 hover:text-coral-500 z-10"
+        className="absolute top-1.5 right-1.5 p-3.5 text-ink-300 hover:text-coral-600 z-10"
         aria-label={favourite ? 'Remove from favourites' : 'Add to favourites'}
       >
-        <Star size={16} className={favourite ? 'fill-coral-500 text-coral-500' : ''} />
+        <Star size={16} className={favourite ? 'fill-coral-600 text-coral-600' : ''} />
       </button>
       <button onClick={onOpen} className="block w-full min-w-0 text-left">
         <span className="flex items-start gap-3 pr-10 min-w-0">

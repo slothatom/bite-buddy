@@ -271,7 +271,7 @@ export default function Home() {
                       className={`w-full rounded-t transition-all ${kcal > 0 ? STATUS_STYLES[status.level].fill : 'bg-border-100'}`}
                       style={{ height: `${kcal > 0 ? Math.max((kcal / peak) * 100, 6) : 6}%` }}
                     />
-                    <span className={`text-[10px] leading-none ${date === today ? 'font-bold text-ink-900' : 'text-ink-300'}`}>
+                    <span className={`text-[10px] leading-none ${date === today ? 'font-bold text-ink-900' : 'text-ink-500'}`}>
                       {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'narrow' })}
                     </span>
                   </div>
