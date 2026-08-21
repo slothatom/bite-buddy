@@ -540,7 +540,8 @@ function PasteRecipe({
         <div>
           <h3 className="display text-lg text-ink-900">Paste a recipe</h3>
           <p className="text-sm text-ink-700">
-            From a website, a message, or a few lines of your own shorthand. It comes back as a
+            The text of one, off a website, out of a message, or a few lines of your own
+            shorthand. Not a link, it cannot open pages. It comes back as a
             draft you can edit, and nothing is saved until you say so.
           </p>
         </div>
