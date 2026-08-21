@@ -59,6 +59,15 @@ That list is the whole security model for who gets in. Anyone not on it cannot
 create an account, even knowing the URL and the key, a database trigger
 rejects the signup itself.
 
+Then paste in all of [`supabase/rows.sql`](../supabase/rows.sql) and run that
+too. It creates the tables the app actually stores your data in, one row per
+meal, weight, recipe or shopping line, with the policies and indexes each of
+them needs. Nothing to edit in this one.
+
+It ends by reading whatever the older `app_state` documents hold and writing
+them out as rows, so a project that has been in use keeps everything it had.
+Running it a second time changes nothing.
+
 Then two settings in the dashboard:
 
 - **Authentication → URL Configuration → Site URL:**
@@ -108,14 +117,17 @@ in, no account to create, no password to agree on.
 ## How the sharing works
 
 Everything is shared: one week, one grocery list, one recipe library, one set of
-targets. Each store is a row in `app_state` holding the same shape the backup
-file uses, and Postgres realtime pushes changes to the other screen as they
-happen.
+targets. It is stored as one row per thing, a meal, a weight, a shopping list
+line, and Postgres realtime pushes changes to the other screen as they happen.
 
-The honest limitation: **last write wins, per store.** If you both edit the same
-day's meals within a second of each other, one of the two edits is lost. With
-two people this is rare, and realtime makes it visible, you see their change
-land. It is not a merge, and it is not trying to be.
+What wins is decided per row, and it favours the device in front of you: a row
+you have changed and not yet sent stays, whatever the server says. Everything
+else takes the shared version, deletions included.
+
+**The honest limitation: both of you editing the same row.** Not the same day,
+the same meal. The later write wins and the app says so on screen rather than
+letting your version disappear without a word. It does not offer you both
+versions to choose between.
 
 Offline still works. The app writes locally first, so a dropped connection
 changes nothing except that the other person doesn't see it yet; the welcome
