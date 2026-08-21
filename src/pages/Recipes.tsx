@@ -22,6 +22,9 @@ import {
 import { interchangeableGroups } from '../lib/mergeRecipes'
 import { usePantry } from '../store/usePantryStore'
 import { availability, availabilityLabel, missingFoods } from '../lib/pantry'
+import { throughLens, lensReady, lensBlocker, LENSES, LENS_ORDER, type Lens } from '../lib/discovery'
+import { useUserStore } from '../store/useUserStore'
+import { useMealPlanStore } from '../store/useMealPlanStore'
 
 /**
  * The recipe library.
@@ -58,13 +61,19 @@ export default function Recipes() {
 
   const mine = useMemo(() => new Set(custom.map((r) => r.id)), [custom])
   const pantry = usePantry()
+  const plan = useMealPlanStore((s) => s.plan)
+  const { profile } = useUserStore()
+  const today = new Date().toISOString().slice(0, 10)
 
   /**
-   * "What can I cook right now", which is the question a full cupboard makes
-   * answerable and an empty one makes meaningless, so the chip only appears
-   * once there is something in it.
+   * The question being asked, rather than another thing to tick.
+   *
+   * Nobody stands in a kitchen at seven wondering about categories. They wonder
+   * what is quick, what can be made from what is in, what needs using up. Each
+   * of those is a different order as much as a different filter, so it is one
+   * choice at a time and the rule is printed underneath rather than implied.
    */
-  const [canMake, setCanMake] = useState(false)
+  const [lens, setLens] = useState<Lens | null>(null)
 
   /** Everything the search and chips allow, before the shelf is chosen. */
   const matching = useMemo(() => {
@@ -74,7 +83,7 @@ export default function Recipes() {
       if (category && r.category !== category) return false
       // Every ticked filter has to hold: they narrow together, they do not pile up.
       if (filters.some((f) => !hasQuickFilter(r, f))) return false
-      if (canMake && availability(r, ctx, pantry).missing.length) return false
+
       if (!n) return true
       // The dietician's own line is searched too, so "telemea" finds the meals
       // that were written in Romanian.
@@ -82,7 +91,22 @@ export default function Recipes() {
         [r.name.en, r.name.ro, r.name.hu, r.sourceLine].filter(Boolean).join(' '))
       return haystack.includes(n)
     })
-  }, [recipes, query, category, filters, favesOnly, favouriteIds, canMake, ctx, pantry])
+  }, [recipes, query, category, filters, favesOnly, favouriteIds])
+
+  const lensInput = useMemo(
+    () => ({ recipes: matching, ctx, today, plan, pantry, targets: profile.targets }),
+    [matching, ctx, today, plan, pantry, profile.targets],
+  )
+
+  /**
+   * The lens applies last, over whatever the search and chips left, so the two
+   * compose: "quick" inside "soups" is a sensible question and the alternative
+   * would be two filters fighting each other.
+   */
+  const lensed = useMemo(
+    () => (lens ? throughLens(lens, lensInput) : matching),
+    [lens, lensInput, matching],
+  )
 
   /**
    * The number on a tab counts cards, not recipes.
@@ -94,11 +118,11 @@ export default function Recipes() {
   const counts = useMemo(() => {
     const c = new Map<Tab, number>()
     for (const g of RECIPE_GROUPS) {
-      c.set(g, groupVariants(matching.filter((r) => groupsOf(r).includes(g))).length)
+      c.set(g, groupVariants(lensed.filter((r) => groupsOf(r).includes(g))).length)
     }
-    c.set('mine', groupVariants(matching.filter((r) => mine.has(r.id))).length)
+    c.set('mine', groupVariants(lensed.filter((r) => mine.has(r.id))).length)
     return c
-  }, [matching, mine])
+  }, [lensed, mine])
 
   /**
    * Searching looks past the shelf you happen to be on.
@@ -111,10 +135,10 @@ export default function Recipes() {
    */
   const shown = useMemo(() => {
     const onShelf = tab === 'mine'
-      ? matching.filter((r) => mine.has(r.id))
-      : matching.filter((r) => groupsOf(r).includes(tab))
+      ? lensed.filter((r) => mine.has(r.id))
+      : lensed.filter((r) => groupsOf(r).includes(tab))
 
-    const list = onShelf.length === 0 && query.trim() ? matching : onShelf
+    const list = onShelf.length === 0 && query.trim() ? lensed : onShelf
 
     // Favourites first, then alphabetical: the handful you actually cook should
     // not be somewhere in the middle of seventy.
@@ -122,14 +146,14 @@ export default function Recipes() {
       const fav = Number(favouriteIds.includes(b.id)) - Number(favouriteIds.includes(a.id))
       return fav || a.name.en.localeCompare(b.name.en)
     })
-  }, [matching, tab, mine, favouriteIds, query])
+  }, [lensed, tab, mine, favouriteIds, query])
 
   /** True when the shelf was set aside because it had no matches. */
   const searchedEverywhere = useMemo(() => {
     if (!query.trim()) return false
     const onShelf = tab === 'mine'
-      ? matching.filter((r) => mine.has(r.id))
-      : matching.filter((r) => groupsOf(r).includes(tab))
+      ? lensed.filter((r) => mine.has(r.id))
+      : lensed.filter((r) => groupsOf(r).includes(tab))
     return onShelf.length === 0 && matching.length > 0
   }, [matching, tab, mine, query])
 
@@ -227,6 +251,36 @@ export default function Recipes() {
             recipes underneath it, so each opens a sheet and what you have picked
             comes back as a chip you can take off.
           */}
+          {/* One question at a time, and the rule underneath it. A filter
+              nobody can explain is a filter nobody trusts. */}
+          <div className="-mx-4 sm:mx-0 px-4 sm:px-0 overflow-x-auto">
+            <div className="flex gap-1.5 w-max pb-0.5">
+              {LENS_ORDER.map((l) => {
+                const ready = lensReady(l, lensInput)
+                const on = lens === l
+                return (
+                  <button
+                    key={l}
+                    onClick={() => setLens(on ? null : l)}
+                    aria-pressed={on}
+                    className={`shrink-0 whitespace-nowrap ${
+                      on ? 'chip bg-teal-500 text-white border border-teal-500'
+                        : ready ? 'chip-off' : 'chip-off opacity-50'
+                    }`}
+                  >
+                    {LENSES[l].emoji} {LENSES[l].label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {lens && (
+            <p className="text-xs text-ink-500">
+              {lensReady(lens, lensInput) ? LENSES[lens].rule : lensBlocker(lens)}
+            </p>
+          )}
+
           <div className="flex flex-wrap items-center gap-1.5">
             <button
               onClick={() => setFavesOnly((v) => !v)}
@@ -234,17 +288,6 @@ export default function Recipes() {
             >
               <Star size={12} className={favesOnly ? 'fill-current' : ''} /> Favourites
             </button>
-
-            {/* Only worth offering once the cupboard has something in it:
-                before that it filters everything out and reads as a bug. */}
-            {pantry.size > 0 && (
-              <button
-                onClick={() => setCanMake((v) => !v)}
-                className={canMake ? 'chip bg-teal-500 text-white border border-teal-500' : 'chip-off'}
-              >
-                🥫 Can make now
-              </button>
-            )}
 
             <button className={category ? 'chip-on' : 'chip-off'} onClick={() => setSheet('category')}>
               {category ? CATEGORY_LABELS[category] : 'Any dish'} <ChevronDown size={13} />
@@ -290,7 +333,7 @@ export default function Recipes() {
             filtered={filtered}
             onNew={() => setEditing(null)}
             onClear={() => {
-              setQuery(''); setCategory(null); setFilters([]); setFavesOnly(false); setCanMake(false)
+              setQuery(''); setCategory(null); setFilters([]); setFavesOnly(false); setLens(null)
             }}
           />
         ) : (

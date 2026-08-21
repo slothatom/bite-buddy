@@ -148,6 +148,25 @@ starts on Monday by default and can start on any of the seven; loading an archiv
 its days up by weekday, so a Wednesday meal still lands on a Wednesday.
 
 ### Recipes
+A row of **lenses** across the top, because nobody stands in a kitchen at seven wondering
+about categories. They wonder what is quick, what can be made from what is in, and what
+needs using up. Each is a different order as much as a different filter, and each prints its
+rule underneath, since a filter nobody can explain is a filter nobody trusts:
+
+| Lens | Rule |
+|---|---|
+| Quick tonight | Twenty minutes or less, start to plate. Quickest first. |
+| From the cupboard | Everything it needs is something you have. Fewest ingredients first. |
+| Use it up | Uses something in the cupboard with a date on it. Soonest first. |
+| Fits today | Lands inside what is left of today against your target. Closest first. |
+| Not lately | Nothing you have planned in the last month. Longest gap first. |
+| Worth a batch | Makes four or more, and keeps. Most portions first. |
+
+One at a time, and they compose with the search and the chips, so "quick" inside "soups" is
+a sensible question. A lens that cannot answer, "from the cupboard" with an empty cupboard,
+says what is missing rather than showing an empty screen that reads as "you have no
+recipes". `src/lib/discovery.ts` holds the rules.
+
 275 recipes on six shelves, opening on the meal you are most likely looking for at this hour.
 Searchable in English, Romanian or Hungarian, typing `telemea` or `zabpehely` finds the right
 thing. Every imported meal shows the original dietician line as provenance. Macros are always
@@ -225,9 +244,8 @@ because 200 g of the 500 g a week needs is a different answer.
 rebuild does not ask again. Nothing is ever decremented automatically. The cupboard is in your
 kitchen and the app has never seen it.
 
-The recipe list gains a **Can make now** chip once the cupboard has anything in it, and a
-recipe says what it would still cost you a trip for. Worded as a list rather than a verdict:
-whether three missing things is a lot depends entirely on which three.
+A recipe says what it would still cost you a trip for. Worded as a list rather than a
+verdict: whether three missing things is a lot depends entirely on which three.
 
 ### Moments
 Eight little things Zig notices, a first day planned, a whole week, something actually
