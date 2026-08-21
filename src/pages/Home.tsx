@@ -416,7 +416,7 @@ function MomentNote() {
 }
 
 function SyncLine() {
-  const { state, at, unsaved, schemaMismatch, conflicts, lastError } = useSyncStatus()
+  const { state, at, unsaved, conflicts, lastError } = useSyncStatus()
 
   // Unsaved changes outrank everything else: it is the only state where what
   // you are looking at is not what the other person will see.
@@ -425,10 +425,6 @@ function SyncLine() {
       ? [AlertTriangle,
          `You and someone else both changed ${conflicts.length === 1 ? formatDay(conflicts[0]) : `${conflicts.length} days`}. The later edit was kept. Worth a look.`,
          'text-mustard-700']
-    : schemaMismatch
-      ? [AlertTriangle,
-         'The other device is running a different version of the app. Nothing has been overwritten. Reload this page to pick up the latest.',
-         'text-coral-600']
     : unsaved
       ? [CloudOff,
          `${unsaved} ${unsaved === 1 ? 'change' : 'changes'} not saved yet, kept on this device and retried automatically.`,

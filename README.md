@@ -247,6 +247,58 @@ Two independent routes, because they answer different questions, and either can 
 
 ---
 
+## How your data is stored
+
+Everything lives on the device first, in localStorage, and every screen reads
+from there. That is what makes the app work with no signal and with no account
+at all: run it yourself without Supabase keys and there is no sign-in, no
+network, and nothing missing.
+
+When an account is configured, the shared copy lives in Postgres as **one row
+per thing**: a meal, a weight, a shopping list line, a recipe you wrote. Not one
+document per store, which is what it used to be and which caused the worst bug
+this app has had.
+
+A document says what exists. Three consequences, all of which bit:
+
+| Under documents | Under rows |
+|---|---|
+| A write is all or nothing, so saving a weight rewrote every weight | A write is about one thing, so two people rarely contend at all |
+| A deletion is an absence, and merging two lists cannot express "this went away" | A deletion is a row with `deleted_at` set, a fact that travels like any other |
+| Every change sent the whole store | A pull asks for what changed since last time |
+
+Each table carries `id`, `data`, `updated_at`, `deleted_at` and `updated_by`,
+plus the few columns the app filters on: `day`, `member_id`, `slot`. Everything
+else stays inside `data`. That is a deliberate middle position: a column per
+field would be more conventional and would mean a database migration every time
+a recipe gains one, for no gain, since this database has exactly one client and
+the types are enforced in TypeScript. What matters is that **the unit of change
+is a row**, because that is what was wrong before.
+
+Rows are never removed, only marked deleted, which is also what keeps archived
+weeks resolving: a plan from 2022 names a recipe by id, and that id still finds
+something.
+
+`supabase/rows.sql` creates it all, and ends with a one-time import that reads
+whatever the old `app_state` documents hold and writes them out as rows. The old
+table is left alone.
+
+### What wins when both of you change something
+
+Per row, and local-first: a row this device changed and has not yet delivered
+stays, whatever the server says. Anything else takes the server's version,
+including its deletions. When both copies moved since they last agreed, theirs
+is kept and yours is reported on screen rather than disappearing quietly.
+
+The device remembers a fingerprint of every row it has sent or received, which
+is what makes a deletion detectable at all, and it is persisted so a deletion
+made offline survives being closed. If local state is empty but that record is
+full, the app refuses to publish it: that is what a cleared browser looks like
+from the inside, and sending it faithfully would take the other person's copy
+down too.
+
+---
+
 ## Deployment
 
 Free end to end: **GitHub Pages** for the site, **Supabase** free tier for the
@@ -255,13 +307,15 @@ guest list lives in the database, so an address that isn't on it cannot create
 an account even with the URL and the key.
 
 Everything is shared between the two accounts: one week, one grocery list, one
-recipe library. Each store syncs as a document and Postgres realtime pushes
-changes to the other screen as they happen. The honest limit is last-write-wins
-per store, with two people that is rare, and you see it happen.
+recipe library. It syncs as rows, one per meal, weight or shopping line, and
+Postgres realtime pushes changes to the other screen as they happen. See
+[how your data is stored](#how-your-data-is-stored) for what wins when you both
+change the same thing.
 
-Setup is four steps, all in [`docs/DEPLOY.md`](docs/DEPLOY.md): make the repo
-public, create the Supabase project, run `supabase/schema.sql`, add two
-repository secrets. Every push then deploys itself.
+Setup is five steps, all in [`docs/DEPLOY.md`](docs/DEPLOY.md): make the repo
+public, create the Supabase project, run `supabase/schema.sql` and then
+`supabase/rows.sql`, add two repository secrets. Every push then deploys
+itself.
 
 ### Cook session reminders
 
@@ -548,11 +602,12 @@ clamps; it is never truncated to a single line where the words carry meaning.
 
 ## Deliberately not done
 
-**No conflict resolution.** Sync is last-write-wins per store, not a merge. Two
-people editing the same day within a second of each other lose one of the two
-edits. Proper merging means per-entry rows, timestamps and a resolution UI -
-a lot of machinery for a two-person household where realtime already makes the
-collision visible.
+**No resolution screen for a contested row.** Sync is per row now, so two
+people have to be editing the same meal, not the same day, before either can
+lose anything. When that does happen the later write wins and the app says so
+on screen. Offering both versions and asking you to choose is a screen and a
+data model for something that has to happen at the same second in a household
+of two.
 
 **No per-user data.** You share everything, by choice. There is no notion of
 "my plan" and "their plan", which is what keeps the permission model down to a

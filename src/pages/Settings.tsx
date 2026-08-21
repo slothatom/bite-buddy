@@ -499,7 +499,7 @@ function AccountPanel() {
  * put the state and the server's own words on a screen you can go and look at.
  */
 function SyncPanel() {
-  const { state, at, unsaved, lastError, schemaMismatch } = useSyncStatus()
+  const { state, at, unsaved, lastError } = useSyncStatus()
 
   const summary =
     state === 'live' && !unsaved ? 'Everything on this device has reached the shared copy.'
@@ -518,7 +518,6 @@ function SyncPanel() {
           <Row label="State" value={state} />
           <Row label="Last agreed" value={at ? at.toLocaleTimeString('en-GB') : 'not yet'} />
           <Row label="Waiting" value={String(unsaved)} />
-          {schemaMismatch && <Row label="Versions" value="the other device is on a different build" />}
           {lastError && <Row label="Server said" value={lastError} />}
         </dl>
 
