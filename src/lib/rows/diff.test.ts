@@ -156,3 +156,28 @@ describe('when both of you changed the same thing', () => {
     expect(contested).toEqual([])
   })
 })
+
+describe('a row that has been round the database', () => {
+  it('fingerprints the same as the one the app produced', () => {
+    // Postgres returns every column, so a field the app leaves out comes back
+    // as null. Treating that as a change means two phones push the same row at
+    // each other for as long as they are both open.
+    const asWritten: SyncRow = { id: 'w1', data: { weight: 72 }, day: '2026-08-19' }
+    const asReturned: SyncRow = {
+      id: 'w1', data: { weight: 72 }, day: '2026-08-19',
+      member_id: null, deleted_at: null, merged_into: null,
+      updated_at: NOW, updated_by: 'someone',
+    }
+    expect(fingerprint(asReturned)).toBe(fingerprint(asWritten))
+  })
+
+  it('is not sent straight back after being received', () => {
+    const asReturned: SyncRow = {
+      id: 'w1', data: { weight: 72 }, day: '2026-08-19',
+      member_id: null, deleted_at: null, updated_at: NOW,
+    }
+    const { agreed } = applyRemote([], [asReturned], empty)
+    const { send } = localChanges([{ id: 'w1', data: { weight: 72 }, day: '2026-08-19' }], { rows: agreed }, NOW)
+    expect(send).toEqual([])
+  })
+})
