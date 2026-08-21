@@ -39,6 +39,15 @@ export interface SyncSnapshot {
    * this is how the other person's loss becomes visible rather than silent.
    */
   conflicts: string[]
+  /**
+   * What the server said when it last refused something, verbatim.
+   *
+   * "Can't reach the server" covers a train tunnel and a row-level security
+   * policy that will refuse every write until somebody changes it, and those
+   * need very different reactions. Keeping the message means the screen can say
+   * which one it is instead of making you guess.
+   */
+  lastError: string | null
 }
 
 let applying = false
@@ -47,14 +56,16 @@ const listeners = new Set<() => void>()
 // One frozen object, replaced only when something actually changes. React's
 // useSyncExternalStore compares snapshots by identity, so returning a fresh
 // object per read would re-render forever.
-let snapshot: SyncSnapshot = { state: 'off', at: null, unsaved: 0, schemaMismatch: false, conflicts: [] }
+let snapshot: SyncSnapshot = {
+  state: 'off', at: null, unsaved: 0, schemaMismatch: false, conflicts: [], lastError: null,
+}
 
 function announce(next: Partial<SyncSnapshot>) {
   const merged = { ...snapshot, ...next }
   if (
     merged.state === snapshot.state && merged.at === snapshot.at &&
     merged.unsaved === snapshot.unsaved && merged.schemaMismatch === snapshot.schemaMismatch &&
-    merged.conflicts.join() === snapshot.conflicts.join()
+    merged.conflicts.join() === snapshot.conflicts.join() && merged.lastError === snapshot.lastError
   ) return
   snapshot = merged
   for (const fn of listeners) fn()
@@ -143,7 +154,7 @@ export function acknowledgeConflicts(): void {
 export function startSync(userId: string): () => void {
   const db = supabase
   if (!db) {
-    announce({ state: 'off', at: null, unsaved: 0 })
+    announce({ state: 'off', at: null, unsaved: 0, lastError: null })
     return () => {}
   }
 
@@ -167,7 +178,11 @@ export function startSync(userId: string): () => void {
         },
         { onConflict: 'key' },
       )
-      if (error) throw new Error(error.message)
+      if (error) {
+        announce({ lastError: error.message })
+        throw new Error(error.message)
+      }
+      announce({ lastError: null })
     },
     onChange: (s) => announce({
       unsaved: s.pending.length,
@@ -181,7 +196,7 @@ export function startSync(userId: string): () => void {
   const pullAll = async () => {
     const { data, error } = await db.from('app_state').select('key, data, schema')
     if (error) {
-      announce({ state: 'error' })
+      announce({ state: 'error', lastError: error.message })
       return false
     }
     for (const row of data ?? []) applyRemote(row.key as StoreKey, row.data, row.schema)
@@ -199,6 +214,18 @@ export function startSync(userId: string): () => void {
         queue.mark(key)
       }))
     }
+
+    // 2a. Send the merged result of every store, whether or not anything
+    //     changed since the app opened.
+    //
+    //     The queue only knows about edits made while it is running, and it
+    //     lives in memory, so anything typed in during a session that never
+    //     reached the server, no signal, a refused write, the tab closed, was
+    //     never going to be offered again. The device would keep quietly
+    //     holding data the server had never seen, and the next pull would
+    //     overwrite it. Pushing once at startup closes that hole: whatever this
+    //     device holds gets one guaranteed attempt at reaching the server.
+    for (const store of STORES) queue.mark(store.name as StoreKey)
 
     // 3. Apply the other person's changes as they land.
     const channel = db

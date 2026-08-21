@@ -419,6 +419,12 @@ export interface UserProfile {
   /** 'system' follows the device; the other two override it in either direction. */
   /** Little things Zig has noticed. See lib/moments.ts for why these are not points. */
   moments: Moment[]
+  /**
+   * When this profile last changed, so two devices can tell whose copy is
+   * newer. Optional because profiles written before sync existed have no stamp,
+   * and an unstamped profile counts as the older one.
+   */
+  updatedAt?: string
 }
 
 /** One thing Zig noticed, once. */

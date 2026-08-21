@@ -32,16 +32,29 @@ const INITIAL_PROFILE: UserProfile = {
   moments: [],
 }
 
+/**
+ * Stamps the profile as changed.
+ *
+ * The profile is one object, so the two devices cannot both keep their version
+ * of it the way the logs can: something has to win. The stamp is what decides,
+ * and without it the merge has nothing to go on and always keeps whichever copy
+ * is local, so a target set on one phone never reaches the other.
+ */
+function stamped(profile: UserProfile): UserProfile {
+  return { ...profile, updatedAt: new Date().toISOString() }
+}
+
 export const useUserStore = create<UserStore>()(
   persist(
     (set, get) => ({
       profile: INITIAL_PROFILE,
 
-      setName: (name) => set((s) => ({ profile: { ...s.profile, name } })),
-      setTargets: (targets) => set((s) => ({ profile: { ...s.profile, targets } })),
-      setTdee: (tdee) => set((s) => ({ profile: { ...s.profile, tdee } })),
-      setWeekStart: (weekStartsOn) => set((s) => ({ profile: { ...s.profile, weekStartsOn } })),
-      setFoodNameLanguage: (foodNameLanguage) => set((s) => ({ profile: { ...s.profile, foodNameLanguage } })),
+      setName: (name) => set((s) => ({ profile: stamped({ ...s.profile, name }) })),
+      setTargets: (targets) => set((s) => ({ profile: stamped({ ...s.profile, targets }) })),
+      setTdee: (tdee) => set((s) => ({ profile: stamped({ ...s.profile, tdee }) })),
+      setWeekStart: (weekStartsOn) => set((s) => ({ profile: stamped({ ...s.profile, weekStartsOn }) })),
+      setFoodNameLanguage: (foodNameLanguage) =>
+        set((s) => ({ profile: stamped({ ...s.profile, foodNameLanguage }) })),
 
       notice: (context) =>
         set((s) => {
@@ -51,10 +64,10 @@ export const useUserStore = create<UserStore>()(
 
           const at = new Date().toISOString()
           return {
-            profile: {
+            profile: stamped({
               ...s.profile,
               moments: [...s.profile.moments, ...fresh.map((kind) => ({ kind, at, seen: false }))],
-            },
+            }),
           }
         }),
 
@@ -64,10 +77,10 @@ export const useUserStore = create<UserStore>()(
 
       markMomentSeen: (kind) =>
         set((s) => ({
-          profile: {
+          profile: stamped({
             ...s.profile,
             moments: s.profile.moments.map((m) => (m.kind === kind ? { ...m, seen: true } : m)),
-          },
+          }),
         })),
     }),
     {

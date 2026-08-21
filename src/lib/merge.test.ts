@@ -104,15 +104,21 @@ describe('mergeMealPlan', () => {
 })
 
 describe('mergeStore', () => {
-  it('merges the meal plan and takes the remote copy of everything else', () => {
+  it('merges the meal plan, and keeps both sides of a log', () => {
     const local = { plan: [day('2026-08-20', [meal('mine')], at(9))] }
     const remote = { plan: [day('2026-08-20', [meal('theirs')], at(1))] }
 
     expect((mergeStore('bite-buddy-mealplan-v2', local, remote).merged as typeof local).plan[0].meals)
       .toEqual([meal('mine')])
 
-    expect(mergeStore('bite-buddy-cook', { sessions: ['mine'] }, { sessions: ['theirs'] }).merged)
-      .toEqual({ sessions: ['theirs'] })
+    // This used to take the server's sessions and drop the device's, which is
+    // how a cook session booked offline disappeared on the next refresh.
+    const cook = mergeStore(
+      'bite-buddy-cook',
+      { sessions: [{ id: 'a', label: 'mine' }] },
+      { sessions: [{ id: 'b', label: 'theirs' }] },
+    ).merged as { sessions: { id: string }[] }
+    expect(cook.sessions.map((s) => s.id).sort()).toEqual(['a', 'b'])
   })
 
   it('keeps a merge made on one phone when the other pushes its copy', () => {

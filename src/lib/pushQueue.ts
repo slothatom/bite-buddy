@@ -94,6 +94,10 @@ export class PushQueue {
     let failed = false
 
     for (const [key, revision] of attempting) {
+      // Checked before the push as well as after it. Only checking after meant
+      // that stopping mid-flush still sent one more document, which after a
+      // sign-out is a write from a session that is over.
+      if (this.stopped) return
       try {
         await this.opts.push(key)
         // Only clear it if nothing changed while the push was in flight, the
