@@ -744,5 +744,6 @@ recipe, plan or measurement is served at a public URL for anything else to read.
 
 ## Not done yet
 
-- Pantry tracking, saved week templates.
+- Saved week templates.
 - Push notifications when the other person changes the week.
+- A recipe assistant that can open a link rather than being handed the text.
