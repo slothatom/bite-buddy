@@ -73,7 +73,7 @@ export default function GroceryList() {
 
   return (
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h1 className="display text-xl sm:text-2xl text-ink-900">Shopping list</h1>
@@ -138,8 +138,13 @@ export default function GroceryList() {
               : 'Plan some meals first, then build the list from them. You can also add lines by hand below.'}
           </EmptyState>
         ) : (
-          grouped.map(([category, items]) => (
-            <section key={category}>
+          // Two columns from lg, laid out as masonry so a category with three
+          // lines does not leave a hole beside one with twelve. A shop is read
+          // top to bottom in one column on a phone and scanned as a whole on a
+          // laptop, and the second is what a wide screen is for.
+          <div className="lg:columns-2 lg:gap-5 space-y-5 lg:space-y-0">
+          {grouped.map(([category, items]) => (
+            <section key={category} className="lg:break-inside-avoid lg:mb-5">
               <SectionHeading>
                 <span className="flex items-center gap-2 text-base">
                   {CATEGORY_EMOJI[category]} {CATEGORY_LABELS[category]}
@@ -164,7 +169,8 @@ export default function GroceryList() {
                 ))}
               </div>
             </section>
-          ))
+          ))}
+          </div>
         )}
 
         <AddItem onAdd={(name, amount) => addGroceryItem({ name, amount })} />

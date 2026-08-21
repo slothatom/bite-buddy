@@ -217,9 +217,16 @@ export function SourceLine({
   /** Up to this many lines, for places where the original wording is the point. */
   clamp?: 2 | 3
 }) {
-  const wrap = clamp ? (clamp === 2 ? 'line-clamp-2' : 'line-clamp-3') : truncate ? 'truncate' : ''
+  // `block` and `line-clamp-*` both set `display`, and which one wins depends on
+  // the order Tailwind happens to emit them in rather than on the order written
+  // here. `block` was winning, so every clamp in the app did nothing and a
+  // 187-character dietician line ran to six lines inside a recipe card.
+  const wrap = clamp
+    ? (clamp === 2 ? 'line-clamp-2' : 'line-clamp-3')
+    : truncate ? 'block truncate' : 'block'
+
   return (
-    <span className={`block text-[13px] text-ink-500 min-w-0 ${wrap}`}>{text}</span>
+    <span className={`text-[13px] text-ink-500 min-w-0 ${wrap}`}>{text}</span>
   )
 }
 

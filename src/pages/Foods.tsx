@@ -58,7 +58,7 @@ export default function Foods() {
 
   return (
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header className="flex items-start justify-between gap-3">
           <div>
             <h1 className="display text-xl sm:text-2xl text-ink-900">Foods</h1>
@@ -116,7 +116,12 @@ export default function Foods() {
                 <span>{CATEGORY_EMOJI[cat]}</span> {CATEGORY_LABELS[cat]}
                 <span className="text-ink-500 font-normal">({list.length})</span>
               </h2>
-              <div className="card divide-y divide-border-100">
+              {/* Two columns from xl. One column of 122 foods on a laptop is
+                  half a screen of names and half a screen of nothing, and the
+                  numbers end up a hand's width from the name they describe.
+                  The divider moves to the cell so the columns still read as
+                  rows rather than as two lists. */}
+              <div className="card xl:grid xl:grid-cols-2 xl:gap-x-2 divide-y divide-border-100 xl:divide-y-0">
                 {list.map((f) => (
                   // One row on a wide screen. On a phone the tier badge and the
                   // 112px figures column left the name 85px of 356, so they drop
@@ -125,7 +130,7 @@ export default function Foods() {
                     key={f.id}
                     onClick={() => setEditing(f)}
                     aria-label={`Edit ${f.names.en}`}
-                    className="w-full text-left flex flex-col gap-1 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-3 md:py-2 hover:bg-cream-50 transition-colors"
+                    className="w-full text-left flex flex-col gap-1 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-3 md:py-2 hover:bg-cream-50 transition-colors xl:border-b xl:border-border-100"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-ink-900">{f.names.en}</p>
@@ -138,7 +143,12 @@ export default function Foods() {
                       ) : null}
                     </div>
                     <div className="flex items-center justify-between gap-3 sm:justify-end">
-                      <TierBadge tier={f.medTier} />
+                      {/* A fixed lane for the badge, so "Moderation" does not
+                          shove the figures left and leave every row in the
+                          column starting somewhere different. */}
+                      <span className="sm:w-24 sm:flex sm:justify-start shrink-0">
+                        <TierBadge tier={f.medTier} />
+                      </span>
                       <div className="text-right shrink-0 sm:w-52">
                         <p className="text-sm font-mono font-bold text-ink-900">
                           {Math.round(f.per100g.calories)}<span className="text-ink-500 font-normal text-xs"> kcal</span>

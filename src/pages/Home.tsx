@@ -129,7 +129,7 @@ export default function Home() {
 
   return (
     <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
         <MomentNote />
 
@@ -190,6 +190,11 @@ export default function Home() {
             <WeightTile />
           )}
         </div>
+
+        {/* Today and the week, side by side from lg. They are read together,
+            "what am I eating" and "how is the week going", and stacking them
+            put the second one below the fold on every laptop. */}
+        <div className="lg:grid lg:grid-cols-2 lg:gap-5 space-y-6 lg:space-y-0 lg:items-start">
 
         {/* ─── Today ───────────────────────────────────────────────────────── */}
         <section>
@@ -281,6 +286,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        </div>
 
         {/* ─── Ideas ───────────────────────────────────────────────────────── */}
         {shown.length > 0 && (
