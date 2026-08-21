@@ -1306,6 +1306,55 @@ test.describe('asking the recipe list a question', () => {
   })
 })
 
+test.describe('a laptop is not a large phone', () => {
+  test.use({ viewport: { width: 1512, height: 950 } })
+
+  test('a whole day fits on the planner without scrolling', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/plan')
+
+    // All five slots, in the viewport, at once. Stacked full width a laptop
+    // showed two and put the rest below the fold, which is the one thing a big
+    // screen should never do to a day.
+    for (const slot of ['Breakfast', 'Snack 1', 'Lunch', 'Snack 2', 'Dinner']) {
+      const box = await page.getByText(slot, { exact: true }).first().boundingBox()
+      expect(box, `${slot} is missing`).not.toBeNull()
+      expect(box!.y, `${slot} is below the fold`).toBeLessThan(950)
+    }
+  })
+
+  test('the shopping list uses both halves of the screen', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/grocery')
+    await page.getByRole('button', { name: /Build list/ }).click()
+
+    const rows = page.locator('.card input[type="checkbox"]')
+    await expect(rows.first()).toBeVisible()
+
+    // Two columns means two distinct left edges. Every row has to be measured,
+    // not the first twenty: a column layout fills the left column first, so a
+    // sample from the top is all in one column by definition.
+    const lefts = new Set<number>()
+    for (let i = 0; i < await rows.count(); i++) {
+      const box = await rows.nth(i).boundingBox()
+      if (box) lefts.add(Math.round(box.x / 50))
+    }
+    expect(lefts.size, 'the list is still one column on a laptop').toBeGreaterThan(1)
+  })
+
+  test('a dietician line never runs past two lines on a card', async ({ page }) => {
+    // `block` and `line-clamp-2` both set display, and block was winning, so
+    // the clamp did nothing and a 187-character line took six lines of a card.
+    await goto(page, '/recipes')
+    const line = page.locator('.card span.line-clamp-2').first()
+    await expect(line).toBeVisible()
+    const box = await line.boundingBox()
+    expect(box!.height).toBeLessThan(48)
+  })
+})
+
 test.describe('what you enter is still there tomorrow', () => {
   /**
    * The check that nothing else makes.

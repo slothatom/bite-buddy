@@ -233,7 +233,10 @@ export default function Planner() {
         {/* Meals */}
         <section>
           <SectionHeading>{formatDate(selected)}</SectionHeading>
-          <div className="space-y-2.5">
+          {/* Two columns from lg. Five slots stacked full width meant a laptop
+              showed two of them and the rest below the fold, which is the one
+              thing a big screen should never do to a day. */}
+          <div className="space-y-2.5 lg:space-y-0 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-2.5 lg:items-start">
             {MEAL_SLOTS.map((slot) => (
               <SlotRow
                 key={slot}

@@ -232,7 +232,6 @@ figures.
 
 ### Still open
 
-- **Density variants**, desktop still uses phone-sized cards in a wider grid
 - **Contrast**, never formally audited against WCAG
 - **Semantic colour**, over-target reuses coral rather than having its own scale
 - **Charts**, the seven-bar chart and the sparkline were drawn ad hoc rather than
@@ -300,10 +299,7 @@ optionally the `@theme` block itself.
 
 ## 11. Decisions worth taking next
 
-1. **Should desktop get its own density?** Phone-sized cards in a wider grid waste a
-   lot of screen on the planner and the recipe list, but a denser mode doubles the
-   layout work.
-2. **How should over-target read without relying on colour?** It is the single
+1. **How should over-target read without relying on colour?** It is the single
    most-read signal in the app and today it is mostly a hue shift.
 3. **What should a partial figure look like?** `12 g +` is honest but plain, and it
    appears wherever an ingredient did not know a nutrient.
