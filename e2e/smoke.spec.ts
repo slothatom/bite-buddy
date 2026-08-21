@@ -1273,6 +1273,39 @@ test.describe('what the kitchen has to say', () => {
   })
 })
 
+test.describe('asking the recipe list a question', () => {
+  test('quick tonight narrows the list and says what it did', async ({ page }) => {
+    await goto(page, '/recipes')
+
+    await page.getByRole('button', { name: /Quick tonight/ }).click()
+    await expect(page.getByText(/Twenty minutes or less/)).toBeVisible()
+    await expect(page.getByRole('button', { name: /Quick tonight/ })).toHaveAttribute('aria-pressed', 'true')
+
+    // Pressing it again puts everything back.
+    await page.getByRole('button', { name: /Quick tonight/ }).click()
+    await expect(page.getByText(/Twenty minutes or less/)).toHaveCount(0)
+  })
+
+  test('a lens it cannot answer says what is missing rather than showing nothing', async ({ page }) => {
+    // An empty cupboard cannot answer "from the cupboard". Saying so is the
+    // honest version; an empty screen would read as "you have no recipes".
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /From the cupboard/ }).click()
+    await expect(page.getByText(/Add a few things to the cupboard/)).toBeVisible()
+  })
+
+  test('the cupboard lens works once there is something in it', async ({ page }) => {
+    await goto(page, '/grocery')
+    await page.getByRole('button', { name: /^Cupboard/ }).click()
+    await page.getByPlaceholder('Search your foods').fill('olive oil')
+    await page.locator('button').filter({ hasText: /olive oil/i }).first().click()
+
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /From the cupboard/ }).click()
+    await expect(page.getByText(/Everything it needs is something you have/)).toBeVisible()
+  })
+})
+
 test.describe('what you enter is still there tomorrow', () => {
   /**
    * The check that nothing else makes.
