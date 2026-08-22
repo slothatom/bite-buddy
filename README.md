@@ -470,32 +470,77 @@ Nothing is saved until you press save. Without the key the button is still
 there and says the assistant is not set up, and every other way of writing a
 recipe works exactly as before.
 
-### Cook session reminders
+### Reminders and notifications
 
-Optional, and the one feature that needs something running when nobody is
-looking at the app: a browser that is closed sends no email. It is an Edge
-Function on a five-minute schedule.
+The one part of the app that needs something running when nobody is looking at
+it: a browser that is closed sends no email and receives no push. It is an Edge
+Function called `notify` on a five-minute schedule, and it does two jobs.
+
+**Before a cooking session.** An email to everyone on the household list,
+fifteen minutes before, and a push to whichever devices asked for one. The time
+is worked out by the browser that scheduled it: "18:00" is an instant only once
+you know where the person typing it was standing, and the server does not. Each
+reminder is recorded in `reminder_log` so it is sent once, and only after
+something actually arrived, so a run that reached nobody tries again rather
+than recording a send that never happened. Sending it twice is worse than
+sending it late, because the second one teaches you to ignore the first.
+
+**When the other one of you changes the week.** Push only. An email saying
+"Oli moved Thursday" is an email nobody wants. Nothing is sent until they have
+been still for ten minutes, so planning a week is one line rather than thirty,
+and you are never told about your own edits.
+
+The whole of that decision, what to send and when, lives in
+`supabase/functions/_shared/notify.ts`, which has no imports so it runs under
+vitest with the rest of the app. Fourteen tests cover it. The encryption and
+delivery around it belong to `web-push` and to Google.
+
+#### Setting it up
+
+Three parts, and each works without the others. Email needs no VAPID keys, push
+needs no Resend account.
 
 ```bash
-supabase functions deploy cook-reminders
+# 1. The function
+supabase functions deploy notify
+
+# 2. Email, if you want it
 supabase secrets set RESEND_API_KEY=...        # a free Resend account
 supabase secrets set REMINDER_FROM="Bite Buddy <hello@yourdomain>"
+
+# 3. Push, if you want it
+npx web-push generate-vapid-keys               # prints a public and a private key
+supabase secrets set VAPID_PUBLIC_KEY=...
+supabase secrets set VAPID_PRIVATE_KEY=...
+supabase secrets set VAPID_SUBJECT=mailto:you@yourdomain
 ```
 
-Then uncomment the `cron.schedule` block at the bottom of
-`supabase/schema.sql`, fill in the project ref, and run it. Supabase's own
-dashboard can schedule the function instead, under Integrations > Cron, which
-avoids putting a key in SQL at all.
+Run `supabase/push.sql` in the SQL editor, then put the **public** half of the
+key where the app can read it:
 
-The email goes to everyone on the household list, fifteen minutes before the
-session. The time is worked out by the browser that scheduled it: "18:00" is
-an instant only once you know where the person typing it was standing, and the
-server does not. Each reminder is recorded in `reminder_log` so it is sent
-once; sending it twice is worse than sending it late, because the second one
-teaches you to ignore the first.
+```sql
+insert into public.push_config (key, value)
+values ('vapid_public', 'BEl62i...')
+on conflict (key) do update set value = excluded.value;
+```
 
-Without any of this the toggle still saves, the app just never emails. Nothing
-else depends on it.
+That key is public by design. It is handed to the push service on every
+subscription and authorises nothing on its own, which is why it can live in a
+table the app reads rather than in a repository secret and a rebuild. The
+private half never leaves the function's secrets.
+
+Then schedule it, either by uncommenting the `cron.schedule` block at the
+bottom of `supabase/schema.sql` and filling in the project ref, or from the
+dashboard under Integrations > Cron, which avoids putting a key in SQL at all.
+
+Each person turns notifications on per device, in Settings. Per device rather
+than per person because a phone is what gets notified, and because the profile
+syncs: putting the setting there would mean switching it off on your phone
+switched it off on theirs. On Android it is more reliable once the app has been
+added to the home screen.
+
+Without any of this the toggle still saves and the app simply never sends.
+Nothing else depends on it.
 
 ---
 
@@ -771,5 +816,6 @@ recipe, plan or measurement is served at a public URL for anything else to read.
 
 ## Not done yet
 
-- Push notifications when the other person changes the week.
 - A recipe assistant that can open a link rather than being handed the text.
+- Anything at all for a device that is not signed in. Notifications, sync and
+  sharing all begin at an account.
