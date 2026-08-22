@@ -1,6 +1,6 @@
 import type {
   BodyMeasurement, CookSession, DayPlan, Food, GroceryItem, PantryItem, PlannedMeal, Portion,
-  Recipe, SleepEntry, StepEntry, UserProfile, WeightEntry,
+  Recipe, SleepEntry, StepEntry, UserProfile, WeekTemplate, WeightEntry,
 } from '../../types'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
 import { useRecipeStore } from '../../store/useRecipeStore'
@@ -227,12 +227,43 @@ const cookSessions = listTable<CookSession>(
  * the later edit wins. It is stamped on every change, and a row with no stamp
  * counts as older than one with.
  */
+/**
+ * The profile, and the weeks worth having again.
+ *
+ * Two unrelated things in one table, which wants explaining. Every other table
+ * here is a list of one kind of thing, and templates could have been a
+ * fourteenth. They are not, because a new table is a new migration, and a
+ * migration is SQL somebody has to find, paste and run before the feature
+ * works at all. Riding in a table that already exists costs a prefix on an id
+ * and buys a feature that works the moment it is deployed.
+ *
+ * The prefix is the whole contract: `profile` is the profile, `template:` is a
+ * saved week, and anything else a future version writes here is ignored by
+ * both rather than mistaken for the other.
+ */
+const TEMPLATE_PREFIX = 'template:'
+
 const settings: RowTable = {
   table: 'settings',
-  read: () => [{ id: 'profile', data: useUserStore.getState().profile }],
+  read: () => [
+    { id: 'profile', data: useUserStore.getState().profile },
+    ...useMealPlanStore.getState().templates.map((t) => ({
+      id: `${TEMPLATE_PREFIX}${t.id}`,
+      data: t,
+    })),
+  ],
   apply: (rows) => {
     const profile = rows.find((r) => r.id === 'profile')?.data as UserProfile | undefined
     if (profile) useUserStore.setState({ profile })
+
+    // The merged set arrives whole, so this is the list, not an addition to
+    // it. A template deleted on the other phone is simply not in these rows.
+    const templates = rows
+      .filter((r) => r.id.startsWith(TEMPLATE_PREFIX))
+      .map((r) => r.data as WeekTemplate)
+      .filter(Boolean)
+      .sort((a, b) => (b.savedAt ?? '').localeCompare(a.savedAt ?? ''))
+    useMealPlanStore.setState({ templates })
   },
 }
 

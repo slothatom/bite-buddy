@@ -217,3 +217,112 @@ describe('planning from the fridge', () => {
     expect(dayNutrients(day, ctx).calories).toBeGreaterThan(0)
   })
 })
+
+describe('a week worth having again', () => {
+  /** Monday the 10th of August 2026, with food on the Wednesday and Friday. */
+  function aWeekWithFoodOnIt() {
+    useMealPlanStore.setState({ plan: [], templates: [] })
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-10T12:00:00'), 1)
+    store.addEntry('2026-08-12', 'lunch', { kind: 'food', foodId: 'food-apple', grams: 150 })
+    store.addEntry('2026-08-14', 'dinner', { kind: 'food', foodId: 'food-lentil-red', grams: 90 })
+  }
+
+  function mealsOn(date: string) {
+    return useMealPlanStore.getState().plan.find((d) => d.date === date)?.meals ?? []
+  }
+
+  it('saves the week on screen and keeps only the days with food on them', () => {
+    aWeekWithFoodOnIt()
+    const template = useMealPlanStore.getState().saveTemplate('Our usual')
+
+    expect(template).not.toBeNull()
+    expect(template!.name).toBe('Our usual')
+    // Wednesday is two days after Monday, Friday is four.
+    expect(template!.days.map((d) => d.offset)).toEqual([2, 4])
+    expect(template!.days[0].meals[0].slot).toBe('lunch')
+  })
+
+  it('refuses to save a week with nothing on it', () => {
+    useMealPlanStore.setState({ plan: [], templates: [] })
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-10T12:00:00'), 1)
+
+    expect(useMealPlanStore.getState().saveTemplate('Empty')).toBeNull()
+    expect(useMealPlanStore.getState().templates).toHaveLength(0)
+  })
+
+  it('writes it onto a different week, on the matching days', () => {
+    aWeekWithFoodOnIt()
+    const template = useMealPlanStore.getState().saveTemplate('Our usual')!
+
+    // A fortnight later, a week nothing has been written to.
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-24T12:00:00'), 1)
+    useMealPlanStore.getState().applyTemplate(template.id)
+
+    expect(mealsOn('2026-08-26')).toHaveLength(1)
+    expect(mealsOn('2026-08-26')[0].slot).toBe('lunch')
+    expect(mealsOn('2026-08-28')).toHaveLength(1)
+    // And the week it came from is untouched.
+    expect(mealsOn('2026-08-12')).toHaveLength(1)
+  })
+
+  it('gives every copied meal its own id, so moving one does not move both', () => {
+    aWeekWithFoodOnIt()
+    const original = mealsOn('2026-08-12')[0].id
+    const template = useMealPlanStore.getState().saveTemplate('Our usual')!
+
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-24T12:00:00'), 1)
+    useMealPlanStore.getState().applyTemplate(template.id)
+
+    expect(mealsOn('2026-08-26')[0].id).not.toBe(original)
+  })
+
+  it('replaces the week rather than merging into it, empty days included', () => {
+    aWeekWithFoodOnIt()
+    const template = useMealPlanStore.getState().saveTemplate('Our usual')!
+
+    // A week with something already on a day the template says nothing about.
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-24T12:00:00'), 1)
+    useMealPlanStore.getState()
+      .addEntry('2026-08-25', 'breakfast', { kind: 'food', foodId: 'food-apple', grams: 100 })
+    useMealPlanStore.getState().applyTemplate(template.id)
+
+    // Gone, deliberately. A week you asked for is the week you get, and the
+    // screen counts what is there and asks before this runs.
+    expect(mealsOn('2026-08-25')).toHaveLength(0)
+    expect(mealsOn('2026-08-26')).toHaveLength(1)
+  })
+
+  it('lands on the same weekdays when the week starts on a Sunday', () => {
+    aWeekWithFoodOnIt()
+    const template = useMealPlanStore.getState().saveTemplate('Our usual')!
+
+    // Saved Monday-first, applied Sunday-first. Offsets are from the start of
+    // the week, so the third day of the week is still the third day of it.
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-24T12:00:00'), 0)
+    useMealPlanStore.getState().applyTemplate(template.id)
+
+    const dates = useMealPlanStore.getState().weekDates
+    expect(mealsOn(dates[2])).toHaveLength(1)
+    expect(mealsOn(dates[4])).toHaveLength(1)
+  })
+
+  it('forgets one when you say so, and keeps the rest', () => {
+    aWeekWithFoodOnIt()
+    const first = useMealPlanStore.getState().saveTemplate('One')!
+    const second = useMealPlanStore.getState().saveTemplate('Two')!
+
+    useMealPlanStore.getState().removeTemplate(first.id)
+
+    expect(useMealPlanStore.getState().templates.map((t) => t.id)).toEqual([second.id])
+  })
+
+  it('keeps the old name rather than accepting an empty one', () => {
+    aWeekWithFoodOnIt()
+    const template = useMealPlanStore.getState().saveTemplate('Our usual')!
+
+    useMealPlanStore.getState().renameTemplate(template.id, '   ')
+
+    expect(useMealPlanStore.getState().templates[0].name).toBe('Our usual')
+  })
+})

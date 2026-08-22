@@ -177,7 +177,7 @@ test.describe('the main flow', () => {
     // test runs at.
     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
     await page.locator('input[type=date]').fill(tomorrow)
-    await page.getByRole('button', { name: 'Save' }).click()
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
 
     await expect(page.getByText(/Both of you get an email at/)).toBeVisible()
     // Eighteen hundred less a quarter of an hour.
@@ -861,7 +861,7 @@ test.describe('movement, per person', () => {
     await page.getByRole('button', { name: 'Log it in one go' }).click()
     await page.getByLabel('What was it').fill('Climbing')
     await page.getByLabel('kcal, if known').fill('430')
-    await page.getByRole('button', { name: 'Save' }).click()
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
 
     await expect(page.getByText('Climbing')).toBeVisible()
     await expect(page.getByText(/about 430 kcal/)).toBeVisible()
@@ -871,7 +871,7 @@ test.describe('movement, per person', () => {
     await goto(page, '/movement')
     await page.getByRole('button', { name: 'Log it in one go' }).click()
     await page.getByLabel('What was it').fill('Arany swim')
-    await page.getByRole('button', { name: 'Save' }).click()
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
     await expect(page.getByText('Arany swim')).toBeVisible()
 
     await page.getByRole('tab', { name: 'Oli' }).click()
@@ -1108,7 +1108,7 @@ test.describe('cooking once and eating twice', () => {
     await page.getByRole('button', { name: 'Session' }).click()
     await page.getByPlaceholder('Search your recipes').fill('soup')
     await page.locator('label').filter({ hasText: /soup/i }).first().click()
-    await page.getByRole('button', { name: 'Save' }).click()
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
 
     // Ticking it off asks what came out of the pan.
     await page.getByRole('button', { name: 'Mark as done' }).first().click()
@@ -1448,7 +1448,7 @@ test.describe('what you enter is still there tomorrow', () => {
     await page.getByRole('button', { name: 'Log it in one go' }).click()
     await page.getByLabel('What was it').fill('Long walk')
     await page.getByLabel('kcal, if known').fill('310')
-    await page.getByRole('button', { name: 'Save' }).click()
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
     await expect(page.getByText('Long walk')).toBeVisible()
 
     await goto(page, '/schedule')
@@ -1456,7 +1456,7 @@ test.describe('what you enter is still there tomorrow', () => {
     await page.getByPlaceholder('Sunday batch cook').fill('Reload cook')
     await page.locator('input[type=date]')
       .fill(new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10))
-    await page.getByRole('button', { name: 'Save' }).click()
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
     await expect(page.getByText('Reload cook')).toBeVisible()
 
     await goto(page, '/settings')
@@ -1524,5 +1524,77 @@ test.describe('resilience', () => {
     // than being interpreted under the wrong assumptions.
     await expect(page.locator('h1').first()).toBeVisible()
     expect(errors).toEqual([])
+  })
+})
+
+test.describe('a week worth having again', () => {
+  test('says there is nothing to save before you have planned anything', async ({ page }) => {
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Saved weeks' }).click()
+
+    await expect(page.getByText('Nothing on this week to save yet.')).toBeVisible()
+    await expect(page.getByText('Nothing saved yet.')).toBeVisible()
+  })
+
+  test('keeps a planned week and writes it onto another one', async ({ page }) => {
+    await goto(page, '/plan')
+
+    // A week with something on it, courtesy of the assistant.
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+    await page.getByRole('button', { name: /^Add these/ }).click()
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+
+    await page.getByRole('button', { name: 'Saved weeks' }).click()
+    await page.getByLabel('Name this week').fill('Our usual')
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
+    await expect(page.getByText(/meals across .* days/)).toBeVisible()
+    await page.getByRole('button', { name: 'Close' }).click()
+
+    // A different week, with nothing on it.
+    await page.getByRole('button', { name: 'Next week' }).click()
+    await expect(page.locator('[data-entry-name]')).toHaveCount(0)
+
+    await page.getByRole('button', { name: 'Saved weeks' }).click()
+    await page.getByRole('button', { name: 'Use it' }).click()
+    // Nothing on this week, so it does not threaten to replace anything.
+    await page.getByRole('button', { name: 'Write the week' }).click()
+
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+  })
+
+  test('counts what it would overwrite, and writes nothing until you agree', async ({ page }) => {
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+    await page.getByRole('button', { name: /^Add these/ }).click()
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+
+    await page.getByRole('button', { name: 'Saved weeks' }).click()
+    await page.getByLabel('Name this week').fill('Our usual')
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
+
+    // Still on the same week, which is full. It has to say so.
+    await page.getByRole('button', { name: 'Use it' }).click()
+    await expect(page.getByText(/replaces the whole week, including \d+ meals? already on it/))
+      .toBeVisible()
+
+    // Backing out leaves the week exactly as it was.
+    const before = await page.locator('[data-entry-name]').count()
+    await page.getByRole('button', { name: 'Cancel' }).click()
+    await page.getByRole('button', { name: 'Close' }).click()
+    expect(await page.locator('[data-entry-name]').count()).toBe(before)
+  })
+
+  test('a week can be forgotten', async ({ page }) => {
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+    await page.getByRole('button', { name: /^Add these/ }).click()
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+
+    await page.getByRole('button', { name: 'Saved weeks' }).click()
+    await page.getByLabel('Name this week').fill('Our usual')
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
+
+    await page.getByRole('button', { name: 'Forget Our usual' }).click()
+    await expect(page.getByText('Nothing saved yet.')).toBeVisible()
   })
 })

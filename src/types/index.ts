@@ -281,6 +281,22 @@ export interface PlannedMeal {
   note?: string
 }
 
+/**
+ * A week worth having again.
+ *
+ * Kept as offsets from the start of the week rather than as dates, because the
+ * point of saving one is to use it on a week that has not happened yet. Meals
+ * carry no ids: an id identifies one meal on one day, and every day this is
+ * dropped onto needs its own.
+ */
+export interface WeekTemplate {
+  id: string
+  name: string
+  /** 0 is the first day of the week, whichever day you start yours on. */
+  days: { offset: number; meals: Omit<PlannedMeal, 'id'>[] }[]
+  savedAt: string
+}
+
 export interface DayPlan {
   date: string        // 'YYYY-MM-DD'
   meals: PlannedMeal[]

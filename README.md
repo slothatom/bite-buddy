@@ -162,6 +162,18 @@ lunch, dinner), live totals against your targets, and copy a day onto another da
 starts on Monday by default and can start on any of the seven; loading an archived plan lines
 its days up by weekday, so a Wednesday meal still lands on a Wednesday.
 
+**Saved weeks** keep a week you eat often so it can be dropped onto one that has not
+happened yet. Held as offsets from the start of the week rather than as dates, so a saved
+week lands the same way whichever day yours begins on, and every copied meal gets its own
+id so moving one does not move the other. Applying replaces the week rather than merging
+into it, which is the honest behaviour and also the destructive one, so it counts what is
+already there and puts the number on the button: "Replace 6". Nothing moves until that
+second tap.
+
+They sync like everything else, without a migration: a saved week is a row in the settings
+table under a `template:` id. A new table would have meant new SQL to find, paste and run
+before the feature worked at all, which is a poor trade for a prefix.
+
 Each planned meal also says **whether you can actually cook it tonight**: either everything
 it needs is in, or the two or three things that are short, named rather than counted, since
 "3 missing" sends you to open the cupboard anyway. It stays quiet until the cupboard has
@@ -759,6 +771,5 @@ recipe, plan or measurement is served at a public URL for anything else to read.
 
 ## Not done yet
 
-- Saved week templates.
 - Push notifications when the other person changes the week.
 - A recipe assistant that can open a link rather than being handed the text.
