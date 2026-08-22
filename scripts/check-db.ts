@@ -61,6 +61,79 @@ function check(what: string, ok: boolean, detail = '') {
  * read and write of the household's data was refused after that. The app could
  * only report that saving had stopped working.
  */
+/**
+ * The push tables, on top of a real schema.
+ *
+ * Its own database because push.sql references `public.members`, and the main
+ * one here never runs schema.sql: it uses a permissive stand-in so the sync
+ * tests are about merging rather than about policies. Pasting push.sql into a
+ * project that has not had schema.sql is a thing somebody will do, and it
+ * should fail loudly there rather than quietly here.
+ */
+async function checkPush() {
+  console.log('\nthe push tables')
+  const fresh = await new PGlite()
+
+  await fresh.exec(`
+    create schema auth;
+    create table auth.users (id uuid primary key, email text);
+    create function auth.uid() returns uuid language sql stable as $$
+      select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
+    create publication supabase_realtime;
+  `)
+  await fresh.exec(readFileSync(resolve(ROOT, 'supabase/schema.sql'), 'utf8'))
+
+  const push = readFileSync(resolve(ROOT, 'supabase/push.sql'), 'utf8')
+  try {
+    await fresh.exec(push)
+    // Pasting it twice is the most likely thing anybody does to a SQL file.
+    await fresh.exec(push)
+    check('push.sql runs, twice', true)
+  } catch (e) {
+    check('push.sql runs, twice', false, (e as Error).message)
+    return
+  }
+
+  for (const table of ['push_subscriptions', 'notify_state']) {
+    const { rows } = await fresh.query<{ on: boolean }>(
+      'select relrowsecurity as on from pg_class where relname = $1', [table])
+    check(`${table} keeps one person's devices to themselves`, rows[0]?.on === true)
+  }
+
+  const MEMBER = '44444444-4444-4444-8444-444444444444'
+  // This database runs schema.sql as its owner, so unlike the joining check
+  // above the guest list trigger really is in force. Being on the list is what
+  // a real account has to be too.
+  await fresh.query('insert into public.allowed_emails (email) values ($1)', ['push@example.com'])
+  await fresh.query('insert into auth.users (id, email) values ($1, $2)', [MEMBER, 'push@example.com'])
+  await fresh.query(
+    'insert into public.members (id, email) values ($1, $2) on conflict (id) do nothing',
+    [MEMBER, 'push@example.com'])
+
+  // The endpoint is the primary key precisely so a phone that re-subscribes
+  // updates its row instead of collecting one per sign-in.
+  for (const key of ['first', 'second']) {
+    await fresh.query(
+      `insert into public.push_subscriptions (endpoint, member_id, p256dh, auth)
+       values ('https://push.example/abc', $1, $2, 'a')
+       on conflict (endpoint) do update set p256dh = excluded.p256dh`,
+      [MEMBER, key])
+  }
+  const subs = await fresh.query<{ n: number; k: string }>(
+    'select count(*)::int n, max(p256dh) k from public.push_subscriptions')
+  check('a phone that re-subscribes replaces its row rather than piling up',
+    subs.rows[0].n === 1 && subs.rows[0].k === 'second')
+
+  // Losing an account should take its devices with it, or the send keeps
+  // trying to reach a phone belonging to nobody.
+  await fresh.query('delete from public.members where id = $1', [MEMBER])
+  const orphans = await fresh.query<{ n: number }>(
+    'select count(*)::int n from public.push_subscriptions')
+  check('and leaving the household takes your devices with you', orphans.rows[0].n === 0)
+
+  await fresh.close()
+}
+
 async function checkJoining() {
   console.log('\njoining the household')
   const fresh = await new PGlite()
@@ -157,6 +230,7 @@ async function checkJoining() {
 }
 
 await checkJoining()
+await checkPush()
 
 const db = await new PGlite()
 
