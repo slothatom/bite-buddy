@@ -46,6 +46,9 @@ jobs:
       - name: Colour meets WCAG AA
         run: npm run check:contrast
 
+      - name: The pasteable function matches its sources
+        run: npm run function:check
+
       - name: Schema and sync agree
         run: npm run db:check
 
