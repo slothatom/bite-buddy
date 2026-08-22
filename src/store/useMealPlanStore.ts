@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import type {
   Component, DayPlan, GroceryItem, MealSlot, MedCategory, PantryItem, PlannedMeal, SourcePlan,
-  WeekStart,
+  WeekStart, WeekTemplate,
 } from '../types'
 import { parseAmount } from '../lib/grocery'
 import { DEFAULT_WEEK_START } from '../types'
@@ -150,6 +150,8 @@ interface MealPlanStore {
   weekDates: string[]
   plan: DayPlan[]
   groceryItems: GroceryItem[]
+  /** Weeks worth having again. Shared, like everything else here. */
+  templates: WeekTemplate[]
 
   setMeal: (date: string, slot: MealSlot, entries: Component[], note?: string) => void
   addEntry: (date: string, slot: MealSlot, entry: Component) => void
@@ -170,6 +172,27 @@ interface MealPlanStore {
   /** Exchanges two meals, each landing where the other was. */
   swapMeals: (a: { date: string; mealId: string }, b: { date: string; mealId: string }) => void
   goToWeek: (reference: Date, weekStartsOn: WeekStart) => void
+  /**
+   * Keeps the week on screen, so it can be used again on a week that has not
+   * happened yet.
+   *
+   * A household eats in patterns. The same shop, the same batch on Sunday, the
+   * same four dinners in a different order, and rebuilding that by hand every
+   * seventh day is the sort of tax that quietly stops people planning at all.
+   * Returns the template, or null when there is nothing on the week to save.
+   */
+  saveTemplate: (name: string) => WeekTemplate | null
+  /**
+   * Writes a saved week onto the week on screen.
+   *
+   * Every day of that week is replaced, including the ones the template leaves
+   * empty, because a week you asked for is the week you get rather than a merge
+   * nobody can predict. What is already there is counted first and shown to
+   * you, and nothing moves until you say so.
+   */
+  applyTemplate: (id: string) => void
+  removeTemplate: (id: string) => void
+  renameTemplate: (id: string, name: string) => void
   /** Drops one of the dietician's weeks onto the current week's dates. */
   loadSourcePlan: (source: SourcePlan) => void
   importWeek: (data: MealPlanExport) => void
@@ -198,6 +221,7 @@ export const useMealPlanStore = create<MealPlanStore>()(
       return {
         weekDates,
         plan: emptyWeek(weekDates),
+        templates: [],
         groceryItems: [],
 
         setMeal: (date, slot, entries, note) =>
@@ -317,6 +341,53 @@ export const useMealPlanStore = create<MealPlanStore>()(
             return { weekDates: dates, plan: pruneEmptyDays(plan, dates) }
           })
         },
+
+        saveTemplate: (name) => {
+          const { weekDates, plan } = get()
+          const byDate = new Map(plan.map((d) => [d.date, d]))
+          const days = weekDates
+            .map((date, offset) => ({
+              offset,
+              // The id goes. It names one meal on one day, and every day this
+              // is dropped onto will need its own.
+              meals: (byDate.get(date)?.meals ?? []).map(({ id: _id, ...meal }) => meal),
+            }))
+            .filter((day) => day.meals.length)
+
+          if (!days.length) return null
+
+          const template: WeekTemplate = {
+            id: newId(),
+            name: name.trim() || 'Saved week',
+            days,
+            savedAt: new Date().toISOString(),
+          }
+          set((s) => ({ templates: [template, ...s.templates] }))
+          return template
+        },
+
+        applyTemplate: (id) =>
+          set((s) => {
+            const template = s.templates.find((t) => t.id === id)
+            if (!template) return {}
+            const byOffset = new Map(template.days.map((d) => [d.offset, d]))
+            let plan = s.plan
+            s.weekDates.forEach((date, offset) => {
+              const meals: PlannedMeal[] = (byOffset.get(offset)?.meals ?? [])
+                .map((meal) => ({ ...meal, id: newId() }))
+              plan = withDay(plan, date, (day) => touch({ ...day, meals }))
+            })
+            return { plan }
+          }),
+
+        removeTemplate: (id) =>
+          set((s) => ({ templates: s.templates.filter((t) => t.id !== id) })),
+
+        renameTemplate: (id, name) =>
+          set((s) => ({
+            templates: s.templates.map((t) =>
+              t.id === id ? { ...t, name: name.trim() || t.name } : t),
+          })),
 
         loadSourcePlan: (source) =>
           set((s) => {

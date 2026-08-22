@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import {
   ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays, MoveRight, Sparkles,
-  Check, ShoppingBasket,
+  Check, ShoppingBasket, Bookmark,
 } from 'lucide-react'
 import type { Component, DayPlan, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
@@ -21,6 +21,7 @@ import { portionEntries } from '../lib/portionsUse'
 import { usePantry } from '../store/usePantryStore'
 import { mealAvailability } from '../lib/pantry'
 import FillGaps from '../components/planner/FillGaps'
+import WeekTemplates from '../components/planner/WeekTemplates'
 import type { Proposal } from '../lib/autoPlan'
 
 /**
@@ -43,6 +44,7 @@ export default function Planner() {
   const [selected, setSelected] = useState<string>(() => todayOrFirst(weekDates))
   const [adding, setAdding] = useState<{ date: string; slot: MealSlot } | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
+  const [templating, setTemplating] = useState(false)
   const [moving, setMoving] = useState<{ date: string; mealId: string } | null>(null)
   const [filling, setFilling] = useState<string[] | null>(null)
   const { quickAdd, clearQuickAdd } = useUiStore()
@@ -165,7 +167,8 @@ export default function Planner() {
         {/* How much of it to look at. A week is the working unit; a fortnight
             is how far ahead a shop reaches; a month is for seeing the shape of
             it rather than the detail. */}
-        <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
           {(Object.keys(RANGE_LABELS) as PlanRange[]).map((r) => (
             <button
               key={r}
@@ -177,6 +180,13 @@ export default function Planner() {
               {RANGE_LABELS[r]}
             </button>
           ))}
+          </div>
+
+          {/* Week scoped, so it sits with the range rather than in the day
+              toolbar below, which acts on the day you have selected. */}
+          <button className="btn-secondary" onClick={() => setTemplating(true)}>
+            <Bookmark size={15} /> Saved weeks
+          </button>
         </div>
 
         {/* The days themselves, seven to a row however many there are. The
@@ -292,6 +302,10 @@ export default function Planner() {
           onMove={(date, slot) => { moveMeal(moving.date, moving.mealId, date, slot); setMoving(null) }}
           onCopy={(date, slot) => { duplicateMeal(moving.date, moving.mealId, date, slot); setMoving(null) }}
         />
+      )}
+
+      {templating && (
+        <WeekTemplates weekDates={weekDates} onClose={() => setTemplating(false)} />
       )}
 
       {copyFrom && (
