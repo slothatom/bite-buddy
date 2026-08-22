@@ -16,6 +16,13 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      // Hand written rather than generated, because a push arrives at the
+      // worker and a generated file has nowhere to put the handler. The
+      // caching it used to generate is transcribed in src/sw.ts, which is now
+      // the only thing standing between the app and a shop with no signal.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
@@ -34,26 +41,15 @@ export default defineConfig({
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: {
+      // What to precache. The runtime caching that used to live beside this
+      // now lives in src/sw.ts, because injectManifest builds the worker from
+      // that file and only the file list comes from here.
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // The barcode library is 477 kB and useless offline anyway. Scanning a
         // product means looking it up over the network. Precaching it would put
         // it on every device that never opens the scanner.
         globIgnores: ['**/esm-*.js'],
-        runtimeCaching: [
-          {
-            // Nutrition lookups are a convenience; a stale answer beats none,
-            // but the app must still work with no network at all.
-            urlPattern: /^https:\/\/(api\.nal\.usda\.gov|world\.openfoodfacts\.org)\//,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'nutrition-api',
-              networkTimeoutSeconds: 5,
-              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
       },
     }),
   ],
