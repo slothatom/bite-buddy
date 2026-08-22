@@ -521,7 +521,19 @@ function NotificationsPanel() {
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
 
-  useEffect(() => { void currentState().then(setState) }, [])
+  // A rejection here used to leave the panel invisible for ever, because the
+  // section rendered nothing until this resolved. A screen that says nothing
+  // is indistinguishable from a feature that was never deployed, which is
+  // exactly the wrong thing for a panel whose job is explaining why something
+  // is not working.
+  useEffect(() => {
+    currentState()
+      .then(setState)
+      .catch((e: Error) => {
+        setState({ kind: 'off' })
+        setMessage(`Could not work out where this device stands: ${e.message}`)
+      })
+  }, [])
 
   async function turnOn() {
     setBusy(true)
@@ -540,8 +552,6 @@ function NotificationsPanel() {
     setBusy(false)
   }
 
-  if (!state) return null
-
   return (
     <section>
       <SectionHeading>Notifications</SectionHeading>
@@ -551,18 +561,22 @@ function NotificationsPanel() {
           week. Nothing else, and never more than one at a time for the same thing.
         </p>
 
-        {state.kind === 'unsupported' && (
+        {state === null && (
+          <p className="text-sm text-ink-500">Checking this device.</p>
+        )}
+
+        {state?.kind === 'unsupported' && (
           <p className="text-sm text-ink-500">This browser cannot show notifications.</p>
         )}
 
-        {state.kind === 'unconfigured' && (
+        {state?.kind === 'unconfigured' && (
           <p className="text-sm text-ink-500">
             No signing key has been set up for this household yet, so there is nothing to switch
             on. It is one line in the SQL editor, and the README has it.
           </p>
         )}
 
-        {state.kind === 'blocked' && (
+        {state?.kind === 'blocked' && (
           <p className="text-sm text-ink-500">
             This site is set to block notifications in your browser. The app cannot undo that, and
             asking again would do nothing: it has to be changed in the browser's own settings for
@@ -570,7 +584,7 @@ function NotificationsPanel() {
           </p>
         )}
 
-        {(state.kind === 'off' || state.kind === 'on') && (
+        {(state?.kind === 'off' || state?.kind === 'on') && (
           <div className="flex flex-wrap items-center gap-3">
             <button
               className={state.kind === 'on' ? 'btn-secondary' : 'btn-primary'}
