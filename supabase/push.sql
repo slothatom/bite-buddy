@@ -80,3 +80,34 @@ alter table public.notify_state
 
 alter table public.notify_state
   add column if not exists want_plan boolean not null default true;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- The public half of the signing key
+--
+-- A browser will not subscribe to push without the sender's public VAPID key,
+-- so the app has to be able to read it. It is public by design: it is handed to
+-- the push service on every subscription and it authorises nothing on its own.
+-- The private half never leaves the Edge Function's secrets.
+--
+-- It lives here rather than in the built bundle so that setting it up is one
+-- more line in the SQL editor you are already in, rather than a repository
+-- secret and a rebuild. Members can read it; nobody can write it except from
+-- here.
+
+create table if not exists public.push_config (
+  key    text primary key,
+  value  text not null
+);
+
+alter table public.push_config enable row level security;
+
+drop policy if exists "the household can read the public key" on public.push_config;
+create policy "the household can read the public key"
+  on public.push_config for select
+  using (public.is_member());
+
+-- Put your own key in with this, once you have generated a pair. See the README.
+--
+--   insert into public.push_config (key, value)
+--   values ('vapid_public', 'BEl62i...')
+--   on conflict (key) do update set value = excluded.value;
