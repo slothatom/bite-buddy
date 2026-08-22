@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import {
   Sparkles, Calculator, Pencil, Upload, Check, X,
@@ -23,6 +23,7 @@ import { SectionHeading } from '../components/ui'
 import { copyToClipboard } from '../lib/clipboard'
 import { PlanArchive } from '../components/settings/PlanArchive'
 import { useAuthStore } from '../store/useAuth'
+import { currentState, deviceLabel, disable, enable, type PushState } from '../lib/push'
 import { useSyncStatus } from '../store/useSync'
 import { probeSaving, type ProbeStep } from '../lib/rows/probe'
 import { isConfigured } from '../lib/supabase'
@@ -308,6 +309,8 @@ function SettingsPanels() {
 
         {isConfigured && session && <SyncPanel />}
 
+        {isConfigured && session && <NotificationsPanel />}
+
         <VersionPanel />
     </div>
   )
@@ -499,6 +502,101 @@ function AccountPanel() {
  * carries on looking perfectly healthy, and the only honest way to tell is to
  * put the state and the server's own words on a screen you can go and look at.
  */
+/**
+ * Being told something while the app is closed.
+ *
+ * Per device, deliberately, and the screen says so. Notifications are the one
+ * setting in this app that is not shared: the profile syncs, so putting this
+ * there would mean switching them off on your phone switched them off on
+ * theirs. Two people, two phones, two answers.
+ *
+ * Four ways this is unavailable and each says which, because "notifications
+ * are unavailable" sends people to the wrong place. A browser that cannot do
+ * it at all, a household with no key set up, a permission already refused, and
+ * simply not on yet are four different problems with four different fixes, and
+ * only one of them is the person's to solve.
+ */
+function NotificationsPanel() {
+  const [state, setState] = useState<PushState | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+
+  useEffect(() => { void currentState().then(setState) }, [])
+
+  async function turnOn() {
+    setBusy(true)
+    setMessage(null)
+    const result = await enable()
+    setMessage(result.ok ? null : result.reason)
+    setState(await currentState())
+    setBusy(false)
+  }
+
+  async function turnOff() {
+    setBusy(true)
+    setMessage(null)
+    await disable()
+    setState(await currentState())
+    setBusy(false)
+  }
+
+  if (!state) return null
+
+  return (
+    <section>
+      <SectionHeading>Notifications</SectionHeading>
+      <div className="card p-4 space-y-3">
+        <p className="text-sm text-ink-700">
+          A reminder before a cooking session, and a line when the other one of you changes the
+          week. Nothing else, and never more than one at a time for the same thing.
+        </p>
+
+        {state.kind === 'unsupported' && (
+          <p className="text-sm text-ink-500">This browser cannot show notifications.</p>
+        )}
+
+        {state.kind === 'unconfigured' && (
+          <p className="text-sm text-ink-500">
+            No signing key has been set up for this household yet, so there is nothing to switch
+            on. It is one line in the SQL editor, and the README has it.
+          </p>
+        )}
+
+        {state.kind === 'blocked' && (
+          <p className="text-sm text-ink-500">
+            This site is set to block notifications in your browser. The app cannot undo that, and
+            asking again would do nothing: it has to be changed in the browser's own settings for
+            this site.
+          </p>
+        )}
+
+        {(state.kind === 'off' || state.kind === 'on') && (
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              className={state.kind === 'on' ? 'btn-secondary' : 'btn-primary'}
+              onClick={state.kind === 'on' ? turnOff : turnOn}
+              disabled={busy}
+            >
+              {state.kind === 'on' ? 'Turn off on this device' : 'Turn on for this device'}
+            </button>
+            <span className="text-sm text-ink-500">
+              {state.kind === 'on' ? `On, for your ${deviceLabel()}.` : 'Off on this device.'}
+            </span>
+          </div>
+        )}
+
+        {message && <p className="text-sm text-coral-600">{message}</p>}
+
+        <p className="text-xs text-ink-500">
+          This is per device rather than per person, because a phone is what gets notified. Turning
+          it on here does nothing to the other one, and on Android it is more reliable once the app
+          has been added to the home screen.
+        </p>
+      </div>
+    </section>
+  )
+}
+
 function SyncPanel() {
   const { state, at, unsaved, lastError } = useSyncStatus()
 
