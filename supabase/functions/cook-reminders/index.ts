@@ -61,10 +61,18 @@ Deno.serve(async () => {
   const db = createClient(url, key)
   const now = new Date()
 
-  const { data: state } = await db
-    .from('app_state').select('data').eq('key', 'bite-buddy-cook').maybeSingle()
+  // Cook sessions are rows, and have been since storage moved off documents.
+  // This read the old `app_state` document until it was noticed: that table is
+  // frozen, so the reminder saw a snapshot from before the migration and every
+  // session written since was invisible to it. A reminder that silently stops
+  // is worse than one that was never built, because you stop expecting it and
+  // never find out why.
+  const { data: rows } = await db
+    .from('cook_sessions').select('data').is('deleted_at', null)
 
-  const sessions: CookSession[] = (state?.data as { sessions?: CookSession[] })?.sessions ?? []
+  const sessions: CookSession[] = (rows ?? [])
+    .map((r) => r.data as CookSession)
+    .filter(Boolean)
   const ready = due(sessions, now)
   if (!ready.length) return Response.json({ sent: 0, checked: sessions.length })
 
