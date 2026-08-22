@@ -1598,3 +1598,57 @@ test.describe('a week worth having again', () => {
     await expect(page.getByText('Nothing saved yet.')).toBeVisible()
   })
 })
+
+test.describe('the app when there is no signal', () => {
+  /**
+   * The service worker is hand written now, because a generated one has
+   * nowhere to put a push handler. That makes this the test that matters: the
+   * caching it used to generate is transcribed by hand, and a mistake in the
+   * transcription is invisible until somebody is standing in a shop with no
+   * bars wondering where their shopping list went.
+   */
+  test('opens with the network cut off, once it has been seen once', async ({ page, context }) => {
+    await page.goto('#/grocery')
+    await page.waitForLoadState('networkidle')
+
+    // Wait for the worker to actually be in charge, rather than merely present.
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready
+      // A worker that is ready still may not control this page on first load.
+      if (!navigator.serviceWorker.controller) {
+        await new Promise<void>((resolve) => {
+          navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), { once: true })
+        })
+      }
+    })
+
+    await context.setOffline(true)
+    await page.reload()
+
+    await expect(page.locator('h1').first()).toBeVisible()
+    // Whichever navigation this viewport uses: the sidebar on a laptop, the
+    // bottom bar on a phone. The other one is in the page and hidden.
+    await expect(page.locator('nav:visible').first()).toBeVisible()
+
+    await context.setOffline(false)
+  })
+
+  test('knows how to be told something while it is closed', async ({ page }) => {
+    await page.goto('#/')
+    await page.waitForLoadState('networkidle')
+
+    // The registration is what carries the push handler onto the device. If
+    // this is absent, notifications cannot arrive however well the server
+    // sends them.
+    const ready = await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready
+      return {
+        active: Boolean(registration.active),
+        canSubscribe: 'pushManager' in registration,
+      }
+    })
+
+    expect(ready.active).toBe(true)
+    expect(ready.canSubscribe).toBe(true)
+  })
+})
