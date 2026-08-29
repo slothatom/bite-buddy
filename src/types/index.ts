@@ -579,6 +579,15 @@ export interface UserProfile {
    * a household cooks once; only the line it is measured against moves.
    */
   targetsByPerson?: Partial<Record<PersonId, Targets>>
+  /**
+   * A weight to trend towards, per person.
+   *
+   * The body screen logged weight and measurements faithfully and had nothing
+   * to compare them to, so the chart was a line with no destination. Optional
+   * because plenty of people are not aiming anywhere, and a goal nobody set
+   * should not appear.
+   */
+  weightGoals?: Partial<Record<PersonId, number>>
   tdee: TdeeProfile
   weightUnit: 'kg' | 'lbs'
   weekStartsOn: WeekStart

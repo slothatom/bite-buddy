@@ -32,6 +32,7 @@ export default function GroceryList() {
   const ctx = useNutritionContext()
   const [justBuilt, setJustBuilt] = useState(false)
   const [tab, setTab] = useState<'list' | 'cupboard'>('list')
+  const [emptying, setEmptying] = useState(false)
   const pantry = usePantry()
   const { keep } = usePantryStore()
 
@@ -126,9 +127,24 @@ export default function GroceryList() {
                 Clear picked up
               </button>
               <ShareList items={groceryItems} />
-              <button className="btn-ghost text-sm text-coral-600" onClick={clearGroceryList}>
-                <Trash2 size={14} /> Empty list
-              </button>
+              {emptying ? (
+                <>
+                  <button
+                    className="btn-primary text-sm"
+                    onClick={() => { clearGroceryList(); setEmptying(false) }}
+                  >
+                    <Trash2 size={14} /> Throw away {groceryItems.length}{' '}
+                    {groceryItems.length === 1 ? 'line' : 'lines'}
+                  </button>
+                  <button className="btn-secondary text-sm" onClick={() => setEmptying(false)}>
+                    Keep them
+                  </button>
+                </>
+              ) : (
+                <button className="btn-ghost text-sm text-coral-600" onClick={() => setEmptying(true)}>
+                  <Trash2 size={14} /> Empty list
+                </button>
+              )}
             </div>
           </div>
         )}
