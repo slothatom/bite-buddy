@@ -1,4 +1,7 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import { safeStorage } from './persist'
+import type { PersonId } from '../lib/people'
 
 /**
  * Transient UI intent, deliberately not persisted.
@@ -23,10 +26,34 @@ interface UiStore {
   quickAdd: string | null
   requestQuickAdd: (date: string) => void
   clearQuickAdd: () => void
+  /**
+   * Whose target the screens compare food against.
+   *
+   * Per device and deliberately not synced, unlike almost everything else
+   * here. Two people, two phones: this is a fact about who is holding one, not
+   * about the household, and putting it in the profile would mean switching to
+   * Oli's target on your phone switched yours on theirs.
+   */
+  viewingAs: PersonId
+  setViewingAs: (who: PersonId) => void
 }
 
-export const useUiStore = create<UiStore>((set) => ({
-  quickAdd: null,
-  requestQuickAdd: (date) => set({ quickAdd: date }),
-  clearQuickAdd: () => set({ quickAdd: null }),
-}))
+export const useUiStore = create<UiStore>()(
+  persist(
+    (set) => ({
+      quickAdd: null,
+      requestQuickAdd: (date) => set({ quickAdd: date }),
+      clearQuickAdd: () => set({ quickAdd: null }),
+
+      viewingAs: 'arany',
+      setViewingAs: (who) => set({ viewingAs: who }),
+    }),
+    {
+      name: 'bite-buddy-ui-v1',
+      storage: safeStorage<UiStore>(),
+      // The intent from the centre button is about this second and must not
+      // survive a reload; who you are is about this device and should.
+      partialize: (state) => ({ viewingAs: state.viewingAs }) as UiStore,
+    },
+  ),
+)

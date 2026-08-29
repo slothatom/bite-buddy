@@ -7,9 +7,11 @@ import { useMealPlanStore } from '../store/useMealPlanStore'
 import { EmptyState } from '../components/ui'
 import { LEAD_MINUTES, reminderAt, reminderLabel } from '../lib/cookReminder'
 import { usePortionStore, useAvailablePortions } from '../store/usePortionStore'
-import { portionsFromSession, offerOrder, madeWhen, portionLabel } from '../lib/portionsUse'
+import {
+  portionsFromSession, offerOrder, madeWhen, portionLabel, spreadPortions,
+} from '../lib/portionsUse'
 import { useNutritionContext } from '../store/useNutrition'
-import { today } from '../store/useMealPlanStore'
+import { today, addDays } from '../store/useMealPlanStore'
 
 /**
  * Batch-cook sessions.
@@ -516,7 +518,13 @@ function LeftoversDialog({ onClose }: { onClose: () => void }) {
  */
 function CookedDialog({ session, onClose }: { session: CookSession; onClose: () => void }) {
   const ctx = useNutritionContext()
-  const { addPortion } = usePortionStore()
+  const { addPortion, takeFrom } = usePortionStore()
+  const { plan, addEntry } = useMealPlanStore()
+  // Off by default, like everything else here that writes to the week. Fill
+  // the gaps proposes and waits; a saved week asks twice. Cooking four
+  // portions and finding the next four days planned without having asked is
+  // the opposite of that, and it empties the fridge the moment it fills it.
+  const [spread, setSpread] = useState(false)
 
   const suggested = useMemo(
     () => portionsFromSession(session.recipeIds, ctx.recipes, session.date, session.id),
@@ -531,10 +539,26 @@ function CookedDialog({ session, onClose }: { session: CookSession; onClose: () 
   )
 
   function save() {
+    const kept: { id: string; servings: number }[] = []
     for (const p of suggested) {
       const servings = made[p.id] ?? p.servings
       if (servings <= 0) continue
       addPortion({ ...p, servings, storage: storage[p.id] ?? 'fridge' })
+      kept.push({ id: p.id, servings })
+    }
+
+    // Cooking four portions is the whole reason to have a cook schedule, and
+    // the batch and the week used to be two screens that knew nothing about
+    // each other: everything went in the fridge and you planned it back out
+    // one slot at a time.
+    if (spread) {
+      const days = Array.from({ length: 7 }, (_, i) => addDays(session.date, i + 1))
+      for (const place of spreadPortions(kept, plan, days, ['dinner', 'lunch'])) {
+        takeFrom(place.portionId, place.servings)
+        addEntry(place.date, place.slot, {
+          kind: 'portion', portionId: place.portionId, servings: place.servings,
+        })
+      }
     }
     onClose()
   }
@@ -586,6 +610,20 @@ function CookedDialog({ session, onClose }: { session: CookSession; onClose: () 
             )
           })}
         </div>
+
+        <label className="flex items-start gap-2.5 cursor-pointer">
+          <input
+            type="checkbox" className="w-4 h-4 accent-bite-500 mt-0.5 shrink-0"
+            checked={spread} onChange={() => setSpread(!spread)}
+          />
+          <span className="min-w-0">
+            <span className="block text-sm text-ink-900">Put them in the days ahead</span>
+            <span className="block text-xs text-ink-500">
+              One a day, into the first free dinner, then lunch. Days you have already planned
+              are left as they are.
+            </span>
+          </span>
+        </label>
 
         <div className="flex gap-2">
           <button className="btn-primary flex-1" onClick={save}>Into the fridge</button>

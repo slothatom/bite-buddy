@@ -1,3 +1,4 @@
+import type { PersonId } from '../lib/people'
 // ─── Nutrition ───────────────────────────────────────────────────────────────
 
 export interface Macros {
@@ -561,7 +562,23 @@ export interface Targets extends Macros {
 
 export interface UserProfile {
   name: string
+  /**
+   * The household's target, and the fallback for anybody without their own.
+   *
+   * Kept as it was so nothing has to be migrated: before per-person targets
+   * existed this was the only one, and it stays the answer for a person who
+   * has not set one.
+   */
   targets: Targets
+  /**
+   * A target of your own, where you have set one.
+   *
+   * Two people eating to one number was the state of things: Body and Movement
+   * had known whose row was whose for months while the one screen about how
+   * much to eat had a single figure for both. The plan stays shared, because
+   * a household cooks once; only the line it is measured against moves.
+   */
+  targetsByPerson?: Partial<Record<PersonId, Targets>>
   tdee: TdeeProfile
   weightUnit: 'kg' | 'lbs'
   weekStartsOn: WeekStart

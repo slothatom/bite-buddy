@@ -6,6 +6,8 @@ import {
 } from 'lucide-react'
 import { useMealPlanStore, today as todayDate } from '../store/useMealPlanStore'
 import { useUserStore } from '../store/useUserStore'
+import { targetsFor } from '../store/useUserStore'
+import { useUiStore } from '../store/useUiStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { useAuthStore } from '../store/useAuth'
 import { useSyncStatus } from '../store/useSync'
@@ -41,6 +43,8 @@ export default function Home() {
   const recipes = useRecipes()
   const sessions = useCookStore((s) => s.sessions)
   const { profile } = useUserStore()
+  const viewingAs = useUiStore((s) => s.viewingAs)
+  const targets = targetsFor(profile, viewingAs)
   const portions = useAvailablePortions()
   const groceryItems = useMealPlanStore((s) => s.groceryItems)
   const pantry = usePantry()
@@ -164,7 +168,7 @@ export default function Home() {
             value={todayTotals?.calories ? Math.round(todayTotals.calories).toLocaleString() : '0'}
             unit="kcal"
             note={`${todayRecord?.recorded ? 'eaten, ' : ''}of ${
-              profile.targets.calories.toLocaleString()}`}
+              targets.calories.toLocaleString()}`}
           />
           <Tile
             label="This week"
@@ -215,7 +219,7 @@ export default function Home() {
           {todayTotals && todayTotals.calories > 0 ? (
             <div className="card p-5 space-y-4">
               <div className="flex flex-col sm:flex-row items-center gap-5">
-                <CalorieRing value={todayTotals.calories} target={profile.targets.calories} />
+                <CalorieRing value={todayTotals.calories} target={targets.calories} />
                 <div className="flex-1 w-full space-y-1.5">
                   {MEAL_SLOTS.map((slot) => {
                     const meals = todayPlan?.meals.filter((m) => m.slot === slot) ?? []
@@ -266,7 +270,7 @@ export default function Home() {
                   <strong className="font-mono text-ink-900">
                     {Math.round(days.reduce((a, d) => a + d.kcal, 0) / plannedDays)}
                   </strong>{' '}
-                  kcal against a target of {profile.targets.calories.toLocaleString()}
+                  kcal against a target of {targets.calories.toLocaleString()}
                 </>
               )}
             </p>
@@ -275,8 +279,8 @@ export default function Home() {
                 weeks is the first length at which a habit is visible. */}
             <div className="flex items-end gap-1 h-16">
               {fortnight.map(({ date, kcal }) => {
-                const peak = Math.max(profile.targets.calories, ...fortnight.map((d) => d.kcal), 1)
-                const status = targetStatus(kcal, profile.targets.calories)
+                const peak = Math.max(targets.calories, ...fortnight.map((d) => d.kcal), 1)
+                const status = targetStatus(kcal, targets.calories)
                 return (
                   <div key={date} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
                     <div

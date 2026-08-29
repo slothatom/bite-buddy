@@ -5,7 +5,9 @@ import {
   Download, ClipboardCopy, ClipboardPaste, LogOut, Undo2,
 } from 'lucide-react'
 import type { ActivityLevel, Goal, Sex, Targets, WeekStart } from '../types'
-import { useUserStore } from '../store/useUserStore'
+import { useUserStore, targetsFor } from '../store/useUserStore'
+import { useUiStore } from '../store/useUiStore'
+import { PEOPLE } from '../lib/people'
 import { useDeletedRecipes, useRecipeStore, useResolvableRecipes } from '../store/useRecipeStore'
 import { useDeletedFoods, useFoodStore, useResolvableFoods } from '../store/useFoodStore'
 import { useMealPlanStore } from '../store/useMealPlanStore'
@@ -88,6 +90,11 @@ function TabLink({ to, label, on }: { to: string; label: string; on: boolean }) 
 
 function SettingsPanels() {
   const { profile, setName, setTargets, setTdee, setWeekStart } = useUserStore()
+  // The same person the rest of the app is showing figures for, so setting a
+  // target and then reading it back are about the same human being.
+  const whose = useUiStore((s) => s.viewingAs)
+  const setViewingAs = useUiStore((s) => s.setViewingAs)
+  const shown = targetsFor(profile, whose)
   // Signed out, the account section has nothing to show and no one to sign out;
   // everything else on this screen belongs to the device and still works.
   const session = useAuthStore((s) => s.session)
@@ -99,19 +106,38 @@ function SettingsPanels() {
   const tdee = totalDailyEnergy(profile.tdee)
   const working = explainTdee(profile.tdee)
 
-  const [manual, setManual] = useState<Targets>(profile.targets)
 
   return (
     <div className="space-y-8">
         {/* ─── Targets ─────────────────────────────────────────────────────── */}
         <section>
           <SectionHeading>Daily targets</SectionHeading>
+
+          {/* Whose. Body and Movement have known whose row is whose for months
+              while the one screen about how much to eat had a single figure
+              for two people. The plan stays shared, because a household cooks
+              once; only the line it is measured against moves. */}
+          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit mb-3" role="tablist">
+            {PEOPLE.map((person) => (
+              <button
+                key={person.id}
+                role="tab"
+                aria-selected={whose === person.id}
+                onClick={() => setViewingAs(person.id)}
+                className={whose === person.id ? 'tab-on' : 'tab-off'}
+              >
+                {person.name}
+              </button>
+            ))}
+          </div>
+
           <p className="text-sm text-ink-700 mb-4">
-            Currently{' '}
-            <strong className="font-mono">{profile.targets.calories} kcal</strong>{' '}
-            (Protein {profile.targets.protein} g · Carbs {profile.targets.carbs} g · Fat {profile.targets.fat} g), set{' '}
-            {profile.targets.source === 'from-plans' ? 'from your plans'
-              : profile.targets.source === 'tdee' ? 'by the calculator' : 'by hand'}.
+            {PEOPLE.find((p) => p.id === whose)?.name} is on{' '}
+            <strong className="font-mono">{shown.calories} kcal</strong>{' '}
+            (Protein {shown.protein} g · Carbs {shown.carbs} g · Fat {shown.fat} g), set{' '}
+            {shown.source === 'from-plans' ? 'from your plans'
+              : shown.source === 'tdee' ? 'by the calculator' : 'by hand'}
+            {profile.targetsByPerson?.[whose] ? '' : ', which is the household figure'}.
           </p>
 
           <div className="space-y-3">
@@ -132,7 +158,7 @@ function SettingsPanels() {
                       <p className="text-xs text-ink-500 mt-1">
                         Individual days ranged from {planAverage.min} to {planAverage.max} kcal.
                       </p>
-                      <button className="btn-primary mt-3" onClick={() => planTargets && setTargets(planTargets)}>
+                      <button className="btn-primary mt-3" onClick={() => planTargets && setTargets(planTargets, whose)}>
                         Use these
                       </button>
                     </>
@@ -234,7 +260,7 @@ function SettingsPanels() {
                         </p>
                       </details>
 
-                      <button className="btn-primary" onClick={() => setTargets(tdeeTargets)}>Use these</button>
+                      <button className="btn-primary" onClick={() => setTargets(tdeeTargets, whose)}>Use these</button>
                     </>
                   ) : (
                     <p className="text-xs text-ink-500">Fill in sex, age, height and weight to see a number.</p>
@@ -243,31 +269,13 @@ function SettingsPanels() {
               </div>
             </div>
 
-            {/* Manual */}
-            <div className="card p-4">
-              <div className="flex items-start gap-3">
-                <Pencil size={18} className="text-bite-600 shrink-0 mt-0.5" />
-                <div className="flex-1 space-y-3">
-                  <h3 className="font-semibold text-ink-900 text-sm">Or set them yourself</h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                    {([
-                      ['calories', 'kcal'], ['protein', 'Protein'], ['carbs', 'Carbs'],
-                      ['fat', 'Fat'], ['fiber', 'Fibre'],
-                    ] as const).map(([key, label]) => (
-                      <div key={key}>
-                        <label className="label">{label}</label>
-                        <input type="number" min={0} className="input px-2"
-                          value={manual[key] ?? 0}
-                          onChange={(e) => setManual({ ...manual, [key]: Number(e.target.value) })} />
-                      </div>
-                    ))}
-                  </div>
-                  <button className="btn-primary" onClick={() => setTargets({ ...manual, source: 'manual' })}>
-                    Save targets
-                  </button>
-                </div>
-              </div>
-            </div>
+            {/* Keyed on the person, so switching tabs shows their numbers
+                rather than whichever were loaded first. */}
+            <ManualTargets
+              key={whose}
+              initial={shown}
+              onSave={(targets) => setTargets(targets, whose)}
+            />
           </div>
         </section>
 
@@ -325,6 +333,50 @@ function SettingsPanels() {
  * blocked, a file picker that isn't offered. At least one path works
  * everywhere the app runs.
  */
+/**
+ * Targets typed in by hand.
+ *
+ * Its own component so it can be keyed on whose targets these are: the fields
+ * hold a draft, and a draft has to start again when the person changes. Held
+ * in the parent, switching to Oli showed Arany's numbers in the boxes and
+ * saved them to Oli.
+ */
+function ManualTargets({
+  initial, onSave,
+}: {
+  initial: Targets
+  onSave: (targets: Targets) => void
+}) {
+  const [manual, setManual] = useState<Targets>(initial)
+
+  return (
+    <div className="card p-4">
+      <div className="flex items-start gap-3">
+        <Pencil size={18} className="text-bite-600 shrink-0 mt-0.5" />
+        <div className="flex-1 space-y-3">
+          <h3 className="font-semibold text-ink-900 text-sm">Or set them yourself</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {([
+              ['calories', 'kcal'], ['protein', 'Protein'], ['carbs', 'Carbs'],
+              ['fat', 'Fat'], ['fiber', 'Fibre'],
+            ] as const).map(([key, label]) => (
+              <div key={key}>
+                <label className="label">{label}</label>
+                <input type="number" min={0} className="input px-2"
+                  value={manual[key] ?? 0}
+                  onChange={(e) => setManual({ ...manual, [key]: Number(e.target.value) })} />
+              </div>
+            ))}
+          </div>
+          <button className="btn-primary" onClick={() => onSave({ ...manual, source: 'manual' })}>
+            Save targets
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function BackupPanel() {
   const [status, setStatus] = useState<{ tone: 'ok' | 'bad'; message: string } | null>(null)
   const [pasted, setPasted] = useState('')
