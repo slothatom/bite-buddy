@@ -20,9 +20,22 @@ export interface EngineHooks {
   onApplied?: (table: string, count: number) => void
   /** Called with the server's own words when it refuses something. */
   onError?: (message: string) => void
-  onDelivered?: () => void
+  /** A table whose changes the server has just accepted. */
+  onDelivered?: (table: string) => void
   /** Rows both of you changed. Theirs was kept; this is how yours is not lost quietly. */
   onContested?: (table: string, rows: SyncRow[]) => void
+  /**
+   * A wholesale deletion this device refused to publish, and the two numbers
+   * behind it, so the screen can ask whether it was meant rather than only
+   * telling the person it was not.
+   */
+  onHeldBack?: (held: HeldDeletion) => void
+}
+
+export interface HeldDeletion {
+  table: string
+  deletions: number
+  known: number
 }
 
 /**
@@ -37,7 +50,13 @@ export interface EngineHooks {
  * to prevent, arriving by a new route.
  *
  * A person deleting eight things by hand is asked for nothing; a device that
- * has apparently lost everything is stopped and says so.
+ * has apparently lost everything is stopped and asked.
+ *
+ * Asked, not refused outright: emptying a shopping list of twenty-one things
+ * looks exactly like a wiped browser from in here, and it is a thing people do
+ * on purpose every week. So the guard holds the deletions and says what it is
+ * holding, and `allowDeletions` is the person answering. Nothing goes without
+ * that answer, and the answer covers one table once.
  */
 const MASS_DELETE_ROWS = 8
 const MASS_DELETE_SHARE = 0.5
@@ -59,6 +78,8 @@ function asAppRow(row: SyncRow): SyncRow {
 
 export class RowSync {
   private stopped = false
+  /** Tables whose wholesale deletion has been agreed to, spent on the next push. */
+  private readonly allowed = new Set<string>()
 
   constructor(
     private readonly db: SupabaseClient,
@@ -69,6 +90,17 @@ export class RowSync {
 
   stop(): void {
     this.stopped = true
+  }
+
+  /**
+   * "Yes, I deleted those."
+   *
+   * Consumed by the next push of that table and not remembered afterwards, so
+   * agreeing to empty a shopping list today cannot quietly wave through a lost
+   * browser tomorrow.
+   */
+  allowDeletions(table: string): void {
+    this.allowed.add(table)
   }
 
   /**
@@ -122,14 +154,18 @@ export class RowSync {
 
     const deletions = send.filter((row) => row.deleted_at).length
     const known = Object.keys(snapshot.rows).length
-    if (deletions >= MASS_DELETE_ROWS && deletions >= known * MASS_DELETE_SHARE) {
+    const wholesale = deletions >= MASS_DELETE_ROWS && deletions >= known * MASS_DELETE_SHARE
+
+    if (wholesale && !this.allowed.has(table.table)) {
       this.hooks.onError?.(
-        `This device is about to remove ${deletions} of ${known} ${table.table} from the shared copy, `
-        + 'which usually means its own storage was cleared rather than that you deleted them. '
-        + 'Nothing has been sent. Open the app on the device that still has your data.',
+        `This device wants to remove ${deletions} of ${known} ${table.table} from the shared copy. `
+        + 'If you deleted them, say so and they will go. If you did not, this device has lost its '
+        + 'own copy and sending would take them off the other phone too, so open the app there instead.',
       )
+      this.hooks.onHeldBack?.({ table: table.table, deletions, known })
       return false
     }
+    this.allowed.delete(table.table)
 
     const { error } = await this.db.from(table.table).upsert(
       send.map((row) => ({ ...row, updated_by: this.userId })),
@@ -142,7 +178,7 @@ export class RowSync {
     }
 
     useSyncState.getState().remember(table.table, { ...next, watermark: snapshot.watermark })
-    this.hooks.onDelivered?.()
+    this.hooks.onDelivered?.(table.table)
     return true
   }
 

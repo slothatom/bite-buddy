@@ -183,7 +183,85 @@ describe('a device that has lost its own storage', () => {
     expect(ok).toBe(false)
     expect(db.upserted).toHaveLength(0)
     expect(server.size).toBe(12)
-    expect(said.join()).toContain('storage was cleared')
+    expect(said.join()).toContain('lost its own copy')
+  })
+
+  it('says what it is holding, so the screen can ask', async () => {
+    const server = new Map<string, SyncRow>()
+    const state = { rows: Array.from({ length: 12 }, (_, i) => ({ id: `r${i}`, data: { v: i } })) }
+    const held: { table: string; deletions: number; known: number }[] = []
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sync = new RowSync(fakeDb(server) as any, [fakeTable('t', state)], 'me', {
+      onHeldBack: (h) => held.push(h),
+    })
+
+    await sync.round()
+    state.rows = []
+    await sync.round()
+
+    expect(held).toEqual([{ table: 't', deletions: 12, known: 12 }])
+  })
+
+  it('sends them once the person says they meant it', async () => {
+    // Emptying a shopping list of twenty-one things looks exactly like a wiped
+    // browser from in here, and only the person holding the phone knows which.
+    const server = new Map<string, SyncRow>()
+    const state = { rows: Array.from({ length: 12 }, (_, i) => ({ id: `r${i}`, data: { v: i } })) }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sync = new RowSync(fakeDb(server) as any, [fakeTable('t', state)], 'me')
+
+    await sync.round()
+    state.rows = []
+    expect(await sync.round()).toBe(false)
+
+    sync.allowDeletions('t')
+    expect(await sync.round()).toBe(true)
+    expect(server.get('r0')?.deleted_at).toBeTruthy()
+  })
+
+  it('spends that answer once rather than remembering it', async () => {
+    // Agreeing to empty a list today must not wave through a lost browser
+    // tomorrow, so the permission covers the push it was given for.
+    const server = new Map<string, SyncRow>()
+    const state = { rows: Array.from({ length: 12 }, (_, i) => ({ id: `r${i}`, data: { v: i } })) }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sync = new RowSync(fakeDb(server) as any, [fakeTable('t', state)], 'me')
+
+    await sync.round()
+    state.rows = []
+    sync.allowDeletions('t')
+    await sync.round()
+
+    // A second wholesale deletion, this time unannounced.
+    state.rows = Array.from({ length: 12 }, (_, i) => ({ id: `s${i}`, data: { v: i } }))
+    await sync.round()
+    state.rows = []
+    expect(await sync.round()).toBe(false)
+  })
+
+  it('keeps the question up while another table goes through', async () => {
+    // The banner's answer button hangs off this. Clearing the question because
+    // some unrelated table delivered would take the only way out away.
+    const server = new Map<string, SyncRow>()
+    const held = { rows: Array.from({ length: 12 }, (_, i) => ({ id: `h${i}`, data: { v: i } })) }
+    const other = { rows: [{ id: 'o1', data: { v: 1 } }] }
+    const delivered: string[] = []
+    const sync = new RowSync(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      fakeDb(server) as any,
+      [fakeTable('held', held), fakeTable('other', other)],
+      'me',
+      { onDelivered: (t) => delivered.push(t) },
+    )
+
+    await sync.round()
+    delivered.length = 0
+
+    held.rows = []
+    other.rows = [...other.rows, { id: 'o2', data: { v: 2 } }]
+    await sync.round()
+
+    expect(delivered).toEqual(['other'])
   })
 
   it('lets an ordinary handful of deletions through', async () => {
