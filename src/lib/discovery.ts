@@ -156,6 +156,11 @@ export function throughLens(lens: Lens, input: LensInput): Recipe[] {
       // cooked it again: the tray of roasted vegetables feeds seven of the 481
       // meals. A recipe of your own carries no such record, so the old rule
       // stays alongside it for anything that plainly makes a crowd.
+      //
+      // Repetition alone is not the question, which is why the servings still
+      // have to be there. Fried eggs are in seven of those meals, more than any
+      // soup in the library, and nobody cooks a batch of them on Sunday to eat
+      // on Wednesday. One serving is one serving however often it was eaten.
       const worth = (r: Recipe) =>
         r.servings >= 4 || (r.servings >= 2 && (r.timesPlanned ?? 0) >= 2)
 
