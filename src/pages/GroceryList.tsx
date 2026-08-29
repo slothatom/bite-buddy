@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
-import { RefreshCw, Trash2, ShoppingBasket, Plus, X, Check, Search } from 'lucide-react'
+import { RefreshCw, Trash2, ShoppingBasket, Plus, X, Check, Search, Share2 } from 'lucide-react'
 import type { GroceryItem, MedCategory, PantryItem } from '../types'
 import { useMealPlanStore, getRangeDates } from '../store/useMealPlanStore'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { EmptyState, SectionHeading } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS } from '../lib/categories'
-import { formatGrams } from '../lib/grocery'
+import { formatGrams, householdAmount, listAsText } from '../lib/grocery'
+import { copyToClipboard } from '../lib/clipboard'
 import { usePantry, usePantryItems, usePantryStore } from '../store/usePantryStore'
 import { useFoods } from '../store/useFoodStore'
 
@@ -124,6 +125,7 @@ export default function GroceryList() {
               <button className="btn-ghost text-sm" onClick={clearCheckedItems} disabled={!checked}>
                 Clear picked up
               </button>
+              <ShareList items={groceryItems} />
               <button className="btn-ghost text-sm text-coral-600" onClick={clearGroceryList}>
                 <Trash2 size={14} /> Empty list
               </button>
@@ -131,11 +133,17 @@ export default function GroceryList() {
           </div>
         )}
 
+        {/* Above the list, not below it. Under a categorised list of forty
+            lines this was off the bottom of the screen, and a walkthrough
+            reported the shopping list as unable to take a typed item at all.
+            It could. Nobody could find it. */}
+        <AddItem onAdd={(name, amount) => addGroceryItem({ name, amount })} />
+
         {groceryItems.length === 0 ? (
           <EmptyState title="Nothing on the list yet">
             {plannedMeals
               ? 'Pick the days you are shopping for, then build it.'
-              : 'Plan some meals first, then build the list from them. You can also add lines by hand below.'}
+              : 'Plan some meals first, then build the list from them, or type a line in above.'}
           </EmptyState>
         ) : (
           // Two columns from lg, laid out as masonry so a category with three
@@ -172,8 +180,6 @@ export default function GroceryList() {
           ))}
           </div>
         )}
-
-        <AddItem onAdd={(name, amount) => addGroceryItem({ name, amount })} />
 
         {groceryItems.length > 0 && (
           <p className="flex items-start gap-2 text-xs text-ink-500">
@@ -416,7 +422,15 @@ function ItemRow({
   /** Only for lines that came from the plan: a typed-in line names no food. */
   onHaveIt?: () => void
 }) {
+  const ctx = useNutritionContext()
   const shown = item.amount ?? (item.grams ? formatGrams(item.grams) : '')
+
+  // What to put in the basket, where the app can say it. The grams stay
+  // underneath, because they are what the plan actually asked for and the
+  // count is a rounding of them.
+  const household = item.amount
+    ? undefined
+    : householdAmount(item.grams, ctx.foods.get(item.foodId)?.units)
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(item.name)
   const [amount, setAmount] = useState(shown)
@@ -479,7 +493,12 @@ function ItemRow({
         aria-label={`Edit ${item.name}`}
         onClick={() => { setName(item.name); setAmount(shown); setEditing(true) }}
       >
-        {shown}
+        {household ? (
+          <>
+            {household}
+            <span className="ml-1.5 text-xs text-ink-500">{shown}</span>
+          </>
+        ) : shown}
       </button>
     </div>
   )
@@ -519,5 +538,46 @@ function AddItem({ onAdd }: { onAdd: (name: string, amount: string) => void }) {
         <Plus size={16} />
       </button>
     </div>
+  )
+}
+
+/**
+ * Handing the list to somebody who is not in the app.
+ *
+ * The only way anything left here was a backup file, which is not a thing you
+ * send to a person standing in a different shop. Share where the browser has
+ * it, which on a phone is the sheet everybody already knows; the clipboard
+ * everywhere else, which is every desktop.
+ *
+ * Only what is left to buy goes: a list of things already in the trolley is
+ * not a shopping list.
+ */
+function ShareList({ items }: { items: GroceryItem[] }) {
+  const ctx = useNutritionContext()
+  const [said, setSaid] = useState<string | null>(null)
+
+  const text = () => listAsText(items, CATEGORY_LABELS, (item) => item.amount
+    ?? householdAmount(item.grams, ctx.foods.get(item.foodId)?.units)
+    ?? (item.grams ? formatGrams(item.grams) : ''))
+
+  async function share() {
+    const body = text()
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Shopping list', text: body })
+        return
+      } catch {
+        // Dismissed, or refused. Fall through to the clipboard rather than
+        // leaving the button having done nothing at all.
+      }
+    }
+    setSaid(await copyToClipboard(body) ? 'Copied' : 'Could not copy')
+    setTimeout(() => setSaid(null), 2000)
+  }
+
+  return (
+    <button className="btn-ghost text-sm" onClick={share}>
+      <Share2 size={14} /> {said ?? 'Share'}
+    </button>
   )
 }
