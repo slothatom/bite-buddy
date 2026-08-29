@@ -25,7 +25,7 @@ import { availability, availabilityLabel } from '../../lib/pantry'
  *
  * The fridge tab comes first when there is anything in it. That is the whole
  * argument for cooking in advance: the next meal is already decided, and the
- * app should say so before offering you 275 things to choose between.
+ * app should say so before offering you 228 things to choose between.
  */
 export default function AddEntryModal({
   date, slot, onClose, onAdd,

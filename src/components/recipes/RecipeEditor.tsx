@@ -28,7 +28,7 @@ import { UNIT_LABELS, unitsFor, toGrams, fromGrams, defaultUnit, APPROXIMATE_UNI
 /**
  * Editing a recipe, whether it came from the dietician or from you.
  *
- * The 275 shipped recipes live in code, so "editing" one really means keeping
+ * The 228 shipped recipes live in code, so "editing" one really means keeping
  * your own copy of it, the store does that on the first change and the original
  * stays available to come back to. That is why this offers Revert as well as
  * Delete: undoing your edits and getting rid of the recipe are different

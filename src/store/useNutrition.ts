@@ -4,12 +4,13 @@ import { buildFoodIndex, type FoodIndex } from '../lib/foodSearch'
 import { useFoods, useFoodStore, useResolvableFoods } from './useFoodStore'
 import { useResolvableRecipes, useRecipeStore } from './useRecipeStore'
 import { useAllPortions } from './usePortionStore'
+import { RECIPE_ALIASES } from '../data'
 
 /**
  * The lookup tables every nutrition calculation needs.
  *
  * Rebuilt only when the food or recipe lists actually change, the library is
- * ~120 foods and ~275 recipes, so rebuilding on every render would be wasteful
+ * ~120 foods and ~230 recipes, so rebuilding on every render would be wasteful
  * on the weekly planner where totals are computed for 35 meal slots at once.
  */
 export function useNutritionContext(): NutritionContext {
@@ -21,13 +22,21 @@ export function useNutritionContext(): NutritionContext {
   const recipes = useResolvableRecipes()
   // Merged-away recipes are not in the library any more, but days you already
   // planned still name them. The aliases keep those days resolving.
-  const mergedInto = useRecipeStore((s) => s.mergedInto)
+  const yourMerges = useRecipeStore((s) => s.mergedInto)
   // Same for foods: a duplicate you folded away is still named by every recipe
   // and every snack line written before you merged it.
   const foodsMergedInto = useFoodStore((s) => s.mergedInto)
   // Every portion, including the empty ones: a day you planned from the fridge
   // names a portion by id, and an eaten tub must still say what that meal was.
   const portions = useAllPortions()
+
+  // The library does its own merging: fourteen documents describe the same
+  // meal in a dozen ways, and the importer keeps one of each. A day planned
+  // against one of the others, before or after that merge, still resolves.
+  const mergedInto = useMemo(
+    () => ({ ...RECIPE_ALIASES, ...yourMerges }),
+    [yourMerges],
+  )
 
   return useMemo(
     () => buildContext(foods, recipes, mergedInto, foodsMergedInto, portions),

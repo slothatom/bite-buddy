@@ -5,24 +5,25 @@ import {
 } from './mergeRecipes'
 import { buildContext } from './nutrition'
 import { groupVariants } from './recipeGroups'
-import { ALL_RECIPES, FOODS } from '../data'
+import { ALL_RECIPES, FOODS, RECIPE_ALIASES } from '../data'
 
 const ctx = buildContext(FOODS, ALL_RECIPES)
 
 describe('which repeats are safe to merge without asking', () => {
   it('reads two spellings of one meal as the same food', () => {
-    // "supă de fasole verde" and "ciorbă de fasole verde" are one dinner written
-    // two ways; nothing is lost by folding them together.
-    // The full name: there is also a "Green bean soup" dish, which is the
-    // component this meal is built from and a group of its own.
-    const soup = groupVariants(ALL_RECIPES)
-      .find((g) => g.name === 'Green bean soup with wholemeal bread & yogurt')!
-    expect(soup.variants.length).toBeGreaterThan(1)
-    expect(interchangeableGroups([soup], ctx)).toHaveLength(1)
+    // "supă de fasole verde" and "ciorbă de fasole verde" are one dinner
+    // written two ways. The importer folds them together on the way in, so the
+    // library ships one of them and the other resolves to it.
+    const soup = ALL_RECIPES.filter((r) =>
+      r.name.en === 'Green bean soup with wholemeal bread & yogurt')
+    expect(soup).toHaveLength(1)
+    const folded = Object.entries(RECIPE_ALIASES).filter(([, to]) => to === soup[0].id)
+    expect(folded.length).toBeGreaterThan(1)
   })
 
   it('leaves alone a dish written at genuinely different portions', () => {
-    // 259 kcal and 408 kcal are a real choice, not a duplicate.
+    // 250 g and 300 g of vegetables are a real choice, not a duplicate, so
+    // these stay two recipes and neither offers to swallow the other.
     const pan = groupVariants(ALL_RECIPES)
       .find((g) => g.name === 'Spicy chicken & vegetable pan')!
     expect(pan.variants.length).toBeGreaterThan(1)
@@ -34,14 +35,23 @@ describe('which repeats are safe to merge without asking', () => {
     expect(interchangeableGroups([single], ctx)).toHaveLength(0)
   })
 
-  it('finds a real number of them in the shipped library', () => {
-    const safe = interchangeableGroups(groupVariants(ALL_RECIPES), ctx)
-    expect(safe.length).toBeGreaterThan(10)
-    // And every one of them really is uniform, not merely similarly named.
-    for (const g of safe) {
-      const signatures = new Set(g.variants.map((v) => recipeSignature(v, ctx)))
-      expect(signatures.size).toBe(1)
-    }
+  it('finds nothing left to merge in the shipped library', () => {
+    // This used to find dozens, which was the importer's failure showing
+    // through as a chore for the reader: 68 of 204 recipes were repeats it had
+    // numbered rather than recognised. It now recognises them, so the offer
+    // here is empty until you add or edit a recipe yourself.
+    expect(interchangeableGroups(groupVariants(ALL_RECIPES), ctx)).toHaveLength(0)
+  })
+
+  it('still spots a repeat you make yourself', () => {
+    const one = ALL_RECIPES.find((r) => r.name.en === 'Baked oats')!
+    const copy = { ...one, id: 'yours', name: { en: `${one.name.en} (2)` } }
+    const yours = buildContext(FOODS, [one, copy])
+    const groups = groupVariants([one, copy])
+    expect(interchangeableGroups(groups, yours)).toHaveLength(1)
+    // And it is offered because the two really are the same food, not because
+    // they are named alike.
+    expect(recipeSignature(one, yours)).toBe(recipeSignature(copy, yours))
   })
 })
 

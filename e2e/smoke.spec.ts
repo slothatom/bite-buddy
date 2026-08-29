@@ -158,7 +158,7 @@ test.describe('the main flow', () => {
 
   test('every screen that lists things actually lists something', async ({ page }) => {
     // Schedule filtered its list on recipes having a written method. Not one of
-    // the 275 does, the dietician wrote portions, not instructions, so the
+    // the 228 does, the dietician wrote portions, not instructions, so the
     // screen shipped permanently empty and rendered fine while doing it.
     // Nothing caught that, because "renders without errors" is exactly what an
     // empty state does.
@@ -341,7 +341,7 @@ test.describe('the planner', () => {
 })
 
 test.describe('the recipe library', () => {
-  test('opens on one shelf rather than all 275', async ({ page }) => {
+  test('opens on one shelf rather than all 228', async ({ page }) => {
     // The screen this replaced showed every recipe at once, sorted
     // alphabetically, a wall you had to scroll past to reach anything.
     await goto(page, '/recipes')
@@ -363,22 +363,33 @@ test.describe('the recipe library', () => {
     expect(await page.locator('.card').count()).toBeGreaterThan(5)
   })
 
-  test('the same dish written four times is one card, not four', async ({ page }) => {
+  test('the same dish written four times is one recipe, not four', async ({ page }) => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Dinner/ }).click()
     await page.getByPlaceholder(/Search in English/).fill('green bean soup')
 
-    // Four lines across the plans, one dish. The numbering the generator added
-    // ("(2)", "(3)") should not be on screen at all.
+    // Four lines across the plans, worded four ways, down to a typo in "sos de
+    // usturoi". The importer reads them as the one dinner they are, so there is
+    // nothing here to group and no numbering to hide.
     await expect(page.locator('.card')).toHaveCount(1)
     await expect(page.getByText('(2)')).toHaveCount(0)
-    await expect(page.getByText(/versions/)).toBeVisible()
+    await expect(page.getByText(/versions/)).toHaveCount(0)
+  })
+
+  test('the same dish at three portions is one card, with the portions inside it', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Breakfast/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt')
+
+    // 30, 40 and 45 g of oats is a real choice rather than a repeat, so all
+    // three survive the import, and each name says which one it is.
+    await expect(page.locator('.card')).toHaveCount(1)
+    await expect(page.getByText(/3 versions/)).toBeVisible()
 
     await page.locator('.card button').nth(1).click()
-    await expect(page.getByText(/Written \d+ times across the plans/)).toBeVisible()
+    await expect(page.getByText(/Written 3 times across the plans/)).toBeVisible()
 
-    // The versions are often the same meal worded differently, so what changes
-    // when you flip between them is the dietician's own line.
+    // What changes when you flip between them is the dietician's own line.
     const line = page.locator('.card-soft').first()
     const before = await line.textContent()
     // Scoped to the sheet: the filter chips behind it are also .chip-off.
@@ -386,43 +397,33 @@ test.describe('the recipe library', () => {
     await expect(line).not.toHaveText(before ?? '')
   })
 
-  test('the duplicates that are only duplicates can be folded away in one tap', async ({ page }) => {
+  test('there is nothing left in the shipped library to fold away', async ({ page }) => {
     await goto(page, '/recipes')
-    // A named shelf, not whichever one the time of day opens on: which cards
-    // lose a version depends on the shelf, and this used to pass or fail by
-    // the hour.
     await page.getByRole('button', { name: /^Breakfast/ }).click()
 
-    const banner = page.getByText(/dishes are written down more than once/)
-    await expect(banner).toBeVisible()
-
-    const versions = page.getByText(/\d+ versions/)
-    const before = await versions.count()
-    expect(before, 'nothing on this shelf was written twice').toBeGreaterThan(0)
-
-    await page.getByRole('button', { name: 'Merge them' }).click()
-
-    // The offer goes away because there is nothing left to fold, and fewer
-    // dishes are still carrying repeats.
-    await expect(banner).toHaveCount(0)
-    expect(await versions.count()).toBeLessThan(before)
+    // This banner used to greet everyone, because 68 of the 204 imported meals
+    // were repeats the importer had numbered rather than recognised. It now
+    // recognises them, so the only duplicates left to offer are ones you make.
+    await expect(page.getByText(/dishes are written down more than once/)).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Merge them' })).toHaveCount(0)
   })
 
   test('a dish written at different portions is never swept up automatically', async ({ page }) => {
     await goto(page, '/recipes')
-    await page.getByRole('button', { name: 'Merge them' }).click()
+    await page.getByRole('button', { name: /^Breakfast/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt')
 
-    // 259 kcal and 408 kcal are a real choice, so this one still has versions.
-    await page.getByRole('button', { name: /^Lunch/ }).click()
-    await page.getByPlaceholder(/Search in English/).fill('spicy chicken')
+    // 30 g and 45 g of oats are a real choice, so this one keeps its versions
+    // and nothing offers to fold them together.
     await page.locator('.card button').nth(1).click()
-    await expect(page.getByText(/Written \d+ times across the plans/)).toBeVisible()
+    await expect(page.getByText(/Written 3 times across the plans/)).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Merge them' })).toHaveCount(0)
   })
 
   test('merging by hand keeps the version you are looking at, and can be undone', async ({ page }) => {
     await goto(page, '/recipes')
-    await page.getByRole('button', { name: /^Lunch/ }).click()
-    await page.getByPlaceholder(/Search in English/).fill('spicy chicken')
+    await page.getByRole('button', { name: /^Breakfast/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt')
     await page.locator('.card button').nth(1).click()
 
     await page.getByRole('button', { name: /Merge these into one/ }).click()
@@ -438,14 +439,21 @@ test.describe('the recipe library', () => {
 
   test('a day already planned survives a merge', async ({ page }) => {
     // The fourteen archived weeks name recipe ids in code, so a merge must not
-    // leave a planned day pointing at nothing.
+    // leave a planned day pointing at nothing. Nor must the importer's own
+    // merging: a week loaded from the archive names the recipes that survived
+    // it, and any id it folded away resolves through the aliases it wrote.
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
+    await expect(page.getByText('Unknown')).toHaveCount(0)
 
     await goto(page, '/recipes')
-    await page.getByRole('button', { name: 'Merge them' }).click()
+    await page.getByRole('button', { name: /^Breakfast/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt')
+    await page.locator('.card button').nth(1).click()
+    await page.getByRole('button', { name: /Merge these into one/ }).click()
+    await page.getByRole('button', { name: 'Merge into this one' }).click()
 
     await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()

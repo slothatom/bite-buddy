@@ -6,7 +6,7 @@ import type { Recipe, RecipeTag } from '../types'
  * The library carries fifteen tags, and the Recipes screen used to offer
  * thirteen of them as filter chips side by side, meal times, diets and dish
  * shapes all in one row, as if "dinner", "vegan" and "soup" were the same kind
- * of choice. They are not, and mixing them is what made 275 recipes feel like a
+ * of choice. They are not, and mixing them is what made the library feel like a
  * dump: no arrangement, just a wall you filtered by guessing.
  *
  * So the tags are read through two axes instead:
@@ -23,7 +23,7 @@ import type { Recipe, RecipeTag } from '../types'
  * carried (soup, salad, spread) are now said better by the category.
  *
  * Nothing here is stored differently: this is a reading of the meal tags the
- * generated library already has, so the 275 recipes did not need re-tagging and
+ * generated library already has, so the shipped recipes did not need re-tagging and
  * a tag this file has never heard of round-trips through the editor unharmed.
  */
 
@@ -78,7 +78,7 @@ export function primaryGroupOf(recipe: Pick<Recipe, 'tags'>): RecipeGroup {
  * Which shelf to open on.
  *
  * Opening on Breakfast at nine in the morning is right far more often than
- * opening on the full 275, which is the screen this replaces.
+ * opening on the full 228, which is the screen this replaces.
  */
 export function groupForTime(now = new Date()): RecipeGroup {
   const h = now.getHours()
@@ -111,21 +111,25 @@ export function withGroups(tags: RecipeTag[], groups: RecipeGroup[]): RecipeTag[
 /**
  * The same dish, weighed differently.
  *
- * A recipe was generated for every distinct line across the fourteen plans, and
- * the dietician repeats a dish at different portions all the time, so 68 of the
- * 204 meals are called something like "Green bean soup with wholemeal bread &
- * yogurt (3)". As separate cards they are a third of the library and pure noise:
- * four near-identical names in a row, differing only in grams.
+ * A recipe is generated for every distinct line across the fourteen plans, and
+ * the dietician repeats a dish at different portions all the time: "Rolled oats
+ * with yogurt & mixed berries" appears at 30, 40 and 45 g of oats. The importer
+ * says so in the name, since a card has to be able to stand alone, but three
+ * near-identical names in a row is not a library, it is a list.
  *
  * Grouped, they are one dish you can flip between portions of, which is what
- * they always were.
+ * they always were. The bracket at the end is what marks a portion: an ingredient
+ * that differs is folded into the name instead, and that really is another dish.
  */
 export function baseName(name: string): string {
-  return name.replace(/\s*\(\d+\)\s*$/, '')
+  // Only the importer's own shapes, "(45 g rolled oats)", "(300 g)", "(no
+  // yogurt garlic sauce)", and the numbering it used to append. A recipe you
+  // named "Porridge (the good one)" keeps its bracket.
+  return name.replace(/\s*\((?:\d+|\d+ g(?: [^()]+)?|no [^()]+)\)\s*$/, '')
 }
 
 export interface RecipeVariants {
-  /** The name with the generator's numbering taken off. */
+  /** The name with the portion in brackets taken off. */
   name: string
   /**
    * Always at least one. The first is what the card shows and what opens when

@@ -27,6 +27,7 @@ import { mealAvailability } from '../lib/pantry'
 import FillGaps from '../components/planner/FillGaps'
 import WeekTemplates from '../components/planner/WeekTemplates'
 import type { Proposal } from '../lib/autoPlan'
+import { baseName } from '../lib/recipeGroups'
 
 /**
  * The weekly planner.
@@ -724,11 +725,19 @@ function EntryLine({
   const portion = entry.kind === 'portion' ? ctx.portions?.get(entry.portionId) : undefined
   const portionRecipe = portion?.recipeId ? ctx.recipes.get(portion.recipeId) : undefined
 
-  const label = entry.kind === 'recipe'
+  const full = entry.kind === 'recipe'
     ? ctx.recipes.get(entry.recipeId)?.name.en ?? 'Unknown recipe'
     : entry.kind === 'portion'
       ? portionRecipe?.name.en ?? portion?.label ?? 'From the fridge'
       : ctx.foods.get(entry.foodId)?.names.en ?? 'Unknown food'
+
+  // Without the portion in brackets. A library name has to stand alone, so
+  // "Eggplant spread with wholemeal bread & mixed vegetables (50 g wholemeal
+  // bread)" is right on a card you might meet cold. Here the ingredients are
+  // written out directly underneath, weights and all, so the bracket is saying
+  // it twice, and saying it in the one place where a second line costs a slot
+  // its place on the screen.
+  const label = baseName(full)
 
   const detail = entry.kind === 'food'
     ? `${Math.round(entry.grams)} g`
@@ -748,6 +757,7 @@ function EntryLine({
     <div className="flex items-baseline gap-2 text-sm">
       <span className="text-base leading-none shrink-0">{emoji}</span>
       <span
+        title={full === label ? undefined : full}
         data-entry-name
         className={`flex-1 min-w-0 ${isDeleted ? 'text-ink-500' : 'text-ink-900'} ${
           struck ? 'line-through' : ''}`}
