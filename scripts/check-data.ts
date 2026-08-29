@@ -9,6 +9,7 @@ import { atwaterCalories, buildContext, calorieDrift, calorieGap, recipePerServi
 import { RECIPE_CLASSIFICATION } from '../src/data/generated/classification.js'
 import { DISH_CATEGORIES, QUICK_FILTERS, HAND_APPLIED_FILTERS } from '../src/lib/dishCategories.js'
 import { RECIPE_ALIASES } from '../src/data/generated/recipeAliases.js'
+import { TIMES_PLANNED } from '../src/data/generated/reuse.js'
 import { componentSignature, rebuildFromArchive, renderFiles } from './lib/library.js'
 import type { Recipe } from '../src/types/index.js'
 
@@ -183,7 +184,33 @@ for (const [from, to] of Object.entries(RECIPE_ALIASES)) {
   if (recipes.some((r) => r.id === from)) problems.push(`alias ${from} shadows a recipe that still exists`)
 }
 
-// 9. The generated data is what the importer would produce today.
+// 9. Every recipe says how long it takes, and how often it was cooked.
+//
+// Both used to be missing for the 157 imported meals, and the two discovery
+// lenses that read them, "Quick tonight" and "Worth a batch", matched nothing
+// at all. An empty filter is worse than an absent one: it reads as an empty
+// library rather than as a question the data cannot answer.
+for (const recipe of recipes) {
+  if (!(recipe.prepMinutes > 0)) {
+    problems.push(`${recipe.id} (${recipe.name.en}): no preparation time`)
+  }
+  if (recipe.prepMinutes + recipe.cookMinutes > 180) {
+    problems.push(`${recipe.id} (${recipe.name.en}): ${recipe.prepMinutes + recipe.cookMinutes} minutes, which is a day rather than a meal`)
+  }
+}
+
+const batchable = recipes.filter((r) =>
+  r.components.length > 0
+  && (r.servings >= 4 || (r.servings >= 2 && (TIMES_PLANNED[r.id] ?? 0) >= 2)))
+if (batchable.length < 5) {
+  problems.push(`only ${batchable.length} recipes are worth a batch, so that lens shows next to nothing`)
+}
+
+for (const id of Object.keys(TIMES_PLANNED)) {
+  if (!ctx.recipes.has(id)) problems.push(`${id}: counted in the plans but no longer in the library`)
+}
+
+// 10. The generated data is what the importer would produce today.
 //
 // The archive keeps every meal line verbatim, so the whole library can be
 // rebuilt from it without the .docx originals. That makes this a drift check:
@@ -201,7 +228,7 @@ for (const [name, content] of Object.entries(rebuilt)) {
   }
 }
 
-// 10. Every recipe knows what kind of food it is, and the file saying so is not
+// 11. Every recipe knows what kind of food it is, and the file saying so is not
 //     stale, a category the classifier no longer produces would silently filter
 //     to nothing on the Recipes screen.
 for (const recipe of recipes) {
@@ -241,6 +268,8 @@ console.log(`meal recipes   ${MEAL_RECIPES.length}`)
 console.log(`components     ${componentCount}`)
 console.log(`plan lines     ${lines} (${lines - empty} mapped)`)
 console.log(`categories     ${categoriesUsed.size} of ${DISH_CATEGORIES.length} in use`)
+console.log(`under 20 min   ${recipes.filter((r) => r.prepMinutes + r.cookMinutes <= 20).length}`)
+console.log(`worth a batch  ${batchable.length}`)
 
 if (notes.length) {
   console.log(`\n${notes.length} note(s):`)

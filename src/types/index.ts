@@ -253,6 +253,14 @@ export interface Recipe {
    */
   sourceLine?: string
   sourcePlanId?: string
+  /**
+   * How many of the fourteen weeks' meals this feeds, for a shipped recipe.
+   *
+   * Provenance rather than a judgement: the dietician cooking a tray of roasted
+   * vegetables into seven different lunches is the evidence behind "Worth a
+   * batch", which otherwise has to guess at what keeps.
+   */
+  timesPlanned?: number
   createdAt: string
 }
 

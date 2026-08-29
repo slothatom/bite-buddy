@@ -4,6 +4,8 @@ import { DISHES, DISH_ALIASES, DISH_BY_WEIGHT } from '../../src/data/dishes.js'
 import { buildFoodIndex, resolveFood } from '../../src/lib/foodSearch.js'
 import { normaliseTerm } from '../../src/lib/units.js'
 import { buildContext, componentsNutrients } from '../../src/lib/nutrition.js'
+import { categorise } from '../../src/lib/classify.js'
+import { deriveTimes } from '../../src/lib/cookingTimes.js'
 import type { RecipeComponent, MealSlot, Recipe, RecipeTag, SourcePlan } from '../../src/types/index.js'
 
 /**
@@ -494,6 +496,8 @@ export interface Library {
   recipes: Recipe[]
   /** Merged-away recipe id → the recipe it became, so old plans still resolve. */
   aliases: Record<string, string>
+  /** Recipe or dish id → how many meals across the fourteen weeks it feeds. */
+  timesPlanned: Record<string, number>
   unresolved: Unresolved[]
   lineCount: number
   mappedLines: number
@@ -600,7 +604,51 @@ export function buildLibrary(plans: PlanInput[]): Library {
   // soup" would otherwise shadow the dish of that name in every search.
   distinguish(kept, DISHES)
 
-  return { plans: sourcePlans, recipes: kept, aliases, unresolved, lineCount, mappedLines }
+  // Times last, because the category is read partly off the name and the names
+  // are only final now.
+  const whole = buildContext(FOODS, [...DISHES, ...kept], aliases)
+  for (const recipe of kept) {
+    Object.assign(recipe, deriveTimes(recipe, whole, categorise(recipe, whole)))
+  }
+
+  return {
+    plans: sourcePlans,
+    recipes: kept,
+    aliases,
+    timesPlanned: countUses(sourcePlans, whole),
+    unresolved,
+    lineCount,
+    mappedLines,
+  }
+}
+
+/**
+ * How many of the 481 meals each recipe feeds.
+ *
+ * Counted through the meals as well as directly: nobody cooks a batch of
+ * "Roasted vegetables with salmon", but the tray of roasted vegetables inside
+ * it turns up in seven of them, and that is the number worth knowing when you
+ * are deciding what to make a lot of on Sunday.
+ */
+function countUses(plans: SourcePlan[], ctx: ReturnType<typeof buildContext>): Record<string, number> {
+  const used = new Map<string, number>()
+  const add = (id: string, n: number) => used.set(id, (used.get(id) ?? 0) + n)
+
+  for (const plan of plans) {
+    for (const day of plan.days) {
+      for (const meal of day.meals) {
+        for (const entry of meal.entries) {
+          if (entry.kind !== 'recipe') continue
+          add(entry.recipeId, 1)
+          for (const part of ctx.recipes.get(entry.recipeId)?.components ?? []) {
+            if (part.kind === 'recipe') add(part.recipeId, 1)
+          }
+        }
+      }
+    }
+  }
+
+  return Object.fromEntries([...used].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])))
 }
 
 // ─── Emitting ─────────────────────────────────────────────────────────────────
@@ -636,6 +684,18 @@ export function renderFiles(library: Library): Record<string, string> {
  * keep a day you planned against the other resolving.
  */
 export const RECIPE_ALIASES: Record<string, string> = ${JSON.stringify(library.aliases, null, 2)}\n`,
+
+    'reuse.ts':
+      `${BANNER}
+/**
+ * How many of the fourteen weeks' meals each recipe feeds.
+ *
+ * Counted through the meals as well as directly, so the tray of roasted
+ * vegetables inside seven different lunches is credited with all seven. This is
+ * what "Worth a batch" reads: not a guess about whether something keeps, but
+ * the record of the dietician cooking it again.
+ */
+export const TIMES_PLANNED: Record<string, number> = ${JSON.stringify(library.timesPlanned, null, 2)}\n`,
   }
 }
 

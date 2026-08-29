@@ -260,17 +260,33 @@ rule underneath, since a filter nobody can explain is a filter nobody trusts:
 
 | Lens | Rule |
 |---|---|
-| Quick tonight | Twenty minutes or less, start to plate. Quickest first. |
+| Quick tonight | Twenty minutes or less, start to plate, estimated for the imported meals. Quickest first. |
 | From the cupboard | Everything it needs is something you have. Fewest ingredients first. |
 | Use it up | Uses something in the cupboard with a date on it. Soonest first. |
 | Fits today | Lands inside what is left of today against your target. Closest first. |
 | Not lately | Nothing you have planned in the last month. Longest gap first. |
-| Worth a batch | Makes four or more, and keeps. Most portions first. |
+| Worth a batch | Makes more than one meal, and the plans came back to it. Most used first. |
 
 One at a time, and they compose with the search and the chips, so "quick" inside "soups" is
 a sensible question. A lens that cannot answer, "from the cupboard" with an empty cupboard,
 says what is missing rather than showing an empty screen that reads as "you have no
 recipes". `src/lib/discovery.ts` holds the rules.
+
+Two of those lenses used to match **nothing at all**, which is worse than a lens that admits
+it cannot answer: an empty screen reads as an empty library. The dietician wrote portions,
+never methods, so all 157 imported meals had no time on them and "Quick tonight" could only
+see the 71 hand-written dishes; and nothing in a library written for two people makes four
+servings, so "Worth a batch" was permanently empty.
+
+Both now read real evidence. A meal's time is the longest thing in it, the hand-written dish
+times it contains, plus a minute for each other thing to be weighed out, with a per-category
+estimate as the floor. Those estimates are the dish library's **own medians**, and
+`cookingTimes.test.ts` pins them there, so they are the numbers somebody already wrote rather
+than numbers this app made up. They are still estimates, and every screen showing one says
+"about 25 min" rather than pretending to a stopwatch. A batch is what makes more than one
+meal and got cooked again: `reuse.ts` counts how many of the 481 meals each recipe feeds,
+counting through the meals, so the tray of roasted vegetables inside seven different lunches
+is credited with all seven. 93 recipes are now under twenty minutes and 20 are worth a batch.
 
 A recipe of your own can also carry **your notes**, **where it came from** and **how much
 of an evening it is** (easy, some effort, a project). Three levels rather than five,
@@ -717,8 +733,9 @@ Four judgement calls live in the data or the rules rather than the parser:
 
 `scripts/check-data.ts` verifies every reference resolves, no recipe nests itself, every one of
 the 481 source lines maps to something, recipe names are unique and carry no bare numbering,
-no two recipes have identical ingredients, every merged-away id still resolves, and each food's
-stated calories agree with its own macros, using fibre-aware Atwater (fibre at 2 kcal/g),
+no two recipes have identical ingredients, every merged-away id still resolves, every recipe
+carries a time and enough of them are worth a batch for that lens to say anything, and each
+food's stated calories agree with its own macros, using fibre-aware Atwater (fibre at 2 kcal/g),
 because plain 4/4/9 makes every vegetable look mis-keyed.
 
 It also rebuilds the whole library from the committed archive and compares it to what is

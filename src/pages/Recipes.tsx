@@ -26,6 +26,7 @@ import { interchangeableGroups } from '../lib/mergeRecipes'
 import { usePantry } from '../store/usePantryStore'
 import { availability, availabilityLabel, missingFoods } from '../lib/pantry'
 import { throughLens, lensReady, lensBlocker, LENSES, LENS_ORDER, type Lens } from '../lib/discovery'
+import { timeIsEstimated } from '../lib/cookingTimes'
 import { useUserStore } from '../store/useUserStore'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 
@@ -478,7 +479,9 @@ function RecipeCard({
             {low === high ? `${low} kcal` : `${low}–${high} kcal`}
           </span>
           {minutes > 0 && (
-            <span className="flex items-center gap-1"><Clock size={11} />{minutes} min</span>
+            <span className="flex items-center gap-1">
+              <Clock size={11} />{timeIsEstimated(lead) ? 'about ' : ''}{minutes} min
+            </span>
           )}
           {card.variants.length > 1 && (
             <span className="flex items-center gap-1 text-ink-500">
@@ -814,7 +817,7 @@ function RecipeDetail({
             <p className="text-xs text-ink-500 mb-3">
               per serving · written for {recipe.servings}
               {recipe.prepMinutes || recipe.cookMinutes
-                ? ` · ${recipe.prepMinutes + recipe.cookMinutes} min`
+                ? ` · ${timeIsEstimated(recipe) ? 'about ' : ''}${recipe.prepMinutes + recipe.cookMinutes} min`
                 : ''}
               {mine ? ' · yours' : ''}
             </p>

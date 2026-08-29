@@ -1270,14 +1270,45 @@ test.describe('what the kitchen has to say', () => {
 test.describe('asking the recipe list a question', () => {
   test('quick tonight narrows the list and says what it did', async ({ page }) => {
     await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Breakfast/ }).click()
+    const before = await page.locator('.card').count()
 
     await page.getByRole('button', { name: /Quick tonight/ }).click()
     await expect(page.getByText(/Twenty minutes or less/)).toBeVisible()
     await expect(page.getByRole('button', { name: /Quick tonight/ })).toHaveAttribute('aria-pressed', 'true')
 
+    // Narrower, and not empty. The dietician wrote portions rather than
+    // methods, so every imported meal used to have no time at all and this
+    // filter could only see the hand-written dishes.
+    const after = await page.locator('.card').count()
+    expect(after).toBeGreaterThan(0)
+    expect(after).toBeLessThan(before)
+
     // Pressing it again puts everything back.
     await page.getByRole('button', { name: /Quick tonight/ }).click()
     await expect(page.getByText(/Twenty minutes or less/)).toHaveCount(0)
+  })
+
+  test('worth a batch offers what the plans actually cooked again', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Dishes/ }).click()
+
+    await page.getByRole('button', { name: /Worth a batch/ }).click()
+    await expect(page.getByText(/the plans came back to it/)).toBeVisible()
+
+    // Nothing in this library makes four servings, so the old rule matched
+    // nothing at all. A pot of soup that did two dinners twice over is the
+    // real answer.
+    expect(await page.locator('.card').count()).toBeGreaterThan(0)
+  })
+
+  test('a time nobody wrote down is offered as an estimate', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Dinner/ }).click()
+    await page.getByPlaceholder(/Search in English/).fill('green bean soup with')
+    await page.locator('.card button').first().click()
+
+    await expect(page.getByText(/about \d+ min/).first()).toBeVisible()
   })
 
   test('a lens it cannot answer says what is missing rather than showing nothing', async ({ page }) => {

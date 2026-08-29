@@ -228,3 +228,35 @@ describe('a seasoning is worth naming when nothing else differs', () => {
     expect(built).toEqual(['Apple & cinnamon porridge with vanilla extract'])
   })
 })
+
+describe('what a meal takes, and how often it was made', () => {
+  it('gives every imported meal a time', () => {
+    // The plans are portions, not methods: not one of the 481 lines says how
+    // long anything takes, so all 157 recipes used to arrive at zero and
+    // "Quick tonight" could only ever see the hand-written dishes.
+    const { recipes } = buildLibrary(REAL_WEEK)
+
+    expect(recipes.length).toBeGreaterThan(0)
+    expect(recipes.every((r) => r.prepMinutes > 0)).toBe(true)
+  })
+
+  it('takes its cooking from the dish it contains, not from the estimate', () => {
+    const { recipes } = buildLibrary([plan(['dinner',
+      '350 g ciorba de varza ( o lingurita de ulei / portie), o lg de iaurt , 25 g paine int',
+    ])])
+    const soup = DISHES.find((d) => d.id === 'dish-ciorba-cabbage')!
+
+    expect(recipes[0].cookMinutes).toBe(soup.cookMinutes)
+  })
+
+  it('counts the dish inside a meal every time the meal is eaten', () => {
+    const { timesPlanned } = buildLibrary([plan(
+      ['dinner', '350 g ciorba de varza ( o lingurita de ulei / portie), o lg de iaurt , 25 g paine int'],
+      ['lunch', '350 g ciorba de varza , 50 g paine int'],
+    )])
+
+    // Two different meals, one pot of soup, which is exactly the thing worth
+    // knowing when you are deciding what to cook a lot of.
+    expect(timesPlanned['dish-ciorba-cabbage']).toBe(2)
+  })
+})
