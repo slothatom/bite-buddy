@@ -776,5 +776,11 @@ recipe, plan or measurement is served at a public URL for anything else to read.
 
 ## Not done yet
 
-- Anything at all for a device that is not signed in. Notifications, sync and
-  sharing all begin at an account.
+Nothing, which is worth stating rather than leaving the heading empty.
+
+One line that used to sit here read like a backlog item and was not one: the
+app works entirely signed out, every screen and every recipe, offline. What an
+account adds is sync, sharing and notifications, and each of those is about
+something outside this device by definition. There is no version of "notify my
+phone" that works without something knowing which phone. That is where the
+boundary sits, not work waiting to be done.

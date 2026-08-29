@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Plus, Check, Trash2, Search, Mail, Minus } from 'lucide-react'
+import { Plus, Check, Trash2, Search, Bell, Minus } from 'lucide-react'
 import type { CookSession } from '../types'
 import { useCookStore } from '../store/useCookStore'
 import { useRecipes } from '../store/useRecipeStore'
@@ -88,7 +88,7 @@ export default function Schedule() {
                     </p>
                     {s.remindAt && !s.completed && (
                       <p className="text-xs text-ink-500 flex items-center gap-1 mt-1">
-                        <Mail size={12} /> Both of you get an email at {reminderLabel(s.remindAt)}
+                        <Bell size={12} /> Both phones buzz at {reminderLabel(s.remindAt)}
                       </p>
                     )}
                     {s.recipeIds.length > 0 && (
@@ -212,11 +212,11 @@ function SessionDialog({
             />
             <span className="min-w-0">
               <span className="block text-sm text-ink-900">
-                Email both of us {LEAD_MINUTES} minutes before
+                Notify both of us {LEAD_MINUTES} minutes before
               </span>
               <span className="block text-xs text-ink-500">
-                Goes to everyone in the household. Needs the reminder job set up on the server;
-                see the README.
+                Reaches whichever phones have notifications switched on, in Settings. Needs
+                the notify job running on the server; see the README.
               </span>
             </span>
           </label>

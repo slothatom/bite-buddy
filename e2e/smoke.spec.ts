@@ -179,7 +179,7 @@ test.describe('the main flow', () => {
     await page.locator('input[type=date]').fill(tomorrow)
     await page.getByRole('button', { name: 'Save', exact: true }).click()
 
-    await expect(page.getByText(/Both of you get an email at/)).toBeVisible()
+    await expect(page.getByText(/Both phones buzz at/)).toBeVisible()
     // Eighteen hundred less a quarter of an hour.
     await expect(page.getByText(/17:45/)).toBeVisible()
   })
