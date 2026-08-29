@@ -681,7 +681,9 @@ function SyncPanel() {
   const summary =
     state === 'live' && !unsaved ? 'Everything on this device has reached the shared copy.'
     : state === 'connecting' ? 'Connecting.'
-    : unsaved ? `${unsaved} ${unsaved === 1 ? 'store has' : 'stores have'} changes waiting to go up.`
+    // Rows, not stores: `owedRows` counts the individual changes, and calling
+    // twenty-one emptied shopping list lines "21 stores" was nonsense.
+    : unsaved ? `${unsaved} ${unsaved === 1 ? 'change is' : 'changes are'} waiting to go up.`
     : state === 'error' ? 'The last attempt was turned down.'
     : 'Not syncing. This device is working on its own.'
 

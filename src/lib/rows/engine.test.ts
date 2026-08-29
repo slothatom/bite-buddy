@@ -169,9 +169,9 @@ describe('a device that has lost its own storage', () => {
       rows: Array.from({ length: 12 }, (_, i) => ({ id: `r${i}`, data: { v: i } })),
     }
     const db = fakeDb(server)
-    const said: string[] = []
+    const held: { table: string }[] = []
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sync = new RowSync(db as any, [fakeTable('t', state)], 'me', { onError: (m) => said.push(m) })
+    const sync = new RowSync(db as any, [fakeTable('t', state)], 'me', { onHeldBack: (h) => held.push(h) })
 
     await sync.round()
     expect(server.size).toBe(12)
@@ -183,7 +183,7 @@ describe('a device that has lost its own storage', () => {
     expect(ok).toBe(false)
     expect(db.upserted).toHaveLength(0)
     expect(server.size).toBe(12)
-    expect(said.join()).toContain('lost its own copy')
+    expect(held.map((h) => h.table)).toEqual(['t'])
   })
 
   it('says what it is holding, so the screen can ask', async () => {

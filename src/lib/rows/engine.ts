@@ -157,11 +157,9 @@ export class RowSync {
     const wholesale = deletions >= MASS_DELETE_ROWS && deletions >= known * MASS_DELETE_SHARE
 
     if (wholesale && !this.allowed.has(table.table)) {
-      this.hooks.onError?.(
-        `This device wants to remove ${deletions} of ${known} ${table.table} from the shared copy. `
-        + 'If you deleted them, say so and they will go. If you did not, this device has lost its '
-        + 'own copy and sending would take them off the other phone too, so open the app there instead.',
-      )
+      // Reported rather than worded here. This file knows table names and
+      // nothing about how to say them to a person, and "21 of 21
+      // grocery_items" is what happens when it tries.
       this.hooks.onHeldBack?.({ table: table.table, deletions, known })
       return false
     }

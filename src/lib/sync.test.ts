@@ -203,4 +203,15 @@ describe('what gets synced at all', () => {
       'portions', 'pantry', 'cook_sessions', 'settings',
     ]))
   })
+
+  it('has something to call each of them out loud', async () => {
+    // A banner offering to remove "21 of 21 grocery_items" is a column name
+    // wearing a sentence. Every table needs a name a person would use, and a
+    // new table must not be able to reach a screen without one.
+    const { whatTheyAre } = await import('./sync')
+    for (const table of ROW_TABLES.map((t) => t.table)) {
+      expect(whatTheyAre(table), table).not.toBe('entries')
+      expect(whatTheyAre(table), table).not.toContain('_')
+    }
+  })
 })
