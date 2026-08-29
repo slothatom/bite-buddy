@@ -18,6 +18,20 @@ export interface Ingredient {
   fromRecipeId: string | null
 }
 
+/**
+ * Something named by a plan that this walk could not resolve to food.
+ *
+ * A deleted food, a portion whose recipe is gone, a recipe id from a backup
+ * written by a newer build. The walk has always dropped these silently, which
+ * is how a day naming a food nobody has any more quietly reported a smaller
+ * total than the food on the plate. Counting them is what lets a screen say
+ * the figure is short rather than presenting it as the whole.
+ */
+export interface LostComponent {
+  kind: 'food' | 'portion' | 'recipe'
+  id: string
+}
+
 const MAX_DEPTH = 6
 
 /**
@@ -29,9 +43,25 @@ const MAX_DEPTH = 6
 export function flattenComponents(
   components: Component[],
   ctx: NutritionContext,
-  { scale = 1, skip = [] as string[] } = {},
+  options: { scale?: number; skip?: string[] } = {},
 ): Ingredient[] {
+  return flattenWithLosses(components, ctx, options).ingredients
+}
+
+/**
+ * The same walk, and what it had to give up on.
+ *
+ * Separate entry point rather than a changed return type: a dozen callers want
+ * the ingredients and nothing else, and only the ones reporting a total to a
+ * person need to know the list is incomplete.
+ */
+export function flattenWithLosses(
+  components: Component[],
+  ctx: NutritionContext,
+  { scale = 1, skip = [] as string[] } = {},
+): { ingredients: Ingredient[]; lost: LostComponent[] } {
   const merged = new Map<string, Ingredient>()
+  const lost: LostComponent[] = []
   const skipped = new Set(skip)
 
   const walk = (list: Component[], factor: number, fromRecipeId: string | null, depth: number) => {
@@ -42,7 +72,8 @@ export function flattenComponents(
     for (const c of list) {
       if (c.kind === 'food') {
         const food = ctx.foods.get(c.foodId)
-        if (!food || skipped.has(food.id)) continue
+        if (!food) { lost.push({ kind: 'food', id: c.foodId }); continue }
+        if (skipped.has(food.id)) continue
 
         const existing = merged.get(c.foodId)
         if (existing) existing.grams += c.grams * factor
@@ -54,12 +85,12 @@ export function flattenComponents(
         // is a different question, answered where the shopping list is built.
         const portion = ctx.portions?.get(c.portionId)
         const recipe = portion?.recipeId ? ctx.recipes.get(portion.recipeId) : undefined
-        if (!recipe) continue
+        if (!recipe) { lost.push({ kind: 'portion', id: c.portionId }); continue }
         const perServing = c.servings / Math.max(1, recipe.servings)
         walk(recipe.components, factor * perServing, fromRecipeId ?? recipe.id, depth + 1)
       } else {
         const recipe = ctx.recipes.get(c.recipeId)
-        if (!recipe) continue
+        if (!recipe) { lost.push({ kind: 'recipe', id: c.recipeId }); continue }
         const perServing = c.servings / Math.max(1, recipe.servings)
         walk(recipe.components, factor * perServing, fromRecipeId ?? recipe.id, depth + 1)
       }
@@ -67,5 +98,8 @@ export function flattenComponents(
   }
 
   walk(components, scale, null, 0)
-  return [...merged.values()].sort((a, b) => b.grams - a.grams)
+  return {
+    ingredients: [...merged.values()].sort((a, b) => b.grams - a.grams),
+    lost,
+  }
 }

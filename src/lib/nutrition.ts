@@ -2,7 +2,7 @@ import type {
   Component, DayPlan, Food, Macros, MicroKey, Micros, Nutrients, PlannedMeal, Portion, Recipe,
 } from '../types'
 import { MICRO_KEYS } from '../types'
-import { flattenComponents } from './ingredients'
+import { flattenWithLosses } from './ingredients'
 
 /**
  * The single place where nutrition numbers are produced.
@@ -203,18 +203,74 @@ export function dayEaten(day: DayPlan, ctx: NutritionContext): {
   /** True once at least one meal has been marked one way or the other. */
   recorded: boolean
 } {
-  const decided = day.meals.filter((m) => m.outcome)
-  if (!decided.length) return { nutrients: dayNutrients(day, ctx), recorded: false }
-
-  const eaten = day.meals.filter((m) => m.outcome === 'eaten')
+  const { meals, recorded } = mealsThatCount(day)
   return {
-    nutrients: eaten.reduce((acc, m) => addNutrients(acc, mealNutrients(m, ctx)), emptyNutrients()),
-    recorded: true,
+    nutrients: meals.reduce((acc, m) => addNutrients(acc, mealNutrients(m, ctx)), emptyNutrients()),
+    recorded,
   }
+}
+
+/**
+ * The meals a day's figures should be built from, and which kind of day it is.
+ *
+ * Exported because the guide scoring needs the same rule and had its own: it
+ * counted every planned meal, so a week where you skipped three dinners still
+ * scored their vegetables. Two answers to "what did this day amount to" is one
+ * too many.
+ */
+export function mealsThatCount(day: DayPlan): { meals: PlannedMeal[]; recorded: boolean } {
+  const decided = day.meals.some((m) => m.outcome)
+  return decided
+    ? { meals: day.meals.filter((m) => m.outcome === 'eaten'), recorded: true }
+    : { meals: day.meals, recorded: false }
 }
 
 export function weekNutrients(days: DayPlan[], ctx: NutritionContext): Nutrients {
   return days.reduce((acc, d) => addNutrients(acc, dayNutrients(d, ctx)), emptyNutrients())
+}
+
+export interface DayReading {
+  date: string
+  nutrients: Nutrients
+  /** True once something on that day was ticked, so this is a record. */
+  recorded: boolean
+  /** False when the day holds nothing at all, planned or eaten. */
+  any: boolean
+}
+
+/**
+ * A stretch of days, each one saying whether it is a record or an intention.
+ *
+ * `dayEaten` answers this for one day and every screen that showed a week
+ * ignored it: the planner ring and Home's Today tile reported what was eaten
+ * while the week averages, the fortnight chart, Progress and the guide scoring
+ * all quietly summed the plan. So the app recorded the truth on two screens and
+ * reported the intention on the rest, without ever saying which was which.
+ *
+ * One function rather than a rule each screen reimplements, and the mix comes
+ * back with the numbers so a screen can say "four of these seven are records"
+ * instead of presenting a blend as though it were one thing.
+ */
+export function weekEaten(
+  dates: string[], plan: DayPlan[], ctx: NutritionContext,
+): { days: DayReading[]; recorded: number; planned: number } {
+  const byDate = new Map(plan.map((d) => [d.date, d]))
+
+  const days = dates.map((date): DayReading => {
+    const day = byDate.get(date)
+    if (!day || !day.meals.length) {
+      return { date, nutrients: emptyNutrients(), recorded: false, any: false }
+    }
+    const { nutrients, recorded } = dayEaten(day, ctx)
+    return { date, nutrients, recorded, any: true }
+  })
+
+  const withFood = days.filter((d) => d.any)
+  return {
+    days,
+    recorded: withFood.filter((d) => d.recorded).length,
+    planned: withFood.filter((d) => !d.recorded).length,
+  }
 }
 
 // ─── Consistency ──────────────────────────────────────────────────────────────
@@ -299,6 +355,16 @@ export interface NutrientReport {
   partial: MicroKey[]
   /** How many ingredients went into this, for explaining a partial total. */
   sources: number
+  /**
+   * Components the walk could not resolve to food at all.
+   *
+   * A deleted food or a portion whose recipe is gone contributes nothing and
+   * used to do so in silence, so the day reported a smaller number with the
+   * same confidence as a complete one. Non-zero means the total is short by an
+   * unknown amount, which is a stronger claim than `partial` and is marked the
+   * same way.
+   */
+  unresolved: number
 }
 
 /**
@@ -324,7 +390,8 @@ export function reportNutrients(
   // where two said nothing about fibre reported a complete fibre figure. Since
   // most planner entries are recipes, that suppressed nearly every partial
   // total in the app: the marking existed and almost never appeared.
-  for (const ingredient of flattenComponents(components, ctx)) {
+  const { ingredients, lost } = flattenWithLosses(components, ctx)
+  for (const ingredient of ingredients) {
     sources++
     for (const k of MICRO_KEYS) {
       if (ingredient.food.per100g[k] != null) known.set(k, (known.get(k) ?? 0) + 1)
@@ -338,7 +405,7 @@ export function reportNutrients(
     return count > 0 && count < sources
   })
 
-  return { total, partial, sources }
+  return { total, partial, sources, unresolved: lost.length }
 }
 
 /**

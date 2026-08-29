@@ -821,7 +821,7 @@ function RecipeDetail({
                 : ''}
               {mine ? ' · yours' : ''}
             </p>
-            <NutrientSummary n={perServing} partial={report.partial} />
+            <NutrientSummary n={perServing} partial={report.partial} unresolved={report.unresolved} />
           </div>
 
           {/* What it is, and what it asks of you, the two axes that are not

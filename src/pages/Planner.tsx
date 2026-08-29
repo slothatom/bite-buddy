@@ -14,7 +14,7 @@ import { useUserStore } from '../store/useUserStore'
 import { targetsFor } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import {
-  componentsNutrients, dayNutrients, dayEaten, emptyNutrients, addNutrients, reportDay,
+  componentsNutrients, dayEaten, weekEaten, emptyNutrients, addNutrients, reportDay,
 } from '../lib/nutrition'
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
 import { useUiStore } from '../store/useUiStore'
@@ -148,13 +148,22 @@ export default function Planner() {
   const targets = targetsFor(profile, viewingAs)
 
   // Totals are for what you are looking at, not for everything ever planned.
+  //
+  // And for what those days came to rather than what was hoped for them: the
+  // ring below this was already reporting the ticks while the range average
+  // above it summed the plan, so the two disagreed about the same week.
   const shownDays = useMemo(
     () => dates.map((date) => byDate.get(date)).filter((d): d is DayPlan => Boolean(d)),
     [dates, byDate],
   )
+  const reading = useMemo(() => weekEaten(dates, plan, ctx), [dates, plan, ctx])
+  const kcalByDate = useMemo(
+    () => new Map(reading.days.map((d) => [d.date, d.nutrients.calories])),
+    [reading],
+  )
   const weekTotal = useMemo(
-    () => shownDays.reduce((acc, d) => addNutrients(acc, dayNutrients(d, ctx)), emptyNutrients()),
-    [shownDays, ctx],
+    () => reading.days.reduce((acc, d) => addNutrients(acc, d.nutrients), emptyNutrients()),
+    [reading],
   )
   const plannedDays = shownDays.filter((d) => d.meals.length).length
 
@@ -302,7 +311,7 @@ export default function Planner() {
               <DayCell
                 key={date}
                 date={date}
-                kcal={(() => { const d = byDate.get(date); return d ? dayNutrients(d, ctx).calories : 0 })()}
+                kcal={kcalByDate.get(date) ?? 0}
                 selected={date === selected}
                 showWeekday={dates.length <= 7}
                 dim={range === 'month' && monthOf(date) !== anchorMonth}
@@ -317,7 +326,12 @@ export default function Planner() {
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <CalorieRing value={selectedTotals.calories} target={targets.calories} />
             <div className="flex-1 w-full">
-              <NutrientSummary n={selectedTotals} targets={targets} partial={dayReport.partial} />
+              <NutrientSummary
+                n={selectedTotals}
+                targets={targets}
+                partial={dayReport.partial}
+                unresolved={dayReport.unresolved}
+              />
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-border-200">

@@ -53,9 +53,17 @@ export function MacroBar({
       </div>
 
       <div className="relative h-2.5 rounded-full bg-border-100 overflow-hidden">
+        {/* A floor does not fill a bar the way a total does. The number carries
+            a "+" and the bar used to carry nothing, so at a glance fibre read
+            as met when the figure was only the part the data knows about. The
+            fill fades out at its end instead of stopping flat. */}
         <div
           className={`h-full rounded-full transition-all duration-500 ${styles.fill}`}
-          style={{ width: `${fillPct}%` }}
+          style={{
+            width: `${fillPct}%`,
+            maskImage: partial ? 'linear-gradient(to right, black 55%, transparent 100%)' : undefined,
+            WebkitMaskImage: partial ? 'linear-gradient(to right, black 55%, transparent 100%)' : undefined,
+          }}
         />
         {targetPct > 0 && (
           <span
@@ -143,11 +151,19 @@ export function StatusPill({ level, label }: { level: StatusLevel; label: string
  * total and printing it plain would be a claim the data cannot support.
  */
 export function NutrientSummary({
-  n, targets, partial = [],
+  n, targets, partial = [], unresolved = 0,
 }: {
   n: Nutrients
   targets?: Macros & { fiber?: number }
   partial?: readonly string[]
+  /**
+   * Components that could not be resolved to food at all.
+   *
+   * Different from `partial`, and worse: a nutrient nobody mentioned makes the
+   * figure a floor, but a food the app has lost makes every figure short,
+   * calories included, by an amount it cannot even estimate.
+   */
+  unresolved?: number
 }) {
   const salt = saltFromSodium(n.sodium)
 
@@ -169,7 +185,7 @@ export function NutrientSummary({
           paragraph of its own. On the planner that paragraph pushed the fifth
           meal of a day off a laptop screen, and the explanation matters less
           than the day does. */}
-      {(n.sugar != null || salt != null || partial.length > 0) && (
+      {(n.sugar != null || salt != null || partial.length > 0 || unresolved > 0) && (
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-ink-700 pt-1 border-t border-border-100">
           {n.sugar != null && (
             <span>
@@ -188,6 +204,13 @@ export function NutrientSummary({
           {partial.length > 0 && (
             <span className="text-ink-500">
               <strong>+</strong> means a floor, not a total
+            </span>
+          )}
+          {unresolved > 0 && (
+            <span className="text-coral-700">
+              {unresolved === 1
+                ? 'One thing here is missing from the library, so every figure is short.'
+                : `${unresolved} things here are missing from the library, so every figure is short.`}
             </span>
           )}
         </div>
