@@ -90,10 +90,49 @@ for (const plan of SOURCE_PLANS) {
 }
 
 // 5. Nothing in the library produces an absurd per-serving figure.
+//
+// This used to warn above 1800 kcal, into `notes`, which never fails the run.
+// A lunch at 1595 kcal sat beside its near-identical twin at 374 for months
+// and neither the threshold nor the severity could say a word about it: the
+// importer had bound a 150 g weight to olive oil instead of tofu, and an
+// absolute ceiling has no way to notice that a dish is wrong for its company.
+//
+// So the test is now relative, and it fails the build.
+const perServing = recipes
+  .map((r) => ({ recipe: r, kcal: recipePerServing(r, ctx).calories }))
+  .filter((r) => r.kcal > 0)
+const sorted = [...perServing].map((r) => r.kcal).sort((a, b) => a - b)
+const median = sorted[Math.floor(sorted.length / 2)] ?? 0
+const ceiling = Math.max(median * 4, 900)
+
 for (const recipe of recipes) {
   const kcal = recipePerServing(recipe, ctx).calories
-  if (kcal <= 0) problems.push(`${recipe.id} (${recipe.name.en}): 0 kcal per serving`)
-  else if (kcal > 1800) notes.push(`${recipe.id} (${recipe.name.en}): ${Math.round(kcal)} kcal per serving looks high`)
+  if (kcal <= 0) {
+    problems.push(`${recipe.id} (${recipe.name.en}): 0 kcal per serving`)
+    continue
+  }
+  if (kcal > ceiling) {
+    problems.push(
+      `${recipe.id} (${recipe.name.en}): ${Math.round(kcal)} kcal per serving, `
+      + `against a library median of ${Math.round(median)}`,
+    )
+  }
+
+  // The shape of the mistake, not just its size. A serving carrying more than
+  // 50 g of oil or butter is a parse error every time: the dietician writes
+  // teaspoons, and 150 g of olive oil is nobody's lunch. This is what would
+  // have caught the tofu line on the day it was imported.
+  for (const c of recipe.components) {
+    if (c.kind !== 'food') continue
+    const food = ctx.foods.get(c.foodId)
+    if (food?.category !== 'fats-vinegars') continue
+    if (c.grams / Math.max(1, recipe.servings) > 50) {
+      problems.push(
+        `${recipe.id} (${recipe.name.en}): ${Math.round(c.grams)} g of ${food.names.en} `
+        + `in ${recipe.servings} serving(s), which is a misread line rather than a recipe`,
+      )
+    }
+  }
 }
 
 // 6. Names are unique, so the library has no indistinguishable entries.

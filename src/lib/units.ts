@@ -189,18 +189,72 @@ export function parseFragment(fragment: string): ParsedQuantity {
  * ("pasta de ton ( pt 2 portii: 135 g ton, 50 g branza cremoasa )") and must not
  * be split on their inner commas.
  */
+/**
+ * Words that join two foods rather than describing one.
+ *
+ * The dietician writes "150 g tofu cu o lingurita de ulei de masline", 150 g of
+ * tofu with a teaspoon of olive oil. Split only on commas and plus signs, that
+ * stayed one fragment carrying one weight, and the resolver then had to choose
+ * a single food for it. It chose the oil, because "ulei de masline" is longer
+ * than "tofu", so the meal was stored as 150 g of olive oil with no tofu in it
+ * and came out at 1595 kcal beside its Hungarian twin at 374. The twin was
+ * written with a plus sign, so it split cleanly and was right all along.
+ *
+ * Bounded by spaces, so "cu" cannot match inside "cuscus" or "curcan".
+ */
+const JOINERS = /\s+(?:cu|impreuna cu|és|es|meg|valamint)\s+/gi
+
+/**
+ * Whether a piece of text states an amount of its own.
+ *
+ * "150 g tofu" does, and so does "o lingurita de ulei" in its own way: a
+ * teaspoon is an amount somebody wrote down, even though the grams are
+ * inferred. "terci de ovaz cu mere" does not, and neither does "spanac cu
+ * linte": both are names of dishes that happen to contain a joining word, and
+ * splitting them turns one meal into two invented ingredients.
+ *
+ * `estimated` is the wrong test, because it is true for a spoon and equally
+ * true for a bare dish name given a default weight. What separates them is
+ * whether an amount was written at all: a digit, or one of the spoon words.
+ */
+function statesAnAmount(text: string): boolean {
+  // A parenthetical belongs to the dish in front of it, so the teaspoon in
+  // "pasta de vinete cu ardei copti ( o lingurita de ulei)" is the spread's,
+  // not the peppers'. Counting it split a dish name and invented 5 g of pepper.
+  const bare = text.replace(/\([^)]*\)/g, ' ')
+  if (parseFragment(bare).grams === undefined) return false
+  if (/\d/.test(bare)) return true
+  const words = bare.toLowerCase().split(/[^a-zà-ÿ.]+/)
+  return words.some((w) => w in SPOON_GRAMS)
+}
+
 export function splitComponents(line: string): string[] {
   const out: string[] = []
   let depth = 0
   let current = ''
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i]
+  // A joining word separates two ingredients only when both sides carry a
+  // weight of their own. Otherwise it is part of a dish's name, and splitting
+  // "terci de ovaz cu mere" gave a porridge's 100 ml of milk to the apples.
+  // Parentheticals are left alone: inside them the words belong to one recipe.
+  const joined = line.replace(/\([^)]*\)/g, (m) => m.replace(JOINERS, ' \u0001 '))
+    .replace(JOINERS, (m, offset: number, whole: string) => {
+      // Only the fragment on each side, not the whole rest of the line. Testing
+      // the remainder let a later "150 g iaurt" vouch for "chec cu branza si
+      // afine", which split a cake's name and lost the cake.
+      const before = whole.slice(0, offset).split(/[,+]/).pop() ?? ''
+      const after = (whole.slice(offset + m.length).split(/[,+]/)[0] ?? '')
+      return statesAnAmount(before) && statesAnAmount(after) ? ' + ' : m
+    })
+    .replace(/ \u0001 /g, ' cu ')
+
+  for (let i = 0; i < joined.length; i++) {
+    const ch = joined[i]
     if (ch === '(') depth++
     if (ch === ')') depth = Math.max(0, depth - 1)
     if (depth === 0 && (ch === ',' || ch === '+')) {
       // A comma between two digits is a decimal point, not a separator -
       // "iaurt 1,5-3,5%" is one component, not three.
-      const isDecimal = ch === ',' && /\d/.test(line[i - 1] ?? '') && /\d/.test(line[i + 1] ?? '')
+      const isDecimal = ch === ',' && /\d/.test(joined[i - 1] ?? '') && /\d/.test(joined[i + 1] ?? '')
       if (!isDecimal) {
         out.push(current)
         current = ''

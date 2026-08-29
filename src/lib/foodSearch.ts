@@ -34,6 +34,13 @@ export function buildFoodIndex(foods: Food[]): FoodIndex {
  * Falls back from exact match to longest-alias-contained-in-term, which handles
  * the plans' habit of appending preparation to the ingredient
  * ("halloumi la gratar", "cartofi dulci cantariti cruzi").
+ *
+ * Preferring the alias nearest the front was tried, to stop "150 g tofu cu o
+ * lingurita de ulei de masline" binding its weight to the oil. It fixed thirty
+ * lines and broke ten others: "salata cezar : 120 g piept de curcan" then gave
+ * its 120 g to the salad. Position is not a better guess than length, only a
+ * different one. The fix belongs where the ambiguity is created, in the
+ * splitter, not here where it is already too late.
  */
 export function resolveFood(term: string, index: FoodIndex): Food | undefined {
   const n = normaliseTerm(term)
@@ -49,6 +56,27 @@ export function resolveFood(term: string, index: FoodIndex): Food | undefined {
     if (!best || key.length > best.length) best = { food, length: key.length }
   }
   return best?.food
+}
+
+/**
+ * Every food an alias in this term points at, earliest first.
+ *
+ * The importer uses it to notice a fragment that names two foods while
+ * carrying one weight, which is a line it has misread rather than a line it
+ * can resolve. Guessing there is what produced the olive oil.
+ */
+export function resolveAllFoods(term: string, index: FoodIndex): Food[] {
+  const n = normaliseTerm(term)
+  if (!n) return []
+
+  const hits: { food: Food; at: number }[] = []
+  for (const [key, food] of index.byExact) {
+    if (key.length < 4) continue
+    const at = n.indexOf(key)
+    if (at < 0) continue
+    if (!hits.some((h) => h.food.id === food.id)) hits.push({ food, at })
+  }
+  return hits.sort((a, b) => a.at - b.at).map((h) => h.food)
 }
 
 /** Ranked search for the food library UI. */

@@ -4244,7 +4244,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-123",
     "name": {
-      "en": "Lentil stew with yogurt"
+      "en": "Lentil stew with tofu & yogurt"
     },
     "emoji": "🫘",
     "servings": 1,
@@ -4253,8 +4253,13 @@ export const MEAL_RECIPES: Recipe[] = [
     "components": [
       {
         "kind": "food",
-        "foodId": "olive-oil",
+        "foodId": "tofu",
         "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
       },
       {
         "kind": "recipe",

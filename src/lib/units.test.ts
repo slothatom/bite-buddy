@@ -111,3 +111,45 @@ describe('normaliseTerm', () => {
     expect(normaliseTerm('țelină')).toBe('telina')
   })
 })
+
+describe('a joining word between two foods', () => {
+  it('separates two things that each carry a weight', () => {
+    // The line that cost a lunch 1200 calories. "150 g tofu with a teaspoon of
+    // olive oil" was one fragment carrying one weight, and the resolver gave
+    // that weight to the oil, because its name is longer than "tofu".
+    expect(splitComponents('150 g tofu cu o lingurita de ulei de masline'))
+      .toEqual(['150 g tofu', 'o lingurita de ulei de masline'])
+  })
+
+  it('leaves a dish name alone, however many joining words it has', () => {
+    expect(splitComponents('spanac cu linte ( 40 g linte nefiarta )'))
+      .toEqual(['spanac cu linte ( 40 g linte nefiarta )'])
+    expect(splitComponents('terci de ovaz cu mere: 100 ml lapte'))
+      .toEqual(['terci de ovaz cu mere: 100 ml lapte'])
+  })
+
+  it('does not let a later ingredient vouch for an earlier dish name', () => {
+    // "150 g chec cu branza si afine, 150 g iaurt". Testing the whole rest of
+    // the line for a weight let the yogurt justify splitting the cake's name,
+    // and the cake was lost entirely.
+    expect(splitComponents('150 g chec cu branza si afine, 150 g iaurt'))
+      .toEqual(['150 g chec cu branza si afine', '150 g iaurt'])
+  })
+
+  it('does not count an amount that belongs to a parenthetical', () => {
+    // The teaspoon is the spread's, not the peppers'.
+    expect(splitComponents('150 g pasta de vinete cu ardei copti ( o lingurita de ulei)'))
+      .toEqual(['150 g pasta de vinete cu ardei copti ( o lingurita de ulei)'])
+  })
+
+  it('never matches inside a longer word', () => {
+    expect(splitComponents('100 g cuscus')).toEqual(['100 g cuscus'])
+    expect(splitComponents('150 g piept de curcan')).toEqual(['150 g piept de curcan'])
+  })
+
+  it('still splits on the separators it always did', () => {
+    expect(splitComponents('50 g paine int + 100 g humus'))
+      .toEqual(['50 g paine int', '100 g humus'])
+    expect(splitComponents('iaurt 1,5-3,5%')).toEqual(['iaurt 1,5-3,5%'])
+  })
+})
