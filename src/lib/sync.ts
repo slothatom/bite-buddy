@@ -106,6 +106,46 @@ export function owedRows(): number {
   }, 0)
 }
 
+/**
+ * What a table holds, in the plural, for the same reason as `describe`.
+ *
+ * Every table gets a name here, and a test says so. The alternative is what
+ * shipped for an hour: a red banner offering to remove "21 of 21
+ * grocery_items", which is a column name wearing a sentence.
+ */
+const PLURALS: Record<string, string> = {
+  plan_meals: 'planned meals',
+  grocery_items: 'shopping list lines',
+  recipes: 'recipes',
+  foods: 'foods',
+  weights: 'weigh-ins',
+  measurements: 'measurements',
+  workouts: 'workouts',
+  steps: 'daily step counts',
+  sleep: 'nights of sleep',
+  portions: 'portions in the fridge',
+  pantry: 'cupboard items',
+  cook_sessions: 'cook sessions',
+  settings: 'settings',
+}
+
+export function whatTheyAre(table: string): string {
+  return PLURALS[table] ?? 'entries'
+}
+
+/**
+ * The question a held-back deletion asks.
+ *
+ * Worded here rather than in the engine, which knows table names and nothing
+ * about how to say them out loud.
+ */
+function heldBackMessage({ table, deletions, known }: HeldDeletion): string {
+  return `This device wants to remove ${deletions} of ${known} ${whatTheyAre(table)} from the `
+    + 'shared copy. If you deleted them, say so and they will go. If you did not, this device has '
+    + 'lost its own copy and sending would take them off the other phone too, so open the app '
+    + 'there instead.'
+}
+
 /** What to call a contested row on screen, without leaking table names. */
 function describe(table: string, row: SyncRow): string {
   const what = table === 'plan_meals' ? 'a meal'
@@ -169,6 +209,8 @@ export function startSync(userId: string): () => void {
       heldBack: snapshot.heldBack.filter((h) => h.table !== table),
     }),
     onHeldBack: (held) => announce({
+      state: 'error',
+      lastError: heldBackMessage(held),
       heldBack: [...snapshot.heldBack.filter((h) => h.table !== held.table), held],
     }),
     onContested: (table, rows) =>
