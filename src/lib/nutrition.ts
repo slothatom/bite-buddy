@@ -2,6 +2,7 @@ import type {
   Component, DayPlan, Food, Macros, MicroKey, Micros, Nutrients, PlannedMeal, Portion, Recipe,
 } from '../types'
 import { MICRO_KEYS } from '../types'
+import { flattenComponents } from './ingredients'
 
 /**
  * The single place where nutrition numbers are produced.
@@ -315,14 +316,18 @@ export function reportNutrients(
 ): NutrientReport {
   const known = new Map<MicroKey, number>()
   let sources = 0
-  let total = emptyNutrients()
+  const total = componentsNutrients(components, ctx, visiting)
 
-  for (const c of components) {
-    const n = componentNutrients(c, ctx, visiting)
-    total = addNutrients(total, n)
+  // Counted per ingredient, all the way down, rather than per top-level
+  // component. A recipe entry was one source, and its own ingredients had
+  // already been summed by the time this saw them, so a five-ingredient dish
+  // where two said nothing about fibre reported a complete fibre figure. Since
+  // most planner entries are recipes, that suppressed nearly every partial
+  // total in the app: the marking existed and almost never appeared.
+  for (const ingredient of flattenComponents(components, ctx)) {
     sources++
     for (const k of MICRO_KEYS) {
-      if (n[k] != null) known.set(k, (known.get(k) ?? 0) + 1)
+      if (ingredient.food.per100g[k] != null) known.set(k, (known.get(k) ?? 0) + 1)
     }
   }
 
@@ -334,6 +339,19 @@ export function reportNutrients(
   })
 
   return { total, partial, sources }
+}
+
+/**
+ * The same, for a day.
+ *
+ * A day is meals of entries, not a flat list of components, and there was no
+ * way to ask this question of one. So the planner totalled with `dayNutrients`,
+ * which throws away every trace of what was known, and showed "Fibre 23 / 25 g"
+ * as though it were a figure. With 109 of the 115 foods in use carrying no
+ * sodium at all, most of what that screen states is a floor.
+ */
+export function reportDay(day: DayPlan, ctx: NutritionContext): NutrientReport {
+  return reportNutrients(day.meals.flatMap((m) => m.entries), ctx)
 }
 
 /** The same, for a whole recipe, per serving. */

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { DayPlan, Food, PlannedMeal, Recipe } from '../types'
 import {
-  atwaterCalories, buildContext, calorieDrift, componentsNutrients, dayEaten,
+  atwaterCalories, buildContext, calorieDrift, componentsNutrients, dayEaten, reportDay,
   recipePerServing, recipeTotal, scaleNutrients, addNutrients,
   reportNutrients, saltFromSodium, sodiumFromSalt,
 } from './nutrition'
@@ -211,5 +211,54 @@ describe('what a day amounted to', () => {
 
     expect(recorded).toBe(true)
     expect(nutrients.calories).toBe(0)
+  })
+})
+
+describe('how honest a total is', () => {
+  const KNOWS = food('knows-all', { calories: 100, protein: 1, carbs: 1, fat: 1, fiber: 5, sodium: 10 })
+  const SILENT = food('silent', { calories: 100, protein: 1, carbs: 1, fat: 1 })
+
+  const DISH: Recipe = {
+    id: 'dish', name: { en: 'Dish' }, emoji: '🍲', servings: 1,
+    prepMinutes: 0, cookMinutes: 0, createdAt: '2026-01-01T00:00:00.000Z',
+    components: [
+      { kind: 'food', foodId: 'knows-all', grams: 100 },
+      { kind: 'food', foodId: 'silent', grams: 100 },
+    ],
+    steps: [], tags: [],
+  }
+  const deep = buildContext([KNOWS, SILENT], [DISH])
+
+  it('sees through a nested recipe to the ingredient that said nothing', () => {
+    // One top-level component, two ingredients, one of them silent. Counted per
+    // component this claimed a complete fibre figure, and since almost every
+    // planner entry is a recipe reference, that hid nearly every partial total
+    // in the app.
+    const report = reportNutrients([{ kind: 'recipe', recipeId: 'dish', servings: 1 }], deep)
+
+    expect(report.partial).toContain('fiber')
+    expect(report.partial).toContain('sodium')
+  })
+
+  it('says nothing is partial when every ingredient knows', () => {
+    const report = reportNutrients([{ kind: 'food', foodId: 'knows-all', grams: 100 }], deep)
+    expect(report.partial).toEqual([])
+  })
+
+  it('reports a day, which is meals of entries rather than components', () => {
+    const day: DayPlan = {
+      date: '2026-08-29',
+      meals: [
+        { id: 'a', slot: 'lunch', entries: [{ kind: 'food', foodId: 'knows-all', grams: 100 }] },
+        { id: 'b', slot: 'dinner', entries: [{ kind: 'food', foodId: 'silent', grams: 100 }] },
+      ],
+    }
+
+    const report = reportDay(day, deep)
+
+    expect(report.sources).toBe(2)
+    expect(report.partial).toContain('fiber')
+    // The figure is still shown, because "at least this much" is worth having.
+    expect(report.total.fiber).toBeCloseTo(5, 5)
   })
 })

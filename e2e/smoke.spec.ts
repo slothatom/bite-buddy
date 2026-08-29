@@ -767,7 +767,7 @@ test.describe('building a recipe from the food database', () => {
     await page.getByPlaceholder(/Search in English/).fill('green bean soup')
     await page.locator('.card button').nth(1).click()
 
-    const note = page.getByText(/at least one ingredient had nothing to say/)
+    const note = page.getByText(/means a floor, not a total/)
     const plus = page.locator('text=/\\d+(\\.\\d+)? g\\u2009\\+/')
     // Either the total is complete, or it is marked, never a bare number that
     // silently treats unknown as zero.
