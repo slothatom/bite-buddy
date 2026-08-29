@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useMealPlanStore } from '../store/useMealPlanStore'
+import { useThisWeek } from '../store/useThisWeek'
 import { useUserStore } from '../store/useUserStore'
 import { targetsFor } from '../store/useUserStore'
 import { useUiStore } from '../store/useUiStore'
@@ -55,7 +56,8 @@ export default function Analytics() {
 }
 
 function WeekTab() {
-  const { plan, weekDates } = useMealPlanStore()
+  const plan = useMealPlanStore((s) => s.plan)
+  const weekDates = useThisWeek()
   const { profile } = useUserStore()
   const viewingAs = useUiStore((s) => s.viewingAs)
   const targets = targetsFor(profile, viewingAs)
@@ -168,7 +170,8 @@ function WeekTab() {
 
 /** Servings against the guide's goals, which is what the diet is actually about. */
 function MediterraneanTab() {
-  const { plan, weekDates } = useMealPlanStore()
+  const plan = useMealPlanStore((s) => s.plan)
+  const weekDates = useThisWeek()
   const ctx = useNutritionContext()
   const week = useMemo(
     () => plan.filter((d) => weekDates.includes(d.date)),

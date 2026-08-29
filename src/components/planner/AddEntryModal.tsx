@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Search, X } from 'lucide-react'
 import type { Component, MealSlot, Recipe } from '../../types'
-import { SLOT_LABELS } from '../../types'
+import { SLOT_LABELS, MEAL_SLOTS } from '../../types'
 import { useRecipes } from '../../store/useRecipeStore'
 import { useFoods } from '../../store/useFoodStore'
 import { useNutritionContext } from '../../store/useNutrition'
@@ -28,13 +28,32 @@ import { availability, availabilityLabel } from '../../lib/pantry'
  * app should say so before offering you 228 things to choose between.
  */
 export default function AddEntryModal({
-  date, slot, onClose, onAdd,
+  date, slot, onClose, onAdd, mode = 'plan', onSlotChange,
 }: {
   date: string
   slot: MealSlot
   onClose: () => void
   onAdd: (entry: Component) => void
+  /**
+   * Whether this is a plan or a record.
+   *
+   * The picker is identical either way, so it is one component. What changes is
+   * the tense: "Add to lunch" is about a lunch that has not happened, and the
+   * commonest thing a person wants to write down is one that already has. The
+   * caller decides where it lands; this only has to stop saying the wrong
+   * thing about it.
+   */
+  mode?: 'plan' | 'ate'
+  /**
+   * Lets the slot be corrected here, when the caller only guessed it.
+   *
+   * Home opens this from the clock, and the clock is often wrong: a late lunch
+   * at four is not an afternoon snack. Given the chance to fix it in place,
+   * rather than closing and reopening from a different button.
+   */
+  onSlotChange?: (slot: MealSlot) => void
 }) {
+  const ate = mode === 'ate'
   const [query, setQuery] = useState('')
   // Snacks open on foods. The plans write them as lines rather than dishes
   // ("150 g mere, 10 g caju"), so the recipe tab for a snack slot was reliably
@@ -81,7 +100,9 @@ export default function AddEntryModal({
       >
         <header className="flex items-center justify-between px-5 py-4 border-b border-border-200">
           <div>
-            <h2 className="text-base font-extrabold text-ink-900">Add to {SLOT_LABELS[slot]}</h2>
+            <h2 className="text-base font-extrabold text-ink-900">
+              {ate ? `Ate this for ${SLOT_LABELS[slot].toLowerCase()}` : `Add to ${SLOT_LABELS[slot]}`}
+            </h2>
             <p className="text-xs text-ink-500">{new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
           </div>
           <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
@@ -93,11 +114,30 @@ export default function AddEntryModal({
             <input
               className="input pl-9"
               autoFocus
-              placeholder="What are we having?"
+              placeholder={ate ? 'What did you have?' : 'What are we having?'}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
+          {onSlotChange && (
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Which meal">
+              {MEAL_SLOTS.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => onSlotChange(s)}
+                  aria-pressed={s === slot}
+                  className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
+                    s === slot
+                      ? 'bg-bite-500 border-bite-500 text-white font-semibold'
+                      : 'bg-paper border-border-200 text-ink-700 hover:border-bite-300'
+                  }`}
+                >
+                  {SLOT_LABELS[s]}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
             {([...(available.length ? ['fridge' as const] : []), 'recipes' as const, 'foods' as const]).map((t) => (
               <button
@@ -205,7 +245,7 @@ export default function AddEntryModal({
                     className="btn-primary shrink-0"
                     onClick={() => { onAdd({ kind: 'food', foodId: f.id, grams: g }); onClose() }}
                   >
-                    Add
+                    {ate ? 'Ate it' : 'Add'}
                   </button>
                 </div>
               </div>

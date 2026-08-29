@@ -9,7 +9,7 @@ import { useNutritionContext } from '../../store/useNutrition'
 import { usePantry } from '../../store/usePantryStore'
 import { useAvailablePortions } from '../../store/usePortionStore'
 import { today } from '../../store/useMealPlanStore'
-import { proposePlan, type Proposal } from '../../lib/autoPlan'
+import { proposePlan, FILLABLE_SLOTS, type Proposal } from '../../lib/autoPlan'
 import { EmptyState } from '../ui'
 
 /**
@@ -47,6 +47,26 @@ export default function FillGaps({
     [dates, plan, recipes, ctx, profile.targets, favouriteIds, pantry, portions],
   )
 
+  /**
+   * Why there is nothing to offer, when there is nothing to offer.
+   *
+   * Three different situations arrived at the same sentence, "every meal on
+   * these days already has something in it", and two of them were flatly
+   * untrue. Open the last week of a month view on the 28th and every day in
+   * range has gone; the meals are not filled, they are over. Say which.
+   */
+  const nothing = useMemo(() => {
+    const ahead = dates.filter((d) => d >= today())
+    if (!ahead.length) return 'past' as const
+
+    const byDay = new Map(plan.map((d) => [d.date, d]))
+    const open = ahead.some((date) => {
+      const filled = new Set((byDay.get(date)?.meals ?? []).map((m) => m.slot))
+      return FILLABLE_SLOTS.some((slot) => !filled.has(slot))
+    })
+    return open ? ('nothing-to-offer' as const) : ('full' as const)
+  }, [dates, plan])
+
   const [dropped, setDropped] = useState<string[]>([])
   const key = (p: Proposal) => `${p.date}-${p.slot}`
   const kept = proposals.filter((p) => !dropped.includes(key(p)))
@@ -78,9 +98,23 @@ export default function FillGaps({
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-          {!proposals.length && (
+          {!proposals.length && nothing === 'full' && (
             <EmptyState title="Nothing to fill" mood="thinking">
-              Every meal on these days already has something in it.
+              Every meal on the days still ahead already has something in it.
+            </EmptyState>
+          )}
+
+          {!proposals.length && nothing === 'past' && (
+            <EmptyState title="These days have gone" mood="thinking">
+              Every day in this range is in the past, so there is nothing left to plan.
+              Step forward a week and try again.
+            </EmptyState>
+          )}
+
+          {!proposals.length && nothing === 'nothing-to-offer' && (
+            <EmptyState title="Nothing to suggest" mood="thinking">
+              There are empty slots here, but nothing in your library fits them right now.
+              Add a few more recipes and this will have more to work with.
             </EmptyState>
           )}
 
