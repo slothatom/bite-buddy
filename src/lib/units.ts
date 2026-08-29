@@ -236,7 +236,7 @@ export function splitComponents(line: string): string[] {
   // weight of their own. Otherwise it is part of a dish's name, and splitting
   // "terci de ovaz cu mere" gave a porridge's 100 ml of milk to the apples.
   // Parentheticals are left alone: inside them the words belong to one recipe.
-  const joined = line.replace(/\([^)]*\)/g, (m) => m.replace(JOINERS, ' \u0001 '))
+  const joined = line.replace(/\([^)]*\)/g, (m) => m.replace(JOINERS, ' \uE000 '))
     .replace(JOINERS, (m, offset: number, whole: string) => {
       // Only the fragment on each side, not the whole rest of the line. Testing
       // the remainder let a later "150 g iaurt" vouch for "chec cu branza si
@@ -245,7 +245,7 @@ export function splitComponents(line: string): string[] {
       const after = (whole.slice(offset + m.length).split(/[,+]/)[0] ?? '')
       return statesAnAmount(before) && statesAnAmount(after) ? ' + ' : m
     })
-    .replace(/ \u0001 /g, ' cu ')
+    .replace(/ \uE000 /g, ' cu ')
 
   for (let i = 0; i < joined.length; i++) {
     const ch = joined[i]
