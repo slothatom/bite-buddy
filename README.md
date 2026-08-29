@@ -332,6 +332,21 @@ Built from the planned week, resolving nested recipes down to what you actually 
 food and grouped by category. Weights are raw, matching how the plans are written. Anything
 covered by a portion already in the fridge is left off, since it is already cooked.
 
+The box for typing a line sits above the list rather than under it. It was always there and
+it was under a categorised list of forty items, which on a phone means off the bottom of the
+screen: a walkthrough reported the shopping list as unable to take a typed item at all.
+
+**Amounts are what you buy, where the app can say so.** "3 tomatoes" rather than "Tomatoes
+360 g", with the grams still beside it, because the count is a rounding of them. Only for
+things you can pick up: three tablespoons of oats is not a shopping instruction and reads
+like one, which is worse than the weight it replaced. Only where the rounding is honest, so
+1.4 peppers stays as grams.
+
+**The list can leave the app.** Share where the browser has it, the clipboard everywhere
+else. Grouped as the screen groups it, and only what is left to buy, since a list of things
+already in the trolley is not a shopping list. Before this the only way anything left was a
+backup file, which is not a thing you send to a person.
+
 A second tab holds the cupboard. Two kinds of entry and the difference matters: something you
 have now, and something you always have. A staple never appears on a list again, which is the
 setting that earns its place, without it a week of real cooking produces forty lines and

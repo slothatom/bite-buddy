@@ -1804,3 +1804,43 @@ test.describe('what actually happened', () => {
     await expect(page.locator('[data-entry-name]').first()).toBeVisible()
   })
 })
+
+test.describe('a list you can take to a shop', () => {
+  test('the box for typing a line is above the list, not under it', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/grocery')
+    await page.getByRole('button', { name: /Build list/ }).click()
+
+    const box = page.getByLabel('Add an item')
+    await expect(box).toBeVisible()
+
+    // Under a categorised list of forty lines this was off the bottom of the
+    // screen, and a walkthrough reported the feature as missing entirely.
+    const adder = await box.boundingBox()
+    const firstRow = await page.locator('.card input[type="checkbox"]').first().boundingBox()
+    expect(adder!.y, 'the adder is below the list again').toBeLessThan(firstRow!.y)
+  })
+
+  test('a typed line joins the list', async ({ page }) => {
+    await goto(page, '/grocery')
+    await page.getByLabel('Add an item').fill('Washing-up liquid')
+    await page.getByLabel('Add an item').press('Enter')
+
+    await expect(page.getByText('Washing-up liquid')).toBeVisible()
+  })
+
+  test('the list can leave the app', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'])
+    await goto(page, '/grocery')
+    await page.getByLabel('Add an item').fill('Washing-up liquid')
+    await page.getByLabel('Add an item').press('Enter')
+    await expect(page.getByText('Washing-up liquid')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Share' }).click()
+    await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible()
+
+    const text = await page.evaluate(() => navigator.clipboard.readText())
+    expect(text).toContain('Washing-up liquid')
+  })
+})
