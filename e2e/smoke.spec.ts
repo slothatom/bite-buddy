@@ -1541,7 +1541,11 @@ test.describe('a week worth having again', () => {
     // Nothing on this week, so it does not threaten to replace anything.
     await page.getByRole('button', { name: 'Write the week' }).click()
 
-    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+    // Asserted across the week rather than on the day that happens to be
+    // selected. Fill the gaps only proposes days still ahead, so which days
+    // carry food depends on what day of the week the suite is run.
+    const filled = page.locator('button[aria-pressed]').filter({ hasText: /\d{2,}/ })
+    await expect(filled.first()).toBeVisible()
   })
 
   test('counts what it would overwrite, and writes nothing until you agree', async ({ page }) => {
@@ -1632,5 +1636,78 @@ test.describe('the app when there is no signal', () => {
 
     expect(ready.active).toBe(true)
     expect(ready.canSubscribe).toBe(true)
+  })
+})
+
+test.describe('the week you are actually in', () => {
+  /** Today, as the app writes it: local calendar, not UTC. */
+  function todayIso(): string {
+    const now = new Date()
+    now.setHours(12, 0, 0, 0)
+    return now.toISOString().slice(0, 10)
+  }
+
+  function longDate(iso: string): string {
+    return new Date(iso + 'T12:00:00').toLocaleDateString('en-GB', {
+      weekday: 'long', day: 'numeric', month: 'long',
+    })
+  }
+
+  /**
+   * The whole app used to agree on the wrong week.
+   *
+   * The planner's window was persisted and only ever advanced by the Today
+   * button, so a fortnight after planning, Home counted the old week, Progress
+   * charted it and the shopping list offered its days, while the week you were
+   * standing in sat empty and unmentioned. This walks the window back and
+   * reloads, which is what a person does every time they open the app.
+   */
+  test('a window left in the past does not survive a reload', async ({ page }) => {
+    await goto(page, '/plan')
+    await expect(page.getByRole('button', { name: longDate(todayIso()) })).toBeVisible()
+
+    for (let i = 0; i < 3; i += 1) {
+      await page.getByRole('button', { name: 'Previous week' }).click()
+    }
+    await expect(page.getByRole('button', { name: longDate(todayIso()) })).toHaveCount(0)
+
+    // A window is about right now, so it has no business in storage, in a
+    // backup, or on its way to the other phone.
+    const stored = await page.evaluate(() => {
+      const raw = localStorage.getItem('bite-buddy-mealplan-v2')
+      return raw ? JSON.parse(raw).state?.weekDates ?? null : null
+    })
+    expect(stored, 'the window was written to storage').toBeNull()
+
+    await page.reload()
+    await page.waitForLoadState('networkidle')
+
+    await expect(page.getByRole('button', { name: longDate(todayIso()) })).toBeVisible()
+  })
+
+  test('the shopping list offers the days you are about to live', async ({ page }) => {
+    await goto(page, '/grocery')
+
+    // The day picker is anchored on the planner's window. Anchored on a stale
+    // one it offered a fortnight that had already been and gone, so the list
+    // was built for food somebody ate a fortnight ago.
+    await expect(page.getByRole('button', { name: longDate(todayIso()) })).toBeVisible()
+  })
+
+  test('the plus button means today, wherever it is pressed', async ({ page }, testInfo) => {
+    // The bar is the phone layout only; on a laptop there is no centre button.
+    test.skip(testInfo.project.name !== 'mobile', 'the bottom bar is a phone thing')
+
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Previous week' }).click()
+
+    // Leave the planner entirely, which is where this went wrong: the day came
+    // from a screen that was no longer mounted.
+    await goto(page, '/analytics')
+    await page.getByRole('button', { name: 'Add a meal' }).click()
+
+    await expect(page.getByRole('heading', { name: /^Add to / })).toBeVisible()
+    await expect(page.getByRole('button', { name: longDate(todayIso()), exact: true }))
+      .toHaveAttribute('aria-pressed', 'true')
   })
 })

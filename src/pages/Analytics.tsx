@@ -8,7 +8,8 @@ import {
 import { MEASUREMENT_KEYS, MEASUREMENT_LABELS, type MeasurementKey } from '../types'
 import { PEOPLE, type PersonId } from '../lib/people'
 import { useNutritionContext } from '../store/useNutrition'
-import { dayNutrients } from '../lib/nutrition'
+import { today } from '../store/useMealPlanStore'
+import { dayNutrients, emptyNutrients } from '../lib/nutrition'
 import { scoreWeek } from '../lib/mediterranean'
 import { STATUS_STYLES, targetStatus } from '../lib/status'
 import { EmptyState, SectionHeading } from '../components/ui'
@@ -44,11 +45,17 @@ export default function Analytics() {
 }
 
 function WeekTab() {
-  const { plan } = useMealPlanStore()
+  const { plan, weekDates } = useMealPlanStore()
   const { profile } = useUserStore()
   const ctx = useNutritionContext()
 
-  const days = plan.map((d) => ({ date: d.date, n: dayNutrients(d, ctx) }))
+  // The week on screen, not every day the app has ever held. Under a tab
+  // labelled "This week" the whole plan was charted, so a week planned a
+  // fortnight ago was still being shown as though it were this one.
+  const days = weekDates.map((date) => {
+    const day = plan.find((d) => d.date === date)
+    return { date, n: day ? dayNutrients(day, ctx) : emptyNutrients() }
+  })
   const planned = days.filter((d) => d.n.calories > 0)
   const peak = Math.max(profile.targets.calories, ...days.map((d) => d.n.calories), 1)
 
@@ -118,10 +125,14 @@ function WeekTab() {
 
 /** Servings against the guide's goals, which is what the diet is actually about. */
 function MediterraneanTab() {
-  const { plan } = useMealPlanStore()
+  const { plan, weekDates } = useMealPlanStore()
   const ctx = useNutritionContext()
-  const goals = useMemo(() => scoreWeek(plan, ctx), [plan, ctx])
-  const planned = plan.filter((d) => d.meals.length).length
+  const week = useMemo(
+    () => plan.filter((d) => weekDates.includes(d.date)),
+    [plan, weekDates],
+  )
+  const goals = useMemo(() => scoreWeek(week, ctx), [week, ctx])
+  const planned = week.filter((d) => d.meals.length).length
 
   if (!planned) {
     return <EmptyState title="Nothing to score yet">
@@ -233,7 +244,7 @@ function BodyTab() {
             onClick={() => {
               addWeightEntry({
                 id: `${Date.now()}`,
-                date: new Date().toISOString().slice(0, 10),
+                date: today(),
                 weight: Number(value),
                 unit: profile.weightUnit,
                 memberId: who,
@@ -306,7 +317,7 @@ function BodyTab() {
             }
             addMeasurement({
               id: `${Date.now()}`,
-              date: new Date().toISOString().slice(0, 10),
+              date: today(),
               measurements: taken,
               unit: 'cm',
               memberId: who,

@@ -8,6 +8,7 @@ import { useUserStore } from '../../store/useUserStore'
 import { useNutritionContext } from '../../store/useNutrition'
 import { usePantry } from '../../store/usePantryStore'
 import { useAvailablePortions } from '../../store/usePortionStore'
+import { today } from '../../store/useMealPlanStore'
 import { proposePlan, type Proposal } from '../../lib/autoPlan'
 import { EmptyState } from '../ui'
 
@@ -41,6 +42,7 @@ export default function FillGaps({
   const proposals = useMemo(
     () => proposePlan({
       dates, plan, recipes, ctx, targets: profile.targets, favouriteIds, pantry, portions,
+      today: today(),
     }),
     [dates, plan, recipes, ctx, profile.targets, favouriteIds, pantry, portions],
   )

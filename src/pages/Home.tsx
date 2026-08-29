@@ -4,7 +4,7 @@ import {
   CalendarDays, ShoppingBasket, BookOpen, ArrowRight, Sparkles,
   Cloud, CloudOff, RefreshCw, AlertTriangle, CookingPot, Scale,
 } from 'lucide-react'
-import { useMealPlanStore } from '../store/useMealPlanStore'
+import { useMealPlanStore, today as todayDate } from '../store/useMealPlanStore'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { useAuthStore } from '../store/useAuth'
@@ -48,13 +48,24 @@ export default function Home() {
   const members = useAuthStore((s) => s.members)
   const me = useAuthStore((s) => s.user)
 
-  const today = new Date().toISOString().slice(0, 10)
+  const today = todayDate()
   const todayPlan = plan.find((d) => d.date === today)
   const todayTotals = todayPlan ? dayNutrients(todayPlan, ctx) : null
 
+  /**
+   * This week, and only this week.
+   *
+   * It used to be the whole plan against a hardcoded "of 7", so a fortnight
+   * planned ahead read "14 of 7" and a week planned a fortnight ago read
+   * "7 of 7" on a Saturday with nothing in the fridge. The number was true of
+   * the database and false of the week you were standing in.
+   */
   const days = useMemo(
-    () => plan.map((d) => ({ date: d.date, kcal: dayNutrients(d, ctx).calories })),
-    [plan, ctx],
+    () => weekDates.map((date) => {
+      const day = plan.find((d) => d.date === date)
+      return { date, kcal: day ? dayNutrients(day, ctx).calories : 0 }
+    }),
+    [weekDates, plan, ctx],
   )
   const plannedDays = days.filter((d) => d.kcal > 0).length
   const others = members.filter((m) => m.id !== me?.id)
@@ -247,7 +258,7 @@ export default function Home() {
           <SectionHeading>This week</SectionHeading>
           <div className="card p-5 space-y-4">
             <p className="text-sm text-ink-700">
-              <strong className="font-mono text-ink-900">{plannedDays}</strong> of 7 days planned
+              <strong className="font-mono text-ink-900">{plannedDays}</strong> of {days.length} days planned
               {plannedDays > 0 && (
                 <> · averaging{' '}
                   <strong className="font-mono text-ink-900">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays, MoveRight, Sparkles,
   Check, ShoppingBasket, Bookmark,
@@ -6,7 +6,7 @@ import {
 import type { Component, DayPlan, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import {
-  useMealPlanStore, getWeekDates, getRangeDates, monthOf,
+  useMealPlanStore, getWeekDates, getRangeDates, monthOf, today,
   RANGE_LABELS, type PlanRange,
 } from '../store/useMealPlanStore'
 import { useDeletedIds } from '../store/useRecipeStore'
@@ -41,7 +41,16 @@ export default function Planner() {
   const ctx = useNutritionContext()
 
   const [range, setRange] = useState<PlanRange>('week')
-  const [selected, setSelected] = useState<string>(() => todayOrFirst(weekDates))
+  /**
+   * The day being looked at, derived rather than stored.
+   *
+   * Three things want a say: the centre button, which means today from
+   * wherever it was pressed; a day you tapped; and failing both, today if it
+   * is on screen. Holding that in state meant writing to it from an effect
+   * every time the button arrived from another screen, which is a cascading
+   * render and a lint error, and got the precedence wrong besides.
+   */
+  const [chosen, setChosen] = useState<string | null>(null)
   const [adding, setAdding] = useState<{ date: string; slot: MealSlot } | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
   const [templating, setTemplating] = useState(false)
@@ -94,6 +103,11 @@ export default function Planner() {
     [weekDates, range, profile.weekStartsOn],
   )
   const anchorMonth = monthOf(weekDates[0])
+
+  // The button first, then whatever you tapped, then today if it is on screen.
+  const selected = quickAdd
+    ?? (chosen && dates.includes(chosen) ? chosen : null)
+    ?? todayOrFirst(dates)
   const selectedDay = byDate.get(selected) ?? { date: selected, meals: [] }
   const selectedTotals = dayNutrients(selectedDay, ctx)
   const targets = profile.targets
@@ -112,10 +126,37 @@ export default function Planner() {
   // The bottom bar's centre button lands here. Rather than syncing that intent
   // into local state from an effect, which costs a second render, the open
   // modal is derived from either source.
-  const filledSlots = new Set(selectedDay.meals.map((m) => m.slot))
+  // The centre button says which day it meant, which is today. Falling back to
+  // whatever this screen had selected is how it used to offer Monday the 17th.
+  const quickDay = quickAdd ?? selected
+  const quickMeals = byDate.get(quickDay)?.meals ?? []
+  const filledSlots = new Set(quickMeals.map((m) => m.slot))
   const openAdd = adding ?? (quickAdd
-    ? { date: selected, slot: MEAL_SLOTS.find((s) => !filledSlots.has(s)) ?? 'breakfast' }
+    ? { date: quickDay, slot: MEAL_SLOTS.find((s) => !filledSlots.has(s)) ?? 'breakfast' }
     : null)
+
+  /**
+   * Follow the day the centre button meant, and bring the week with it.
+   *
+   * Two halves, and the second was missed first time round. Selecting the day
+   * is not enough: if you had stepped the planner back a week, the modal opened
+   * on today while the grid still showed a week today was not in, so the meal
+   * you added appeared nowhere on screen. The button says today, so the screen
+   * has to be showing today.
+   */
+  /**
+   * Bring the week to the day the button meant.
+   *
+   * Selecting it is not enough: stepped back a week, the modal opened on today
+   * while the grid showed a week today was not in, so the meal you added
+   * appeared nowhere. Moving the window is a write to the store rather than to
+   * this component, so it belongs in an effect and the selection does not.
+   */
+  useEffect(() => {
+    if (quickAdd && !dates.includes(quickAdd)) {
+      goToWeek(new Date(quickAdd + 'T12:00:00'), profile.weekStartsOn)
+    }
+  }, [quickAdd, dates, goToWeek, profile.weekStartsOn])
 
   function closeAdd() {
     setAdding(null)
@@ -129,7 +170,7 @@ export default function Planner() {
     else ref.setDate(ref.getDate() + direction * (range === 'fortnight' ? 14 : 7))
 
     goToWeek(ref, profile.weekStartsOn)
-    setSelected(getRangeDates(
+    setChosen(getRangeDates(
       getWeekDates(ref, profile.weekStartsOn)[0], range, profile.weekStartsOn,
     )[0])
   }
@@ -154,7 +195,7 @@ export default function Planner() {
             </button>
             <button
               className="btn-secondary"
-              onClick={() => { goToWeek(new Date(), profile.weekStartsOn); setSelected(new Date().toISOString().slice(0, 10)) }}
+              onClick={() => { goToWeek(new Date(), profile.weekStartsOn); setChosen(today()) }}
             >
               Today
             </button>
@@ -211,7 +252,7 @@ export default function Planner() {
                 selected={date === selected}
                 showWeekday={dates.length <= 7}
                 dim={range === 'month' && monthOf(date) !== anchorMonth}
-                onSelect={() => setSelected(date)}
+                onSelect={() => setChosen(date)}
               />
             ))}
           </div>
@@ -586,8 +627,8 @@ function CopyDayDialog({
 }
 
 function todayOrFirst(dates: string[]): string {
-  const today = new Date().toISOString().slice(0, 10)
-  return dates.includes(today) ? today : dates[0]
+  const now = today()
+  return dates.includes(now) ? now : dates[0]
 }
 
 function formatDate(date: string): string {
@@ -624,7 +665,7 @@ function DayCell({
   dim: boolean
   onSelect: () => void
 }) {
-  const today = date === new Date().toISOString().slice(0, 10)
+  const isToday = date === today()
   const d = new Date(date + 'T12:00:00')
 
   return (
@@ -643,7 +684,7 @@ function DayCell({
           {d.toLocaleDateString('en-GB', { weekday: 'short' })}
         </div>
       )}
-      <div className={`text-base sm:text-lg font-bold leading-tight ${today && !selected ? 'text-bite-700' : ''}`}>
+      <div className={`text-base sm:text-lg font-bold leading-tight ${isToday && !selected ? 'text-bite-700' : ''}`}>
         {d.getDate()}
       </div>
       <div className={`text-[11px] sm:text-xs font-mono tabular-nums ${selected ? 'text-bite-100' : 'text-ink-500'}`}>

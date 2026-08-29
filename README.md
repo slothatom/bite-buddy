@@ -162,6 +162,22 @@ lunch, dinner), live totals against your targets, and copy a day onto another da
 starts on Monday by default and can start on any of the seven; loading an archived plan lines
 its days up by weekday, so a Wednesday meal still lands on a Wednesday.
 
+**The week is the one you are in.** It sounds like nothing and it was the worst bug in the
+app. The window was persisted and only the Today button ever moved it, so a fortnight after
+planning, Home counted a week that had already happened, Progress charted it, the shopping
+list offered its days, and the week you were standing in was empty and unmentioned
+everywhere. It is now recomputed on start and whenever the app comes back to the foreground,
+kept out of storage entirely, and kept out of backups and sync too: a window is a fact about
+right now, not about your data, and restoring a backup should not move your week.
+
+The centre button carries the day it meant. It used to raise a bare flag and let the planner
+fill in the day from whatever it had selected, which from another screen meant the first day
+of the window: "Add to Snack 1, Monday 17 August", on a Saturday the 29th.
+
+**Fill the gaps only offers days still ahead.** It filled whatever was on screen, so on a
+Saturday it carefully proposed meals for the Monday to Friday that had already gone. Every one
+of those pushed a real empty day further down a list people scan rather than read.
+
 **Saved weeks** keep a week you eat often so it can be dropped onto one that has not
 happened yet. Held as offsets from the start of the week rather than as dates, so a saved
 week lands the same way whichever day yours begins on, and every copied meal gets its own

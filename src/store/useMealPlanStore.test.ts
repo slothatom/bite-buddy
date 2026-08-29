@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { getRangeDates, getWeekDates, useMealPlanStore } from './useMealPlanStore'
+import { describe, expect, it, vi } from 'vitest'
+import { getRangeDates, getWeekDates, today, useMealPlanStore } from './useMealPlanStore'
 
 /**
  * The week shape is the one piece of date handling that is easy to get subtly
@@ -324,5 +324,72 @@ describe('a week worth having again', () => {
     useMealPlanStore.getState().renameTemplate(template.id, '   ')
 
     expect(useMealPlanStore.getState().templates[0].name).toBe('Our usual')
+  })
+})
+
+describe('the week you are actually in', () => {
+  /**
+   * The bug this exists to prevent.
+   *
+   * The window was a persisted snapshot that only the Planner's Today button
+   * ever advanced. A fortnight after planning, Home scored a week that had
+   * already happened, the shopping list offered its days, and the week you
+   * were standing in was empty and unmentioned on every screen but one.
+   */
+  it('moves to the week containing today when it is somewhere else', () => {
+    useMealPlanStore.setState({ plan: [] })
+    // A week planned a fortnight ago, exactly as it would have been restored.
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-17T12:00:00'), 1)
+    expect(useMealPlanStore.getState().weekDates[0]).toBe('2026-08-17')
+
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-08-29T09:00:00'))
+    useMealPlanStore.getState().ensureCurrentWeek(1)
+    vi.useRealTimers()
+
+    expect(useMealPlanStore.getState().weekDates).toContain('2026-08-29')
+    expect(useMealPlanStore.getState().weekDates[0]).toBe('2026-08-24')
+  })
+
+  it('leaves the window alone when today is already in it', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-08-29T09:00:00'))
+
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-29T12:00:00'), 1)
+    // Stepping forward deliberately is not something to undo on every check.
+    useMealPlanStore.getState().goToWeek(new Date('2026-09-05T12:00:00'), 1)
+    const stepped = useMealPlanStore.getState().weekDates
+
+    useMealPlanStore.getState().ensureCurrentWeek(1)
+    vi.useRealTimers()
+
+    // Next week does not contain today, so it is corrected. That is the point:
+    // the check is about where today is, not about what you last pressed.
+    expect(useMealPlanStore.getState().weekDates).not.toEqual(stepped)
+    expect(useMealPlanStore.getState().weekDates).toContain('2026-08-29')
+  })
+
+  it('honours the day you start your week on', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-08-29T09:00:00'))
+    useMealPlanStore.setState({ weekDates: [] })
+
+    useMealPlanStore.getState().ensureCurrentWeek(0)
+    vi.useRealTimers()
+
+    // Sunday start: the 29th is a Saturday, so the week runs from the 23rd.
+    expect(useMealPlanStore.getState().weekDates[0]).toBe('2026-08-23')
+  })
+
+  it('reads today from the local calendar, not from UTC', () => {
+    // Late evening east of Greenwich. Read as UTC this is already tomorrow,
+    // which is how six hand-rolled copies of this could put you a day out.
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 7, 29, 23, 30))
+    expect(today()).toBe('2026-08-29')
+
+    vi.setSystemTime(new Date(2026, 7, 29, 0, 30))
+    expect(today()).toBe('2026-08-29')
+    vi.useRealTimers()
   })
 })

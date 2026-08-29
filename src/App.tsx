@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { HashRouter, Routes, Route, Navigate, Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import Sidebar from './components/layout/Sidebar'
@@ -11,6 +11,8 @@ import SignIn from './pages/SignIn'
 
 import { useAuthStore } from './store/useAuth'
 import { useSyncSession } from './store/useSync'
+import { useMealPlanStore } from './store/useMealPlanStore'
+import { useUserStore } from './store/useUserStore'
 import { isConfigured } from './lib/supabase'
 import Zig from './components/brand/Mascot'
 
@@ -40,6 +42,28 @@ function ScreenLoading() {
 }
 
 /**
+ * Keeps the planner's window on the week you are actually in.
+ *
+ * Done here rather than in the Planner because every other screen reads the
+ * same window and most people open Home. It runs on start and again whenever
+ * the app comes back to the foreground: a phone with the app left open
+ * overnight is the ordinary case, and until this existed such a phone would
+ * still be showing yesterday's week at breakfast.
+ */
+function useCurrentWeek() {
+  const weekStartsOn = useUserStore((s) => s.profile.weekStartsOn)
+  const ensureCurrentWeek = useMealPlanStore((s) => s.ensureCurrentWeek)
+
+  useEffect(() => {
+    ensureCurrentWeek(weekStartsOn)
+
+    const check = () => { if (!document.hidden) ensureCurrentWeek(weekStartsOn) }
+    document.addEventListener('visibilitychange', check)
+    return () => document.removeEventListener('visibilitychange', check)
+  }, [weekStartsOn, ensureCurrentWeek])
+}
+
+/**
  * The app itself, once you are allowed to see it.
  *
  * Sync is started here rather than inside a screen, so it survives navigation
@@ -47,6 +71,7 @@ function ScreenLoading() {
  */
 function Shell() {
   useSyncSession()
+  useCurrentWeek()
 
   return (
     <>

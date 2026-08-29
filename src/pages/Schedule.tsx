@@ -9,6 +9,7 @@ import { LEAD_MINUTES, reminderAt, reminderLabel } from '../lib/cookReminder'
 import { usePortionStore, useAvailablePortions } from '../store/usePortionStore'
 import { portionsFromSession, offerOrder, madeWhen, portionLabel } from '../lib/portionsUse'
 import { useNutritionContext } from '../store/useNutrition'
+import { today } from '../store/useMealPlanStore'
 
 /**
  * Batch-cook sessions.
@@ -138,7 +139,7 @@ function SessionDialog({
 }) {
   const plan = useMealPlanStore((s) => s.plan)
   const [label, setLabel] = useState('')
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [date, setDate] = useState(today())
   const [time, setTime] = useState('18:00')
   const [picked, setPicked] = useState<string[]>([])
   const [query, setQuery] = useState('')
@@ -405,7 +406,7 @@ function LeftoversDialog({ onClose }: { onClose: () => void }) {
       recipeId: chosen?.id,
       label: chosen ? undefined : label.trim(),
       servings,
-      madeOn: new Date().toISOString().slice(0, 10),
+      madeOn: today(),
       storage,
       source: 'leftover',
     })
