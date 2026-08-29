@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { offerOrder, madeWhen, portionEntries, portionsFromSession, portionLabel } from './portionsUse'
+import type { MealSlot } from '../types'
+import { offerOrder, madeWhen, portionEntries, portionsFromSession, portionLabel, spreadPortions } from './portionsUse'
 import type { Portion, Recipe } from '../types'
 
 const TODAY = new Date('2026-08-21T12:00:00')
@@ -100,5 +101,52 @@ describe('what to call it', () => {
 
   it('falls back to what you typed', () => {
     expect(portionLabel(portion({ label: 'Half a lasagne' }), new Map())).toBe('Half a lasagne')
+  })
+})
+
+describe('spreading a batch across the days ahead', () => {
+  const days = ['2026-08-30', '2026-08-31', '2026-09-01', '2026-09-02']
+  const slots: MealSlot[] = ['dinner', 'lunch']
+
+  it('puts one serving on each of the coming days', () => {
+    const out = spreadPortions([{ id: 'tub', servings: 3 }], [], days, slots)
+
+    expect(out).toHaveLength(3)
+    expect(out.map((p) => p.date)).toEqual(['2026-08-30', '2026-08-31', '2026-09-01'])
+    expect(out.every((p) => p.slot === 'dinner')).toBe(true)
+  })
+
+  it('never puts the same batch twice in one day', () => {
+    const out = spreadPortions([{ id: 'tub', servings: 4 }], [], ['2026-08-30'], slots)
+    expect(out).toHaveLength(1)
+  })
+
+  it('fills gaps rather than rearranging a week', () => {
+    const plan = [{
+      date: '2026-08-30',
+      meals: [{ id: 'm', slot: 'dinner' as const, entries: [] }],
+    }]
+
+    const out = spreadPortions([{ id: 'tub', servings: 2 }], plan, days, slots)
+
+    // Monday's dinner was already spoken for, so it uses lunch there instead.
+    expect(out[0]).toMatchObject({ date: '2026-08-30', slot: 'lunch' })
+    expect(out[1]).toMatchObject({ date: '2026-08-31', slot: 'dinner' })
+  })
+
+  it('stops when the portions run out rather than inventing them', () => {
+    const out = spreadPortions([{ id: 'tub', servings: 1 }], [], days, slots)
+    expect(out).toHaveLength(1)
+  })
+
+  it('does nothing with half a portion, which is not a meal to plan', () => {
+    expect(spreadPortions([{ id: 'tub', servings: 0.5 }], [], days, slots)).toEqual([])
+  })
+
+  it('moves on to the next tub once one is spent', () => {
+    const out = spreadPortions(
+      [{ id: 'a', servings: 1 }, { id: 'b', servings: 1 }], [], days, slots,
+    )
+    expect(out.map((p) => p.portionId)).toEqual(['a', 'b'])
   })
 })

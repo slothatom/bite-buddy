@@ -1844,3 +1844,50 @@ test.describe('a list you can take to a shop', () => {
     expect(text).toContain('Washing-up liquid')
   })
 })
+
+test.describe('a batch that lands in the week', () => {
+  /**
+   * Cooking four portions is the reason to have a cook schedule at all, and
+   * until now everything went into the fridge and you planned it back out one
+   * slot at a time from the picker. The batch and the week were two screens
+   * that knew nothing about each other.
+   */
+  test('the portions go into the days ahead, not just the fridge', async ({ page }) => {
+    await goto(page, '/schedule')
+    await page.getByRole('button', { name: 'Session' }).click()
+    await page.getByPlaceholder('Search your recipes').fill('soup')
+    await page.locator('label').filter({ hasText: /soup/i }).first().click()
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
+
+    await page.getByRole('button', { name: 'Mark as done' }).first().click()
+    await expect(page.getByText('What came out?')).toBeVisible()
+
+    // Off until asked for, like everything else here that writes to the week.
+    const spread = page.getByLabel('Put them in the days ahead')
+    await expect(spread).not.toBeChecked()
+    await spread.check()
+    await page.getByRole('button', { name: 'Into the fridge' }).click()
+
+    await goto(page, '/plan')
+    // Somewhere in the week ahead there is now a meal from the fridge.
+    const week = page.locator('button[aria-pressed]').filter({ hasText: /\d{2,}/ })
+    await expect(week.first()).toBeVisible()
+  })
+
+  test('it can be turned off, and then nothing is planned', async ({ page }) => {
+    await goto(page, '/schedule')
+    await page.getByRole('button', { name: 'Session' }).click()
+    await page.getByPlaceholder('Search your recipes').fill('soup')
+    await page.locator('label').filter({ hasText: /soup/i }).first().click()
+    await page.getByRole('button', { name: 'Save', exact: true }).click()
+
+    await page.getByRole('button', { name: 'Mark as done' }).first().click()
+    await expect(page.getByLabel('Put them in the days ahead')).not.toBeChecked()
+    await page.getByRole('button', { name: 'Into the fridge' }).click()
+
+    // The portions still exist, they are simply nobody's dinner yet.
+    await expect(page.getByText('In the fridge')).toBeVisible()
+    await goto(page, '/plan')
+    await expect(page.locator('[data-entry-name]')).toHaveCount(0)
+  })
+})

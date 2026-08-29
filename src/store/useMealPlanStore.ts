@@ -55,7 +55,8 @@ export const RANGE_LABELS: Record<PlanRange, string> = {
   month: '1 month',
 }
 
-function addDays(date: string, days: number): string {
+/** A date a number of days along, read at noon so a timezone cannot shift it. */
+export function addDays(date: string, days: number): string {
   const d = new Date(date + 'T12:00:00')
   d.setDate(d.getDate() + days)
   return d.toISOString().slice(0, 10)

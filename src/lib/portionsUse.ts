@@ -1,4 +1,4 @@
-import type { Component, Portion, Recipe } from '../types'
+import type { Component, DayPlan, MealSlot, Portion, Recipe } from '../types'
 import { ageInDays } from '../store/usePortionStore'
 
 /**
@@ -99,4 +99,43 @@ export function portionsFromSession(
       sessionId,
     }]
   })
+}
+
+/**
+ * Where the rest of a batch is going to be eaten.
+ *
+ * Cooking four portions on a Sunday is the entire reason to have a cook
+ * schedule, and until now the app took all four, put them in the fridge and
+ * left you to plan them one slot at a time from the picker, at one serving a
+ * time. The batch and the week were two screens that knew nothing about each
+ * other.
+ *
+ * Days already carrying something in that slot are left alone: this fills gaps
+ * rather than rearranging a week somebody has already thought about. It stops
+ * when the portions run out, or when the days do.
+ */
+export function spreadPortions(
+  portions: { id: string; servings: number }[],
+  plan: DayPlan[],
+  dates: string[],
+  slots: MealSlot[],
+): { date: string; slot: MealSlot; portionId: string; servings: number }[] {
+  const byDate = new Map(plan.map((d) => [d.date, d]))
+  const left = portions.map((p) => ({ id: p.id, servings: p.servings }))
+  const out: { date: string; slot: MealSlot; portionId: string; servings: number }[] = []
+
+  for (const date of dates) {
+    const taken = new Set((byDate.get(date)?.meals ?? []).map((m) => m.slot))
+    for (const slot of slots) {
+      if (taken.has(slot)) continue
+      const next = left.find((p) => p.servings >= 1)
+      if (!next) return out
+      next.servings -= 1
+      out.push({ date, slot, portionId: next.id, servings: 1 })
+      // One meal per day from a batch. Eating the same thing at lunch and
+      // dinner is a decision somebody makes, not one an app makes for them.
+      break
+    }
+  }
+  return out
 }

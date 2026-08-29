@@ -11,12 +11,14 @@ import {
 } from '../store/useMealPlanStore'
 import { useDeletedIds } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
+import { targetsFor } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import {
   componentsNutrients, dayNutrients, dayEaten, emptyNutrients, addNutrients, reportDay,
 } from '../lib/nutrition'
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
 import { useUiStore } from '../store/useUiStore'
+import { PEOPLE } from '../lib/people'
 import AddEntryModal from '../components/planner/AddEntryModal'
 import { usePortionStore } from '../store/usePortionStore'
 import { portionEntries } from '../lib/portionsUse'
@@ -59,7 +61,7 @@ export default function Planner() {
   const [amount, setAmount] = useState<{ mealId: string; index: number } | null>(null)
   const [moving, setMoving] = useState<{ date: string; mealId: string } | null>(null)
   const [filling, setFilling] = useState<string[] | null>(null)
-  const { quickAdd, clearQuickAdd } = useUiStore()
+  const { quickAdd, clearQuickAdd, viewingAs, setViewingAs } = useUiStore()
   const { takeFrom, returnTo } = usePortionStore()
 
   const byDate = useMemo(() => new Map(plan.map((d) => [d.date, d])), [plan])
@@ -139,7 +141,9 @@ export default function Planner() {
   // that discards it, so a day of foods with no sodium figure between them
   // still showed a salt total as though it were one.
   const dayReport = reportDay(selectedDay, ctx)
-  const targets = profile.targets
+  // Whose target the day is measured against. The plan is shared, the line
+  // it is compared to is not.
+  const targets = targetsFor(profile, viewingAs)
 
   // Totals are for what you are looking at, not for everything ever planned.
   const shownDays = useMemo(
@@ -257,6 +261,25 @@ export default function Planner() {
           <button className="btn-secondary" onClick={() => setTemplating(true)}>
             <Bookmark size={15} /> Saved weeks
           </button>
+
+          {/* Whose target the totals are measured against. The plan is one
+              plan; the line across it is personal, and it lives here rather
+              than buried in Settings because this is where you notice it is
+              the wrong one. */}
+          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl ml-auto" role="tablist">
+            {PEOPLE.map((person) => (
+              <button
+                key={person.id}
+                role="tab"
+                aria-selected={viewingAs === person.id}
+                aria-label={`Show totals against ${person.name}'s target`}
+                onClick={() => setViewingAs(person.id)}
+                className={viewingAs === person.id ? 'tab-on' : 'tab-off'}
+              >
+                {person.name}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* The days themselves, seven to a row however many there are. The

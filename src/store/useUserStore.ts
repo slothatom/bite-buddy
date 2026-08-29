@@ -5,12 +5,21 @@ import type { Moment, Targets, TdeeProfile, UserProfile, WeekStart } from '../ty
 import { type MomentKind, noticeMoments, type MomentContext } from '../lib/moments'
 import { DEFAULT_WEEK_START } from '../types'
 import { FALLBACK_TARGETS } from '../lib/targets'
+import type { PersonId } from '../lib/people'
 
 interface UserStore {
   profile: UserProfile
 
   setName: (name: string) => void
-  setTargets: (targets: Targets) => void
+  /**
+   * Sets a target, for one person or for the household.
+   *
+   * Without a person it writes the shared figure, which is what anybody who
+   * has not set their own is measured against, and what every existing profile
+   * already holds. So nothing needs migrating: an empty per-person map means
+   * two people on one number, exactly as before.
+   */
+  setTargets: (targets: Targets, person?: PersonId) => void
   setTdee: (tdee: TdeeProfile) => void
   setWeekStart: (day: WeekStart) => void
   setFoodNameLanguage: (lang: UserProfile['foodNameLanguage']) => void
@@ -44,13 +53,29 @@ function stamped(profile: UserProfile): UserProfile {
   return { ...profile, updatedAt: new Date().toISOString() }
 }
 
+/**
+ * The target a given person is measured against.
+ *
+ * Theirs if they have set one, the household's otherwise. Every screen that
+ * compares food to a number goes through here, so there is one answer to
+ * "whose target is this" rather than one per screen.
+ */
+export function targetsFor(profile: UserProfile, person: PersonId): Targets {
+  return profile.targetsByPerson?.[person] ?? profile.targets
+}
+
 export const useUserStore = create<UserStore>()(
   persist(
     (set, get) => ({
       profile: INITIAL_PROFILE,
 
       setName: (name) => set((s) => ({ profile: stamped({ ...s.profile, name }) })),
-      setTargets: (targets) => set((s) => ({ profile: stamped({ ...s.profile, targets }) })),
+      setTargets: (targets, person) =>
+        set((s) => ({
+          profile: stamped(person
+            ? { ...s.profile, targetsByPerson: { ...s.profile.targetsByPerson, [person]: targets } }
+            : { ...s.profile, targets }),
+        })),
       setTdee: (tdee) => set((s) => ({ profile: stamped({ ...s.profile, tdee }) })),
       setWeekStart: (weekStartsOn) => set((s) => ({ profile: stamped({ ...s.profile, weekStartsOn }) })),
       setFoodNameLanguage: (foodNameLanguage) =>

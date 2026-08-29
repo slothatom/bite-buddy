@@ -191,6 +191,21 @@ The centre button carries the day it meant. It used to raise a bare flag and let
 fill in the day from whatever it had selected, which from another screen meant the first day
 of the window: "Add to Snack 1, Monday 17 August", on a Saturday the 29th.
 
+**Targets are per person; the plan is not.** A household cooks once, so there is one week of
+meals, and the line it is measured against belongs to whoever is looking. Body and Movement
+had known whose row was whose for months while the one screen about how much to eat carried a
+single figure for two people. Whoever has not set their own is measured against the
+household's, so nothing needed migrating. The switch sits on the planner rather than only in
+Settings, because that is where you notice it is the wrong one, and which person a device is
+showing is remembered per device and never synced: two people, two phones.
+
+**A batch can land in the week.** Ticking off a cook session offers to put the portions into
+the days ahead, one a day, into the first free dinner and then lunch, leaving days you have
+already planned alone. Off until asked for, like everything else here that writes to a week.
+It defaulted to on for about ten minutes and the test suite caught what that meant: four
+portions cooked, four days planned nobody asked for, and a fridge emptied the moment it was
+filled.
+
 **A plan is an intention; a tick makes it a record.** Every meal carries one button with
 three states: nothing said, eaten, skipped. The label says what the next press does, so the
 cycle needs no legend, and it goes round to nothing said because people change their minds

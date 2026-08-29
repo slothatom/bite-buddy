@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { useUserStore } from '../store/useUserStore'
+import { targetsFor } from '../store/useUserStore'
+import { useUiStore } from '../store/useUiStore'
 import {
   useBodyStore, useWeightFor, useMeasurementsFor, useUnassignedCount,
 } from '../store/useBodyStore'
@@ -47,6 +49,8 @@ export default function Analytics() {
 function WeekTab() {
   const { plan, weekDates } = useMealPlanStore()
   const { profile } = useUserStore()
+  const viewingAs = useUiStore((s) => s.viewingAs)
+  const targets = targetsFor(profile, viewingAs)
   const ctx = useNutritionContext()
 
   // The week on screen, not every day the app has ever held. Under a tab
@@ -57,7 +61,7 @@ function WeekTab() {
     return { date, n: day ? dayNutrients(day, ctx) : emptyNutrients() }
   })
   const planned = days.filter((d) => d.n.calories > 0)
-  const peak = Math.max(profile.targets.calories, ...days.map((d) => d.n.calories), 1)
+  const peak = Math.max(targets.calories, ...days.map((d) => d.n.calories), 1)
 
   if (!planned.length) {
     return <EmptyState title="Nothing planned yet this week">
@@ -75,7 +79,7 @@ function WeekTab() {
           {Math.round(avg)}<span className="text-base text-ink-500 font-semibold ml-1">kcal</span>
         </p>
         <p className="text-sm text-ink-700">
-          across {planned.length} planned {planned.length === 1 ? 'day' : 'days'} · target {profile.targets.calories}
+          across {planned.length} planned {planned.length === 1 ? 'day' : 'days'} · target {targets.calories}
         </p>
       </div>
 
@@ -87,16 +91,16 @@ function WeekTab() {
               on a phone. It reads as a legend instead, and the line stays bare. */}
           <p className="flex items-center gap-2 mb-3 text-xs text-ink-500">
             <span className="w-6 border-t-2 border-dashed border-ink-900/25" aria-hidden="true" />
-            target {profile.targets.calories.toLocaleString()} kcal
+            target {targets.calories.toLocaleString()} kcal
           </p>
           <div className="relative flex items-end gap-2 h-40">
             <div
               className="absolute inset-x-0 border-t-2 border-dashed border-ink-900/25 pointer-events-none"
-              style={{ bottom: `${Math.min(96, (profile.targets.calories / peak) * 100)}%` }}
+              style={{ bottom: `${Math.min(96, (targets.calories / peak) * 100)}%` }}
             />
             {days.map((d) => {
               const height = (d.n.calories / peak) * 100
-              const status = targetStatus(d.n.calories, profile.targets.calories)
+              const status = targetStatus(d.n.calories, targets.calories)
               return (
                 // The figures sit under the bars, not above them: above, they
                 // land exactly where the target line runs whenever the week is
