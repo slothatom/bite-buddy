@@ -3,7 +3,7 @@ import type { DayPlan, Food, PlannedMeal, Recipe } from '../types'
 import {
   atwaterCalories, buildContext, calorieDrift, componentsNutrients, dayEaten, reportDay,
   recipePerServing, recipeTotal, scaleNutrients, addNutrients,
-  reportNutrients, saltFromSodium, sodiumFromSalt,
+  reportNutrients, saltFromSodium, sodiumFromSalt, weekEaten,
 } from './nutrition'
 
 function food(id: string, per100g: Food['per100g']): Food {
@@ -211,6 +211,48 @@ describe('what a day amounted to', () => {
 
     expect(recorded).toBe(true)
     expect(nutrients.calories).toBe(0)
+  })
+})
+
+describe('what a stretch of days amounted to', () => {
+  const meal = (id: string, grams: number, outcome?: PlannedMeal['outcome']): PlannedMeal => ({
+    id, slot: 'lunch', outcome,
+    entries: [{ kind: 'food', foodId: 'oats', grams }],
+  })
+
+  const PLAN: DayPlan[] = [
+    { date: '2026-08-24', meals: [meal('a', 100, 'eaten'), meal('b', 100, 'skipped')] },
+    { date: '2026-08-25', meals: [meal('c', 100), meal('d', 100)] },
+    { date: '2026-08-26', meals: [] },
+  ]
+  const DATES = ['2026-08-24', '2026-08-25', '2026-08-26', '2026-08-27']
+
+  it('says which days are records and which are still intentions', () => {
+    const { recorded, planned } = weekEaten(DATES, PLAN, ctx)
+
+    // A week presented as one number is a blend of the two, and every screen
+    // that summed a week used to present exactly that without saying so.
+    expect(recorded).toBe(1)
+    expect(planned).toBe(1)
+  })
+
+  it('reads a ticked day as what was eaten and an untouched one as the plan', () => {
+    const { days } = weekEaten(DATES, PLAN, ctx)
+    const [ticked, untouched] = days
+
+    expect(ticked.recorded).toBe(true)
+    expect(untouched.recorded).toBe(false)
+    // The skipped half of the first day is gone; both halves of the second stand.
+    expect(ticked.nutrients.calories).toBeCloseTo(untouched.nutrients.calories / 2, 5)
+  })
+
+  it('gives a date with nothing on it back rather than dropping it', () => {
+    const { days } = weekEaten(DATES, PLAN, ctx)
+
+    // The chart has a bar per day and needs the empty ones to keep their place.
+    expect(days.map((d) => d.date)).toEqual(DATES)
+    expect(days[2].any).toBe(false)
+    expect(days[3].any).toBe(false)
   })
 })
 

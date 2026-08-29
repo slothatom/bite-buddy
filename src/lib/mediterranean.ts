@@ -1,6 +1,6 @@
 import type { DayPlan, Food, FoodState, MedCategory } from '../types'
-import type { NutritionContext } from './nutrition'
-import { flattenComponents } from './ingredients'
+import { mealsThatCount, type NutritionContext } from './nutrition'
+import { flattenComponents, flattenWithLosses } from './ingredients'
 
 /**
  * Scoring a week against the Mediterranean Diet guide's serving goals.
@@ -63,6 +63,18 @@ export function servingGrams(food: Food, goal: ServingGoal): number {
     : goal.gramsPerServing * COOKED_FROM_DRY
 }
 
+/**
+ * What the week actually put on a plate, day by day.
+ *
+ * A day nobody has ticked counts as planned, and a day somebody has ticked
+ * counts only what they said they ate. Without this the guide scored three
+ * dinners you skipped: it read the plan and the plan alone, while the same
+ * week's calories on the planner already knew better.
+ */
+function countedEntries(days: DayPlan[]) {
+  return days.flatMap((day) => mealsThatCount(day).meals.flatMap((meal) => meal.entries))
+}
+
 /** Categories the guide says to limit rather than reach for. */
 export const LIMIT_CATEGORIES: MedCategory[] = ['red-meat', 'treats']
 
@@ -76,7 +88,7 @@ export const LIMIT_CATEGORIES: MedCategory[] = ['red-meat', 'treats']
 export function servingsByCategory(
   days: DayPlan[], ctx: NutritionContext,
 ): Map<MedCategory, number> {
-  const entries = days.flatMap((day) => day.meals.flatMap((meal) => meal.entries))
+  const entries = countedEntries(days)
   const goals = new Map(SERVING_GOALS.map((g) => [g.category, g]))
   const totals = new Map<MedCategory, number>()
 
@@ -94,7 +106,7 @@ export function gramsByCategory(days: DayPlan[], ctx: NutritionContext): Map<Med
   // Third copy of this tree walk, before it moved to lib/ingredients. Water is
   // skipped for the same reason it is left off a shopping list: nobody is
   // counting it towards a serving goal.
-  const entries = days.flatMap((day) => day.meals.flatMap((meal) => meal.entries))
+  const entries = countedEntries(days)
   const totals = new Map<MedCategory, number>()
 
   for (const ingredient of flattenComponents(entries, ctx, { skip: ['water'] })) {
@@ -103,6 +115,44 @@ export function gramsByCategory(days: DayPlan[], ctx: NutritionContext): Map<Med
   }
   return totals
 }
+
+/**
+ * What the week's scoring had to leave out, so the screen can say so.
+ *
+ * Two different silences, both of which used to pass without a word.
+ * `noGoal` is food the guide has no serving size for, dropped mid-count.
+ * `lost` is food the app cannot resolve at all. Either way the servings shown
+ * are of less than the week, and a score presented as complete when it is not
+ * is the whole reason this screen was reporting 80.7 of 21 in the first place.
+ */
+export interface ScoreGaps {
+  /** Foods with no serving size for any guide group, by display name. */
+  noGoal: string[]
+  /** Components that resolved to nothing at all. */
+  lost: number
+}
+
+export function scoreGaps(days: DayPlan[], ctx: NutritionContext): ScoreGaps {
+  const goals = new Set(SERVING_GOALS.map((g) => g.category))
+  const { ingredients, lost } = flattenWithLosses(countedEntries(days), ctx, { skip: ['water'] })
+
+  const noGoal = new Map<string, string>()
+  for (const ingredient of ingredients) {
+    if (!goals.has(ingredient.food.category)) noGoal.set(ingredient.foodId, ingredient.food.names.en)
+  }
+
+  return { noGoal: [...noGoal.values()].sort(), lost: lost.length }
+}
+
+/**
+ * A count so far past its target that it is a data problem rather than a result.
+ *
+ * The screen once read "Vegetables 80.7 of 21" and rendered it as a score,
+ * because grams were being counted as servings. That specific bug is fixed and
+ * tested, but a number three times its target is worth doubting on sight rather
+ * than believing because the arithmetic happened to run.
+ */
+export const IMPLAUSIBLE_RATIO = 3
 
 export interface GoalProgress extends ServingGoal {
   servings: number

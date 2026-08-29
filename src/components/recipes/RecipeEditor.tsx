@@ -358,7 +358,7 @@ export default function RecipeEditor({
               {Math.round(perServing.calories)}
               <span className="text-sm font-semibold text-ink-500 ml-1">kcal</span>
             </p>
-            <NutrientSummary n={perServing} partial={report.partial} />
+            <NutrientSummary n={perServing} partial={report.partial} unresolved={report.unresolved} />
           </div>
 
           {/* ─── Getting rid of it ──────────────────────────────────────── */}

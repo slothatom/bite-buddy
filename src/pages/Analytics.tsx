@@ -11,8 +11,8 @@ import { MEASUREMENT_KEYS, MEASUREMENT_LABELS, type MeasurementKey } from '../ty
 import { PEOPLE, type PersonId } from '../lib/people'
 import { useNutritionContext } from '../store/useNutrition'
 import { today } from '../store/useMealPlanStore'
-import { dayNutrients, emptyNutrients } from '../lib/nutrition'
-import { scoreWeek } from '../lib/mediterranean'
+import { weekEaten } from '../lib/nutrition'
+import { scoreWeek, scoreGaps, IMPLAUSIBLE_RATIO } from '../lib/mediterranean'
 import { STATUS_STYLES, targetStatus } from '../lib/status'
 import { EmptyState, SectionHeading } from '../components/ui'
 
@@ -64,20 +64,21 @@ function WeekTab() {
   // The week on screen, not every day the app has ever held. Under a tab
   // labelled "This week" the whole plan was charted, so a week planned a
   // fortnight ago was still being shown as though it were this one.
-  const days = weekDates.map((date) => {
-    const day = plan.find((d) => d.date === date)
-    return { date, n: day ? dayNutrients(day, ctx) : emptyNutrients() }
-  })
-  const planned = days.filter((d) => d.n.calories > 0)
-  const peak = Math.max(targets.calories, ...days.map((d) => d.n.calories), 1)
+  //
+  // And what each day amounted to, not what was hoped for it. This screen
+  // summed the plan while the planner and Home reported what had been ticked,
+  // so the app recorded the truth in one place and reported the intention here.
+  const { days, recorded, planned: stillPlanned } = weekEaten(weekDates, plan, ctx)
+  const withFood = days.filter((d) => d.nutrients.calories > 0)
+  const peak = Math.max(targets.calories, ...days.map((d) => d.nutrients.calories), 1)
 
-  if (!planned.length) {
+  if (!withFood.length) {
     return <EmptyState title="Nothing planned yet this week">
       Add a few meals and the numbers will appear here.
     </EmptyState>
   }
 
-  const avg = planned.reduce((a, d) => a + d.n.calories, 0) / planned.length
+  const avg = withFood.reduce((a, d) => a + d.nutrients.calories, 0) / withFood.length
 
   return (
     <div className="space-y-5">
@@ -86,8 +87,15 @@ function WeekTab() {
         <p className="text-3xl font-extrabold font-mono text-ink-900">
           {Math.round(avg)}<span className="text-base text-ink-500 font-semibold ml-1">kcal</span>
         </p>
+        {/* Which days are records and which are still intentions. A blend of
+            the two presented as one number is the thing this screen used to do
+            without saying so. */}
         <p className="text-sm text-ink-700">
-          across {planned.length} planned {planned.length === 1 ? 'day' : 'days'} · target {targets.calories}
+          across {withFood.length} {withFood.length === 1 ? 'day' : 'days'}
+          {recorded > 0 && stillPlanned > 0
+            ? `, ${recorded} recorded and ${stillPlanned} still planned`
+            : recorded > 0 ? ', all recorded' : ', all planned'}
+          {' · '}target {targets.calories}
         </p>
       </div>
 
@@ -100,6 +108,11 @@ function WeekTab() {
           <p className="flex items-center gap-2 mb-3 text-xs text-ink-500">
             <span className="w-6 border-t-2 border-dashed border-ink-900/25" aria-hidden="true" />
             target {targets.calories.toLocaleString()} kcal
+            {recorded > 0 && (
+              <span className="ml-1">
+                · <span className="text-teal-700 font-bold">{'\u2713'}</span> recorded, the rest planned
+              </span>
+            )}
           </p>
           <div className="relative flex items-end gap-2 h-40">
             <div
@@ -107,22 +120,40 @@ function WeekTab() {
               style={{ bottom: `${Math.min(96, (targets.calories / peak) * 100)}%` }}
             />
             {days.map((d) => {
-              const height = (d.n.calories / peak) * 100
-              const status = targetStatus(d.n.calories, targets.calories)
+              const kcal = d.nutrients.calories
+              const height = (kcal / peak) * 100
+              const status = targetStatus(kcal, targets.calories)
               return (
                 // The figures sit under the bars, not above them: above, they
                 // land exactly where the target line runs whenever the week is
                 // near target, and the dashes struck through the digits.
                 <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                  {/* Over target used to be carried by hue alone, which
+                      lib/status.ts exists to prevent: it hands back a label and
+                      a symbol precisely so a bar does not have to be red to
+                      mean something. The symbol rides above the bar. */}
+                  <span
+                    className={`text-[11px] font-bold leading-none h-3 ${STATUS_STYLES[status.level].text}`}
+                    aria-hidden="true"
+                  >
+                    {status.symbol}
+                  </span>
                   <div
                     className={`w-full rounded-t-lg transition-all duration-500 ${STATUS_STYLES[status.level].fill}`}
-                    style={{ height: `${Math.max(height, d.n.calories > 0 ? 4 : 0)}%` }}
+                    style={{ height: `${Math.max(height, kcal > 0 ? 4 : 0)}%` }}
                   />
                   <span className="text-[11px] font-mono text-ink-900 tabular-nums leading-none">
-                    {d.n.calories > 0 ? Math.round(d.n.calories) : ''}
+                    {kcal > 0 ? Math.round(kcal) : ''}
                   </span>
-                  <span className="text-[11px] text-ink-500 leading-none">
+                  {/* A recorded day and a planned one are different claims, so
+                      the difference is a mark under the day rather than a shade
+                      of the same bar. */}
+                  <span
+                    className="text-[11px] text-ink-500 leading-none"
+                    title={d.any ? (d.recorded ? 'recorded' : 'planned') : undefined}
+                  >
                     {new Date(d.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'narrow' })}
+                    {d.recorded ? <span className="text-teal-700 font-bold">{'\u2009\u2713'}</span> : null}
                   </span>
                 </div>
               )
@@ -144,6 +175,7 @@ function MediterraneanTab() {
     [plan, weekDates],
   )
   const goals = useMemo(() => scoreWeek(week, ctx), [week, ctx])
+  const gaps = useMemo(() => scoreGaps(week, ctx), [week, ctx])
   const planned = week.filter((d) => d.meals.length).length
 
   if (!planned) {
@@ -158,6 +190,28 @@ function MediterraneanTab() {
         Serving goals from the Mediterranean Diet guide, scaled to the {planned}{' '}
         {planned === 1 ? 'day' : 'days'} planned so far.
       </p>
+      {/* What the count had to leave out. Dropping a food mid-count and then
+          presenting the total as the week is the same silence that let the
+          serving figures go unquestioned for months. */}
+      {(gaps.noGoal.length > 0 || gaps.lost > 0) && (
+        <div className="card p-4 space-y-1.5">
+          {gaps.noGoal.length > 0 && (
+            <p className="text-sm text-ink-700">
+              {gaps.noGoal.length} {gaps.noGoal.length === 1 ? 'food' : 'foods'} could not be
+              counted as servings, because the guide has no serving size for{' '}
+              {gaps.noGoal.length === 1 ? 'it' : 'them'}:{' '}
+              <span className="text-ink-900">{gaps.noGoal.join(', ')}</span>.
+            </p>
+          )}
+          {gaps.lost > 0 && (
+            <p className="text-sm text-coral-700">
+              {gaps.lost} {gaps.lost === 1 ? 'thing is' : 'things are'} missing from the library
+              altogether, so these counts are short by an unknown amount.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="card divide-y divide-border-100">
         {goals.map((g) => {
           const pct = Math.min(1, g.ratio)
@@ -171,7 +225,9 @@ function MediterraneanTab() {
                     {g.isLimit ? 'at most ' : ''}{g.target} / {g.period}
                   </span>
                 </span>
-                <span className={`text-xs font-mono ${met ? 'text-bite-700' : 'text-ink-500'}`}>
+                <span className={`text-xs font-mono ${
+                  g.ratio > IMPLAUSIBLE_RATIO ? 'text-coral-700'
+                    : met ? 'text-bite-700' : 'text-ink-500'}`}>
                   {/* Named, because "42.1 of 21" with no unit reads as a
                       broken number rather than a big one. */}
                   {g.servings.toFixed(1)} of {g.expected.toFixed(0)} servings
@@ -185,6 +241,14 @@ function MediterraneanTab() {
                   style={{ width: `${pct * 100}%` }}
                 />
               </div>
+              {/* Three times a target is not a good week, it is a number to
+                  doubt. This screen once rendered "80.7 of 21" as a result. */}
+              {g.ratio > IMPLAUSIBLE_RATIO && (
+                <p className="mt-1.5 text-xs text-coral-700">
+                  That is {g.ratio.toFixed(0)} times the goal, which is more likely a problem with
+                  the data than a week of eating. Worth checking the foods in it.
+                </p>
+              )}
             </div>
           )
         })}

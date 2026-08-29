@@ -13,7 +13,7 @@ import { useAuthStore } from '../store/useAuth'
 import { useSyncStatus } from '../store/useSync'
 import { useAvailablePortions } from '../store/usePortionStore'
 import { acknowledgeConflicts } from '../lib/sync'
-import { dayNutrients, dayEaten, componentsNutrients } from '../lib/nutrition'
+import { dayNutrients, dayEaten, weekEaten, componentsNutrients } from '../lib/nutrition'
 import { targetStatus, STATUS_STYLES } from '../lib/status'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import { CalorieRing, SectionHeading } from '../components/ui'
@@ -89,20 +89,25 @@ export default function Home() {
     return { met, of: scored.length }
   }, [weekPlan, ctx])
 
-  /** The last fortnight, so a trend has something to be a trend of. */
+  /**
+   * The last fortnight, so a trend has something to be a trend of.
+   *
+   * What each day came to, not what was hoped for it. A fortnight is mostly
+   * days that have happened, and charting the plan for those said the app knew
+   * something it did not: the ring directly above it was already reporting what
+   * had been ticked.
+   */
   const fortnight = useMemo(() => {
     const from = new Date(today + 'T12:00:00')
     from.setDate(from.getDate() - 13)
     const start = from.toISOString().slice(0, 10)
-    const out: { date: string; kcal: number }[] = []
+    const dates: string[] = []
     for (let i = 0; i < 14; i++) {
       const d = new Date(start + 'T12:00:00')
       d.setDate(d.getDate() + i)
-      const date = d.toISOString().slice(0, 10)
-      const day = plan.find((p) => p.date === date)
-      out.push({ date, kcal: day ? dayNutrients(day, ctx).calories : 0 })
+      dates.push(d.toISOString().slice(0, 10))
     }
-    return out
+    return weekEaten(dates, plan, ctx).days
   }, [plan, ctx, today])
 
   const nextCook = useMemo(
@@ -278,13 +283,27 @@ export default function Home() {
             {/* A fortnight rather than a week: seven bars is a snapshot, two
                 weeks is the first length at which a habit is visible. */}
             <div className="flex items-end gap-1 h-16">
-              {fortnight.map(({ date, kcal }) => {
-                const peak = Math.max(targets.calories, ...fortnight.map((d) => d.kcal), 1)
+              {fortnight.map(({ date, nutrients, recorded }) => {
+                const kcal = nutrients.calories
+                const peak = Math.max(targets.calories, ...fortnight.map((d) => d.nutrients.calories), 1)
                 const status = targetStatus(kcal, targets.calories)
+                const when = new Date(date + 'T12:00:00')
+                  .toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
                 return (
                   <div key={date} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                    {/* The status was hue and nothing else here, with the kcal
+                        hidden in a title a phone cannot reach. The symbol from
+                        lib/status.ts sits above the bar where a thumb cannot
+                        hide it, and the label goes to a screen reader. */}
+                    <span
+                      className={`text-[10px] font-bold leading-none h-2.5 ${STATUS_STYLES[status.level].text}`}
+                      aria-hidden="true"
+                    >
+                      {status.symbol}
+                    </span>
                     <div
-                      title={`${new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}: ${Math.round(kcal)} kcal`}
+                      title={`${when}: ${Math.round(kcal)} kcal${recorded ? ', recorded' : kcal > 0 ? ', planned' : ''}`}
+                      aria-label={`${when}, ${Math.round(kcal)} kcal${status.label ? `, ${status.label}` : ''}${recorded ? ', recorded' : kcal > 0 ? ', planned' : ''}`}
                       className={`w-full rounded-t transition-all ${kcal > 0 ? STATUS_STYLES[status.level].fill : 'bg-border-100'}`}
                       style={{ height: `${kcal > 0 ? Math.max((kcal / peak) * 100, 6) : 6}%` }}
                     />

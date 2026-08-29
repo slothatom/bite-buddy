@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { gramsByCategory, scoreWeek, SERVING_GOALS, LIMIT_CATEGORIES } from './mediterranean'
+import { gramsByCategory, scoreWeek, scoreGaps, SERVING_GOALS, LIMIT_CATEGORIES } from './mediterranean'
 import { buildContext } from './nutrition'
 import type { DayPlan, Food, Recipe } from '../types'
 
@@ -30,6 +30,9 @@ const FOODS: Food[] = [
   food('lentils', 'legumes'),
   food('beef', 'red-meat'),
   food('water', 'beverages'),
+  // A category the guide has no serving size for, which is the whole point of
+  // scoreGaps: it is dropped mid-count either way.
+  food('cinnamon', 'herbs-spices'),
 ]
 
 const stew: Recipe = {
@@ -111,6 +114,35 @@ describe('scoreWeek', () => {
     expect(veg.ratio).toBe(1)
   })
 
+  it('does not score a dinner you said you skipped', () => {
+    // The sharpest version of the split this fixes: the planner ring already
+    // knew the dinner had not happened, and the guide went on counting its
+    // vegetables because it read the plan and only the plan.
+    const eaten: DayPlan = {
+      date: '2026-08-20',
+      meals: [
+        { id: 'a', slot: 'lunch', outcome: 'eaten', entries: [{ kind: 'food', foodId: 'spinach', grams: 240 }] },
+        { id: 'b', slot: 'dinner', outcome: 'skipped', entries: [{ kind: 'food', foodId: 'carrot', grams: 240 }] },
+      ],
+    }
+    const veg = scoreWeek([eaten], ctx).find((g) => g.category === 'vegetables')!
+
+    expect(veg.servings).toBe(3)
+  })
+
+  it('still scores an untouched day as the intention it is', () => {
+    const untouched: DayPlan = {
+      date: '2026-08-20',
+      meals: [
+        { id: 'a', slot: 'lunch', entries: [{ kind: 'food', foodId: 'spinach', grams: 240 }] },
+        { id: 'b', slot: 'dinner', entries: [{ kind: 'food', foodId: 'carrot', grams: 240 }] },
+      ],
+    }
+    const veg = scoreWeek([untouched], ctx).find((g) => g.category === 'vegetables')!
+
+    expect(veg.servings).toBe(6)
+  })
+
   it('leaves weekly goals alone whatever the week looks like', () => {
     const days = [day('2026-08-20', [{ kind: 'food', foodId: 'lentils', grams: 270 }])]
     const legumes = scoreWeek(days, ctx).find((g) => g.category === 'legumes')!
@@ -143,6 +175,35 @@ describe('scoreWeek', () => {
     for (const goal of scoreWeek([day('2026-08-20', [])], ctx)) {
       expect(goal.isLimit).toBe(LIMIT_CATEGORIES.includes(goal.category))
     }
+  })
+})
+
+describe('what the scoring had to leave out', () => {
+  it('names a food the guide has no serving size for', () => {
+    // It is dropped mid-count either way. The difference is whether the screen
+    // presents the remainder as the week or says what is missing from it.
+    const days = [day('2026-08-20', [
+      { kind: 'food', foodId: 'spinach', grams: 240 },
+      { kind: 'food', foodId: 'cinnamon', grams: 5 },
+    ])]
+    const gaps = scoreGaps(days, ctx)
+
+    expect(gaps.noGoal).toEqual(['cinnamon'])
+    expect(gaps.lost).toBe(0)
+  })
+
+  it('counts a food the library has lost', () => {
+    const days = [day('2026-08-20', [{ kind: 'food', foodId: 'no-such-food', grams: 100 }])]
+
+    expect(scoreGaps(days, ctx).lost).toBe(1)
+  })
+
+  it('says nothing when the week counts cleanly', () => {
+    const days = [day('2026-08-20', [{ kind: 'food', foodId: 'spinach', grams: 240 }])]
+    const gaps = scoreGaps(days, ctx)
+
+    expect(gaps.noGoal).toEqual([])
+    expect(gaps.lost).toBe(0)
   })
 })
 
