@@ -1,10 +1,11 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   CalendarDays, ShoppingBasket, BookOpen, ArrowRight, Sparkles,
-  Cloud, CloudOff, RefreshCw, AlertTriangle, CookingPot, Scale,
+  Cloud, CloudOff, RefreshCw, AlertTriangle, CookingPot, Scale, Utensils,
 } from 'lucide-react'
 import { useMealPlanStore, today as todayDate } from '../store/useMealPlanStore'
+import { useThisWeek } from '../store/useThisWeek'
 import { useUserStore } from '../store/useUserStore'
 import { targetsFor } from '../store/useUserStore'
 import { useUiStore } from '../store/useUiStore'
@@ -16,6 +17,8 @@ import { acknowledgeConflicts } from '../lib/sync'
 import { dayNutrients, dayEaten, weekEaten, componentsNutrients } from '../lib/nutrition'
 import { targetStatus, STATUS_STYLES } from '../lib/status'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
+import type { MealSlot } from '../types'
+import AddEntryModal from '../components/planner/AddEntryModal'
 import { CalorieRing, SectionHeading } from '../components/ui'
 import { isConfigured } from '../lib/supabase'
 import Zig from '../components/brand/Mascot'
@@ -39,7 +42,13 @@ import { PEOPLE } from '../lib/people'
  */
 export default function Home() {
   useWatchForMoments()
-  const { plan, weekDates } = useMealPlanStore()
+  const plan = useMealPlanStore((s) => s.plan)
+  const recordEaten = useMealPlanStore((s) => s.recordEaten)
+  // The week you are in, not the week the planner happens to be showing.
+  const weekDates = useThisWeek()
+  // Which meal an unplanned bite gets filed under, guessed from the clock and
+  // correctable in the sheet.
+  const [ateSlot, setAteSlot] = useState<MealSlot | null>(null)
   const recipes = useRecipes()
   const sessions = useCookStore((s) => s.sessions)
   const { profile } = useUserStore()
@@ -246,9 +255,14 @@ export default function Home() {
                   })}
                 </div>
               </div>
-              <Link to="/plan" className="btn-secondary w-fit">
-                Open the planner <ArrowRight size={15} />
-              </Link>
+              <div className="flex flex-wrap gap-2">
+                <Link to="/plan" className="btn-secondary">
+                  Open the planner <ArrowRight size={15} />
+                </Link>
+                <button className="btn-secondary" onClick={() => setAteSlot(slotNow())}>
+                  <Utensils size={15} /> I ate something else
+                </button>
+              </div>
             </div>
           ) : (
             <div className="card p-5 text-center space-y-3">
@@ -258,6 +272,9 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 <Link to="/plan" className="btn-primary">Plan today</Link>
+                <button className="btn-secondary" onClick={() => setAteSlot(slotNow())}>
+                  <Utensils size={15} /> I ate something
+                </button>
                 <Link to="/settings/history" className="btn-secondary">Load a week</Link>
               </div>
             </div>
@@ -383,8 +400,34 @@ export default function Home() {
           </section>
         )}
       </div>
+
+      {ateSlot && (
+        <AddEntryModal
+          date={todayDate()}
+          slot={ateSlot}
+          mode="ate"
+          onSlotChange={setAteSlot}
+          onClose={() => setAteSlot(null)}
+          onAdd={(entry) => recordEaten(todayDate(), ateSlot, entry)}
+        />
+      )}
     </div>
   )
+}
+
+/**
+ * Which meal it probably was, from the clock.
+ *
+ * A guess, and said as one: the sheet shows the slot and lets it be changed.
+ * The alternative was making somebody pick before they can even search, which
+ * is a question the clock can usually answer.
+ */
+function slotNow(hour = new Date().getHours()): MealSlot {
+  if (hour < 10) return 'breakfast'
+  if (hour < 12) return 'snack1'
+  if (hour < 15) return 'lunch'
+  if (hour < 17) return 'snack2'
+  return 'dinner'
 }
 
 /**

@@ -393,6 +393,12 @@ function LeftoversDialog({ onClose }: { onClose: () => void }) {
   const [storage, setStorage] = useState<'fridge' | 'freezer'>('fridge')
   const [recipeId, setRecipeId] = useState<string | null>(null)
 
+  // When it was cooked, not when it was written down. Half a lasagne from
+  // Sunday, logged on Wednesday, used to be stamped today and then reported as
+  // three days fresher than it was, which is the one number a fridge card is
+  // for. Today by default, because most of the time it is.
+  const [madeOn, setMadeOn] = useState(today())
+
   const matches = useMemo(() => {
     const n = query.trim().toLowerCase()
     if (!n) return []
@@ -408,7 +414,7 @@ function LeftoversDialog({ onClose }: { onClose: () => void }) {
       recipeId: chosen?.id,
       label: chosen ? undefined : label.trim(),
       servings,
-      madeOn: today(),
+      madeOn,
       storage,
       source: 'leftover',
     })
@@ -470,6 +476,18 @@ function LeftoversDialog({ onClose }: { onClose: () => void }) {
             </div>
           </div>
         )}
+
+        <div>
+          <label className="label" htmlFor="leftover-made-on">Cooked on</label>
+          <input
+            id="leftover-made-on"
+            type="date"
+            className="input"
+            max={today()}
+            value={madeOn}
+            onChange={(e) => setMadeOn(e.target.value || today())}
+          />
+        </div>
 
         <div className="flex items-center gap-3">
           <div>

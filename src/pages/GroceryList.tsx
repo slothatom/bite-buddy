@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { RefreshCw, Trash2, ShoppingBasket, Plus, X, Check, Search, Share2 } from 'lucide-react'
 import type { GroceryItem, MedCategory, PantryItem } from '../types'
-import { useMealPlanStore, getRangeDates } from '../store/useMealPlanStore'
+import { useMealPlanStore, getRangeDates, today } from '../store/useMealPlanStore'
+import { useThisWeek } from '../store/useThisWeek'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { EmptyState, SectionHeading } from '../components/ui'
@@ -26,9 +27,10 @@ export default function GroceryList() {
   const {
     groceryItems, generateGroceryList, toggleGroceryItem, addGroceryItem,
     updateGroceryItem, removeGroceryItem, clearCheckedItems, clearGroceryList,
-    plan, weekDates,
+    plan,
   } = useMealPlanStore()
   const { profile } = useUserStore()
+  const thisWeek = useThisWeek()
   const ctx = useNutritionContext()
   const [justBuilt, setJustBuilt] = useState(false)
   const [tab, setTab] = useState<'list' | 'cupboard'>('list')
@@ -36,10 +38,17 @@ export default function GroceryList() {
   const pantry = usePantry()
   const { keep } = usePantryStore()
 
-  /** A fortnight of choices: this week and the next, which is as far as a shop reaches. */
+  /**
+   * A fortnight of choices, starting today.
+   *
+   * It used to start at `weekDates[0]`, the first day of the week on screen, so
+   * on a Saturday it offered the five days that had already gone and a walkthrough
+   * found the list being built for a week that had ended. Nobody shops backwards.
+   */
   const offered = useMemo(
-    () => getRangeDates(weekDates[0], 'fortnight', profile.weekStartsOn),
-    [weekDates, profile.weekStartsOn],
+    () => getRangeDates(thisWeek[0], 'fortnight', profile.weekStartsOn)
+      .filter((d) => d >= today()),
+    [thisWeek, profile.weekStartsOn],
   )
 
   const mealsByDate = useMemo(() => {
@@ -53,6 +62,11 @@ export default function GroceryList() {
   const [days, setDays] = useState<string[]>(() =>
     offered.filter((d) => plan.find((p) => p.date === d)?.meals.length))
 
+  // Ticked on Sunday night, still ticked on Monday morning, and by then it is
+  // yesterday. The state is not pruned when the window moves, so read it
+  // through the window rather than trusting it.
+  const picked = useMemo(() => days.filter((d) => offered.includes(d)), [days, offered])
+
   const grouped = useMemo(() => {
     const map = new Map<MedCategory, GroceryItem[]>()
     for (const item of groceryItems) {
@@ -65,10 +79,10 @@ export default function GroceryList() {
   }, [groceryItems])
 
   const checked = groceryItems.filter((i) => i.checked).length
-  const plannedMeals = days.reduce((n, d) => n + (mealsByDate.get(d) ?? 0), 0)
+  const plannedMeals = picked.reduce((n, d) => n + (mealsByDate.get(d) ?? 0), 0)
 
   function build() {
-    generateGroceryList(ctx, { dates: days, pantry })
+    generateGroceryList(ctx, { dates: picked, pantry })
     setJustBuilt(true)
     setTimeout(() => setJustBuilt(false), 1500)
   }
@@ -85,7 +99,7 @@ export default function GroceryList() {
                 : `Ready to build from ${plannedMeals} ${plannedMeals === 1 ? 'meal' : 'meals'}.`}
             </p>
           </div>
-          <button className="btn-primary shrink-0" onClick={build} disabled={!days.length}>
+          <button className="btn-primary shrink-0" onClick={build} disabled={!picked.length}>
             <RefreshCw size={15} className={justBuilt ? 'animate-spin' : ''} />
             {groceryItems.length ? 'Rebuild' : 'Build list'}
           </button>
@@ -108,7 +122,7 @@ export default function GroceryList() {
           <>
         <DayPicker
           dates={offered}
-          picked={days}
+          picked={picked}
           mealsByDate={mealsByDate}
           onToggle={(date) =>
             setDays((d) => (d.includes(date) ? d.filter((x) => x !== date) : [...d, date]))}
@@ -377,6 +391,10 @@ function PantryRow({
  * Days with nothing planned are shown but cannot be ticked: ticking one would
  * add nothing to the list, and hiding them entirely makes the fortnight look
  * shorter than it is.
+ *
+ * Days that have gone are a different case and are not passed in at all. An
+ * empty Thursday might still get a meal; last Thursday will not, and offering
+ * it only invites a shop for food that was eaten or never cooked.
  */
 function DayPicker({
   dates, picked, mealsByDate, onToggle, onAll, onNone,

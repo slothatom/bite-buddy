@@ -172,6 +172,20 @@ interface MealPlanStore {
 
   setMeal: (date: string, slot: MealSlot, entries: Component[], note?: string) => void
   addEntry: (date: string, slot: MealSlot, entry: Component) => void
+  /**
+   * Records something that was eaten and had never been planned.
+   *
+   * Most of what an evening actually contains was not written down that
+   * morning, and the app only had one way in: add it to the plan, find it
+   * again, tick it. Two actions and a lie in between, because for the seconds
+   * in between the day claims you are going to eat it.
+   *
+   * It does not fold into a planned meal in the same slot. Ticking that meal
+   * would say the rest of it was eaten too, which is a different claim and
+   * probably a false one, so this lands as its own record beside the plan. Both
+   * screens that read a slot already read all of it.
+   */
+  recordEaten: (date: string, slot: MealSlot, entry: Component) => void
   removeMeal: (date: string, mealId: string) => void
   clearDay: (date: string) => void
   copyDay: (fromDate: string, toDate: string) => void
@@ -295,6 +309,27 @@ export const useMealPlanStore = create<MealPlanStore>()(
                 })
               }
               return touch({ ...day, meals: [...day.meals, { id: newId(), slot, entries: [entry] }] })
+            }),
+          })),
+
+        recordEaten: (date, slot, entry) =>
+          set((s) => ({
+            plan: withDay(s.plan, date, (day) => {
+              const eaten = day.meals.find((m) => m.slot === slot && m.outcome === 'eaten')
+              if (eaten) {
+                return touch({
+                  ...day,
+                  meals: day.meals.map((m) =>
+                    m.id === eaten.id ? { ...m, entries: [...m.entries, entry] } : m),
+                })
+              }
+              return touch({
+                ...day,
+                meals: [...day.meals, {
+                  id: newId(), slot, entries: [entry],
+                  outcome: 'eaten', outcomeAt: new Date().toISOString(),
+                }],
+              })
             }),
           })),
 

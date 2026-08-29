@@ -445,6 +445,53 @@ describe('what actually happened', () => {
   })
 })
 
+describe('something you ate that was never planned', () => {
+  const apple = { kind: 'food' as const, foodId: 'food-apple', grams: 150 }
+  const date = '2026-08-27'
+
+  function aThursday() {
+    useMealPlanStore.setState({ plan: [] })
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-24T12:00:00'), 1)
+  }
+
+  const day = () => useMealPlanStore.getState().plan.find((d) => d.date === date)!
+
+  it('lands as a record, not as a plan waiting to be ticked', () => {
+    aThursday()
+    useMealPlanStore.getState().recordEaten(date, 'snack1', apple)
+
+    const [meal] = day().meals
+    expect(meal.outcome).toBe('eaten')
+    expect(meal.outcomeAt).toBeTruthy()
+    expect(meal.entries).toEqual([apple])
+  })
+
+  it('does not tick the planned meal already in that slot', () => {
+    aThursday()
+    useMealPlanStore.getState().addEntry(date, 'lunch', apple)
+    useMealPlanStore.getState()
+      .recordEaten(date, 'lunch', { kind: 'food', foodId: 'food-apple', grams: 40 })
+
+    // Two records in one slot: the lunch that was planned, still undecided,
+    // and the thing that was actually eaten. Folding them together would have
+    // claimed the planned lunch was eaten too.
+    const lunches = day().meals.filter((m) => m.slot === 'lunch')
+    expect(lunches).toHaveLength(2)
+    expect(lunches.find((m) => m.outcome === 'eaten')!.entries).toHaveLength(1)
+    expect(lunches.find((m) => !m.outcome)!.entries).toEqual([apple])
+  })
+
+  it('adds a second bite to the record it already made', () => {
+    aThursday()
+    useMealPlanStore.getState().recordEaten(date, 'snack1', apple)
+    useMealPlanStore.getState()
+      .recordEaten(date, 'snack1', { kind: 'food', foodId: 'food-apple', grams: 40 })
+
+    expect(day().meals).toHaveLength(1)
+    expect(day().meals[0].entries).toHaveLength(2)
+  })
+})
+
 describe('changing how much of it there was', () => {
   function aDayWith(entry: { kind: 'food'; foodId: string; grams: number }) {
     useMealPlanStore.setState({ plan: [] })

@@ -96,8 +96,10 @@ export function kitchenNudges(input: KitchenInput): Nudge[] {
       kind: 'sitting',
       title: `${portionLabel(oldest.portion, ctx.recipes)} has been in the fridge ${oldest.days} days`,
       // Said plainly, with no verdict attached. The app has not seen the tub,
-      // and "worth a look" is the most it is entitled to.
-      detail: 'Worth a look, and worth eating first if it is still good.',
+      // and "worth a look" is the most it is entitled to. The clause that used
+      // to follow, "worth eating first if it is still good", handed back the
+      // judgement the sentence before it had just refused to make.
+      detail: 'Worth a look, and the oldest thing in there.',
       to: '/schedule',
       rank: 30,
     })

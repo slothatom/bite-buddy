@@ -1740,6 +1740,24 @@ test.describe('the week you are actually in', () => {
     // one it offered a fortnight that had already been and gone, so the list
     // was built for food somebody ate a fortnight ago.
     await expect(page.getByRole('button', { name: longDate(todayIso()) })).toBeVisible()
+
+    // And yesterday is not on offer at all. Nobody shops backwards.
+    const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10)
+    await expect(page.getByRole('button', { name: longDate(yesterday) })).toHaveCount(0)
+  })
+
+  test('stepping the planner back leaves every other screen where it was', async ({ page }) => {
+    await goto(page, '/plan')
+    for (let i = 0; i < 2; i += 1) {
+      await page.getByRole('button', { name: 'Previous week' }).click()
+    }
+    await expect(page.getByRole('button', { name: longDate(todayIso()) })).toHaveCount(0)
+
+    // The planner's window used to be the app's only idea of "this week", so
+    // looking back at what you ate a fortnight ago moved the shopping list
+    // there too and left it there.
+    await goto(page, '/grocery')
+    await expect(page.getByRole('button', { name: longDate(todayIso()) })).toBeVisible()
   })
 
   test('the plus button means today, wherever it is pressed', async ({ page }, testInfo) => {
@@ -1832,6 +1850,35 @@ test.describe('what actually happened', () => {
 
     await dialog.getByRole('button', { name: 'Save', exact: true }).click()
     await expect(page.getByRole('dialog')).toHaveCount(0)
+  })
+
+  /**
+   * The commonest thing to record was the one thing there was no way to say.
+   *
+   * Adding a biscuit to the plan and then ticking it is two actions, and in
+   * between them the day claims you are going to eat something you already
+   * have. This is the one-tap version, from the screen you were already on.
+   */
+  test('something eaten that was never planned goes down in one go', async ({ page }) => {
+    await goto(page, '/')
+    await page.getByRole('button', { name: /^I ate something/ }).click()
+
+    const sheet = page.getByRole('heading', { name: /^Ate this for / })
+    await expect(sheet).toBeVisible()
+
+    // The clock guessed a meal, and the guess can be corrected before anything
+    // is written.
+    await page.getByRole('button', { name: 'Snack 1', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Ate this for snack 1' })).toBeVisible()
+
+    await page.getByRole('button', { name: 'foods', exact: true }).click()
+    await page.getByPlaceholder('What did you have?').fill('apple')
+    await page.getByRole('button', { name: 'Ate it' }).first().click()
+
+    // It lands on the planner already a record. Nothing to tick afterwards.
+    await goto(page, '/plan')
+    await expect(page.getByText('eaten', { exact: true }).first()).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Eaten\./ }).first()).toBeVisible()
   })
 
   test('a recipe can go into a day without leaving the recipe', async ({ page }) => {
