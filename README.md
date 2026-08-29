@@ -510,9 +510,18 @@ is kept and yours is reported on screen rather than disappearing quietly.
 The device remembers a fingerprint of every row it has sent or received, which
 is what makes a deletion detectable at all, and it is persisted so a deletion
 made offline survives being closed. If local state is empty but that record is
-full, the app refuses to publish it: that is what a cleared browser looks like
-from the inside, and sending it faithfully would take the other person's copy
-down too.
+full, the app holds the deletions rather than publishing them: that is what a
+cleared browser looks like from the inside, and sending it faithfully would
+take the other person's copy down too.
+
+Held, and then **asked about**, because emptying a shopping list of twenty-one
+things is indistinguishable from a wiped browser at this level and is a thing
+people do on purpose every week. The banner says which table and how many, and
+offers "I deleted those"; nothing goes without that answer. The answer covers
+one table once and is not remembered, so agreeing to empty a list today cannot
+wave through a lost browser tomorrow. It arrived the hard way: the guard shipped
+with no way to say yes, so a deliberately emptied list left a red banner and a
+stuck queue with no route out of either.
 
 ---
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AlertTriangle, X } from 'lucide-react'
 import { onStorageFailure, storageFailure } from '../../store/persist'
+import { allowDeletions } from '../../lib/sync'
 import { useSyncStatus } from '../../store/useSync'
 import { useAuthStore } from '../../store/useAuth'
 
@@ -20,6 +21,10 @@ import { useAuthStore } from '../../store/useAuth'
  *  - **This account never joined the household.** Membership is what every
  *    database policy checks, so an account without it is signed in and allowed
  *    to read and write nothing.
+ *  - **A wholesale deletion is being held.** Emptying a shopping list and
+ *    losing a browser produce exactly the same thing here, and only the person
+ *    holding the phone knows which it was, so this is the one message that asks
+ *    rather than tells.
  *
  * The server's own words are included when there are any. "new row violates
  * row-level security policy" is not friendly, but it is the difference between
@@ -29,7 +34,7 @@ import { useAuthStore } from '../../store/useAuth'
 export default function StorageBanner() {
   const [reason, setReason] = useState<string | null>(storageFailure())
   const [dismissed, setDismissed] = useState(false)
-  const { state, unsaved, lastError } = useSyncStatus()
+  const { state, unsaved, lastError, heldBack } = useSyncStatus()
   const authError = useAuthStore((s) => s.error)
 
   useEffect(() => onStorageFailure(setReason), [])
@@ -44,7 +49,10 @@ export default function StorageBanner() {
         + `They are safe on this device and will keep retrying.`
       : null)
 
-  if (!message || dismissed) return null
+  // Dismissing hides a message you can do nothing about. It must not hide a
+  // question, because answering it is the only way out of this state.
+  const held = heldBack[0]
+  if (!message || (dismissed && !held)) return null
 
   return (
     <div
@@ -59,6 +67,15 @@ export default function StorageBanner() {
           <span className="block text-white/80 text-xs mt-0.5 break-words">{lastError}</span>
         ) : null}
       </p>
+      {held ? (
+        <button
+          onClick={() => allowDeletions(held.table)}
+          className="shrink-0 self-start rounded-lg bg-white/95 text-coral-700 font-semibold
+                     px-3 py-2 text-xs hover:bg-white"
+        >
+          I deleted those
+        </button>
+      ) : null}
       <button onClick={() => setDismissed(true)} aria-label="Dismiss" className="shrink-0 p-1 -m-1">
         <X size={16} />
       </button>

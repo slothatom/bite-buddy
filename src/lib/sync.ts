@@ -1,7 +1,7 @@
 import { supabase } from './supabase'
 import { STORES } from '../store/registry'
 import { PushQueue } from './pushQueue'
-import { RowSync } from './rows/engine'
+import { RowSync, type HeldDeletion } from './rows/engine'
 import { ROW_TABLES } from './rows/tables'
 import { localChanges } from './rows/diff'
 import { useSyncState } from './rows/store'
@@ -52,6 +52,14 @@ export interface SyncSnapshot {
    * need very different reactions.
    */
   lastError: string | null
+  /**
+   * Wholesale deletions this device is holding rather than publishing.
+   *
+   * Empty almost always. When it is not, the screen has a question to ask and
+   * the numbers to ask it with, because emptying a shopping list and losing a
+   * browser look identical from inside the sync engine.
+   */
+  heldBack: HeldDeletion[]
 }
 
 const listeners = new Set<() => void>()
@@ -60,14 +68,16 @@ const listeners = new Set<() => void>()
 // useSyncExternalStore compares snapshots by identity, so returning a fresh
 // object per read would re-render forever.
 let snapshot: SyncSnapshot = {
-  state: 'off', at: null, unsaved: 0, conflicts: [], lastError: null,
+  state: 'off', at: null, unsaved: 0, conflicts: [], lastError: null, heldBack: [],
 }
 
 function announce(next: Partial<SyncSnapshot>) {
   const merged = { ...snapshot, ...next }
   if (
     merged.state === snapshot.state && merged.at === snapshot.at &&
-    merged.unsaved === snapshot.unsaved && merged.conflicts.join() === snapshot.conflicts.join() && merged.lastError === snapshot.lastError
+    merged.unsaved === snapshot.unsaved && merged.conflicts.join() === snapshot.conflicts.join() &&
+    merged.lastError === snapshot.lastError &&
+    merged.heldBack.map((h) => h.table).join() === snapshot.heldBack.map((h) => h.table).join()
   ) return
   snapshot = merged
   for (const fn of listeners) fn()
@@ -114,10 +124,34 @@ function describe(table: string, row: SyncRow): string {
  * Call once a session exists. Safe to call when Supabase is not configured: it
  * does nothing and reports `off`.
  */
+/**
+ * The engine currently running, so the screen can answer its question.
+ *
+ * A module-level handle rather than something threaded through React: there is
+ * exactly one sync session per signed-in app, `startSync` already owns it, and
+ * the alternative is a context that exists to carry one function.
+ */
+let running: RowSync | null = null
+
+/**
+ * "Yes, I deleted those." Lets one held-back table publish its deletions.
+ *
+ * Deliberately not automatic and deliberately not sticky: it takes a person
+ * saying so, it covers the one table they were asked about, and the next round
+ * asks again if the same thing happens tomorrow.
+ */
+export function allowDeletions(table: string): void {
+  running?.allowDeletions(table)
+  announce({ heldBack: snapshot.heldBack.filter((h) => h.table !== table) })
+  void retry()
+}
+
+let retry: () => Promise<void> = async () => {}
+
 export function startSync(userId: string): () => void {
   const db = supabase
   if (!db) {
-    announce({ state: 'off', at: null, unsaved: 0, lastError: null })
+    announce({ state: 'off', at: null, unsaved: 0, lastError: null, heldBack: [] })
     return () => {}
   }
 
@@ -127,7 +161,16 @@ export function startSync(userId: string): () => void {
 
   const engine = new RowSync(db, ROW_TABLES, userId, {
     onError: (message) => announce({ state: 'error', lastError: message }),
-    onDelivered: () => announce({ lastError: null }),
+    // Per table, because another table going through says nothing about the
+    // one still being held: clearing the question on any success would take
+    // the answer button away while the deletions were still stuck.
+    onDelivered: (table) => announce({
+      lastError: null,
+      heldBack: snapshot.heldBack.filter((h) => h.table !== table),
+    }),
+    onHeldBack: (held) => announce({
+      heldBack: [...snapshot.heldBack.filter((h) => h.table !== held.table), held],
+    }),
     onContested: (table, rows) =>
       announce({
         conflicts: [...new Set([...snapshot.conflicts, ...rows.map((r) => describe(table, r))])],
@@ -146,6 +189,9 @@ export function startSync(userId: string): () => void {
       at: s.pending.length ? snapshot.at : new Date(),
     }),
   })
+
+  running = engine
+  retry = () => queue.flush()
 
   /** One name, because a round covers every table anyway. */
   const EVERYTHING = 'rows'
@@ -188,6 +234,7 @@ export function startSync(userId: string): () => void {
     engine.stop()
     queue.stop()
     for (const off of unsubscribers) off()
-    announce({ state: 'off', at: null, unsaved: 0 })
+    if (running === engine) { running = null; retry = async () => {} }
+    announce({ state: 'off', at: null, unsaved: 0, heldBack: [] })
   }
 }
