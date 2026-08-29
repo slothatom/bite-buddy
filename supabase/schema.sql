@@ -292,22 +292,32 @@ on conflict (email) do nothing;
 -- and still be roughly on time. Requires the pg_cron and pg_net extensions,
 -- both available on Supabase; enable them under Database > Extensions.
 --
--- Replace the two placeholders before running: the project ref in the URL, and
--- the service role key. Keep the key out of the repository. If you would
--- rather not paste it here at all, Supabase's dashboard can schedule an Edge
--- Function directly instead, under Integrations > Cron.
+-- The Authorization header is not optional and is the whole of the setup that
+-- goes wrong silently. Edge Functions verify a JWT before your code runs, so a
+-- request without one is answered 401 by the gateway and the function never
+-- executes: pg_cron reports the job as succeeded, because posting the request
+-- did succeed, and nothing anywhere says a notification was refused. See the
+-- README for the one query that shows it.
+--
+-- The **anon** key, not the service role key. Anon is enough to get past the
+-- gateway, it is in the app's own bundle already, and it authorises nothing on
+-- its own. The service role key bypasses every policy in this file and has no
+-- business in a scheduled job, a repository, or a chat window.
+--
+-- Replace the two placeholders before running: the project ref and the anon key.
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- select cron.schedule(
---   'cook-reminders',
+--   'notify',
 --   '*/5 * * * *',
 --   $$
 --   select net.http_post(
---     url := 'https://YOUR-PROJECT-REF.supabase.co/functions/v1/cook-reminders',
+--     url := 'https://YOUR-PROJECT-REF.supabase.co/functions/v1/notify',
 --     headers := jsonb_build_object(
 --       'Content-Type', 'application/json',
---       'Authorization', 'Bearer YOUR-SERVICE-ROLE-KEY'
---     )
+--       'Authorization', 'Bearer YOUR-ANON-KEY'
+--     ),
+--     body := '{}'::jsonb
 --   );
 --   $$
 -- );
