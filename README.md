@@ -455,7 +455,9 @@ would have been worse than no second channel at all.
 The whole of that decision, what to send and when, lives in
 `supabase/functions/_shared/notify.ts`, which has no imports so it runs under
 vitest with the rest of the app. Fourteen tests cover it. The encryption and
-delivery around it belong to `web-push` and to Google.
+delivery around it belong to `web-push` and to Google, and that half has been
+run for real: a cook session reminder reaching an Android phone on the lock
+screen, from the cron to the notification, on 29 August 2026.
 
 #### Setting it up
 
