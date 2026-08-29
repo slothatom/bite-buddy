@@ -103,6 +103,24 @@ describe('the library it produces', () => {
     expect(MEAL_RECIPES.every((r) => r.prepMinutes > 0)).toBe(true)
   })
 
+  it('gives the same bowl the same time, whichever way it was named', () => {
+    // These two have identical ingredients and differ only in which of them
+    // the generated name leads with. That sent one to Porridge and the other
+    // to Yogurt, and charged the first eight minutes on a hob it never sees.
+    const time = (name: string) => {
+      const r = ALL_RECIPES.find((x) => x.name.en === name)!
+      return r.prepMinutes + r.cookMinutes
+    }
+
+    expect(time('Rolled oats with yogurt & mixed berries (30 g rolled oats)'))
+      .toBe(time('Yogurt with rolled oats & mixed berries'))
+  })
+
+  it('still simmers the porridge that is actually porridge', () => {
+    const r = ALL_RECIPES.find((x) => x.name.en === 'Oat porridge with kefir')!
+    expect(r.cookMinutes).toBeGreaterThan(0)
+  })
+
   it('leaves a bowl of yogurt quicker than a pot of soup', () => {
     const time = (name: string) => {
       const r = ALL_RECIPES.find((x) => x.name.en === name)!

@@ -540,8 +540,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 6,
-    "cookMinutes": 8,
+    "prepMinutes": 5,
+    "cookMinutes": 0,
     "components": [
       {
         "kind": "food",
@@ -4232,8 +4232,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 6,
-    "cookMinutes": 8,
+    "prepMinutes": 5,
+    "cookMinutes": 0,
     "components": [
       {
         "kind": "food",
@@ -4558,8 +4558,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 6,
-    "cookMinutes": 8,
+    "prepMinutes": 5,
+    "cookMinutes": 0,
     "components": [
       {
         "kind": "food",

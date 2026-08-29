@@ -61,7 +61,8 @@ const NAME_RULES: [RegExp, DishCategory][] = [
   [/\bporridge/i, 'porridge'],
   [/\bmuesli|granola|cereal/i, 'cereal'],
   [/\bpudding|ice bar|brownie|chocolate\b/i, 'dessert'],
-  [/\boats?\b|oatmeal/i, 'porridge'],
+  // Handled below rather than here: oats are porridge when something simmers
+  // them and cereal when they are soaked in yogurt, and the name cannot tell.
   [/\bloaf\b|\bcake\b|banana bread/i, 'cake'],
   [/\bcookie|biscuit/i, 'cookie'],
   [/\bpastry|croissant|pie\b/i, 'pastry'],
@@ -117,6 +118,18 @@ const SEAFOOD = new Set(['shrimp'])
 export function categorise(recipe: Recipe, ctx: NutritionContext): DishCategory {
   for (const [pattern, category] of NAME_RULES) {
     if (pattern.test(headOfName(recipe.name.en))) return category
+  }
+
+  // Oats, twice over. "Rolled oats with yogurt & mixed berries" and "Yogurt
+  // with rolled oats & mixed berries" are the same bowl written two ways, and
+  // the name decided which: one was filed as Porridge and charged eight
+  // minutes on the hob, the other as Yogurt and given three with a spoon. What
+  // separates them is not the word order but whether anything simmers the oats,
+  // so the liquid decides it. Porridge has milk or water in it; overnight oats
+  // have neither.
+  if (/\boats?\b|oatmeal/i.test(headOfName(recipe.name.en))) {
+    const inside = weighFoods(recipe, ctx)
+    return inside.has('milk') || inside.has('water') ? 'porridge' : 'cereal'
   }
 
   // Nothing in the name, so ask the food. Yogurt is called out because it is a
