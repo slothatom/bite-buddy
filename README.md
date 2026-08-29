@@ -846,6 +846,25 @@ clamps; it is never truncated to a single line where the words carry meaning.
 
 ---
 
+**The dietician reads in English, and still says what she said.** Fourteen weeks of plans,
+481 lines, written in Romanian and Hungarian. The archive shows both: the reading first,
+because for one of the two people here the original is not readable at all, and the original
+underneath, because it is the record and a plan you cannot check against what was prescribed
+is one you have to take on faith. On dense screens, a recipe card or a planner row, only the
+reading is shown, since doubling every line pushed the fifth meal of a day off a laptop.
+
+Composed rather than listed. A table of 291 translated lines would be a second copy of the
+data, correct on the day it was written and wrong the first time anybody edited a plan.
+Instead the vocabulary is translated and the line is rebuilt from it, which means the food
+database stays the single source of truth: `paine int` reads as Wholemeal bread because that
+is what `bread-wholemeal` is called on every other screen, and renaming a food renames it in
+the archive too.
+
+It refuses to guess. A word it does not know is left exactly as written, so the gap is
+visible rather than papered over with something plausible, and a test measures how much of
+the archive that amounts to: **2 unrecognised words out of 2,580**, both proper nouns in one
+Hungarian line.
+
 **The tab says which screen you are on.** Every route was called "Bite Buddy", so two tabs of
 this app were indistinguishable and so was a month of history.
 

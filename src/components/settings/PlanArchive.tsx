@@ -6,6 +6,7 @@ import { SOURCE_PLANS } from '../../data'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
 import { useUserStore } from '../../store/useUserStore'
 import { EMPTY_CONTEXT } from '../../lib/moments'
+import { SourceLine } from '../ui'
 import { useNutritionContext } from '../../store/useNutrition'
 import { componentsNutrients } from '../../lib/nutrition'
 
@@ -108,7 +109,13 @@ function PlanCard({
                 {day.meals.map((meal, j) => (
                   <div key={j} className="flex gap-3 text-xs">
                     <dt className="w-20 shrink-0 font-semibold text-ink-500">{SLOT_LABELS[meal.slot]}</dt>
-                    <dd className="flex-1 text-ink-700">{meal.text}</dd>
+                    {/* The archive is where these are actually read, so both
+                        go: what it says, and what was written. The original is
+                        the record and stays underneath rather than being
+                        replaced by a reading of it. */}
+                    <dd className="flex-1 min-w-0">
+                      <SourceLine text={meal.text} translate />
+                    </dd>
                     <dd className="w-12 text-right font-mono text-ink-500 shrink-0">
                       {Math.round(componentsNutrients(meal.entries, ctx).calories)}
                     </dd>

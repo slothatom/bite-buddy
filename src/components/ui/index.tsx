@@ -4,6 +4,7 @@ import type { Macros, MedTier, Nutrients } from '../../types'
 import { STATUS_STYLES, targetStatus, type StatusLevel } from '../../lib/status'
 import { saltFromSodium } from '../../lib/nutrition'
 import Zig, { type ZigMood } from '../brand/Mascot'
+import { useEnglish } from '../../store/useEnglish'
 
 /** Shared display pieces. Kept together because each is a handful of lines. */
 
@@ -226,9 +227,18 @@ export function TierBadge({ tier }: { tier: MedTier }) {
  * text, rather than italic, near-invisible grey.
  */
 export function SourceLine({
-  text, truncate = false, clamp,
+  text, truncate = false, clamp, translate = false,
 }: {
   text: string
+  /**
+   * Whether this is a line of the dietician's, or simply foreign text.
+   *
+   * Off by default, and deliberately: this same component shows a food's
+   * Romanian and Hungarian names on the Foods screen, and rendering those in
+   * English turns "sparanghel · spárga" into "asparagus · asparagus", which is
+   * the exact opposite of why they are on screen.
+   */
+  translate?: boolean
   /** One line with an ellipsis, for dense lists where the line is a hint. */
   truncate?: boolean
   /** Up to this many lines, for places where the original wording is the point. */
@@ -242,8 +252,30 @@ export function SourceLine({
     ? (clamp === 2 ? 'line-clamp-2' : 'line-clamp-3')
     : truncate ? 'block truncate' : 'block'
 
+  // The dietician's own words, and what they say. The original stays because it
+  // is the record: a plan you cannot check against what was actually prescribed
+  // is a plan you have to take on faith. The English goes first because for one
+  // of the two people here the Romanian is not readable at all.
+  const reading = useEnglish(text)
+  const english = translate ? reading : ''
+
+  // Both, where there is room to read; the English alone in a dense list.
+  // Clamped or truncated means this is a hint beside something else, and
+  // doubling the height of every line pushed the fifth meal of a day off a
+  // laptop screen. The original is never far: it is on the recipe and it is
+  // the whole of the archive.
+  const dense = Boolean(clamp || truncate)
+
+  if (dense || !english || english.toLowerCase() === text.toLowerCase()) {
+    const shown = dense && english ? english : text
+    return <span className={`text-[13px] text-ink-500 min-w-0 ${wrap}`} title={text}>{shown}</span>
+  }
+
   return (
-    <span className={`text-[13px] text-ink-500 min-w-0 ${wrap}`}>{text}</span>
+    <span className="block min-w-0">
+      <span className={`text-[13px] text-ink-700 min-w-0 ${wrap}`}>{english}</span>
+      <span className={`text-[13px] text-ink-500 min-w-0 italic ${wrap}`} lang="ro">{text}</span>
+    </span>
   )
 }
 

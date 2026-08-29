@@ -900,7 +900,11 @@ test.describe('the food library', () => {
     await page.getByLabel('Food name').fill('Asparagus spears')
     await page.getByRole('button', { name: 'Save changes' }).click()
 
-    await expect(page.getByText('Asparagus spears')).toBeVisible()
+    // First, because the rename reaches the archive too: the dietician's lines
+    // are read through the food database, so renaming a food renames it there
+    // as well. That is the point of building the reading on the food names
+    // rather than on a second list of translated strings.
+    await expect(page.getByText('Asparagus spears').first()).toBeVisible()
   })
 
   test('the name line no longer claims a language it is not', async ({ page }) => {
@@ -1955,5 +1959,26 @@ test.describe('the small sharp edges', () => {
 
     await page.getByLabel('Aiming for').fill('68')
     await expect(page.getByText(/to go\.|below your goal\.|At your goal\./)).toBeVisible()
+  })
+})
+
+test.describe('the dietician, in English', () => {
+  test('the archive says what a line means, and keeps what it said', async ({ page }) => {
+    await goto(page, '/settings/history')
+
+    // Both, because the original is the record: a plan you cannot check
+    // against what was actually prescribed is one you have to take on faith.
+    await expect(page.getByText(/half a plate of vegetables|raw vegetable salad|wholemeal bread/i).first())
+      .toBeVisible()
+    await expect(page.getByText(/paine int|salata de cruditati|legume/i).first()).toBeVisible()
+  })
+
+  test('a food keeps its own foreign names, which are the point of them', async ({ page }) => {
+    await goto(page, '/foods')
+    await page.getByPlaceholder(/Search/).first().fill('asparagus')
+
+    // Translating these would turn "sparanghel · spárga" into
+    // "asparagus · asparagus", which is the opposite of why they are shown.
+    await expect(page.getByText('sparanghel · spárga', { exact: false })).toBeVisible()
   })
 })
