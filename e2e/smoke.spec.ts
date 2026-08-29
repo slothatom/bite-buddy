@@ -778,7 +778,7 @@ test.describe('building a recipe from the food database', () => {
 test.describe('progress, per person', () => {
   test('weight and the five measurements are logged and shown separately', async ({ page }) => {
     await goto(page, '/analytics')
-    await page.getByRole('button', { name: 'Body' }).click()
+    await page.getByRole('tab', { name: 'Body' }).click()
 
     await page.getByLabel('Weight').fill('68.4')
     await page.getByRole('button', { name: /^Log$/ }).click()
@@ -801,7 +801,7 @@ test.describe('progress, per person', () => {
 
   test('the two people have their own histories, signed in or not', async ({ page }) => {
     await goto(page, '/analytics')
-    await page.getByRole('button', { name: 'Body' }).click()
+    await page.getByRole('tab', { name: 'Body' }).click()
 
     // Both tabs are there before anybody signs in. They used to appear only
     // once the household list loaded, which meant never on a device that was
@@ -828,7 +828,7 @@ test.describe('progress, per person', () => {
 
   test('a measurement can be taken back off', async ({ page }) => {
     await goto(page, '/analytics')
-    await page.getByRole('button', { name: 'Body' }).click()
+    await page.getByRole('tab', { name: 'Body' }).click()
     await page.getByLabel('Hips').fill('95')
     await page.getByRole('button', { name: /Log measurements/ }).click()
     await expect(page.getByText('hips 95')).toBeVisible()
@@ -842,7 +842,7 @@ test.describe('movement, per person', () => {
   test('a session is built from the exercise list and costed from your weight', async ({ page }) => {
     // A weight first: without one the app refuses to guess a calorie figure.
     await goto(page, '/analytics')
-    await page.getByRole('button', { name: 'Body' }).click()
+    await page.getByRole('tab', { name: 'Body' }).click()
     await page.getByLabel('Weight').fill('70')
     await page.getByRole('button', { name: /^Log$/ }).click()
 
@@ -1426,7 +1426,7 @@ test.describe('what you enter is still there tomorrow', () => {
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
     await goto(page, '/analytics')
-    await page.getByRole('button', { name: 'Body' }).click()
+    await page.getByRole('tab', { name: 'Body' }).click()
     await page.getByLabel('Weight').fill('69.2')
     await page.getByRole('button', { name: /^Log$/ }).click()
     await expect(page.getByText('69.2 kg')).toBeVisible()
@@ -1458,7 +1458,7 @@ test.describe('what you enter is still there tomorrow', () => {
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
 
     await goto(page, '/analytics')
-    await page.getByRole('button', { name: 'Body' }).click()
+    await page.getByRole('tab', { name: 'Body' }).click()
     await expect(page.getByText('69.2 kg')).toBeVisible()
 
     await goto(page, '/movement')
@@ -1889,5 +1889,71 @@ test.describe('a batch that lands in the week', () => {
     await expect(page.getByText('In the fridge')).toBeVisible()
     await goto(page, '/plan')
     await expect(page.locator('[data-entry-name]')).toHaveCount(0)
+  })
+})
+
+test.describe('the small sharp edges', () => {
+  test('the tab is named after the screen', async ({ page }) => {
+    await goto(page, '/plan')
+    await expect(page).toHaveTitle(/^Planner · Bite Buddy$/)
+
+    await goto(page, '/grocery')
+    await expect(page).toHaveTitle(/^Shopping · Bite Buddy$/)
+
+    // Every route used to be "Bite Buddy", so two tabs of this app were
+    // indistinguishable and so was a month of history.
+    await goto(page, '/settings/history')
+    await expect(page).toHaveTitle(/^Plan history · Bite Buddy$/)
+  })
+
+  test('clearing a day asks first, and says how much it would throw away', async ({ page }) => {
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+    await page.getByRole('button', { name: /^Add these/ }).click()
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+
+    await page.getByRole('button', { name: 'Clear day' }).click()
+    const confirm = page.getByRole('button', { name: /^Clear \d+ meals?$/ })
+    await expect(confirm).toBeVisible()
+
+    // Backing out leaves the day exactly as it was.
+    await page.getByRole('button', { name: 'Keep them' }).click()
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+
+    await page.getByRole('button', { name: 'Clear day' }).click()
+    await page.getByRole('button', { name: /^Clear \d+ meals?$/ }).click()
+    await expect(page.locator('[data-entry-name]')).toHaveCount(0)
+  })
+
+  test('emptying the shopping list asks first', async ({ page }) => {
+    await goto(page, '/grocery')
+    await page.getByLabel('Add an item').fill('Washing-up liquid')
+    await page.getByLabel('Add an item').press('Enter')
+
+    await page.getByRole('button', { name: 'Empty list' }).click()
+    await expect(page.getByRole('button', { name: /^Throw away \d+ lines?$/ })).toBeVisible()
+
+    await page.getByRole('button', { name: 'Keep them' }).click()
+    await expect(page.getByText('Washing-up liquid')).toBeVisible()
+  })
+
+  test('signed out, the backup panel does not promise an account it lacks', async ({ page }) => {
+    await goto(page, '/settings')
+    // These tests never sign in, so the honest sentence is the local one.
+    await expect(page.getByText(/lives in this browser and nowhere else/)).toBeVisible()
+    await expect(page.getByText(/Signed in as/)).toHaveCount(0)
+  })
+
+  test('a weight can be given somewhere to head', async ({ page }) => {
+    await goto(page, '/analytics')
+    await page.getByRole('tab', { name: 'Body' }).click()
+
+    await page.getByLabel('Weight', { exact: true }).fill('72')
+    // Two Log buttons on this screen: weight and measurements. The first one
+    // sits under the weight field.
+    await page.getByRole('button', { name: 'Log' }).first().click()
+
+    await page.getByLabel('Aiming for').fill('68')
+    await expect(page.getByText(/to go\.|below your goal\.|At your goal\./)).toBeVisible()
   })
 })

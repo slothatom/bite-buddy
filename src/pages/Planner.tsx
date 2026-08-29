@@ -59,6 +59,7 @@ export default function Planner() {
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
   const [templating, setTemplating] = useState(false)
   const [amount, setAmount] = useState<{ mealId: string; index: number } | null>(null)
+  const [clearing, setClearing] = useState(false)
   const [moving, setMoving] = useState<{ date: string; mealId: string } | null>(null)
   const [filling, setFilling] = useState<string[] | null>(null)
   const { quickAdd, clearQuickAdd, viewingAs, setViewingAs } = useUiStore()
@@ -329,9 +330,27 @@ export default function Planner() {
               <Copy size={15} /> Copy day to…
             </button>
             {selectedDay.meals.length > 0 && (
-              <button className="btn-ghost text-ink-500 hover:text-coral-600" onClick={() => clearDayReturningPortions(selected)}>
-                <Trash2 size={15} /> Clear day
-              </button>
+              clearing ? (
+                <>
+                  {/* The count is on the button, where the thumb already is,
+                      rather than in a sentence above it. */}
+                  <button
+                    className="btn-primary"
+                    onClick={() => { clearDayReturningPortions(selected); setClearing(false) }}
+                  >
+                    <Trash2 size={15} /> Clear {selectedDay.meals.length}{' '}
+                    {selectedDay.meals.length === 1 ? 'meal' : 'meals'}
+                  </button>
+                  <button className="btn-secondary" onClick={() => setClearing(false)}>Keep them</button>
+                </>
+              ) : (
+                <button
+                  className="btn-ghost text-ink-500 hover:text-coral-600"
+                  onClick={() => setClearing(true)}
+                >
+                  <Trash2 size={15} /> Clear day
+                </button>
+              )
             )}
           </div>
         </section>

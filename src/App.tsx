@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { HashRouter, Routes, Route, Navigate, Link } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import Sidebar from './components/layout/Sidebar'
 import BottomNav from './components/layout/BottomNav'
@@ -64,6 +64,37 @@ function useCurrentWeek() {
 }
 
 /**
+ * Names the browser tab after the screen you are on.
+ *
+ * Every route was called "Bite Buddy", so two tabs of this app were
+ * indistinguishable and so was every entry in a month of history. The app's
+ * own name goes second, which is the way round that helps: a tab strip shows
+ * you the first few characters.
+ */
+const TITLES: Record<string, string> = {
+  '/': 'Today',
+  '/plan': 'Planner',
+  '/recipes': 'Recipes',
+  '/foods': 'Foods',
+  '/grocery': 'Shopping',
+  '/schedule': 'Cooking',
+  '/movement': 'Movement',
+  '/analytics': 'Progress',
+  '/settings': 'Settings',
+  '/settings/history': 'Plan history',
+}
+
+function useRouteTitle() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    const name = TITLES[pathname]
+      ?? TITLES[Object.keys(TITLES).filter((k) => k !== '/' && pathname.startsWith(k)).sort().pop() ?? '']
+    document.title = name ? `${name} · Bite Buddy` : 'Bite Buddy'
+  }, [pathname])
+}
+
+/**
  * The app itself, once you are allowed to see it.
  *
  * Sync is started here rather than inside a screen, so it survives navigation
@@ -72,6 +103,7 @@ function useCurrentWeek() {
 function Shell() {
   useSyncSession()
   useCurrentWeek()
+  useRouteTitle()
 
   return (
     <>

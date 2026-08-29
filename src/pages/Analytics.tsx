@@ -29,10 +29,18 @@ export default function Analytics() {
           <p className="text-sm text-ink-700">How your week is shaping up.</p>
         </header>
 
-        <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
+        {/* Announced as tabs, like every other strip in the app. These were
+            plain buttons, so nothing told a screen reader they were a set or
+            which one was current. */}
+        <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
           {([['week', 'This week'], ['mediterranean', 'Mediterranean'], ['body', 'Body']] as const).map(([k, label]) => (
-            <button key={k} onClick={() => setTab(k)}
-              className={tab === k ? 'tab-on' : 'tab-off'}>
+            <button
+              key={k}
+              role="tab"
+              aria-selected={tab === k}
+              onClick={() => setTab(k)}
+              className={tab === k ? 'tab-on' : 'tab-off'}
+            >
               {label}
             </button>
           ))}
@@ -189,7 +197,7 @@ function BodyTab() {
   const {
     addWeightEntry, removeWeightEntry, addMeasurement, removeMeasurement, claimUnassigned,
   } = useBodyStore()
-  const { profile } = useUserStore()
+  const { profile, setWeightGoal } = useUserStore()
 
   // Both people are always on screen, signed in or not. Two waists averaged
   // into one line is a graph of nothing, and a tab that only appears once
@@ -198,6 +206,7 @@ function BodyTab() {
   const unassigned = useUnassignedCount()
 
   const weights = useWeightFor(who)
+  const goal = profile.weightGoals?.[who]
   const measurements = useMeasurementsFor(who)
 
   const [value, setValue] = useState('')
@@ -273,7 +282,29 @@ function BodyTab() {
               {change > 0 ? '+' : ''}{change.toFixed(1)}
               <span className="text-base text-ink-500 font-semibold ml-1">{profile.weightUnit}</span>
             </p>
-            <Sparkline values={weights.map((w) => w.weight)} />
+            {goal != null && weights.length > 0 && (
+              <p className="text-xs text-ink-500 mt-1">
+                {(() => {
+                  const togo = weights[weights.length - 1].weight - goal
+                  return Math.abs(togo) < 0.05
+                    ? 'At your goal.'
+                    : `${Math.abs(togo).toFixed(1)} ${profile.weightUnit} ${togo > 0 ? 'to go' : 'below your goal'}.`
+                })()}
+              </p>
+            )}
+            <Sparkline values={weights.map((w) => w.weight)} goal={goal} />
+
+            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border-100">
+              <label className="label mb-0 shrink-0" htmlFor="goal">Aiming for</label>
+              <input
+                id="goal"
+                type="number" min={0} step={0.1} className="input w-24 px-2"
+                placeholder="none"
+                value={goal ?? ''}
+                onChange={(e) => setWeightGoal(who, e.target.value ? Number(e.target.value) : undefined)}
+              />
+              <span className="text-sm text-ink-500">{profile.weightUnit}</span>
+            </div>
           </div>
 
           <div className="card divide-y divide-border-100">
@@ -399,17 +430,26 @@ function formatDay(date: string): string {
     .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function Sparkline({ values }: { values: number[] }) {
+function Sparkline({ values, goal }: { values: number[]; goal?: number }) {
   if (values.length < 2) return null
-  const min = Math.min(...values)
-  const max = Math.max(...values)
+  // The goal is part of the range, or a line above the chart is a line you
+  // cannot see, which is worse than no line.
+  const all = goal ? [...values, goal] : values
+  const min = Math.min(...all)
+  const max = Math.max(...all)
   const span = max - min || 1
-  const points = values
-    .map((v, i) => `${(i / (values.length - 1)) * 100},${30 - ((v - min) / span) * 26}`)
-    .join(' ')
+  const y = (v: number) => 30 - ((v - min) / span) * 26
+  const points = values.map((v, i) => `${(i / (values.length - 1)) * 100},${y(v)}`).join(' ')
 
   return (
     <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="w-full h-16 mt-3">
+      {goal != null && (
+        <line
+          x1="0" x2="100" y1={y(goal)} y2={y(goal)}
+          strokeWidth={1} vectorEffect="non-scaling-stroke" strokeDasharray="3 3"
+          className="stroke-ink-300"
+        />
+      )}
       <polyline points={points} fill="none" strokeWidth={1.5} vectorEffect="non-scaling-stroke"
         className="stroke-teal-500" strokeLinejoin="round" strokeLinecap="round" />
     </svg>

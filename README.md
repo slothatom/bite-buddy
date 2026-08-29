@@ -846,6 +846,22 @@ clamps; it is never truncated to a single line where the words carry meaning.
 
 ---
 
+**The tab says which screen you are on.** Every route was called "Bite Buddy", so two tabs of
+this app were indistinguishable and so was a month of history.
+
+**Clearing a day and emptying the list ask first**, and put the count on the button rather
+than in a sentence above it: "Clear 5 meals". Removing a single meal still goes straight
+through, deliberately: the row already carries three controls, a fourth step on each of them
+would cost more than the mistake does, and the portions go back to the fridge either way.
+
+**Settings stops contradicting itself.** "Everything lives in this browser and nowhere else.
+There's no account behind it" sat directly above "Signed in as", unconditionally. The
+frightening sentence was the one that was out of date. It now says which of the two is true.
+
+**A weight has somewhere to head.** Body logged faithfully and had nothing to compare against,
+so the chart was a line with no destination. A goal per person, a dashed line on the chart,
+and how far there is to go. Optional, because plenty of people are not aiming anywhere.
+
 ## Deliberately not done
 
 **No resolution screen for a contested row.** Sync is per row now, so two

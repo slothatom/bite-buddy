@@ -20,6 +20,8 @@ interface UserStore {
    * two people on one number, exactly as before.
    */
   setTargets: (targets: Targets, person?: PersonId) => void
+  /** A weight to aim at, or nothing, which clears it. */
+  setWeightGoal: (person: PersonId, weight: number | undefined) => void
   setTdee: (tdee: TdeeProfile) => void
   setWeekStart: (day: WeekStart) => void
   setFoodNameLanguage: (lang: UserProfile['foodNameLanguage']) => void
@@ -76,6 +78,14 @@ export const useUserStore = create<UserStore>()(
             ? { ...s.profile, targetsByPerson: { ...s.profile.targetsByPerson, [person]: targets } }
             : { ...s.profile, targets }),
         })),
+      setWeightGoal: (person, weight) =>
+        set((s) => ({
+          profile: stamped({
+            ...s.profile,
+            weightGoals: { ...s.profile.weightGoals, [person]: weight },
+          }),
+        })),
+
       setTdee: (tdee) => set((s) => ({ profile: stamped({ ...s.profile, tdee }) })),
       setWeekStart: (weekStartsOn) => set((s) => ({ profile: stamped({ ...s.profile, weekStartsOn }) })),
       setFoodNameLanguage: (foodNameLanguage) =>

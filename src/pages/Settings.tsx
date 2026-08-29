@@ -378,6 +378,9 @@ function ManualTargets({
 }
 
 function BackupPanel() {
+  // Whether there is anywhere else this data lives, which is the difference
+  // between the two things this panel can truthfully say.
+  const shared = useAuthStore((s) => Boolean(s.session)) && isConfigured
   const [status, setStatus] = useState<{ tone: 'ok' | 'bad'; message: string } | null>(null)
   const [pasted, setPasted] = useState('')
   const [showPaste, setShowPaste] = useState(false)
@@ -416,10 +419,19 @@ function BackupPanel() {
 
   return (
     <div className="card p-4 space-y-4">
+      {/* Two paragraphs, because signing in changes which one is true. Both
+          used to be on screen at once, the frightening one first, directly
+          above "Signed in as": the app told you there was no account behind it
+          and then named the account. */}
       <p className="text-sm text-ink-700">
-        Everything you plan, log and add lives in this browser and nowhere else. There's no
-        account behind it. A backup is the only copy that survives clearing your browser data,
-        switching phone, or a browser that won't let this page save anything at all.
+        {shared
+          ? `Everything you plan, log and add is on this device and in the household's shared
+             copy, so it reaches the other phone and comes back if this one is lost. A backup
+             is still worth having: it is the copy that survives an account going away, and
+             the only one you hold yourself.`
+          : `Everything you plan, log and add lives in this browser and nowhere else. There's no
+             account behind it. A backup is the only copy that survives clearing your browser
+             data, switching phone, or a browser that won't let this page save anything at all.`}
       </p>
 
       <div className="space-y-2">
