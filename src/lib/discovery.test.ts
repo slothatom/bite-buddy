@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { throughLens, lensReady, LENSES, LENS_ORDER } from './discovery'
 import { buildContext } from './nutrition'
+import { ALL_RECIPES, FOODS as LIBRARY, TIMES_PLANNED } from '../data'
 import type { DayPlan, Food, PantryItem, Recipe, Targets } from '../types'
 
 const now = '2026-08-21T10:00:00.000Z'
@@ -152,6 +153,34 @@ describe('worth a batch', () => {
     const input = { ...base, recipes: [eggs], ctx: buildContext(FOODS, [eggs]) }
 
     expect(ids(throughLens('batch', input))).toEqual([])
+  })
+})
+
+describe('the shipped library, through the batch lens', () => {
+  const shipped = throughLens('batch', {
+    recipes: ALL_RECIPES,
+    ctx: buildContext(LIBRARY, ALL_RECIPES),
+    today: TODAY,
+  })
+
+  it('never offers fried eggs, however many mornings they turn up on', () => {
+    // Seven of the 481 meals are built on them, which is more than any soup in
+    // the library. Repetition on its own is not the question: nobody cooks a
+    // batch of fried eggs on Sunday and eats them on Wednesday.
+    expect(TIMES_PLANNED['dish-fried-eggs']).toBeGreaterThanOrEqual(5)
+    expect(ids(shipped)).not.toContain('dish-fried-eggs')
+  })
+
+  it('offers nothing that makes a single serving', () => {
+    // The rule that keeps the eggs out. Thirty-six things in the library were
+    // cooked three times or more, and most of them are one plate each time.
+    for (const r of shipped) {
+      expect(r.servings, `${r.name.en} makes ${r.servings}`).toBeGreaterThanOrEqual(2)
+    }
+  })
+
+  it('still has plenty to say', () => {
+    expect(shipped.length).toBeGreaterThan(10)
   })
 })
 
