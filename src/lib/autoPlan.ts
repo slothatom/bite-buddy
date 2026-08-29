@@ -48,6 +48,15 @@ export interface AutoPlanInput {
   portions?: Portion[]
   /** How far back to look for repeats. A fortnight, by default. */
   lookBackDays?: number
+  /**
+   * Today, so days that have been and gone are left alone.
+   *
+   * Without it this filled whatever range was on screen, which on a Saturday
+   * meant carefully proposing meals for the Monday through Friday that had
+   * already happened. Nobody cooks those, and every one of them pushed a real
+   * empty day further down the list.
+   */
+  today?: string
 }
 
 interface Candidate {
@@ -70,7 +79,7 @@ interface Candidate {
 export function proposePlan(input: AutoPlanInput): Proposal[] {
   const {
     dates, plan, recipes, ctx, targets,
-    favouriteIds = [], pantry = new Map(), portions = [], lookBackDays = 14,
+    favouriteIds = [], pantry = new Map(), portions = [], lookBackDays = 14, today,
   } = input
 
   const byDate = new Map(plan.map((d) => [d.date, d]))
@@ -79,13 +88,17 @@ export function proposePlan(input: AutoPlanInput): Proposal[] {
   // What has been eaten lately, so the same stew is not offered on Monday,
   // Wednesday and Friday. Counted rather than merely flagged: twice recently is
   // worse than once.
-  const recent = recentlyUsed(plan, dates[0], lookBackDays)
+  // Anchored on today rather than on the first day being filled. Anchored on
+  // the range, filling a window that starts a fortnight back measured the wrong
+  // fortnight and cheerfully proposed what you have been eating all week.
+  const recent = recentlyUsed(plan, today ?? dates[0], lookBackDays)
 
   // Portions are consumed as they are proposed, so a fridge with two portions
   // in it fills two slots and not five.
   const left = new Map(portions.map((p) => [p.id, p.servings]))
 
   for (const date of dates) {
+    if (today && date < today) continue
     const day = byDate.get(date)
     const already = new Set((day?.meals ?? []).map((m) => m.slot))
     let spent = day ? dayCalories(day, ctx) : 0

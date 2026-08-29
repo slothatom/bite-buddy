@@ -30,6 +30,21 @@ export function getWeekDates(reference: Date = new Date(), weekStartsOn: WeekSta
   })
 }
 
+/**
+ * Today, as the calendar sees it here.
+ *
+ * Pinned to noon before being read as ISO, exactly as `getWeekDates` does, and
+ * for the same reason: `new Date().toISOString()` is UTC, so anybody east of
+ * Greenwich gets tomorrow's date for the last hours of their evening and
+ * anybody west gets yesterday's for the first hours of their morning. That was
+ * hand-rolled in six places before this existed.
+ */
+export function today(now: Date = new Date()): string {
+  const d = new Date(now)
+  d.setHours(12, 0, 0, 0)
+  return d.toISOString().slice(0, 10)
+}
+
 /** How much of the plan you are looking at. */
 export type PlanRange = 'week' | 'fortnight' | 'month'
 
@@ -193,6 +208,20 @@ interface MealPlanStore {
   applyTemplate: (id: string) => void
   removeTemplate: (id: string) => void
   renameTemplate: (id: string, name: string) => void
+  /**
+   * Moves the window to the week containing today, if it is not there already.
+   *
+   * The window used to be whatever week the Planner was last pointed at, kept
+   * for ever. Nothing advanced it: not opening the app, not a new day, not a
+   * new month. So a fortnight after planning, Home scored a week that had
+   * already happened, the shopping list offered its days, and the week you were
+   * actually in was empty and unmentioned. The one screen that could tell you
+   * was the Planner, and only if you pressed Today.
+   *
+   * Called on start and whenever the app comes back to the foreground, because
+   * a phone left open overnight is the common case, not the rare one.
+   */
+  ensureCurrentWeek: (weekStartsOn: WeekStart) => void
   /** Drops one of the dietician's weeks onto the current week's dates. */
   loadSourcePlan: (source: SourcePlan) => void
   importWeek: (data: MealPlanExport) => void
@@ -389,6 +418,11 @@ export const useMealPlanStore = create<MealPlanStore>()(
               t.id === id ? { ...t, name: name.trim() || t.name } : t),
           })),
 
+        ensureCurrentWeek: (weekStartsOn) => {
+          if (get().weekDates.includes(today())) return
+          get().goToWeek(new Date(), weekStartsOn)
+        },
+
         loadSourcePlan: (source) =>
           set((s) => {
             // Source days carry a weekday, not a date. Line them up with the
@@ -551,6 +585,20 @@ export const useMealPlanStore = create<MealPlanStore>()(
       name: 'bite-buddy-mealplan-v2',
       version: SCHEMA_VERSION,
       storage: safeStorage<MealPlanStore>(),
+      /**
+       * Everything except which week you were looking at.
+       *
+       * A window is a thing about right now, not a thing about your data, and
+       * storing it caused three separate faults: it came back stale on every
+       * visit, it travelled into backups so restoring one moved your week, and
+       * it went up with sync so the other phone could move it too. Left out
+       * here, the store's own initialiser wins on every load and that is
+       * computed from the clock.
+       */
+      partialize: (state) => {
+        const { weekDates: _window, ...rest } = state
+        return rest as MealPlanStore
+      },
       migrate: upgradeThrough<MealPlanStore>(SCHEMA_VERSION, {
         // v1 → v2: days gained updatedAt. Existing days are stamped once, at
         // the epoch, so anything either of you touches from now on wins over

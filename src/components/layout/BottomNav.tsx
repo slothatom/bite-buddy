@@ -6,6 +6,7 @@ import {
   Home as HomeIcon,
 } from 'lucide-react'
 import { useUiStore } from '../../store/useUiStore'
+import { today } from '../../store/useMealPlanStore'
 
 /**
  * The phone navigation: Home · Plan · + · Recipes · More.
@@ -45,7 +46,9 @@ export default function BottomNav() {
   const moreActive = MORE.some((m) => isActive(m.to))
 
   function quickAdd() {
-    requestQuickAdd()
+    // Today, always. The button is a thumb's reach from the middle of the
+    // screen and it should not depend on where another screen was left.
+    requestQuickAdd(today())
     navigate('/plan')
   }
 

@@ -8,6 +8,7 @@ import { DIFFICULTY_LABELS } from '../types'
 import { safeUrl, linkLabel } from '../lib/links'
 import { useRecipes, useRecipeStore, useMergedInto } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
+import { today as todayDate } from '../store/useMealPlanStore'
 import { recipePerServing, reportPerServing, roundNutrients } from '../lib/nutrition'
 import { normaliseTerm } from '../lib/units'
 import { NutrientSummary, EmptyState, SourceLine } from '../components/ui'
@@ -65,7 +66,7 @@ export default function Recipes() {
   const pantry = usePantry()
   const plan = useMealPlanStore((s) => s.plan)
   const { profile } = useUserStore()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = todayDate()
 
   /**
    * The question being asked, rather than another thing to tick.

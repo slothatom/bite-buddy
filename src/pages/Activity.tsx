@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Plus, Trash2, Upload, X, Search, Moon, Footprints } from 'lucide-react'
 import type { ExerciseKind, SleepEntry, StepEntry, Workout, WorkoutEntry } from '../types'
 import { PEOPLE, type PersonId } from '../lib/people'
+import { today as todayDate } from '../store/useMealPlanStore'
 import {
   useActivityStore, useSleepFor, useStepsFor, useWorkoutsFor,
 } from '../store/useActivityStore'
@@ -178,7 +179,7 @@ function WorkoutRow({
  */
 function SessionBuilder({ who, onClose }: { who: PersonId; onClose: () => void }) {
   const { addWorkout } = useActivityStore()
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [date, setDate] = useState(todayDate())
   const [query, setQuery] = useState('')
   const [entries, setEntries] = useState<WorkoutEntry[]>([])
   const [note, setNote] = useState('')
@@ -300,7 +301,7 @@ function SessionBuilder({ who, onClose }: { who: PersonId; onClose: () => void }
 /** For when the detail is not worth typing: "gym, an hour, about 400 kcal". */
 function BulkDialog({ who, onClose }: { who: PersonId; onClose: () => void }) {
   const { addWorkout } = useActivityStore()
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
+  const [date, setDate] = useState(todayDate())
   const [label, setLabel] = useState('')
   const [minutes, setMinutes] = useState(60)
   const [calories, setCalories] = useState(0)
@@ -352,7 +353,7 @@ function BulkDialog({ who, onClose }: { who: PersonId; onClose: () => void }) {
 /** Steps, by hand or out of a watch export. */
 function StepsPanel({ who, steps }: { who: PersonId; steps: StepEntry[] }) {
   const { addSteps, importActivity } = useActivityStore()
-  const [today] = useState(() => new Date().toISOString().slice(0, 10))
+  const [today] = useState(() => todayDate())
   const [value, setValue] = useState('')
   const recent = [...steps].reverse().slice(0, 7)
   const average = recent.length
@@ -468,7 +469,7 @@ function GarminImport({
 function SleepTab({ who }: { who: PersonId }) {
   const sleep = useSleepFor(who)
   const { addSleep, removeSleep, importActivity } = useActivityStore()
-  const [today] = useState(() => new Date().toISOString().slice(0, 10))
+  const [today] = useState(() => todayDate())
   const [hours, setHours] = useState('')
   const [quality, setQuality] = useState(0)
 

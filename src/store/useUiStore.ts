@@ -9,14 +9,24 @@ import { create } from 'zustand'
  * consumes it on mount.
  */
 interface UiStore {
-  /** Set when the user taps the bottom bar's centre button. */
-  quickAdd: boolean
-  requestQuickAdd: () => void
+  /**
+   * The day the centre button meant, or null when it has not been pressed.
+   *
+   * It used to be a bare boolean, and the Planner filled in the day from
+   * whichever one it happened to have selected. Pressed from Progress, where
+   * the Planner is not even mounted, that selection fell back to the first day
+   * of the window: "Add to Snack 1, Monday 17 August", on a Saturday the 29th.
+   *
+   * Carrying the date makes the button mean what it looks like it means,
+   * today, from wherever it is pressed.
+   */
+  quickAdd: string | null
+  requestQuickAdd: (date: string) => void
   clearQuickAdd: () => void
 }
 
 export const useUiStore = create<UiStore>((set) => ({
-  quickAdd: false,
-  requestQuickAdd: () => set({ quickAdd: true }),
-  clearQuickAdd: () => set({ quickAdd: false }),
+  quickAdd: null,
+  requestQuickAdd: (date) => set({ quickAdd: date }),
+  clearQuickAdd: () => set({ quickAdd: null }),
 }))

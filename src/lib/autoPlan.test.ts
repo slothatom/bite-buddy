@@ -176,3 +176,30 @@ describe('when it cannot help', () => {
     expect(out).toEqual([])
   })
 })
+
+describe('filling only the days that are still ahead', () => {
+  it('leaves days that have already happened alone', () => {
+    const proposals = proposePlan({
+      dates: ['2026-08-24', '2026-08-25', '2026-08-29', '2026-08-30'],
+      plan: [],
+      recipes: RECIPES,
+      ctx,
+      targets: TARGETS,
+      today: '2026-08-29',
+    })
+
+    // Nobody cooks last Monday, and every proposal for one pushes a real
+    // empty day further down a list people scan rather than read.
+    const days = [...new Set(proposals.map((p) => p.date))].sort()
+    expect(days).toEqual(['2026-08-29', '2026-08-30'])
+  })
+
+  it('still fills everything when it is not told what day it is', () => {
+    const proposals = proposePlan({
+      dates: ['2026-08-24', '2026-08-25'],
+      plan: [], recipes: RECIPES, ctx, targets: TARGETS,
+    })
+
+    expect(proposals.length).toBeGreaterThan(0)
+  })
+})
