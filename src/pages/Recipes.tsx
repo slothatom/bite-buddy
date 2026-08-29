@@ -787,8 +787,8 @@ function RecipeDetail({
           ) : null}
 
           {/* Checked again here rather than trusted from storage: a recipe can
-              arrive from a backup file, from the other phone, or from the
-              assistant, and only one of those went through the editor. */}
+              arrive from a backup file or from the other phone, and neither
+              went through this device's editor. */}
           {(() => {
             const link = safeUrl(recipe.sourceUrl)
             return link ? (
