@@ -160,7 +160,9 @@ function MediterraneanTab() {
                   </span>
                 </span>
                 <span className={`text-xs font-mono ${met ? 'text-bite-700' : 'text-ink-500'}`}>
-                  {g.servings.toFixed(1)} of {g.expected.toFixed(0)}
+                  {/* Named, because "42.1 of 21" with no unit reads as a
+                      broken number rather than a big one. */}
+                  {g.servings.toFixed(1)} of {g.expected.toFixed(0)} servings
                 </span>
               </div>
               <div className="h-2 rounded-full bg-border-100 overflow-hidden">

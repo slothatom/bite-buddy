@@ -1,4 +1,4 @@
-import type { DayPlan, MedCategory } from '../types'
+import type { DayPlan, Food, FoodState, MedCategory } from '../types'
 import type { NutritionContext } from './nutrition'
 import { flattenComponents } from './ingredients'
 
@@ -16,23 +16,78 @@ export interface ServingGoal {
   label: string
   /** Grams that count as one serving. */
   gramsPerServing: number
+  /**
+   * The state that figure is about.
+   *
+   * A serving of grains is conventionally 40 g uncooked; a serving of legumes
+   * is a cooked weight. The food database records state as part of a food's
+   * identity, and this was ignored, so 40 g of dry lentils were scored against
+   * a cooked serving and counted as less than half of one.
+   */
+  servingState: FoodState
   /** Target servings, and whether that target is daily or weekly. */
   target: number
   period: 'day' | 'week'
 }
 
 export const SERVING_GOALS: ServingGoal[] = [
-  { category: 'vegetables',    label: 'Vegetables',   gramsPerServing: 80,  target: 3, period: 'day' },
-  { category: 'fruits',        label: 'Fruits',       gramsPerServing: 120, target: 2, period: 'day' },
-  { category: 'grains',        label: 'Whole grains', gramsPerServing: 40,  target: 3, period: 'day' },
-  { category: 'legumes',       label: 'Legumes',      gramsPerServing: 90,  target: 3, period: 'week' },
-  { category: 'fish-seafood',  label: 'Fish',         gramsPerServing: 120, target: 2, period: 'week' },
-  { category: 'nuts-seeds',    label: 'Nuts & seeds', gramsPerServing: 15,  target: 5, period: 'week' },
-  { category: 'red-meat',      label: 'Red meat',     gramsPerServing: 100, target: 1, period: 'week' },
+  { category: 'vegetables',   label: 'Vegetables',   gramsPerServing: 80,  target: 3, period: 'day',  servingState: 'raw' },
+  { category: 'fruits',       label: 'Fruits',       gramsPerServing: 120, target: 2, period: 'day',  servingState: 'raw' },
+  { category: 'grains',       label: 'Whole grains', gramsPerServing: 40,  target: 3, period: 'day',  servingState: 'dry' },
+  { category: 'legumes',      label: 'Legumes',      gramsPerServing: 90,  target: 3, period: 'week', servingState: 'cooked' },
+  { category: 'fish-seafood', label: 'Fish',         gramsPerServing: 120, target: 2, period: 'week', servingState: 'raw' },
+  { category: 'nuts-seeds',   label: 'Nuts & seeds', gramsPerServing: 15,  target: 5, period: 'week', servingState: 'as-sold' },
+  { category: 'red-meat',     label: 'Red meat',     gramsPerServing: 100, target: 1, period: 'week', servingState: 'raw' },
+  // Listed as a category to limit and given no goal, so it never appeared on
+  // the screen at all: the one group the guide is most emphatic about was the
+  // one the app said nothing about.
+  { category: 'treats',       label: 'Treats',       gramsPerServing: 40,  target: 2, period: 'week', servingState: 'as-sold' },
 ]
+
+/**
+ * Dry weight to cooked weight, near enough.
+ *
+ * Pulses and grains take up roughly two and a half times their dry weight in
+ * water. It is a rule of thumb rather than a measurement, and it only ever
+ * decides how a serving is counted, never a calorie: the energy comes from the
+ * food's own per-100 g figures, in the state that food is stored in.
+ */
+const COOKED_FROM_DRY = 2.5
+
+/** What one serving weighs, for a food in the state this one is stored in. */
+export function servingGrams(food: Food, goal: ServingGoal): number {
+  const dry = (s: FoodState) => s === 'dry'
+  if (dry(goal.servingState) === dry(food.state)) return goal.gramsPerServing
+  return dry(food.state)
+    ? goal.gramsPerServing / COOKED_FROM_DRY
+    : goal.gramsPerServing * COOKED_FROM_DRY
+}
 
 /** Categories the guide says to limit rather than reach for. */
 export const LIMIT_CATEGORIES: MedCategory[] = ['red-meat', 'treats']
+
+/**
+ * Servings per category, counting each ingredient in the state it is stored in.
+ *
+ * Summing grams first and dividing once at the end is what buried the state
+ * problem: dry and cooked went into the same bucket and came out as one weight
+ * with no way to tell them apart.
+ */
+export function servingsByCategory(
+  days: DayPlan[], ctx: NutritionContext,
+): Map<MedCategory, number> {
+  const entries = days.flatMap((day) => day.meals.flatMap((meal) => meal.entries))
+  const goals = new Map(SERVING_GOALS.map((g) => [g.category, g]))
+  const totals = new Map<MedCategory, number>()
+
+  for (const ingredient of flattenComponents(entries, ctx, { skip: ['water'] })) {
+    const goal = goals.get(ingredient.food.category)
+    if (!goal) continue
+    const per = servingGrams(ingredient.food, goal)
+    totals.set(goal.category, (totals.get(goal.category) ?? 0) + ingredient.grams / per)
+  }
+  return totals
+}
 
 /** Total grams eaten per category, resolving nested recipes down to foods. */
 export function gramsByCategory(days: DayPlan[], ctx: NutritionContext): Map<MedCategory, number> {
@@ -60,11 +115,10 @@ export interface GoalProgress extends ServingGoal {
 
 export function scoreWeek(days: DayPlan[], ctx: NutritionContext): GoalProgress[] {
   const plannedDays = days.filter((d) => d.meals.length).length || 1
-  const totals = gramsByCategory(days, ctx)
+  const totals = servingsByCategory(days, ctx)
 
   return SERVING_GOALS.map((goal) => {
-    const grams = totals.get(goal.category) ?? 0
-    const servings = grams / goal.gramsPerServing
+    const servings = totals.get(goal.category) ?? 0
     const expected = goal.period === 'day' ? goal.target * plannedDays : goal.target
     return {
       ...goal,

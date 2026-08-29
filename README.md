@@ -81,6 +81,23 @@ colour and a surface as separate keys, where the fill is a dot rather than the
 ground the words sit on. Measuring by line reported a third more failures than
 exist, and a check that cries wolf is one people learn to silence.
 
+**A total says how much of it is actually known.** Missing nutrient data means unknown, never
+zero, so a figure built partly on silence is marked with a `+` and shown as a floor. Two
+things were wrong with that. The marking counted each top-level component as one source, and
+a recipe entry had already had its own ingredients summed by the time the count saw them, so
+a five-ingredient dish where two said nothing reported a complete figure: since most planner
+entries are recipe references, nearly every partial total in the app was suppressed. And
+fibre could never be marked at all, because it renders as a bar rather than a figure, and the
+bar turned unknown into a hard zero, which is the one thing the types say must never happen.
+With 109 of the 115 foods in use carrying no sodium at all, most of what these screens state
+is a floor, and now they say so.
+
+**Servings are counted in the state the food is in.** A serving of grains is conventionally
+40 g uncooked and a serving of legumes a cooked weight, and the scorer used one flat figure
+per category, so 40 g of dry lentils were scored against a cooked serving and counted as less
+than half of one. Treats had no goal at all despite being listed as a category to limit, so
+the group the guide is loudest about was the one group the screen never mentioned.
+
 **Status is never hue alone.** `src/lib/status.ts` returns a label, a symbol and
 a signed delta alongside the colour level, and every consumer renders at least
 one of them: bars show `+ Slightly over · +42 g`, and the target sits on the bar

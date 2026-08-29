@@ -15,12 +15,21 @@ import Zig, { type ZigMood } from '../brand/Mascot'
  * coloured, the design system forbids carrying that state by hue alone.
  */
 export function MacroBar({
-  label, value, target, unit = 'g',
+  label, value, target, unit = 'g', partial = false,
 }: {
   label: string
   value: number
   target?: number
   unit?: string
+  /**
+   * At least one ingredient said nothing about this, so the figure is a floor.
+   *
+   * Only fibre has ever needed it: protein, carbs and fat are on every food.
+   * Without it, fibre was the one nutrient that could never be marked, and it
+   * is exactly the one the plans are short of data on, so "Fibre 23 / 25 g"
+   * read as a total on every screen including the recipe sheet.
+   */
+  partial?: boolean
 }) {
   const status = targetStatus(value, target, unit)
   const styles = STATUS_STYLES[status.level]
@@ -38,7 +47,7 @@ export function MacroBar({
         <span className="font-bold text-ink-900">
           {Math.round(value)}
           {target ? <span className="text-ink-500 font-semibold"> / {Math.round(target)}</span> : null}
-          <span className="text-ink-500 font-semibold">{unit}</span>
+          <span className="text-ink-500 font-semibold">{unit}{partial ? '\u2009+' : ''}</span>
         </span>
       </div>
 
@@ -147,10 +156,19 @@ export function NutrientSummary({
         <MacroBar label="Protein" value={n.protein} target={targets?.protein} />
         <MacroBar label="Carbs" value={n.carbs} target={targets?.carbs} />
         <MacroBar label="Fat" value={n.fat} target={targets?.fat} />
-        <MacroBar label="Fibre" value={n.fiber ?? 0} target={targets?.fiber} />
+        <MacroBar
+          label="Fibre"
+          value={n.fiber ?? 0}
+          target={targets?.fiber}
+          partial={partial.includes('fiber')}
+        />
       </div>
 
-      {(n.sugar != null || salt != null) && (
+      {/* The note rides along with the sugar and salt line rather than taking a
+          paragraph of its own. On the planner that paragraph pushed the fifth
+          meal of a day off a laptop screen, and the explanation matters less
+          than the day does. */}
+      {(n.sugar != null || salt != null || partial.length > 0) && (
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-ink-700 pt-1 border-t border-border-100">
           {n.sugar != null && (
             <span>
@@ -166,15 +184,14 @@ export function NutrientSummary({
               </strong>
             </span>
           )}
+          {partial.length > 0 && (
+            <span className="text-ink-500">
+              <strong>+</strong> means a floor, not a total
+            </span>
+          )}
         </div>
       )}
 
-      {partial.length > 0 && (
-        <p className="text-[11px] text-ink-500">
-          A <strong>+</strong> means at least one ingredient had nothing to say about that
-          nutrient, so the figure is a floor rather than a total.
-        </p>
-      )}
     </div>
   )
 }

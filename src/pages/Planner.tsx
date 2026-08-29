@@ -13,7 +13,7 @@ import { useDeletedIds } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import {
-  componentsNutrients, dayNutrients, dayEaten, emptyNutrients, addNutrients,
+  componentsNutrients, dayNutrients, dayEaten, emptyNutrients, addNutrients, reportDay,
 } from '../lib/nutrition'
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
 import { useUiStore } from '../store/useUiStore'
@@ -135,6 +135,10 @@ export default function Planner() {
   // intention, and the ring says which. A ring built on the plan looked like a
   // tracker and was really a sum of things nobody had confirmed eating.
   const { nutrients: selectedTotals, recorded } = dayEaten(selectedDay, ctx)
+  // What the day's figures do not know. The planner totalled with a function
+  // that discards it, so a day of foods with no sodium figure between them
+  // still showed a salt total as though it were one.
+  const dayReport = reportDay(selectedDay, ctx)
   const targets = profile.targets
 
   // Totals are for what you are looking at, not for everything ever planned.
@@ -288,7 +292,7 @@ export default function Planner() {
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <CalorieRing value={selectedTotals.calories} target={targets.calories} />
             <div className="flex-1 w-full">
-              <NutrientSummary n={selectedTotals} targets={targets} />
+              <NutrientSummary n={selectedTotals} targets={targets} partial={dayReport.partial} />
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-border-200">

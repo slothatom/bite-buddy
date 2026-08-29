@@ -145,3 +145,46 @@ describe('scoreWeek', () => {
     }
   })
 })
+
+describe('counting a serving in the state the food is in', () => {
+  const dry = (id: string, category: Food['category']): Food => ({
+    id, names: { en: id }, aliases: [], category, medTier: 'weekly',
+    state: 'dry', per100g: { calories: 350, protein: 24, carbs: 60, fat: 1 },
+    units: [], source: 'curated',
+  })
+  const cooked = (id: string, category: Food['category']): Food => ({
+    ...dry(id, category), id, state: 'cooked',
+    per100g: { calories: 140, protein: 9, carbs: 24, fat: 0.4 },
+  })
+
+  const LENTILS = dry('lentils', 'legumes')
+  const LENTILS_COOKED = cooked('lentils-cooked', 'legumes')
+  const ctx = buildContext([LENTILS, LENTILS_COOKED], [])
+
+  function week(foodId: string, grams: number) {
+    return [{
+      date: '2026-08-29',
+      meals: [{ id: 'm', slot: 'dinner' as const, entries: [{ kind: 'food' as const, foodId, grams }] }],
+    }]
+  }
+
+  it('counts dry weight against a dry serving, not a cooked one', () => {
+    // 40 g of dry lentils is about a serving. Scored against the 90 g cooked
+    // figure it was 0.44 of one, so the household's legumes read as less than
+    // half of what they ate.
+    const dryScore = scoreWeek(week('lentils', 40), ctx).find((g) => g.category === 'legumes')!
+    expect(dryScore.servings).toBeCloseTo(40 / (90 / 2.5), 5)
+    expect(dryScore.servings).toBeGreaterThan(1)
+  })
+
+  it('leaves an already cooked weight alone', () => {
+    const wet = scoreWeek(week('lentils-cooked', 90), ctx).find((g) => g.category === 'legumes')!
+    expect(wet.servings).toBeCloseTo(1, 5)
+  })
+
+  it('has a goal for treats, which is the group the guide is loudest about', () => {
+    expect(SERVING_GOALS.some((g) => g.category === 'treats')).toBe(true)
+    // And it is scored as a limit, so being under it is the good outcome.
+    expect(LIMIT_CATEGORIES).toContain('treats')
+  })
+})
