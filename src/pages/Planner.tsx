@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays, MoveRight, Sparkles,
-  Check, ShoppingBasket, Bookmark,
+  Check, ShoppingBasket, Bookmark, Circle, CircleSlash, Minus,
 } from 'lucide-react'
-import type { Component, DayPlan, MealSlot } from '../types'
+import type { Component, DayPlan, MealOutcome, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import {
   useMealPlanStore, getWeekDates, getRangeDates, monthOf, today,
@@ -12,7 +12,9 @@ import {
 import { useDeletedIds } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
-import { componentsNutrients, dayNutrients, emptyNutrients, addNutrients } from '../lib/nutrition'
+import {
+  componentsNutrients, dayNutrients, dayEaten, emptyNutrients, addNutrients,
+} from '../lib/nutrition'
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
 import { useUiStore } from '../store/useUiStore'
 import AddEntryModal from '../components/planner/AddEntryModal'
@@ -36,7 +38,7 @@ export default function Planner() {
   const { profile } = useUserStore()
   const {
     weekDates, plan, goToWeek, addEntry, removeMeal, clearDay, copyDay,
-    moveMeal, duplicateMeal,
+    moveMeal, duplicateMeal, setMealOutcome, updateEntry,
   } = useMealPlanStore()
   const ctx = useNutritionContext()
 
@@ -54,6 +56,7 @@ export default function Planner() {
   const [adding, setAdding] = useState<{ date: string; slot: MealSlot } | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
   const [templating, setTemplating] = useState(false)
+  const [amount, setAmount] = useState<{ mealId: string; index: number } | null>(null)
   const [moving, setMoving] = useState<{ date: string; mealId: string } | null>(null)
   const [filling, setFilling] = useState<string[] | null>(null)
   const { quickAdd, clearQuickAdd } = useUiStore()
@@ -78,6 +81,25 @@ export default function Planner() {
     const meal = byDate.get(date)?.meals.find((m) => m.id === mealId)
     for (const p of portionEntries(meal?.entries ?? [])) returnTo(p.portionId, p.servings)
     removeMeal(date, mealId)
+  }
+
+  /**
+   * Changing how much of a portion you are having gives the rest back.
+   *
+   * The same bookkeeping as adding and removing: the tub knows how many
+   * servings are left, and saying "actually I only had half" has to put the
+   * other half back or the fridge slowly forgets food it still has.
+   */
+  const changeAmountKeepingPortions = (
+    date: string, mealId: string, index: number, value: number,
+  ) => {
+    const entry = byDate.get(date)?.meals.find((m) => m.id === mealId)?.entries[index]
+    if (entry?.kind === 'portion') {
+      const difference = value - entry.servings
+      if (difference > 0) takeFrom(entry.portionId, difference)
+      else if (difference < 0) returnTo(entry.portionId, -difference)
+    }
+    updateEntry(date, mealId, index, value)
   }
 
   /** Everything the assistant offered and you kept, in one go. */
@@ -109,7 +131,10 @@ export default function Planner() {
     ?? (chosen && dates.includes(chosen) ? chosen : null)
     ?? todayOrFirst(dates)
   const selectedDay = byDate.get(selected) ?? { date: selected, meals: [] }
-  const selectedTotals = dayNutrients(selectedDay, ctx)
+  // Once anything on the day has been ticked this is a record rather than an
+  // intention, and the ring says which. A ring built on the plan looked like a
+  // tracker and was really a sum of things nobody had confirmed eating.
+  const { nutrients: selectedTotals, recorded } = dayEaten(selectedDay, ctx)
   const targets = profile.targets
 
   // Totals are for what you are looking at, not for everything ever planned.
@@ -286,11 +311,16 @@ export default function Planner() {
 
         {/* Meals */}
         <section>
-          <SectionHeading>{formatDate(selected)}</SectionHeading>
+          <SectionHeading>
+            {formatDate(selected)}
+            <span className="ml-2 text-[11px] font-bold uppercase tracking-wide text-ink-500">
+              {recorded ? 'eaten' : 'planned'}
+            </span>
+          </SectionHeading>
           {/* Two columns from lg. Five slots stacked full width meant a laptop
               showed two of them and the rest below the fold, which is the one
               thing a big screen should never do to a day. */}
-          <div className="space-y-2.5 lg:space-y-0 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-2.5 lg:items-start">
+          <div className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-2 lg:items-start">
             {MEAL_SLOTS.map((slot) => (
               <SlotRow
                 key={slot}
@@ -299,6 +329,8 @@ export default function Planner() {
                 onAdd={() => setAdding({ date: selected, slot })}
                 onRemove={(mealId) => removeMealReturningPortions(selected, mealId)}
                 onMove={(mealId) => setMoving({ date: selected, mealId })}
+                onOutcome={(mealId, outcome) => setMealOutcome(selected, mealId, outcome)}
+                onAmount={(mealId, index) => setAmount({ mealId, index })}
               />
             ))}
           </div>
@@ -349,6 +381,19 @@ export default function Planner() {
         <WeekTemplates weekDates={weekDates} onClose={() => setTemplating(false)} />
       )}
 
+      {amount && (
+        <AmountDialog
+          day={selectedDay}
+          mealId={amount.mealId}
+          index={amount.index}
+          onClose={() => setAmount(null)}
+          onSet={(value) => {
+            changeAmountKeepingPortions(selected, amount.mealId, amount.index, value)
+            setAmount(null)
+          }}
+        />
+      )}
+
       {copyFrom && (
         <CopyDayDialog
           from={copyFrom}
@@ -362,13 +407,15 @@ export default function Planner() {
 }
 
 function SlotRow({
-  slot, day, onAdd, onRemove, onMove,
+  slot, day, onAdd, onRemove, onMove, onOutcome, onAmount,
 }: {
   slot: MealSlot
   day: DayPlan
   onAdd: () => void
   onRemove: (mealId: string) => void
   onMove: (mealId: string) => void
+  onOutcome: (mealId: string, outcome: MealOutcome | undefined) => void
+  onAmount: (mealId: string, index: number) => void
 }) {
   const ctx = useNutritionContext()
   const meals = day.meals.filter((m) => m.slot === slot)
@@ -376,7 +423,9 @@ function SlotRow({
 
   return (
     <div className="card p-4">
-      <div className="flex items-center justify-between mb-2">
+      {/* Tight, because a tick and an amount now live on every meal and a day
+          still has to fit on a laptop without scrolling. */}
+      <div className="flex items-center justify-between mb-1">
         <span className="text-xs font-bold uppercase tracking-wide text-ink-500">{SLOT_LABELS[slot]}</span>
         <span className="text-xs font-mono text-ink-700">{kcal > 0 ? `${Math.round(kcal)} kcal` : ''}</span>
       </div>
@@ -386,12 +435,21 @@ function SlotRow({
           <Plus size={16} className="mr-1" /> Pop something in
         </button>
       ) : (
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           {meals.map((meal) => (
             <div key={meal.id} className="flex items-start gap-2">
-              <div className="flex-1 min-w-0 space-y-1">
+              <OutcomeTick
+                outcome={meal.outcome}
+                onChange={(next) => onOutcome(meal.id, next)}
+              />
+              <div className={`flex-1 min-w-0 space-y-1 ${meal.outcome === 'skipped' ? 'opacity-55' : ''}`}>
                 {meal.entries.map((entry, i) => (
-                  <EntryLine key={i} entry={entry} />
+                  <EntryLine
+                    key={i}
+                    entry={entry}
+                    struck={meal.outcome === 'skipped'}
+                    onAmount={() => onAmount(meal.id, i)}
+                  />
                 ))}
                 {meal.note ? (
                   <div className="pt-0.5" title={meal.note}>
@@ -465,7 +523,146 @@ function ShoppingState({ entries }: { entries: Component[] }) {
   )
 }
 
-function EntryLine({ entry }: { entry: Component }) {
+/**
+ * Whether this actually happened.
+ *
+ * One button and three states, rather than two buttons, because the row
+ * already carries move and remove and a fourth control turns a meal into a
+ * toolbar. The label says what the next press does, so the cycle is learnable
+ * without a legend: unsaid, eaten, skipped, unsaid.
+ *
+ * Nothing here scolds. A skipped meal is dimmed and struck through, not marked
+ * in red: not eating what you planned is a Tuesday, not a failure, and an app
+ * that treats it as one is an app people stop ticking honestly.
+ */
+function OutcomeTick({
+  outcome, onChange,
+}: {
+  outcome: MealOutcome | undefined
+  onChange: (next: MealOutcome | undefined) => void
+}) {
+  const next: MealOutcome | undefined =
+    outcome === undefined ? 'eaten' : outcome === 'eaten' ? 'skipped' : undefined
+
+  const label = outcome === undefined ? 'Mark as eaten'
+    : outcome === 'eaten' ? 'Eaten. Mark as skipped instead'
+      : 'Skipped. Clear it'
+
+  return (
+    <button
+      className={`btn-ghost btn-icon shrink-0 ${
+        outcome === 'eaten' ? 'text-teal-700'
+          : outcome === 'skipped' ? 'text-ink-500' : 'text-ink-300 hover:text-teal-700'
+      }`}
+      onClick={() => onChange(next)}
+      aria-label={label}
+      aria-pressed={outcome === 'eaten'}
+      title={label}
+    >
+      {outcome === 'eaten' ? <Check size={16} />
+        : outcome === 'skipped' ? <CircleSlash size={16} />
+          : <Circle size={16} />}
+    </button>
+  )
+}
+
+/**
+ * How much of it there was.
+ *
+ * Grams for a food, servings for anything already made. The steps are the ones
+ * people actually eat in, halves and quarters of a portion, rather than a free
+ * number field that invites 0.37 of a stew.
+ */
+function AmountDialog({
+  day, mealId, index, onClose, onSet,
+}: {
+  day: DayPlan
+  mealId: string
+  index: number
+  onClose: () => void
+  onSet: (value: number) => void
+}) {
+  const ctx = useNutritionContext()
+  const entry = day.meals.find((m) => m.id === mealId)?.entries[index]
+
+  const current = entry ? (entry.kind === 'food' ? entry.grams : entry.servings) : 0
+  const [value, setValue] = useState(current)
+
+  if (!entry) return null
+
+  const isFood = entry.kind === 'food'
+  const step = isFood ? 10 : 0.25
+  const label = isFood
+    ? ctx.foods.get(entry.foodId)?.names.en ?? 'This ingredient'
+    : entry.kind === 'recipe'
+      ? ctx.recipes.get(entry.recipeId)?.name.en ?? 'This dish'
+      : 'This portion'
+
+  const shown = isFood
+    ? `${Math.round(value)} g`
+    : `${value === Math.round(value) ? value : value.toFixed(2).replace(/0+$/, '')} ${
+      value === 1 ? 'serving' : 'servings'}`
+
+  const kcal = componentsNutrients(
+    [isFood ? { ...entry, grams: value } : { ...entry, servings: value }],
+    ctx,
+  ).calories
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-paper rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-sm shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label={`How much ${label}`}
+      >
+        <h3 className="font-bold text-ink-900 mb-1">{label}</h3>
+        <p className="text-sm text-ink-700 mb-4">
+          {isFood ? 'How much of it, in grams.' : 'How much of it you are having.'}
+        </p>
+
+        <div className="flex items-center justify-center gap-4 mb-5">
+          <button
+            className="btn-secondary btn-icon"
+            onClick={() => setValue((v) => Math.max(0, Math.round((v - step) * 100) / 100))}
+            aria-label="Less"
+          >
+            <Minus size={18} />
+          </button>
+          <div className="text-center min-w-28">
+            <div className="text-2xl font-bold text-ink-900 tabular-nums">{shown}</div>
+            <div className="text-xs text-ink-500 font-mono">
+              {kcal > 0 ? `${Math.round(kcal)} kcal` : ' '}
+            </div>
+          </div>
+          <button
+            className="btn-secondary btn-icon"
+            onClick={() => setValue((v) => Math.round((v + step) * 100) / 100)}
+            aria-label="More"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+
+        <div className="flex gap-2">
+          <button className="btn-primary flex-1" onClick={() => onSet(value)}>Save</button>
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function EntryLine({
+  entry, struck = false, onAmount,
+}: {
+  entry: Component
+  struck?: boolean
+  onAmount?: () => void
+}) {
   const ctx = useNutritionContext()
   const deleted = useDeletedIds()
   const kcal = componentsNutrients([entry], ctx).calories
@@ -504,7 +701,11 @@ function EntryLine({ entry }: { entry: Component }) {
   return (
     <div className="flex items-baseline gap-2 text-sm">
       <span className="text-base leading-none shrink-0">{emoji}</span>
-      <span data-entry-name className={`flex-1 min-w-0 ${isDeleted ? 'text-ink-500' : 'text-ink-900'}`}>
+      <span
+        data-entry-name
+        className={`flex-1 min-w-0 ${isDeleted ? 'text-ink-500' : 'text-ink-900'} ${
+          struck ? 'line-through' : ''}`}
+      >
         {label}
         {entry.kind === 'portion' && (
           <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-teal-700">
@@ -517,7 +718,20 @@ function EntryLine({ entry }: { entry: Component }) {
           </span>
         )}
       </span>
-      {detail ? <span className="text-xs text-ink-500 font-mono shrink-0 tabular-nums">{detail}</span> : null}
+      {/* The amount is the control. Tapping the line's name would fight with
+          reading it, and a separate button would be a fourth thing in a row
+          that already has three. */}
+      <button
+        // A thumb-sized hit area that costs no height: the padding makes the
+        // box, the negative margin gives the space back to the layout. Sized
+        // to fill it instead pushed the fifth slot of a day below the fold.
+        className="text-xs text-ink-500 font-mono shrink-0 tabular-nums min-w-11 px-1 py-3 -my-3
+                   hover:text-bite-700 underline decoration-dotted underline-offset-4"
+        onClick={onAmount}
+        aria-label={`Change how much: ${label}`}
+      >
+        {detail || (entry.kind === 'food' ? '0 g' : '1×')}
+      </button>
       <span className="text-xs text-ink-700 font-mono shrink-0 tabular-nums w-10 sm:w-14 text-right">
         {Math.round(kcal)}
       </span>

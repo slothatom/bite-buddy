@@ -274,11 +274,24 @@ export const SLOT_LABELS: Record<MealSlot, string> = {
  * what lets "150 g mere, 10 g caju" be two food lines instead of a fabricated
  * recipe, while a cooked lunch is a single nested recipe entry.
  */
+/**
+ * What became of a planned meal.
+ *
+ * Unset is the ordinary state and means nothing has been said yet, which is
+ * different from both of these. A plan is an intention; without somewhere to
+ * record the outcome the app was quietly treating the intention as the record,
+ * and showing a calorie ring built on it.
+ */
+export type MealOutcome = 'eaten' | 'skipped'
+
 export interface PlannedMeal {
   id: string
   slot: MealSlot
   entries: Component[]
   note?: string
+  outcome?: MealOutcome
+  /** When it was marked, so a tick is a record rather than a decoration. */
+  outcomeAt?: string
 }
 
 /**

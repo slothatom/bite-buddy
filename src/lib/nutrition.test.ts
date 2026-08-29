@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import type { Food, Recipe } from '../types'
+import type { DayPlan, Food, PlannedMeal, Recipe } from '../types'
 import {
-  atwaterCalories, buildContext, calorieDrift, componentsNutrients,
+  atwaterCalories, buildContext, calorieDrift, componentsNutrients, dayEaten,
   recipePerServing, recipeTotal, scaleNutrients, addNutrients,
   reportNutrients, saltFromSodium, sodiumFromSalt,
 } from './nutrition'
@@ -179,5 +179,37 @@ describe('salt and sodium are one number', () => {
 
   it('keeps unknown sodium unknown rather than calling it no salt', () => {
     expect(saltFromSodium(undefined)).toBeUndefined()
+  })
+})
+
+describe('what a day amounted to', () => {
+  const day = (meals: PlannedMeal[]): DayPlan => ({ date: '2026-08-29', meals })
+  const meal = (id: string, grams: number, outcome?: PlannedMeal['outcome']): PlannedMeal => ({
+    id, slot: 'lunch', outcome,
+    entries: [{ kind: 'food', foodId: 'oats', grams }],
+  })
+
+  it('totals the plan while nothing has been said', () => {
+    const { nutrients, recorded } = dayEaten(day([meal('a', 100), meal('b', 100)]), ctx)
+
+    expect(recorded).toBe(false)
+    expect(nutrients.calories).toBeGreaterThan(0)
+  })
+
+  it('totals what was eaten as soon as anything is ticked', () => {
+    const both = dayEaten(day([meal('a', 100), meal('b', 100)]), ctx).nutrients
+    const one = dayEaten(day([meal('a', 100, 'eaten'), meal('b', 100)]), ctx)
+
+    // The untouched meal stops counting the moment the day becomes a record
+    // rather than an intention. Half the food, half the calories.
+    expect(one.recorded).toBe(true)
+    expect(one.nutrients.calories).toBeCloseTo(both.calories / 2, 5)
+  })
+
+  it('counts a skipped meal as neither eaten nor planned', () => {
+    const { nutrients, recorded } = dayEaten(day([meal('a', 100, 'skipped')]), ctx)
+
+    expect(recorded).toBe(true)
+    expect(nutrients.calories).toBe(0)
   })
 })

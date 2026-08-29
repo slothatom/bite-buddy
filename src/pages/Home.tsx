@@ -11,7 +11,7 @@ import { useAuthStore } from '../store/useAuth'
 import { useSyncStatus } from '../store/useSync'
 import { useAvailablePortions } from '../store/usePortionStore'
 import { acknowledgeConflicts } from '../lib/sync'
-import { dayNutrients, componentsNutrients } from '../lib/nutrition'
+import { dayNutrients, dayEaten, componentsNutrients } from '../lib/nutrition'
 import { targetStatus, STATUS_STYLES } from '../lib/status'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import { CalorieRing, SectionHeading } from '../components/ui'
@@ -50,7 +50,8 @@ export default function Home() {
 
   const today = todayDate()
   const todayPlan = plan.find((d) => d.date === today)
-  const todayTotals = todayPlan ? dayNutrients(todayPlan, ctx) : null
+  const todayRecord = todayPlan ? dayEaten(todayPlan, ctx) : null
+  const todayTotals = todayRecord?.nutrients ?? null
 
   /**
    * This week, and only this week.
@@ -162,12 +163,13 @@ export default function Home() {
             label="Today"
             value={todayTotals?.calories ? Math.round(todayTotals.calories).toLocaleString() : '0'}
             unit="kcal"
-            note={`of ${profile.targets.calories.toLocaleString()}`}
+            note={`${todayRecord?.recorded ? 'eaten, ' : ''}of ${
+              profile.targets.calories.toLocaleString()}`}
           />
           <Tile
             label="This week"
             value={`${plannedDays}`}
-            unit="of 7"
+            unit={`of ${days.length}`}
             note="days planned"
           />
           <Tile
