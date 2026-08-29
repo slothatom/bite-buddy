@@ -2,10 +2,10 @@
  * Letting a recipe point at where it came from, without letting it point
  * anywhere else.
  *
- * A recipe is data: typed in, pasted in, or read out of somebody's website by
- * the assistant. Rendering a link from data means rendering whatever that data
- * says, and `javascript:` in an href is a script that runs on your own page
- * with your own session. It has never been a hypothetical.
+ * A recipe is data: typed in on this device, restored from a backup file, or
+ * arrived from the other phone. Rendering a link from data means rendering
+ * whatever that data says, and `javascript:` in an href is a script that runs
+ * on your own page with your own session. It has never been a hypothetical.
  *
  * So a link is only ever http or https, it is checked at the moment it is shown
  * rather than only when it is saved, and anything else is treated as not a link
