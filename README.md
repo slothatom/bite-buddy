@@ -628,7 +628,13 @@ from net._http_response order by id desc limit 20;
 
 `content` is the function's own reply: `checked` cook sessions, `pushed`, `told`,
 and `pushing` for whether the VAPID keys are set. A 401 there means the header,
-not the code.
+not the code, and the code says which mistake it was:
+
+| `content` | What it means |
+|---|---|
+| `UNAUTHORIZED_NO_AUTH_HEADER` | No `Authorization` header at all. The dashboard's cron builder writes `headers := '{}'` unless you fill it in. |
+| `UNAUTHORIZED_INVALID_JWT_FORMAT` | A header, but the token is not a JWT. Nearly always a key truncated or line-broken on the way through a paste. Use the copy button on the API keys page rather than selecting it by hand. |
+| `200` with `"pushing": false` | The function is running. The VAPID secrets are not set on it. |
 
 Use the **anon** key, never the service role key. Anon is enough to get past the
 gateway, it is in the app's bundle already and authorises nothing on its own;
