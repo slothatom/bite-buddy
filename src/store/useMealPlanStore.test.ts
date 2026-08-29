@@ -393,3 +393,126 @@ describe('the week you are actually in', () => {
     vi.useRealTimers()
   })
 })
+
+describe('what actually happened', () => {
+  function aMealOnThursday(): { date: string; mealId: string } {
+    useMealPlanStore.setState({ plan: [] })
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-24T12:00:00'), 1)
+    store.addEntry('2026-08-27', 'lunch', { kind: 'food', foodId: 'food-apple', grams: 150 })
+    const day = useMealPlanStore.getState().plan.find((d) => d.date === '2026-08-27')!
+    return { date: '2026-08-27', mealId: day.meals[0].id }
+  }
+
+  function meal(date: string, id: string) {
+    return useMealPlanStore.getState().plan
+      .find((d) => d.date === date)?.meals.find((m) => m.id === id)
+  }
+
+  it('starts as an intention, with nothing said either way', () => {
+    const { date, mealId } = aMealOnThursday()
+    expect(meal(date, mealId)?.outcome).toBeUndefined()
+  })
+
+  it('records that it was eaten, and when', () => {
+    const { date, mealId } = aMealOnThursday()
+    useMealPlanStore.getState().setMealOutcome(date, mealId, 'eaten')
+
+    expect(meal(date, mealId)?.outcome).toBe('eaten')
+    expect(meal(date, mealId)?.outcomeAt).toBeTruthy()
+  })
+
+  it('lets you take it back, because people change their minds', () => {
+    const { date, mealId } = aMealOnThursday()
+    useMealPlanStore.getState().setMealOutcome(date, mealId, 'eaten')
+    useMealPlanStore.getState().setMealOutcome(date, mealId, undefined)
+
+    expect(meal(date, mealId)?.outcome).toBeUndefined()
+    // The timestamp goes too. A time with no outcome attached is a puzzle for
+    // whoever reads the row next.
+    expect(meal(date, mealId)?.outcomeAt).toBeUndefined()
+  })
+
+  it('leaves every other meal alone', () => {
+    const { date, mealId } = aMealOnThursday()
+    useMealPlanStore.getState()
+      .addEntry(date, 'dinner', { kind: 'food', foodId: 'food-apple', grams: 100 })
+    useMealPlanStore.getState().setMealOutcome(date, mealId, 'skipped')
+
+    const dinner = useMealPlanStore.getState().plan
+      .find((d) => d.date === date)!.meals.find((m) => m.slot === 'dinner')
+    expect(dinner?.outcome).toBeUndefined()
+  })
+})
+
+describe('changing how much of it there was', () => {
+  function aDayWith(entry: { kind: 'food'; foodId: string; grams: number }) {
+    useMealPlanStore.setState({ plan: [] })
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-24T12:00:00'), 1)
+    store.addEntry('2026-08-27', 'lunch', entry)
+    const day = useMealPlanStore.getState().plan.find((d) => d.date === '2026-08-27')!
+    return { date: '2026-08-27', mealId: day.meals[0].id }
+  }
+
+  function entries(date: string) {
+    return useMealPlanStore.getState().plan.find((d) => d.date === date)!.meals[0].entries
+  }
+
+  it('changes the weight of a food', () => {
+    const { date, mealId } = aDayWith({ kind: 'food', foodId: 'food-apple', grams: 150 })
+    useMealPlanStore.getState().updateEntry(date, mealId, 0, 75)
+
+    const entry = entries(date)[0]
+    expect(entry.kind === 'food' && entry.grams).toBe(75)
+  })
+
+  it('rounds a weight, because kitchen scales do not do fractions of a gram', () => {
+    const { date, mealId } = aDayWith({ kind: 'food', foodId: 'food-apple', grams: 150 })
+    useMealPlanStore.getState().updateEntry(date, mealId, 0, 74.6)
+
+    const entry = entries(date)[0]
+    expect(entry.kind === 'food' && entry.grams).toBe(75)
+  })
+
+  it('allows half a serving of something already made', () => {
+    useMealPlanStore.setState({ plan: [] })
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-24T12:00:00'), 1)
+    store.addEntry('2026-08-27', 'dinner', { kind: 'recipe', recipeId: 'stew', servings: 1 })
+    const mealId = useMealPlanStore.getState().plan
+      .find((d) => d.date === '2026-08-27')!.meals[0].id
+
+    useMealPlanStore.getState().updateEntry('2026-08-27', mealId, 0, 0.5)
+
+    const entry = entries('2026-08-27')[0]
+    // Servings keep their fraction: half a stew is a real thing to have eaten,
+    // and rounding it to one is the error this exists to prevent.
+    expect(entry.kind === 'recipe' && entry.servings).toBe(0.5)
+  })
+
+  it('refuses to go below nothing', () => {
+    const { date, mealId } = aDayWith({ kind: 'food', foodId: 'food-apple', grams: 150 })
+    useMealPlanStore.getState().updateEntry(date, mealId, 0, -20)
+
+    const entry = entries(date)[0]
+    expect(entry.kind === 'food' && entry.grams).toBe(0)
+  })
+
+  it('touches only the entry named, not its neighbours', () => {
+    const { date, mealId } = aDayWith({ kind: 'food', foodId: 'food-apple', grams: 150 })
+    useMealPlanStore.getState().setMeal(date, 'lunch', [
+      { kind: 'food', foodId: 'food-apple', grams: 150 },
+      { kind: 'food', foodId: 'food-lentil-red', grams: 90 },
+    ])
+    const id = useMealPlanStore.getState().plan.find((d) => d.date === date)!.meals[0].id
+    expect(id).toBeTruthy()
+
+    useMealPlanStore.getState().updateEntry(date, id, 1, 45)
+
+    const [first, second] = entries(date)
+    expect(first.kind === 'food' && first.grams).toBe(150)
+    expect(second.kind === 'food' && second.grams).toBe(45)
+    expect(mealId).toBeTruthy()
+  })
+})

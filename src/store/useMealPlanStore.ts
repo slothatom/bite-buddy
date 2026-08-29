@@ -2,7 +2,8 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import type {
-  Component, DayPlan, GroceryItem, MealSlot, MedCategory, PantryItem, PlannedMeal, SourcePlan,
+  Component, DayPlan, GroceryItem, MealOutcome, MealSlot, MedCategory, PantryItem,
+  PlannedMeal, SourcePlan,
   WeekStart, WeekTemplate,
 } from '../types'
 import { parseAmount } from '../lib/grocery'
@@ -182,6 +183,25 @@ interface MealPlanStore {
    * typing it again on the other day.
    */
   moveMeal: (fromDate: string, mealId: string, toDate: string, toSlot?: MealSlot) => void
+  /**
+   * Says what became of a meal: eaten, skipped, or nothing yet.
+   *
+   * The plan was the only record the app had, so a calorie ring on the home
+   * screen was really a ring about an intention. Passing `undefined` clears it,
+   * because changing your mind about what happened has to be as easy as saying
+   * it in the first place, and a tick you cannot take back is one people stop
+   * pressing.
+   */
+  setMealOutcome: (date: string, mealId: string, outcome: MealOutcome | undefined) => void
+  /**
+   * Changes how much of something is in a meal, after it is already there.
+   *
+   * Portions were fixed once added: a recipe or a tub from the fridge went in
+   * at one serving and stayed there, so "I had half" and "I had two" were both
+   * unsayable. With the imported plans averaging well above the target, the
+   * portion is the obvious lever and it was the one thing that could not move.
+   */
+  updateEntry: (date: string, mealId: string, index: number, amount: number) => void
   /** The same meal again somewhere else, leaving the original where it is. */
   duplicateMeal: (fromDate: string, mealId: string, toDate: string, toSlot?: MealSlot) => void
   /** Exchanges two meals, each landing where the other was. */
@@ -345,6 +365,40 @@ export const useMealPlanStore = create<MealPlanStore>()(
                 day.date === a.date || day.date === b.date ? swapped(day) : day),
             }
           }),
+
+        setMealOutcome: (date, mealId, outcome) =>
+          set((s) => ({
+            plan: s.plan.map((day) => (day.date === date
+              ? touch({
+                ...day,
+                meals: day.meals.map((m) => (m.id === mealId
+                  ? { ...m, outcome, outcomeAt: outcome ? new Date().toISOString() : undefined }
+                  : m)),
+              })
+              : day)),
+          })),
+
+        updateEntry: (date, mealId, index, amount) =>
+          set((s) => ({
+            plan: s.plan.map((day) => (day.date === date
+              ? touch({
+                ...day,
+                meals: day.meals.map((m) => {
+                  if (m.id !== mealId) return m
+                  const entries = m.entries.map((entry, i) => {
+                    if (i !== index) return entry
+                    // Grams for a food, servings for anything already made.
+                    // Never below zero, and never a fraction of a gram: the
+                    // scale in your kitchen does not have those either.
+                    return entry.kind === 'food'
+                      ? { ...entry, grams: Math.max(0, Math.round(amount)) }
+                      : { ...entry, servings: Math.max(0, amount) }
+                  })
+                  return { ...m, entries }
+                }),
+              })
+              : day)),
+          })),
 
         copyDay: (fromDate, toDate) =>
           set((s) => {

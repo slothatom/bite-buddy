@@ -174,6 +174,29 @@ The centre button carries the day it meant. It used to raise a bare flag and let
 fill in the day from whatever it had selected, which from another screen meant the first day
 of the window: "Add to Snack 1, Monday 17 August", on a Saturday the 29th.
 
+**A plan is an intention; a tick makes it a record.** Every meal carries one button with
+three states: nothing said, eaten, skipped. The label says what the next press does, so the
+cycle needs no legend, and it goes round to nothing said because people change their minds
+and a tick you cannot take back is one nobody presses honestly. A skipped meal is dimmed and
+struck through rather than marked in red: not eating what you planned is a Tuesday, not a
+failure.
+
+Until something on a day is ticked, the day's totals are the plan and the heading says
+"planned". The moment one meal is a fact, the totals are what was eaten and the heading says
+"eaten". A skipped meal counts as neither. This is what the home screen's calorie ring was
+missing: it read like a tracker and was really a sum of intentions.
+
+**How much of it there was can be changed after the fact.** Grams for a food, servings for
+anything already made, in the steps people actually eat in rather than a free number field
+that invites 0.37 of a stew. Recipes and fridge portions used to go in at one serving and
+stay there, so "I had half" and "I had two" were both unsayable, on a library whose imported
+meals average well above the target. Changing a portion gives the rest back to the fridge,
+the same bookkeeping as adding and removing one.
+
+**A recipe can go straight into a day.** The sheet offered Edit and nothing else, so acting
+on a decision you had already made meant closing it, opening the planner, finding the day and
+searching for the same dish again. It keeps whatever servings the sheet was scaled to.
+
 **Fill the gaps only offers days still ahead.** It filled whatever was on screen, so on a
 Saturday it carefully proposed meals for the Monday to Friday that had already gone. Every one
 of those pushed a real empty day further down a list people scan rather than read.

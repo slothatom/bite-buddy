@@ -1,10 +1,10 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import {
   Search, Star, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
-  ChevronDown, SlidersHorizontal, Minus, ExternalLink,
+  ChevronDown, SlidersHorizontal, Minus, ExternalLink, CalendarPlus, Check,
 } from 'lucide-react'
-import type { DishCategory, QuickFilter, Recipe } from '../types'
-import { DIFFICULTY_LABELS } from '../types'
+import type { DishCategory, MealSlot, QuickFilter, Recipe } from '../types'
+import { DIFFICULTY_LABELS, MEAL_SLOTS, SLOT_LABELS } from '../types'
 import { safeUrl, linkLabel } from '../lib/links'
 import { useRecipes, useRecipeStore, useMergedInto } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
@@ -20,7 +20,7 @@ import {
 } from '../lib/recipeGroups'
 import {
   DISH_CATEGORIES, CATEGORY_LABELS, QUICK_FILTERS, QUICK_FILTER_DEFINITIONS,
-  hasQuickFilter, quickFilterLabel,
+  hasQuickFilter, quickFilterLabel, mealTimesOf,
 } from '../lib/dishCategories'
 import { interchangeableGroups } from '../lib/mergeRecipes'
 import { usePantry } from '../store/usePantryStore'
@@ -461,7 +461,7 @@ function RecipeCard({
       >
         <Star size={16} className={favourite ? 'fill-coral-600 text-coral-600' : ''} />
       </button>
-      <button onClick={onOpen} className="block w-full min-w-0 text-left">
+      <button onClick={onOpen} data-recipe-card className="block w-full min-w-0 text-left">
         <span className="flex items-start gap-3 pr-10 min-w-0">
           <span className="text-2xl leading-none shrink-0">{lead.emoji}</span>
           <span className="flex-1 min-w-0">
@@ -671,6 +671,7 @@ function RecipeDetail({
    * mistake worth avoiding, it would say a double batch is twice as filling.
    */
   const [wanted, setWanted] = useState(recipe.servings)
+  const [planning, setPlanning] = useState(false)
   const scale = recipe.servings > 0 ? wanted / recipe.servings : 1
   const scaled = wanted !== recipe.servings
 
@@ -914,10 +915,24 @@ function RecipeDetail({
           )}
 
           <div className="flex gap-2">
-            <button className="btn-secondary flex-1" onClick={() => onEdit(recipe)}>
+            {/* The obvious thing to want, and until now the one thing this
+                sheet could not do. You browsed, decided, closed it, opened the
+                planner, found the day and searched for the same dish again. */}
+            <button className="btn-primary flex-1" onClick={() => setPlanning(true)}>
+              <CalendarPlus size={15} /> Put it in a day
+            </button>
+            <button className="btn-secondary" onClick={() => onEdit(recipe)}>
               <Pencil size={15} /> Edit
             </button>
           </div>
+
+          {planning && (
+            <PlanIntoDay
+              recipe={recipe}
+              servings={wanted}
+              onClose={() => setPlanning(false)}
+            />
+          )}
 
           {recipe.steps.length === 0 && (
             <p className="flex items-start gap-2 text-xs text-ink-500">
@@ -931,3 +946,102 @@ function RecipeDetail({
     </div>
   )
 }
+
+/**
+ * Putting a recipe into a day, from the recipe.
+ *
+ * The flow this replaces was: browse, decide, close the sheet, open the
+ * planner, find the day, search for the same dish again. Five steps to act on
+ * a decision you had already made.
+ *
+ * The days offered are the week on screen in the planner, and the servings are
+ * whatever the sheet was scaled to, so scaling a recipe to feed four and then
+ * planning it keeps the four rather than silently going back to one.
+ */
+function PlanIntoDay({
+  recipe, servings, onClose,
+}: {
+  recipe: Recipe
+  servings: number
+  onClose: () => void
+}) {
+  const { weekDates, addEntry } = useMealPlanStore()
+  const [date, setDate] = useState(() => (weekDates.includes(todayDate()) ? todayDate() : weekDates[0]))
+
+  // The recipe's own meal times, where it has them, so a breakfast opens on
+  // breakfast. The two vocabularies overlap by name rather than by type, and
+  // a slot the recipe says nothing about is not a reason to refuse.
+  const times = mealTimesOf(recipe).map(String)
+  const [slot, setSlot] = useState<MealSlot>(
+    () => MEAL_SLOTS.find((s) => times.includes(s)) ?? 'dinner',
+  )
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-paper rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-sm shadow-xl max-h-[85vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-label={`Put ${recipe.name.en} in a day`}
+      >
+        <h3 className="font-bold text-ink-900 mb-1">{recipe.emoji} {recipe.name.en}</h3>
+        <p className="text-sm text-ink-700 mb-4">
+          {servings === 1 ? 'One serving' : `${servings} servings`}, on a day of your choosing.
+        </p>
+
+        <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-1.5">Which day</p>
+        <div className="grid grid-cols-7 gap-1 mb-4">
+          {weekDates.map((d) => (
+            <button
+              key={d}
+              onClick={() => setDate(d)}
+              aria-pressed={date === d}
+              aria-label={new Date(d + 'T12:00:00').toLocaleDateString('en-GB', {
+                weekday: 'long', day: 'numeric', month: 'long' })}
+              className={`rounded-xl py-2 text-center text-xs font-semibold min-h-11 border ${
+                date === d
+                  ? 'bg-bite-500 text-white border-bite-500'
+                  : 'bg-cream-50 border-transparent text-ink-900'}`}
+            >
+              <span className="block text-[10px] font-bold uppercase tracking-wide opacity-80">
+                {new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })}
+              </span>
+              {new Date(d + 'T12:00:00').getDate()}
+            </button>
+          ))}
+        </div>
+
+        <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-1.5">Which meal</p>
+        <div className="flex flex-wrap gap-1.5 mb-5">
+          {MEAL_SLOTS.map((s) => (
+            <button
+              key={s}
+              onClick={() => setSlot(s)}
+              aria-pressed={slot === s}
+              className={slot === s ? 'chip bg-bite-500 text-white border border-bite-500' : 'chip-off'}
+            >
+              {SLOT_LABELS[s]}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            className="btn-primary flex-1"
+            onClick={() => {
+              addEntry(date, slot, { kind: 'recipe', recipeId: recipe.id, servings })
+              onClose()
+            }}
+          >
+            <Check size={15} /> Put it in
+          </button>
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+

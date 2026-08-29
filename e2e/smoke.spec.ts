@@ -1291,7 +1291,12 @@ test.describe('asking the recipe list a question', () => {
 test.describe('a laptop is not a large phone', () => {
   test.use({ viewport: { width: 1512, height: 950 } })
 
-  test('a whole day fits on the planner without scrolling', async ({ page }) => {
+  test('a whole day fits on the planner without scrolling', async ({ page }, testInfo) => {
+    // A laptop assertion, and only that. The phone viewport is 844px tall, so
+    // a 950px ceiling sits below its fold and never asserted anything there:
+    // on a phone you scroll a day, which is what a phone is for.
+    test.skip(testInfo.project.name !== 'desktop', 'this fold belongs to a laptop')
+
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await goto(page, '/plan')
@@ -1709,5 +1714,93 @@ test.describe('the week you are actually in', () => {
     await expect(page.getByRole('heading', { name: /^Add to / })).toBeVisible()
     await expect(page.getByRole('button', { name: longDate(todayIso()), exact: true }))
       .toHaveAttribute('aria-pressed', 'true')
+  })
+})
+
+test.describe('what actually happened', () => {
+  /**
+   * The plan was the only record the app had.
+   *
+   * A ring on the home screen said "0 kcal of 1,400" and read like a tracker,
+   * while nothing anywhere could say a meal had been eaten, skipped or halved.
+   * For somebody on a target, that is the point of the app.
+   */
+  async function aPlannedDay(page: Page) {
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+    await page.getByRole('button', { name: /^Add these/ }).click()
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+  }
+
+  test('a meal can be ticked off, and untidied again', async ({ page }) => {
+    await aPlannedDay(page)
+
+    const tick = page.getByRole('button', { name: 'Mark as eaten' }).first()
+    await tick.click()
+
+    // Eaten. The same button now offers the other thing you might mean.
+    await expect(page.getByRole('button', { name: /^Eaten\./ }).first()).toBeVisible()
+    await expect(page.getByText('eaten', { exact: true })).toBeVisible()
+
+    await page.getByRole('button', { name: /^Eaten\./ }).first().click()
+    await expect(page.getByRole('button', { name: /^Skipped\./ }).first()).toBeVisible()
+
+    // And round to nothing said, because people change their minds.
+    await page.getByRole('button', { name: /^Skipped\./ }).first().click()
+    await expect(page.getByRole('button', { name: 'Mark as eaten' }).first()).toBeVisible()
+  })
+
+  test('the day counts what was eaten rather than what was hoped', async ({ page }) => {
+    await aPlannedDay(page)
+
+    // Before anything is said, the ring is about the plan and says so.
+    await expect(page.getByText('planned', { exact: true })).toBeVisible()
+
+    await page.getByRole('button', { name: 'Mark as eaten' }).first().click()
+
+    // The moment one meal is a fact, the day stops totalling intentions.
+    await expect(page.getByText('eaten', { exact: true })).toBeVisible()
+    await expect(page.getByText('planned', { exact: true })).toHaveCount(0)
+  })
+
+  test('a skipped meal is dimmed rather than told off', async ({ page }) => {
+    await aPlannedDay(page)
+
+    await page.getByRole('button', { name: 'Mark as eaten' }).first().click()
+    await page.getByRole('button', { name: /^Eaten\./ }).first().click()
+
+    // Struck through and quieter. Nothing red, nothing scolding: not eating
+    // what you planned is a Tuesday, not a failure.
+    const struck = page.locator('[data-entry-name].line-through')
+    await expect(struck.first()).toBeVisible()
+  })
+
+  test('how much of it there was can be changed after the fact', async ({ page }) => {
+    await aPlannedDay(page)
+
+    await page.getByRole('button', { name: /^Change how much/ }).first().click()
+    await expect(page.getByRole('dialog')).toBeVisible()
+
+    const dialog = page.getByRole('dialog')
+    const before = await dialog.innerText()
+    await dialog.getByRole('button', { name: 'Less' }).click()
+    const after = await dialog.innerText()
+    expect(after, 'the amount did not move').not.toBe(before)
+
+    await dialog.getByRole('button', { name: 'Save', exact: true }).click()
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+  })
+
+  test('a recipe can go into a day without leaving the recipe', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.locator('[data-recipe-card]').first().click()
+
+    await page.getByRole('button', { name: 'Put it in a day' }).click()
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toBeVisible()
+    await dialog.getByRole('button', { name: 'Put it in', exact: true }).click()
+
+    await goto(page, '/plan')
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
   })
 })

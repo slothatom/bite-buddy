@@ -184,6 +184,34 @@ export function dayNutrients(day: DayPlan, ctx: NutritionContext): Nutrients {
   return day.meals.reduce((acc, m) => addNutrients(acc, mealNutrients(m, ctx)), emptyNutrients())
 }
 
+/**
+ * What a day amounted to, and whether that is a plan or a record.
+ *
+ * Once anything on the day has been ticked, the totals are about what was
+ * eaten; until then they are about what is intended. Both are useful and they
+ * are not the same number, so the caller is told which it is holding rather
+ * than left to guess. A skipped meal counts as neither: it is a fact that it
+ * did not happen.
+ *
+ * The alternative, always totalling the plan, is what made the home screen's
+ * ring quietly dishonest: it read like a tracker and was really a sum of
+ * intentions.
+ */
+export function dayEaten(day: DayPlan, ctx: NutritionContext): {
+  nutrients: Nutrients
+  /** True once at least one meal has been marked one way or the other. */
+  recorded: boolean
+} {
+  const decided = day.meals.filter((m) => m.outcome)
+  if (!decided.length) return { nutrients: dayNutrients(day, ctx), recorded: false }
+
+  const eaten = day.meals.filter((m) => m.outcome === 'eaten')
+  return {
+    nutrients: eaten.reduce((acc, m) => addNutrients(acc, mealNutrients(m, ctx)), emptyNutrients()),
+    recorded: true,
+  }
+}
+
 export function weekNutrients(days: DayPlan[], ctx: NutritionContext): Nutrients {
   return days.reduce((acc, d) => addNutrients(acc, dayNutrients(d, ctx)), emptyNutrients())
 }

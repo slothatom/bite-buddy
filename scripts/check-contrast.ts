@@ -108,7 +108,11 @@ function pairs(palette: Map<string, string>): Pair[] {
 
     lines.forEach((line, index) => {
       const where = `${file}:${index + 1}`
-      const inside = lines.slice(index, index + 4).join('\n')
+      // A few lines either side, not just below. The colour is usually written
+      // on the button and the icon it tints sits inside, but a class built by a
+      // ternary puts the colour below the `btn-icon` that classifies it, and
+      // looking only forward called that button body text.
+      const inside = lines.slice(Math.max(0, index - 3), index + 4).join('\n')
 
       for (const scope of literals(line)) {
         // Opacity variants are read at full strength. That understates rather
