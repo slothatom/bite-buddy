@@ -10,8 +10,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥩",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 60,
     "components": [
       {
         "kind": "recipe",
@@ -44,7 +44,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 9,
     "cookMinutes": 0,
     "components": [
       {
@@ -83,8 +83,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "food",
@@ -127,7 +127,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -161,7 +161,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥕",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -195,7 +195,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -229,7 +229,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 5,
     "cookMinutes": 0,
     "components": [
       {
@@ -263,8 +263,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥬",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 9,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "food",
@@ -292,8 +292,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 15,
+    "cookMinutes": 22,
     "components": [
       {
         "kind": "food",
@@ -331,7 +331,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥑",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 11,
     "cookMinutes": 0,
     "components": [
       {
@@ -370,8 +370,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍲",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 14,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "recipe",
@@ -404,7 +404,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥕",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -438,8 +438,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍠",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 14,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "food",
@@ -472,7 +472,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍮",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -501,7 +501,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 8,
     "cookMinutes": 0,
     "components": [
       {
@@ -540,8 +540,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 6,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "food",
@@ -574,8 +574,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌶️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "recipe",
@@ -608,7 +608,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -642,7 +642,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🐟",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 14,
     "cookMinutes": 0,
     "components": [
       {
@@ -686,8 +686,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍄",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -710,8 +710,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "recipe",
@@ -744,8 +744,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌽",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -778,8 +778,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍠",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 14,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "food",
@@ -812,7 +812,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -846,7 +846,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 12,
     "cookMinutes": 0,
     "components": [
       {
@@ -890,8 +890,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍲",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "recipe",
@@ -914,8 +914,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥩",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 60,
     "components": [
       {
         "kind": "recipe",
@@ -948,7 +948,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🧀",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -982,8 +982,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥒",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 17,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "recipe",
@@ -1016,7 +1016,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥬",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -1050,8 +1050,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 16,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "food",
@@ -1079,8 +1079,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍲",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 50,
     "components": [
       {
         "kind": "recipe",
@@ -1113,7 +1113,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -1147,8 +1147,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 16,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "food",
@@ -1176,8 +1176,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -1205,7 +1205,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 8,
     "cookMinutes": 0,
     "components": [
       {
@@ -1244,7 +1244,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -1278,8 +1278,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🐟",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 13,
+    "cookMinutes": 22,
     "components": [
       {
         "kind": "recipe",
@@ -1307,8 +1307,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍲",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "recipe",
@@ -1341,7 +1341,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -1370,8 +1370,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌶️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -1399,7 +1399,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 8,
     "cookMinutes": 0,
     "components": [
       {
@@ -1438,8 +1438,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 5,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "food",
@@ -1472,8 +1472,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥔",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -1506,7 +1506,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -1540,8 +1540,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -1579,8 +1579,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍲",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "recipe",
@@ -1613,7 +1613,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍮",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -1642,8 +1642,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍆",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 14,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "recipe",
@@ -1676,8 +1676,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 8,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "food",
@@ -1710,8 +1710,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍆",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 14,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "recipe",
@@ -1744,8 +1744,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥣",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 6,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "recipe",
@@ -1778,8 +1778,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 16,
+    "cookMinutes": 12,
     "components": [
       {
         "kind": "recipe",
@@ -1822,7 +1822,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥑",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -1857,7 +1857,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -1886,8 +1886,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -1915,7 +1915,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -1949,7 +1949,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -1983,8 +1983,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥒",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "food",
@@ -2012,7 +2012,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -2046,8 +2046,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 13,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "food",
@@ -2085,8 +2085,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥔",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -2124,8 +2124,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥘",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 9,
+    "cookMinutes": 10,
     "components": [
       {
         "kind": "food",
@@ -2153,8 +2153,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 15,
+    "cookMinutes": 22,
     "components": [
       {
         "kind": "food",
@@ -2192,7 +2192,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -2226,8 +2226,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 16,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "recipe",
@@ -2255,8 +2255,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -2299,8 +2299,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌽",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -2333,8 +2333,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 5,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "recipe",
@@ -2367,8 +2367,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -2406,7 +2406,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {
@@ -2440,8 +2440,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍆",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -2474,8 +2474,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥬",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -2503,8 +2503,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥣",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 5,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "food",
@@ -2532,8 +2532,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "food",
@@ -2566,7 +2566,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥚",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 14,
     "cookMinutes": 0,
     "components": [
       {
@@ -2600,7 +2600,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -2634,7 +2634,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -2668,8 +2668,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 16,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "food",
@@ -2697,8 +2697,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -2731,8 +2731,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍞",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 9,
+    "cookMinutes": 4,
     "components": [
       {
         "kind": "recipe",
@@ -2760,8 +2760,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥦",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 17,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -2794,8 +2794,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥣",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -2823,7 +2823,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 8,
     "cookMinutes": 0,
     "components": [
       {
@@ -2862,8 +2862,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 17,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -2896,8 +2896,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍄",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -2925,8 +2925,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -2959,8 +2959,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥦",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 17,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -2993,7 +2993,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🐟",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 12,
     "cookMinutes": 0,
     "components": [
       {
@@ -3027,8 +3027,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 5,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "recipe",
@@ -3061,8 +3061,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥩",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -3095,8 +3095,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🫘",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "food",
@@ -3129,8 +3129,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍞",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "recipe",
@@ -3158,7 +3158,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 11,
     "cookMinutes": 0,
     "components": [
       {
@@ -3197,8 +3197,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "recipe",
@@ -3231,8 +3231,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍲",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 13,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "recipe",
@@ -3260,8 +3260,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥣",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 6,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "recipe",
@@ -3294,8 +3294,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -3333,8 +3333,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 7,
+    "cookMinutes": 15,
     "components": [
       {
         "kind": "recipe",
@@ -3367,8 +3367,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥬",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -3396,8 +3396,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 13,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "food",
@@ -3435,8 +3435,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥒",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 17,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "recipe",
@@ -3469,8 +3469,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌯",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 15,
+    "cookMinutes": 12,
     "components": [
       {
         "kind": "recipe",
@@ -3508,7 +3508,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥚",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 15,
     "cookMinutes": 0,
     "components": [
       {
@@ -3547,8 +3547,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍕",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -3591,8 +3591,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥣",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -3620,7 +3620,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 8,
     "cookMinutes": 0,
     "components": [
       {
@@ -3659,8 +3659,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🐟",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 14,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "recipe",
@@ -3693,7 +3693,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🐟",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 12,
     "cookMinutes": 0,
     "components": [
       {
@@ -3727,8 +3727,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥬",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -3756,8 +3756,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍠",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "food",
@@ -3790,8 +3790,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍅",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -3819,7 +3819,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍮",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -3848,8 +3848,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 17,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "food",
@@ -3882,7 +3882,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 5,
     "cookMinutes": 0,
     "components": [
       {
@@ -3916,7 +3916,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -3950,8 +3950,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 8,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "food",
@@ -3974,8 +3974,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 15,
+    "cookMinutes": 22,
     "components": [
       {
         "kind": "food",
@@ -4013,8 +4013,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 8,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "recipe",
@@ -4047,8 +4047,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥣",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 5,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "recipe",
@@ -4076,8 +4076,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍆",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -4120,7 +4120,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 8,
     "cookMinutes": 0,
     "components": [
       {
@@ -4159,8 +4159,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 5,
+    "cookMinutes": 9,
     "components": [
       {
         "kind": "food",
@@ -4193,8 +4193,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍆",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -4232,8 +4232,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 6,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "food",
@@ -4266,8 +4266,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥩",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "recipe",
@@ -4300,8 +4300,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -4339,7 +4339,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -4383,7 +4383,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 8,
     "cookMinutes": 0,
     "components": [
       {
@@ -4422,8 +4422,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 13,
+    "cookMinutes": 15,
     "components": [
       {
         "kind": "recipe",
@@ -4461,8 +4461,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌽",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -4495,8 +4495,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥣",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 5,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "recipe",
@@ -4524,8 +4524,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥔",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -4558,8 +4558,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 6,
+    "cookMinutes": 8,
     "components": [
       {
         "kind": "food",
@@ -4592,7 +4592,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 8,
     "cookMinutes": 0,
     "components": [
       {
@@ -4631,7 +4631,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥚",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 16,
     "cookMinutes": 0,
     "components": [
       {
@@ -4675,8 +4675,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥣",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 13,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -4704,8 +4704,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -4748,8 +4748,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "food",
@@ -4787,8 +4787,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌅",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -4826,8 +4826,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "food",
@@ -4870,7 +4870,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 7,
     "cookMinutes": 0,
     "components": [
       {
@@ -4904,8 +4904,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🧁",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 12,
+    "cookMinutes": 20,
     "components": [
       {
         "kind": "recipe",
@@ -4938,8 +4938,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🫘",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "food",
@@ -4967,8 +4967,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 14,
+    "cookMinutes": 22,
     "components": [
       {
         "kind": "food",
@@ -5001,8 +5001,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍲",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 16,
+    "cookMinutes": 60,
     "components": [
       {
         "kind": "recipe",
@@ -5030,8 +5030,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍠",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 13,
+    "cookMinutes": 35,
     "components": [
       {
         "kind": "food",
@@ -5059,8 +5059,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍲",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 17,
+    "cookMinutes": 60,
     "components": [
       {
         "kind": "recipe",
@@ -5093,8 +5093,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍗",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -5127,8 +5127,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 14,
+    "cookMinutes": 22,
     "components": [
       {
         "kind": "food",
@@ -5161,8 +5161,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -5195,8 +5195,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍞",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "recipe",
@@ -5229,8 +5229,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🍳",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 6,
+    "cookMinutes": 15,
     "components": [
       {
         "kind": "recipe",
@@ -5258,8 +5258,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌙",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 13,
+    "cookMinutes": 30,
     "components": [
       {
         "kind": "food",
@@ -5297,8 +5297,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥩",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 17,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -5331,8 +5331,8 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥬",
     "servings": 1,
-    "prepMinutes": 0,
-    "cookMinutes": 0,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
@@ -5360,7 +5360,7 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥕",
     "servings": 1,
-    "prepMinutes": 0,
+    "prepMinutes": 10,
     "cookMinutes": 0,
     "components": [
       {

@@ -131,8 +131,27 @@ describe('fits today', () => {
 })
 
 describe('worth a batch', () => {
-  it('keeps what makes four or more, most first', () => {
+  it('keeps what plainly makes a crowd, even with no record behind it', () => {
     expect(ids(throughLens('batch', base))).toEqual(['stew', 'gratin'])
+  })
+
+  it('counts a smaller pot the plans kept coming back to', () => {
+    // Two servings is a batch in a house of two. What makes it worth cooking is
+    // that it was cooked again, which the plans record and a recipe of your own
+    // does not.
+    const soup = recipe({ id: 'soup', servings: 2, timesPlanned: 5 })
+    const once = recipe({ id: 'once', servings: 2, timesPlanned: 1 })
+    const input = { ...base, recipes: [...RECIPES, soup, once], ctx: buildContext(FOODS, [...RECIPES, soup, once]) }
+
+    expect(ids(throughLens('batch', input))).toEqual(['soup', 'stew', 'gratin'])
+  })
+
+  it('leaves alone a single serving, however often it was eaten', () => {
+    // Fried eggs turn up in seven of the plans' meals. Nobody batch-cooks them.
+    const eggs = recipe({ id: 'eggs', servings: 1, timesPlanned: 7 })
+    const input = { ...base, recipes: [eggs], ctx: buildContext(FOODS, [eggs]) }
+
+    expect(ids(throughLens('batch', input))).toEqual([])
   })
 })
 

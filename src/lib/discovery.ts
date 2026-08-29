@@ -35,7 +35,7 @@ export interface LensDefinition {
 export const LENSES: Record<Lens, LensDefinition> = {
   quick: {
     label: 'Quick tonight', emoji: '⚡',
-    rule: 'Twenty minutes or less, start to plate. Quickest first.',
+    rule: 'Twenty minutes or less, start to plate, estimated for the imported meals. Quickest first.',
   },
   have: {
     label: 'From the cupboard', emoji: '🥫',
@@ -55,7 +55,7 @@ export const LENSES: Record<Lens, LensDefinition> = {
   },
   batch: {
     label: 'Worth a batch', emoji: '🍱',
-    rule: 'Makes four or more, and keeps. Most portions first.',
+    rule: 'Makes more than one meal, and the plans came back to it. Most used first.',
   },
 }
 
@@ -150,9 +150,21 @@ export function throughLens(lens: Lens, input: LensInput): Recipe[] {
     }
 
     case 'batch': {
+      // "Four servings or more" matched nothing at all here. The dietician
+      // cooks for two, so a batch in this library is a pot of soup that does
+      // two dinners, and the evidence that it is worth making is that she
+      // cooked it again: the tray of roasted vegetables feeds seven of the 481
+      // meals. A recipe of your own carries no such record, so the old rule
+      // stays alongside it for anything that plainly makes a crowd.
+      const worth = (r: Recipe) =>
+        r.servings >= 4 || (r.servings >= 2 && (r.timesPlanned ?? 0) >= 2)
+
       return recipes
-        .filter((r) => r.servings >= 4 && r.components.length > 0)
-        .sort((a, b) => b.servings - a.servings || a.id.localeCompare(b.id))
+        .filter((r) => r.components.length > 0 && worth(r))
+        .sort((a, b) =>
+          (b.timesPlanned ?? 0) - (a.timesPlanned ?? 0)
+          || b.servings - a.servings
+          || a.id.localeCompare(b.id))
     }
   }
 }

@@ -151,7 +151,8 @@ Real measurements from the shipped data, not estimates. Regenerate with
 | What | Figure | Why it matters |
 |---|---|---|
 | Recipes | **228** | 71 base dishes plus 157 meals taken from the plans, grouped into far fewer cards by variant |
-| Recipe name length | **5 to 77 chars**, median 41 | Cards must handle two-line names without breaking the grid |
+| Recipe name length | **5 to 79 chars**, median 42 | Cards must handle two-line names without breaking the grid; a name says what makes that version different, so it can be long |
+| Cooking time | **5 to 77 min**, median 28 | Estimated for the imported meals, from the dish library's own medians, and shown as "about 25 min" |
 | Source lines | **up to 187 chars** | Shown under the name; truncates on cards, wraps in detail |
 | Foods | **122** | Across 16 categories, each row carrying up to three language names |
 | Dish categories | **38 defined, 19 in use** | Describe what the food is, never when it is eaten |
