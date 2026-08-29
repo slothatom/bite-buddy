@@ -8,16 +8,16 @@
  *
  * Two jobs, one schedule:
  *
- *  1. **Before a cooking session.** Email to both of you, which has worked for
- *     months, plus a push to whichever devices have asked for one.
- *  2. **When the other one of you changes the week.** Push only. An email for
- *     "Oli moved Thursday" would be an email nobody wants.
+ *  1. **Before a cooking session.**
+ *  2. **When the other one of you changes the week.**
+ *
+ * Push only, both of them. There was an email path here and it has been taken
+ * out: reaching two different mailboxes needs a verified sending domain, and a
+ * push reaches both phones for nothing. A second channel that only worked for
+ * one of the two people would have been worse than no second channel.
  *
  * Deploy: supabase functions deploy notify
- * Secrets: RESEND_API_KEY, REMINDER_FROM, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY,
- * VAPID_SUBJECT. The email pair without the VAPID ones still sends email, and
- * the VAPID ones without the email pair still sends push. Neither is required
- * for the other.
+ * Secrets: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT.
  *
  * What decides whether to send anything lives in ../_shared/notify.ts, which
  * has no imports precisely so it can be tested under vitest with the rest of
@@ -27,7 +27,7 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import webpush from 'npm:web-push@3.6.7'
 import {
-  dueSessions, cookNote, planNote, LEAD_MINUTES,
+  dueSessions, cookNote, planNote,
   type CookSession, type Note, type PlanRow,
 } from '../_shared/notify.ts'
 
@@ -132,7 +132,6 @@ Deno.serve(async () => {
     .filter(Boolean)
 
   const ready = dueSessions(sessions, now)
-  let emailed = 0
   let pushed = 0
 
   if (ready.length) {
@@ -142,31 +141,11 @@ Deno.serve(async () => {
       .from('reminder_log').select('session_id').in('session_id', ready.map((s) => s.id))
     const sent = new Set((already ?? []).map((r) => r.session_id as string))
 
-    const resend = Deno.env.get('RESEND_API_KEY')
-    const from = Deno.env.get('REMINDER_FROM')
-    const to = people.map((m) => m.email as string).filter(Boolean)
-
     for (const session of ready) {
       if (sent.has(session.id)) continue
 
       const note = cookNote(session)
       let delivered = false
-
-      if (resend && from && to.length) {
-        const response = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${resend}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            from,
-            to,
-            subject: `Cooking in ${LEAD_MINUTES} minutes: ${session.label}`,
-            text: `${note.body}\n\nBite Buddy`,
-          }),
-        })
-        if (response.ok) { emailed += 1; delivered = true } else {
-          console.error('email failed', session.id, await response.text())
-        }
-      }
 
       for (const member of people) {
         if (!(await wants(member.id as string)).cook) continue
@@ -180,7 +159,7 @@ Deno.serve(async () => {
       if (delivered) {
         await db.from('reminder_log').insert({
           session_id: session.id,
-          sent_to: to,
+          sent_to: people.map((m) => m.email as string).filter(Boolean),
           session_at: `${session.date} at ${session.time}`,
         })
       }
@@ -226,7 +205,6 @@ Deno.serve(async () => {
 
   return Response.json({
     checked: sessions.length,
-    emailed,
     pushed,
     told,
     pushing: canPush,
