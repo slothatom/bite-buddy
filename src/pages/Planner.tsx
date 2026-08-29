@@ -499,7 +499,7 @@ function SlotRow({
                 ))}
                 {meal.note ? (
                   <div className="pt-0.5" title={meal.note}>
-                    <SourceLine text={meal.note} clamp={2} />
+                    <SourceLine text={meal.note} clamp={2} translate />
                   </div>
                 ) : null}
                 <ShoppingState entries={meal.entries} />

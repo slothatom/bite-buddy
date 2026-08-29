@@ -468,7 +468,7 @@ function RecipeCard({
             <span className="block font-semibold text-ink-900 text-sm leading-snug">{card.name}</span>
             {lead.sourceLine ? (
               <span className="block mt-1">
-                <SourceLine text={lead.sourceLine} clamp={2} />
+                <SourceLine text={lead.sourceLine} clamp={2} translate />
               </span>
             ) : null}
           </span>
@@ -777,7 +777,7 @@ function RecipeDetail({
           {recipe.sourceLine ? (
             <div className="card-soft p-3">
               <p className="text-[10px] font-bold uppercase tracking-wide text-ink-500 mb-1">How your dietician wrote it</p>
-              <SourceLine text={recipe.sourceLine} />
+              <SourceLine text={recipe.sourceLine} translate />
             </div>
           ) : null}
 
