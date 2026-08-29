@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import {
-  Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download, ClipboardPaste, Sparkles,
+  Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download,
 } from 'lucide-react'
 import type {
   Difficulty, DishCategory, RecipeComponent, PortionUnit, QuickFilter, Recipe, RecipeTag,
@@ -12,9 +12,6 @@ import { useFoods, useFoodStore } from '../../store/useFoodStore'
 import { useIngredientSearch, type IngredientSearch } from '../../store/useIngredientSearch'
 import { importedFood, alreadyHave } from '../../lib/foodImport'
 import type { NutritionResult } from '../../services/nutritionApi'
-import { draftFromText } from '../../services/recipeAssistant'
-import { componentsFrom, resolveIngredients, type RecipeDraft } from '../../lib/recipeDraft'
-import { buildFoodIndex } from '../../lib/foodSearch'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
 import { useNutritionContext } from '../../store/useNutrition'
 import { recipePerServing, componentNutrients, reportPerServing, roundNutrients } from '../../lib/nutrition'
@@ -56,15 +53,6 @@ export default function RecipeEditor({
   const [draft, setDraft] = useState<Recipe>(() => recipe ?? blankRecipe())
   const [picking, setPicking] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [pasting, setPasting] = useState(false)
-  /**
-   * Ingredients the assistant read but could not match to a food you have.
-   *
-   * Kept beside the draft rather than dropped, because "handful of coriander"
-   * is a real line in a real recipe and the person reading it knows what to do
-   * with it. Shown until they are resolved or the recipe is saved without them.
-   */
-  const [unmatched, setUnmatched] = useState<string[]>([])
 
   const isNew = recipe === null
   const edited = !isNew && custom.some((r) => r.id === draft.id)
@@ -159,29 +147,6 @@ export default function RecipeEditor({
         </header>
 
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
-
-          {/* Offered only on a new recipe: on an existing one it would mean
-              replacing what is already there, which is not what anybody wants
-              from a button labelled "paste". */}
-          {isNew && (
-            <button className="btn-secondary w-full" onClick={() => setPasting(true)}>
-              <ClipboardPaste size={15} /> Paste a recipe and let it read it
-            </button>
-          )}
-
-          {unmatched.length > 0 && (
-            <div className="card-soft p-3 space-y-1">
-              <p className="text-xs font-bold uppercase tracking-wide text-mustard-700">
-                {unmatched.length === 1 ? 'One ingredient' : `${unmatched.length} ingredients`} not
-                in your foods
-              </p>
-              <p className="text-sm text-ink-700">{unmatched.join(', ')}</p>
-              <p className="text-xs text-ink-500">
-                They were left out rather than guessed at. Add them below if they matter to the
-                numbers.
-              </p>
-            </div>
-          )}
 
           {/* ─── What it is ─────────────────────────────────────────────── */}
           <div className="space-y-3">
@@ -441,31 +406,6 @@ export default function RecipeEditor({
         </footer>
       </div>
 
-      {pasting && (
-        <PasteRecipe
-          onClose={() => setPasting(false)}
-          onDraft={(read, components, missing) => {
-            patch({
-              name: { en: read.name },
-              emoji: read.emoji,
-              servings: read.servings,
-              prepMinutes: read.prepMinutes,
-              cookMinutes: read.cookMinutes,
-              category: read.category,
-              quickFilters: read.quickFilters,
-              tags: read.mealTypes as Recipe['tags'],
-              components,
-              steps: read.steps.map((instruction, i) => ({
-                id: `step-${i}`, instruction, timerSeconds: 0,
-              })),
-              description: read.note,
-            })
-            setUnmatched(missing)
-            setPasting(false)
-          }}
-        />
-      )}
-
       {picking && (
         <IngredientPicker
           excludeRecipeId={draft.id}
@@ -486,99 +426,6 @@ export default function RecipeEditor({
  * for the row so the number you typed is the number you see, but nothing
  * downstream ever has to know about cups.
  */
-/**
- * Reading a paste into a draft.
- *
- * The assistant does the tedious half: turning "1 cup of red lentils" into 190
- * grams of a food you actually have, and a list of steps into a list of steps.
- * It does not decide anything. What comes back lands in the editor as a draft
- * with every field showing, and nothing is saved until you press save.
- *
- * Two things it is not allowed to do, and the second is the reason this is
- * safe. It cannot invent a category or a filter, only choose from the ones this
- * app has. And it cannot supply a single calorie: every number still comes from
- * your food database, so an ingredient it could not match is reported rather
- * than costed.
- */
-function PasteRecipe({
-  onClose, onDraft,
-}: {
-  onClose: () => void
-  onDraft: (draft: RecipeDraft, components: RecipeComponent[], unmatched: string[]) => void
-}) {
-  const foods = useFoods()
-  const [text, setText] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  async function read() {
-    setBusy(true)
-    setError(null)
-    const result = await draftFromText(text, foods)
-    setBusy(false)
-
-    if (!result.ok) {
-      setError(result.error)
-      return
-    }
-
-    const resolved = resolveIngredients(result.draft, foods, buildFoodIndex(foods))
-    onDraft(
-      result.draft,
-      componentsFrom(resolved),
-      resolved.filter((i) => i.matched === 'none').map((i) => i.name),
-    )
-  }
-
-  return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
-      <div
-        className="bg-paper w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl p-5 space-y-4"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div>
-          <h3 className="display text-lg text-ink-900">Paste a recipe</h3>
-          <p className="text-sm text-ink-700">
-            The text of one, off a website, out of a message, or a few lines of your own
-            shorthand. Not a link, it cannot open pages. It comes back as a
-            draft you can edit, and nothing is saved until you say so.
-          </p>
-        </div>
-
-        <textarea
-          className="input min-h-40 font-mono text-xs"
-          autoFocus
-          placeholder={'chicken thighs, 500g\nsweet potato, 3 medium\nroast 40 min at 200'}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-
-        {error && (
-          <p className="card-soft p-3 text-sm text-coral-700 bg-coral-50">{error}</p>
-        )}
-
-        <p className="text-xs text-ink-500">
-          Ingredients are matched to foods you already have, and anything it cannot match is
-          listed rather than guessed at. Every calorie still comes from your own food database.
-        </p>
-
-        <div className="flex gap-2">
-          <button
-            className="btn-primary flex-1"
-            disabled={busy || text.trim().length < 10}
-            onClick={() => void read()}
-          >
-            {busy
-              ? <><Loader2 size={15} className="animate-spin" /> Reading it</>
-              : <><Sparkles size={15} /> Read it</>}
-          </button>
-          <button className="btn-secondary" onClick={onClose}>Cancel</button>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 function ComponentRow({
   component, onChange, onRemove,

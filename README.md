@@ -207,7 +207,7 @@ because the only thing that has to be told apart is a Tuesday from a Sunday.
 
 A source link is checked before it is stored and again before it is shown. Only http and
 https ever become a link: a recipe is data, it can arrive from a backup, from the other
-phone or from the assistant, and `javascript:` in an href is a script running on your page
+phone or from a backup, and `javascript:` in an href is a script running on your page
 with your session. `src/lib/links.ts` is four lines of that and a test for each way in.
 
 275 recipes on six shelves, opening on the meal you are most likely looking for at this hour.
@@ -428,67 +428,29 @@ public, create the Supabase project, run `supabase/schema.sql` and then
 `supabase/rows.sql`, add two repository secrets. Every push then deploys
 itself.
 
-### The recipe assistant
-
-Optional, and the only feature in the app that calls a model. You paste a
-recipe, from a website or a message or a few lines of your own shorthand, and it
-comes back as a draft: named, weighed in grams, ingredients matched to foods you
-already have, with a method if the paste had one.
-
-```bash
-supabase login                                        # once, opens a browser
-supabase link --project-ref <your-project-ref>        # the id in your Supabase URL
-supabase secrets set ANTHROPIC_API_KEY=...            # from console.anthropic.com
-supabase functions deploy recipe-assistant
-```
-
-This repository holds no `supabase/config.toml`, so the CLI has nothing to
-deduce the project from: without the link step, or a `--project-ref` on each
-command, it stops and asks. The project ref is the subdomain of your Supabase
-URL, and it is not a secret, it is already in the public bundle.
-
-The key lives on the function and never reaches a browser, which is the whole
-reason this is a function at all: the site is public, and a key in the bundle is
-a key anyone can read and spend. The function checks that the caller is in the
-household before it spends anything, using the same membership row every policy
-in the database consults.
-
-Three rules it works under, in `supabase/functions/recipe-assistant/index.ts`
-and enforced again on the way back in `src/lib/recipeDraft.ts`:
-
-- **No nutrition ever comes from the model.** There is no field for a calorie in
-  what it returns. Ingredients are matched to your food database and every
-  number is computed from those, so a model that hallucinates cannot put a
-  figure on a screen about what you eat.
-- **It cannot invent a category or a filter**, only choose from the ones this app
-  has. Anything else is dropped when the reply is read.
-- **A miss is reported, never guessed.** An ingredient it cannot match to a food
-  you have comes back as a name and a weight, listed for you to resolve. A wrong
-  match is a wrong number nobody would ever notice.
-
-Nothing is saved until you press save. Without the key the button is still
-there and says the assistant is not set up, and every other way of writing a
-recipe works exactly as before.
-
 ### Reminders and notifications
 
 The one part of the app that needs something running when nobody is looking at
 it: a browser that is closed sends no email and receives no push. It is an Edge
 Function called `notify` on a five-minute schedule, and it does two jobs.
 
-**Before a cooking session.** An email to everyone on the household list,
-fifteen minutes before, and a push to whichever devices asked for one. The time
-is worked out by the browser that scheduled it: "18:00" is an instant only once
-you know where the person typing it was standing, and the server does not. Each
-reminder is recorded in `reminder_log` so it is sent once, and only after
-something actually arrived, so a run that reached nobody tries again rather
-than recording a send that never happened. Sending it twice is worse than
-sending it late, because the second one teaches you to ignore the first.
+**Before a cooking session.** A push fifteen minutes before, to whichever
+devices asked for one. The time is worked out by the browser that scheduled it:
+"18:00" is an instant only once you know where the person typing it was
+standing, and the server does not. Each reminder is recorded in `reminder_log`
+so it is sent once, and only after something actually arrived, so a run that
+reached nobody tries again rather than recording a send that never happened.
+Sending it twice is worse than sending it late, because the second one teaches
+you to ignore the first.
 
-**When the other one of you changes the week.** Push only. An email saying
-"Oli moved Thursday" is an email nobody wants. Nothing is sent until they have
+**When the other one of you changes the week.** Nothing is sent until they have
 been still for ten minutes, so planning a week is one line rather than thirty,
 and you are never told about your own edits.
+
+There was an email path here as well, and it has been taken out. Reaching two
+different mailboxes needs a verified sending domain, and a push reaches both
+phones for nothing; a second channel that only worked for one of the two people
+would have been worse than no second channel at all.
 
 The whole of that decision, what to send and when, lives in
 `supabase/functions/_shared/notify.ts`, which has no imports so it runs under
@@ -496,9 +458,6 @@ vitest with the rest of the app. Fourteen tests cover it. The encryption and
 delivery around it belong to `web-push` and to Google.
 
 #### Setting it up
-
-Three parts, and each works without the others. Email needs no VAPID keys, push
-needs no Resend account.
 
 The function is two files here, the plumbing and the decisions, so the
 decisions can be tested. For deploying by hand there is one:
@@ -508,18 +467,12 @@ sources, because a stale pasted copy is the sort of thing nobody finds out
 about until a notification does the wrong thing.
 
 ```bash
-# 1. The function
 supabase functions deploy notify
 
-# 2. Email, if you want it
-supabase secrets set RESEND_API_KEY=...        # a free Resend account
-supabase secrets set REMINDER_FROM="Bite Buddy <hello@yourdomain>"
-
-# 3. Push, if you want it
-npx web-push generate-vapid-keys               # prints a public and a private key
+npx web-push generate-vapid-keys        # prints a public and a private key
 supabase secrets set VAPID_PUBLIC_KEY=...
 supabase secrets set VAPID_PRIVATE_KEY=...
-supabase secrets set VAPID_SUBJECT=mailto:you@yourdomain
+supabase secrets set VAPID_SUBJECT=https://your-site/
 ```
 
 Run `supabase/push.sql` in the SQL editor, then put the **public** half of the
@@ -823,6 +776,5 @@ recipe, plan or measurement is served at a public URL for anything else to read.
 
 ## Not done yet
 
-- A recipe assistant that can open a link rather than being handed the text.
 - Anything at all for a device that is not signed in. Notifications, sync and
   sharing all begin at an account.

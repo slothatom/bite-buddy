@@ -110,31 +110,6 @@ publishing a site that silently falls back to local-only storage.
 
 ---
 
-## 5. Optional: the recipe assistant
-
-The one feature that calls a model. Skip it and everything else works; the
-button says it is not set up.
-
-```bash
-supabase login                                        # once, opens a browser
-supabase link --project-ref <your-project-ref>        # the id in your Supabase URL
-supabase secrets set ANTHROPIC_API_KEY=...            # from console.anthropic.com
-supabase functions deploy recipe-assistant
-```
-
-This repository holds no `supabase/config.toml`, so the CLI has nothing to
-deduce the project from: without the link step, or a `--project-ref` on each
-command, it stops and asks. The project ref is the subdomain of your Supabase
-URL, and it is not a secret, it is already in the public bundle.
-
-The key stays on the function. It never reaches a browser and it is not one of
-the repository secrets, because those end up in the deployed bundle, which is
-public. Paste it into the terminal or the Supabase dashboard, and nowhere else.
-
-What it costs: a recipe read is well under a penny at current prices, and the
-function refuses anyone who is not in the household, so nobody else can spend
-it.
-
 ## Then it deploys itself
 
 Every push to the branch runs `.github/workflows/deploy.yml`: lint, typecheck,
