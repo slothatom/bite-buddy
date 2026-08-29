@@ -606,9 +606,34 @@ subscription and authorises nothing on its own, which is why it can live in a
 table the app reads rather than in a repository secret and a rebuild. The
 private half never leaves the function's secrets.
 
-Then schedule it, either by uncommenting the `cron.schedule` block at the
-bottom of `supabase/schema.sql` and filling in the project ref, or from the
-dashboard under Integrations > Cron, which avoids putting a key in SQL at all.
+Then schedule it, by uncommenting the `cron.schedule` block at the bottom of
+`supabase/schema.sql` and filling in the project ref and the anon key. The
+dashboard's Integrations > Cron can schedule an Edge Function too, but check
+what it wrote: **the Authorization header is not optional**, and a job without
+one is the one setup mistake that hides completely.
+
+Edge Functions verify a JWT before your code runs, so a request with no header
+is answered `401 UNAUTHORIZED_NO_AUTH_HEADER` by the gateway and the function
+never executes. `pg_cron` still records the job as `succeeded`, because posting
+the request did succeed, and `net.http_post` is asynchronous so the answer lands
+somewhere else entirely. Everything looks healthy and nothing is ever sent.
+
+This is the query that shows the truth, and it is worth running first whenever a
+notification does not arrive:
+
+```sql
+select id, status_code, content, created
+from net._http_response order by id desc limit 20;
+```
+
+`content` is the function's own reply: `checked` cook sessions, `pushed`, `told`,
+and `pushing` for whether the VAPID keys are set. A 401 there means the header,
+not the code.
+
+Use the **anon** key, never the service role key. Anon is enough to get past the
+gateway, it is in the app's bundle already and authorises nothing on its own;
+the service role key bypasses every row-level policy in the schema and belongs
+only in the function's own secrets.
 
 Each person turns notifications on per device, in Settings. Per device rather
 than per person because a phone is what gets notified, and because the profile
