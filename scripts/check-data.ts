@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { FOODS } from '../src/data/foods.js'
 import { DISHES } from '../src/data/dishes.js'
 import { MEAL_RECIPES } from '../src/data/generated/mealRecipes.js'
@@ -5,6 +8,8 @@ import { SOURCE_PLANS } from '../src/data/generated/sourcePlans.js'
 import { atwaterCalories, buildContext, calorieDrift, calorieGap, recipePerServing } from '../src/lib/nutrition.js'
 import { RECIPE_CLASSIFICATION } from '../src/data/generated/classification.js'
 import { DISH_CATEGORIES, QUICK_FILTERS, HAND_APPLIED_FILTERS } from '../src/lib/dishCategories.js'
+import { RECIPE_ALIASES } from '../src/data/generated/recipeAliases.js'
+import { componentSignature, rebuildFromArchive, renderFiles } from './lib/library.js'
 import type { Recipe } from '../src/types/index.js'
 
 /**
@@ -136,15 +141,69 @@ for (const recipe of recipes) {
 }
 
 // 6. Names are unique, so the library has no indistinguishable entries.
-const names = new Map<string, number>()
-for (const r of recipes) names.set(r.name.en, (names.get(r.name.en) ?? 0) + 1)
-for (const [name, count] of names) {
-  if (count > 1) problems.push(`duplicate recipe name: "${name}" ×${count}`)
+//
+// A duplicate name used to be settled by appending a number, which told the
+// reader nothing: 68 of the 204 imported recipes ended up as "Baked oats (2)".
+// The importer now says what differs instead, so a duplicate reaching here is
+// a rule that failed rather than a name waiting to be numbered.
+const names = new Map<string, Recipe[]>()
+for (const r of recipes) names.set(r.name.en, [...(names.get(r.name.en) ?? []), r])
+for (const [name, group] of names) {
+  if (group.length > 1) {
+    problems.push(
+      `duplicate recipe name: "${name}" ×${group.length} (${group.map((r) => r.id).join(', ')}), `
+      + 'the importer could not find an ingredient to tell them apart',
+    )
+  }
+  if (/ \(\d+\)$/.test(name)) {
+    problems.push(`${name}: a number in brackets says nothing about the recipe`)
+  }
 }
 
-// 5. Every recipe knows what kind of food it is, and the file saying so is not
-//    stale, a category the classifier no longer produces would silently filter
-//    to nothing on the Recipes screen.
+// 7. No two recipes are the same recipe.
+//
+// The same meal is written a dozen different ways across fourteen documents,
+// down to a typo in "sos de usturoi". Two entries with identical ingredients in
+// identical amounts are one recipe, and the importer merges them; one arriving
+// here means the merge missed it and the library is browsing worse than it needs to.
+const bySignature = new Map<string, Recipe[]>()
+for (const r of recipes) {
+  const key = componentSignature(r.components)
+  bySignature.set(key, [...(bySignature.get(key) ?? []), r])
+}
+for (const group of bySignature.values()) {
+  if (group.length > 1) {
+    problems.push(`identical ingredients: ${group.map((r) => `${r.id} (${r.name.en})`).join(' = ')}`)
+  }
+}
+
+// 8. Every merged-away recipe still resolves, and none of them shadows a live one.
+for (const [from, to] of Object.entries(RECIPE_ALIASES)) {
+  if (!ctx.recipes.has(to)) problems.push(`alias ${from} points at missing recipe ${to}`)
+  if (recipes.some((r) => r.id === from)) problems.push(`alias ${from} shadows a recipe that still exists`)
+}
+
+// 9. The generated data is what the importer would produce today.
+//
+// The archive keeps every meal line verbatim, so the whole library can be
+// rebuilt from it without the .docx originals. That makes this a drift check:
+// change a dish definition or an import rule and forget to re-run the build,
+// and the committed data no longer follows from the rules that produced it.
+// It is also the only way to catch a whole class of import bug, since a meal
+// that quietly counts its dish's olive oil twice looks perfectly plausible
+// sitting in the file.
+const GENERATED = resolve(dirname(fileURLToPath(import.meta.url)), '../src/data/generated')
+const rebuilt = renderFiles(rebuildFromArchive(SOURCE_PLANS))
+for (const [name, content] of Object.entries(rebuilt)) {
+  const onDisk = readFileSync(resolve(GENERATED, name), 'utf8')
+  if (onDisk !== content) {
+    problems.push(`src/data/generated/${name} is out of date, re-run: npm run data:build`)
+  }
+}
+
+// 10. Every recipe knows what kind of food it is, and the file saying so is not
+//     stale, a category the classifier no longer produces would silently filter
+//     to nothing on the Recipes screen.
 for (const recipe of recipes) {
   const classified = RECIPE_CLASSIFICATION[recipe.id]
   if (!classified) {
@@ -159,6 +218,15 @@ for (const recipe of recipes) {
     if (HAND_APPLIED_FILTERS.includes(f)) {
       problems.push(`${recipe.id}: "${f}" cannot be derived and must not be generated`)
     }
+  }
+}
+
+// And nothing is classified that is no longer there. A recipe the importer
+// merged away leaves its category behind, which is harmless until the day two
+// of them disagree about what the surviving recipe is.
+for (const id of Object.keys(RECIPE_CLASSIFICATION)) {
+  if (!ctx.recipes.has(id)) {
+    problems.push(`${id}: classified but no longer in the library, re-run scripts/classify-recipes.ts`)
   }
 }
 

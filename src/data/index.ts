@@ -7,6 +7,7 @@ export { FOODS, FOOD_BY_ID } from './foods'
 export { DISHES } from './dishes'
 export { SOURCE_PLANS } from './generated/sourcePlans'
 export { MEAL_RECIPES } from './generated/mealRecipes'
+export { RECIPE_ALIASES } from './generated/recipeAliases'
 
 /**
  * The full recipe library.

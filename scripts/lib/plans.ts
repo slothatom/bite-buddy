@@ -127,7 +127,7 @@ function parseDocument(path: string, id: string): RawPlan {
     current.meals.push({
       slot,
       text: value.replace(/\s+/g, ' ').trim(),
-      fragments: splitComponents(value).map(toFragment),
+      fragments: fragmentsOf(value),
     })
   }
 
@@ -144,6 +144,18 @@ function bare(text: string): Omit<RawFragment, 'inner' | 'innerFragments'> {
     state: parsed.state,
     estimated: parsed.estimated,
   }
+}
+
+/**
+ * A meal line, split into the things it names.
+ *
+ * Exported because the committed archive stores each line verbatim, so the
+ * whole library can be rebuilt from `sourcePlans.ts` alone when the .docx
+ * originals are not to hand. Both paths must parse a line identically, so
+ * there is one function and `parseDocument` uses it too.
+ */
+export function fragmentsOf(text: string): RawFragment[] {
+  return splitComponents(text).map(toFragment)
 }
 
 function toFragment(fragment: string): RawFragment {

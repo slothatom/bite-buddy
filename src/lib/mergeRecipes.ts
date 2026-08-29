@@ -5,10 +5,15 @@ import type { RecipeVariants } from './recipeGroups'
 /**
  * Merging a dish that got written down more than once.
  *
- * Grouping the repeats made the list readable, but they are still 275 separate
- * recipes underneath: the planner's picker offers all of them, and picking
- * "Green bean soup" means picking one of four identical things for no reason.
+ * Grouping the versions makes the list readable, but they are still separate
+ * recipes underneath, and the planner's picker offers every one of them.
  * Merging collapses a group for real.
+ *
+ * The importer now folds away the repeats that are only repeats, so the shipped
+ * library arrives with nothing to offer here. What is left is the versions that
+ * genuinely differ, 30 g of oats against 45 g, which are a choice rather than a
+ * duplicate and are never swept up on your behalf, and whatever you write or
+ * edit yourself.
  *
  * Nothing is deleted. A merge records "this recipe is really that one", and
  * every lookup follows the note, which is what makes it safe to merge

@@ -35,7 +35,7 @@ interface RecipeStore {
   restoreRecipe: (id: string) => void
 }
 
-/** True for the 275 recipes that ship with the app, as opposed to your own. */
+/** True for the 228 recipes that ship with the app, as opposed to your own. */
 export function isBuiltIn(id: string): boolean {
   return ALL_RECIPES.some((r) => r.id === id)
 }

@@ -88,7 +88,7 @@ const groceryItems = listTable<GroceryItem>(
 /**
  * The recipe library, meaning your changes to it.
  *
- * The 275 shipped recipes live in the app, so a row exists only for one you
+ * The 228 shipped recipes live in the app, so a row exists only for one you
  * wrote, edited, hid, favourited or folded into another. That is why the four
  * separate lists the store keeps collapse into one row per recipe: they are all
  * answers to "what have you done to this recipe".

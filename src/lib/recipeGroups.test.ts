@@ -104,11 +104,20 @@ describe('the same dish written at different portions', () => {
     expect(groups.map((g) => g.name)).toEqual(['Zebra stew', 'Apple bake'])
   })
 
-  it('cuts a real third off the meal library', () => {
-    // 204 generated meals, 68 of them numbered repeats of a dish already there.
-    const meals = ALL_RECIPES.filter((r) => r.sourceLine)
-    const grouped = groupVariants(meals)
-    expect(grouped.length).toBeLessThan(meals.length * 0.75)
+  it('puts one dish written at three portions on one shelf', () => {
+    // The importer folds away the repeats that are the same food, so what is
+    // left to group is genuinely different portions of a dish: 30, 40 and 45 g
+    // of oats under the same yogurt and berries.
+    const oats = groupVariants(ALL_RECIPES)
+      .find((g) => g.name === 'Rolled oats with yogurt & mixed berries')!
+    expect(oats.variants).toHaveLength(3)
+  })
+
+  it('leaves a portion in brackets but not a name in brackets', () => {
+    expect(baseName('Cream of mushroom soup (300 g)')).toBe('Cream of mushroom soup')
+    expect(baseName('Creamed spinach with halloumi (80 g halloumi)')).toBe('Creamed spinach with halloumi')
+    expect(baseName('Salmon with sweet potato (no yogurt garlic sauce)')).toBe('Salmon with sweet potato')
+    expect(baseName('Porridge (the good one)')).toBe('Porridge (the good one)')
   })
 
   it('loses nothing on the way', () => {

@@ -89,7 +89,7 @@ Nine screens. Routes are hash-based so the app works offline.
 |---|---|---|---|
 | **Home** | `/` | Open the app and know where you stand. | Greeting with Zig, four at-a-glance tiles (today's calories, days planned, Mediterranean goals met, next cook or latest weight), today's meals against a calorie ring, a seven-bar week chart, one dismissible moment, sync status |
 | **Planner** | `/plan` | Plan and read a stretch of days. | Week, fortnight or month range, day cards with per-day calories, 5 meal slots each holding any number of entries, add-entry sheet, copy day, macro bars against target |
-| **Recipes** | `/recipes` | Find something to eat. | 275 recipes on meal-type shelves, grouped into variant cards, dish-category sheet, 14 quick-filter chips, search, favourites, detail sheet with provenance and method, editor, merge duplicates, delete |
+| **Recipes** | `/recipes` | Find something to eat. | 228 recipes on meal-type shelves, grouped into variant cards, dish-category sheet, 14 quick-filter chips, search, favourites, detail sheet with provenance and method, editor, merge duplicates, delete |
 | **Foods** | `/foods` | The ingredient database. | 122 rows under 16 category headings, per-100 g figures and a how-often tier, add by hand or from USDA FoodData Central, Open Food Facts or a barcode, edit, merge, delete, provenance on every imported food |
 | **Grocery** | `/grocery` | Get through a shop one-handed. | Checklist grouped by category, scoped to the days you pick, editable rows, free-typed additions, progress bar |
 | **Schedule** | `/schedule` | Plan batch-cook sessions. | Session list with date, time, dishes and completion state, plus an email reminder to both people before a session |
@@ -150,7 +150,7 @@ Real measurements from the shipped data, not estimates. Regenerate with
 
 | What | Figure | Why it matters |
 |---|---|---|
-| Recipes | **275** | 71 base dishes plus 204 meals taken from the plans, grouped into far fewer cards by variant |
+| Recipes | **228** | 71 base dishes plus 157 meals taken from the plans, grouped into far fewer cards by variant |
 | Recipe name length | **5 to 77 chars**, median 41 | Cards must handle two-line names without breaking the grid |
 | Source lines | **up to 187 chars** | Shown under the name; truncates on cards, wraps in detail |
 | Foods | **122** | Across 16 categories, each row carrying up to three language names |

@@ -330,7 +330,7 @@ const SPECS: DishSpec[] = [
     servings: 2, parts: [['mushrooms', 400], ['onion', 60], ['potato', 100], ['milk', 100], ['olive-oil', 10], ['water', 500]],
     tags: ['soup', 'vegetarian', 'batch'], prep: 10, cook: 25,
     steps: ['Sweat the mushrooms and onion in olive oil.', 'Add potato and water, simmer, then blend with the milk.'],
-    aliases: ['supa crema de ciuperci', 'gombakremleves', '300 gombakremleves'],
+    aliases: ['supa crema de ciuperci', 'gombakremleves'],
     byWeight: true,
   },
   {

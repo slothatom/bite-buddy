@@ -4,7 +4,7 @@ import { recipePerServing, type NutritionContext } from './nutrition'
 /**
  * Working out what a recipe is, from what goes in it.
  *
- * The 275 shipped recipes were generated from the dietician's lines, which
+ * The 228 shipped recipes were generated from the dietician's lines, which
  * never say "this is a soup", they say "350 g supă de fasole verde, 25 g pâine
  * int". So the category has to be read off the food, and the rules below are
  * the reading. They are checked in rather than run once and forgotten, so the

@@ -14,7 +14,7 @@ and it still runs entirely offline on your own machine with no account at all.
 Bite Buddy isn't seeded with invented recipes. Its library comes from two real sources:
 
 **14 dietician plan documents** (Jan 2021 in Hungarian, Apr–Nov 2022 in Romanian), **97 days,
-481 meals**. These are parsed into **204 named meal recipes** and **71 underlying dishes**,
+481 meals**. These are parsed into **157 named meal recipes** and **71 underlying dishes**,
 every one traceable back to the line the dietician wrote.
 
 **An 89-page Mediterranean Diet guide**, its 17 food categories, allowed-lists and serving
@@ -281,21 +281,25 @@ https ever become a link: a recipe is data, it can arrive from a backup, from th
 phone or from a backup, and `javascript:` in an href is a script running on your page
 with your session. `src/lib/links.ts` is four lines of that and a test for each way in.
 
-275 recipes on six shelves, opening on the meal you are most likely looking for at this hour.
+228 recipes on six shelves, opening on the meal you are most likely looking for at this hour.
 Searchable in English, Romanian or Hungarian, typing `telemea` or `zabpehely` finds the right
 thing. Every imported meal shows the original dietician line as provenance. Macros are always
 derived from components, never stored, so they can't drift out of date.
 
 The plans write the same dish more than once, sometimes at a different portion, more often
-just worded differently (`supă de fasole verde` one week, `ciorbă de fasole verde` the next),
-which is why 68 of the 204 imported meals are numbered repeats. Those collapse into one card
-with the wordings inside it, taking the library from 275 cards to 207.
+just worded differently (`supă de fasole verde` one week, `ciorbă de fasole verde` the next).
+Where the wording differs but the food does not, the importer keeps one recipe rather than
+two: 47 of the 204 lines that used to be their own recipe now resolve to another one, or to
+the dish they amount to. Where the portion genuinely differs, both survive and the name says
+which is which, `Rolled oats with yogurt & mixed berries (45 g rolled oats)`, and the 13
+dishes written at more than one portion collapse into one card with the portions inside it,
+taking the library from 228 cards to 211.
 
 Collapsing them is only a display; they can also be **merged** for real, which takes them out
-of the library and out of the planner's picker. 21 of the 45 repeated dishes have versions that
-come to identical numbers, and those are offered as a one-tap tidy, the other 24 differ by
-portion (`Spicy chicken & vegetable pan` runs 259 to 408 kcal), which is a real choice and is
-never swept up automatically; merge those by hand from the recipe itself.
+of the library and out of the planner's picker. The shipped library now offers nothing to
+merge, since the importer has already done it; the offer is for the repeats you create
+yourself. Versions that differ by portion are a real choice and are never swept up
+automatically; merge those by hand from the recipe itself.
 
 A merge deletes nothing. It records "this recipe is really that one", and every lookup resolves
 through the note, which is what lets you merge something a planned day already names, or
@@ -314,7 +318,7 @@ guess, "contains nothing expensive", was true of 83% of the library, because Med
 home cooking out of a Romanian supermarket is cheap almost by definition. A filter matching
 four recipes in five narrows nothing, so it is yours to apply.
 
-Every recipe is editable, including the 275 that ship in code: the first change keeps a copy
+Every recipe is editable, including the 228 that ship in code: the first change keeps a copy
 of your own and the original stays underneath, so **Revert** and **Delete** are separate
 buttons that mean different things.
 
@@ -679,24 +683,48 @@ The plan data is generated, not hand-typed, so it stays reproducible and auditab
 
 ```bash
 npm run data:build -- <dir-with-the-.docx-plans>   # regenerate src/data/generated/
+npm run data:build                                 # or from the committed archive
 npm run data:check                                 # integrity checks
 ```
 
-`scripts/build-data.ts` reads the `.docx` files directly (a small ZIP reader, no dependency),
-splits each meal line into fragments, and resolves each fragment to either a food or a dish.
-Two judgement calls live in the data rather than the parser:
+`scripts/build-data.ts` reads the `.docx` files directly (a small ZIP reader, no dependency)
+and hands each meal line to `scripts/lib/library.ts`, which splits it into fragments and
+resolves each fragment to either a food or a dish. Without the `.docx` files it rebuilds from
+the committed archive instead, which stores every line verbatim: the same rules over the same
+text, so a dish definition or an import rule can be changed and the data regenerated on any
+clone of the repository.
+
+Four judgement calls live in the data or the rules rather than the parser:
 
 - `DISH_BY_WEIGHT` in `src/data/dishes.ts` marks dishes the plans portion by weight
   (`350 g ciorba a la grec`). For everything else a stated weight names an *ingredient*
-  (`tigaie picanta: 100 g piept de pui`) and must not be read as a portion size.
-- A parenthetical's ingredients are added only when the dish definition doesn't already
-  contain them, so `cartofi cu ou (…, sos: 100 g iaurt, 50 g telemea)` picks up its sauce
-  without double-counting the potatoes.
+  (`tigaie picanta: 100 g piept de pui`) and must not be read as a portion size. A bare number
+  in front of one of them is grams: `300 gombakremleves` lost its `g` in the typing, and
+  without this it imported as the whole two-serving pot.
+- A food a dish in the same meal already contains is not added twice. `bruschete cu telemea:
+  50 g telemea, 50 g paine int, rosii…` names the dish and then lists what is on it; read
+  literally that is a bruschetta plus a second helping of everything, which is how 45 of the
+  204 imported meals came to carry a median of 88 kcal of food nobody ate. Where she asked for
+  more than the dish definition assumes, the difference is kept, so `salata cezar … salata de
+  cruditati` at 200 g against a 150 g definition still gets its extra 50 g.
+- Two lines that come to the same ingredients in the same amounts are one recipe. The first
+  survives, the rest become entries in `recipeAliases.ts` so a day planned against one of them
+  still resolves, and a meal that amounts to exactly one serving of one dish becomes that dish.
+- A duplicate name is settled by saying what differs, never by a number. An ingredient one of
+  them has joins its name (`Feta with puffed rice cakes, raw vegetable salad & extra virgin
+  olive oil`); otherwise the weight that differs most goes in brackets (`Rolled oats with
+  yogurt & mixed berries (45 g rolled oats)`).
 
 `scripts/check-data.ts` verifies every reference resolves, no recipe nests itself, every one of
-the 481 source lines maps to something, recipe names are unique, and each food's stated
-calories agree with its own macros, using fibre-aware Atwater (fibre at 2 kcal/g), because
-plain 4/4/9 makes every vegetable look mis-keyed.
+the 481 source lines maps to something, recipe names are unique and carry no bare numbering,
+no two recipes have identical ingredients, every merged-away id still resolves, and each food's
+stated calories agree with its own macros, using fibre-aware Atwater (fibre at 2 kcal/g),
+because plain 4/4/9 makes every vegetable look mis-keyed.
+
+It also rebuilds the whole library from the committed archive and compares it to what is
+committed. That is the only check that can see a whole class of import bug: a meal quietly
+counting its dish's olive oil twice looks perfectly plausible sitting in the file, and only
+disagrees with the rules that were supposed to produce it.
 
 ---
 
@@ -793,11 +821,14 @@ would be silent if it did.
 
 **Data invariants** (`npm run data:check`), every component resolves to a real
 food or recipe, no recipe nests itself, all 481 plan lines map to something,
-recipe names are unique, and each food's stated calories agree with its own
+recipe names are unique and say what makes them different, no two recipes are
+made of the same thing, and each food's stated calories agree with its own
 macros. Calorie agreement uses fibre-aware Atwater (fibre at 2 kcal/g); plain
 4/4/9 flags every vegetable as mis-keyed. Foods whose energy genuinely isn't in
 the macros, vanilla extract is mostly ethanol, are listed explicitly rather
-than silently tolerated.
+than silently tolerated. Last, the whole library is rebuilt from the committed
+archive and compared to the committed files, so the data always follows from
+the rules that produced it.
 
 **Unit tests** cover the parsing vocabulary and the nutrition maths, the two
 places where a mistake produces a plausible wrong number instead of an error:

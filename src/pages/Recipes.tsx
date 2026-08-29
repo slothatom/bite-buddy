@@ -32,7 +32,7 @@ import { useMealPlanStore } from '../store/useMealPlanStore'
 /**
  * The recipe library.
  *
- * This used to be one alphabetical grid of 275 cards behind thirteen filter
+ * This used to be one alphabetical grid of 228 cards behind thirteen filter
  * chips, every recipe in the app, in one undifferentiated wall, sorted by a
  * property nobody thinks in. Finding tomorrow's dinner meant scrolling past two
  * hundred things that were not dinner.

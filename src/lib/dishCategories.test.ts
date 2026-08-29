@@ -128,7 +128,7 @@ describe('reading a category off a recipe', () => {
   it('keeps mămăligă apart from a bowl of oats', () => {
     // Polenta arrives under cottage cheese as the starch of a meal; porridge is
     // a bowl and a spoon. Filing both as Porridge made the distinction useless.
-    expect(categorise(find('Polenta with cottage cheese & yogurt'), ctx)).toBe('grain')
+    expect(categorise(find('Polenta with cottage cheese & yogurt (30 g yogurt)'), ctx)).toBe('grain')
     expect(categorise(find('Oat porridge'), ctx)).toBe('porridge')
   })
 
