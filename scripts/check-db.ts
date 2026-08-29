@@ -83,6 +83,11 @@ async function checkPush() {
   `)
   await fresh.exec(readFileSync(resolve(ROOT, 'supabase/schema.sql'), 'utf8'))
 
+  // The row tables too, so this database is a whole project rather than half
+  // of one: the scheduled function reads the plan and the cook sessions, which
+  // live there, and a check that stopped at push.sql could not see them.
+  await fresh.exec(readFileSync(resolve(ROOT, 'supabase/rows.sql'), 'utf8'))
+
   const push = readFileSync(resolve(ROOT, 'supabase/push.sql'), 'utf8')
   try {
     await fresh.exec(push)
@@ -131,7 +136,38 @@ async function checkPush() {
     'select count(*)::int n from public.push_subscriptions')
   check('and leaving the household takes your devices with you', orphans.rows[0].n === 0)
 
+  await everyTableTheFunctionUses(fresh)
+
   await fresh.close()
+}
+
+/**
+ * Every table the scheduled function touches actually exists.
+ *
+ * `reminder_log` was written in schema.sql back when reminders were emails,
+ * and stayed there when they became push. A database that had been set up from
+ * push.sql alone therefore ran the whole feature without the one table that
+ * stops a reminder repeating, and nothing said so: supabase-js answers a
+ * missing table with `data: null` and an error nobody was reading, so the
+ * "already sent" check quietly found nothing every time and a single dinner
+ * would have buzzed twelve times.
+ *
+ * Reading the table names out of the function's own source is the point. A
+ * list maintained by hand here would have been just as out of date as the
+ * schema was.
+ */
+async function everyTableTheFunctionUses(db: PGlite) {
+  const source = readFileSync(resolve(ROOT, 'supabase/functions/notify/index.ts'), 'utf8')
+  const used = [...new Set([...source.matchAll(/\.from\('([a-z_]+)'\)/g)].map((m) => m[1]))]
+  check('the function names some tables', used.length > 0)
+
+  const { rows } = await db.query<{ table_name: string }>(
+    "select table_name from information_schema.tables where table_schema = 'public'")
+  const present = new Set(rows.map((r) => r.table_name))
+
+  for (const table of used.sort()) {
+    check(`notify reads ${table}, and the schema has it`, present.has(table))
+  }
 }
 
 async function checkJoining() {

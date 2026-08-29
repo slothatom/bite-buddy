@@ -111,3 +111,36 @@ create policy "the household can read the public key"
 --   insert into public.push_config (key, value)
 --   values ('vapid_public', 'BEl62i...')
 --   on conflict (key) do update set value = excluded.value;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- What has already been sent
+--
+-- One row per cook session that has been reminded about, so a reminder goes
+-- out once. Sending the same one twice is worse than sending it late: the
+-- second one teaches you to ignore the first. The reminder window is an hour
+-- wide and the job runs every five minutes, so without this a single dinner
+-- would buzz twelve times.
+--
+-- It lived in schema.sql when reminders were emails, and stayed there when
+-- they became push, which is how a database can end up running the push
+-- feature without the one table that stops it repeating itself. It belongs
+-- with the rest of the notification schema, and here it is.
+--
+-- Written only by the scheduled function, which runs as the service role and
+-- is not subject to these policies. The client can read it, so the app could
+-- one day show "reminded at", and can write nothing.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+create table if not exists public.reminder_log (
+  session_id text primary key,
+  sent_to    text[] not null,
+  session_at text,
+  sent_at    timestamptz not null default now()
+);
+
+alter table public.reminder_log enable row level security;
+
+drop policy if exists "household members read the reminder log" on public.reminder_log;
+create policy "household members read the reminder log"
+  on public.reminder_log for select
+  using (public.is_member());
