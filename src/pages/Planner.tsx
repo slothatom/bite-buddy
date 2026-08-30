@@ -28,6 +28,8 @@ import FillGaps from '../components/planner/FillGaps'
 import WeekTemplates from '../components/planner/WeekTemplates'
 import type { Proposal } from '../lib/autoPlan'
 import { baseName } from '../lib/recipeGroups'
+import { entriesName, entryName } from '../lib/entryLabel'
+import { offerUndo } from '../store/useUndo'
 
 /**
  * The weekly planner.
@@ -41,7 +43,7 @@ export default function Planner() {
   const { profile } = useUserStore()
   const {
     weekDates, plan, goToWeek, addEntry, removeMeal, clearDay, copyDay,
-    moveMeal, duplicateMeal, setMealOutcome, updateEntry,
+    moveMeal, duplicateMeal, setMealOutcome, updateEntry, restoreMeals,
   } = useMealPlanStore()
   const ctx = useNutritionContext()
 
@@ -85,6 +87,15 @@ export default function Planner() {
     const meal = byDate.get(date)?.meals.find((m) => m.id === mealId)
     for (const p of portionEntries(meal?.entries ?? [])) returnTo(p.portionId, p.servings)
     removeMeal(date, mealId)
+
+    // Removing a meal had neither a confirmation nor a way back, and it is a
+    // single tap next to the tick that says you ate it.
+    if (meal) {
+      offerUndo(`Removed ${entriesName(meal.entries, ctx)}`, () => {
+        for (const p of portionEntries(meal.entries)) takeFrom(p.portionId, p.servings)
+        restoreMeals(date, [meal])
+      })
+    }
   }
 
   /**
@@ -114,10 +125,20 @@ export default function Planner() {
 
   const clearDayReturningPortions = (date: string) => {
     const day = byDate.get(date)
-    for (const meal of day?.meals ?? []) {
+    const meals = day?.meals ?? []
+    for (const meal of meals) {
       for (const p of portionEntries(meal.entries)) returnTo(p.portionId, p.servings)
     }
     clearDay(date)
+
+    if (meals.length) {
+      offerUndo(`Cleared ${meals.length} ${meals.length === 1 ? 'meal' : 'meals'} off ${formatDate(date)}`, () => {
+        for (const meal of meals) {
+          for (const p of portionEntries(meal.entries)) takeFrom(p.portionId, p.servings)
+        }
+        restoreMeals(date, meals)
+      })
+    }
   }
 
   /**
@@ -733,17 +754,12 @@ function EntryLine({
   // silently dropping it would rewrite it.
   const isDeleted = entry.kind === 'recipe' && deleted.has(entry.recipeId)
 
-  // A portion says where it came from rather than what it is made of: the
-  // useful fact when you are reading a plan is that this one is already cooked
-  // and waiting, not that it is a lentil stew.
+  // Which tub it is, for the emoji and the fridge-or-freezer tag. The name
+  // itself comes from the shared helper, which already knows that a portion
+  // says where it came from rather than what it is made of.
   const portion = entry.kind === 'portion' ? ctx.portions?.get(entry.portionId) : undefined
-  const portionRecipe = portion?.recipeId ? ctx.recipes.get(portion.recipeId) : undefined
 
-  const full = entry.kind === 'recipe'
-    ? ctx.recipes.get(entry.recipeId)?.name.en ?? 'Unknown recipe'
-    : entry.kind === 'portion'
-      ? portionRecipe?.name.en ?? portion?.label ?? 'From the fridge'
-      : ctx.foods.get(entry.foodId)?.names.en ?? 'Unknown food'
+  const full = entryName(entry, ctx)
 
   // Without the portion in brackets. A library name has to stand alone, so
   // "Eggplant spread with wholemeal bread & mixed vegetables (50 g wholemeal
@@ -763,17 +779,28 @@ function EntryLine({
       ? (portion?.storage === 'freezer' ? '🧊' : '🥡')
       : '·'
 
-  // The names are long, 46 characters at the median, 77 at the longest, and a
-  // phone gives this row about 150px. Truncating turned most of them into
-  // "Potatoes with egg, Teleme…", so the name wraps and the numbers hold their
-  // own column instead. w-14 was two digits wider than four digits need.
+  // The names are long, 46 characters at the median, 77 at the longest, and in
+  // a three-column day on a laptop this row gets about 320px, which the tick,
+  // the two meal buttons, the amount and the calories take 250 of. The name
+  // was left with 70px and broke one word per line: "Eggplant / spread / with
+  // / wholemeal / bread & / mixed / vegetables", seven lines for one meal,
+  // which pushed Snack 2 and Dinner off the bottom of a 950px laptop.
+  //
+  // So the row wraps instead, and the two numbers travel together. The name
+  // takes its natural width and will not be squeezed below 7rem, so a short
+  // one keeps the numbers beside it and a long one sends them to a second
+  // line rather than shrinking to nothing. Two lines at worst, one whenever
+  // the column is wide enough, which is what a phone gives it.
   return (
-    <div className="flex items-baseline gap-2 text-sm">
+    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm">
+      {/* Emoji and name in one box, so the name wraps underneath its own first
+          line rather than underneath the emoji. */}
+      <span className="flex-auto min-w-28 flex items-baseline gap-2">
       <span className="text-base leading-none shrink-0">{emoji}</span>
       <span
         title={full === label ? undefined : full}
         data-entry-name
-        className={`flex-1 min-w-0 ${isDeleted ? 'text-ink-500' : 'text-ink-900'} ${
+        className={`min-w-0 ${isDeleted ? 'text-ink-500' : 'text-ink-900'} ${
           struck ? 'line-through' : ''}`}
       >
         {label}
@@ -788,9 +815,12 @@ function EntryLine({
           </span>
         )}
       </span>
+      </span>
       {/* The amount is the control. Tapping the line's name would fight with
           reading it, and a separate button would be a fourth thing in a row
-          that already has three. */}
+          that already has three. Kept in one box with the calories so the two
+          numbers wrap as a pair instead of stacking one above the other. */}
+      <span className="flex items-baseline gap-2 shrink-0 ml-auto">
       <button
         // A thumb-sized hit area that costs no height: the padding makes the
         // box, the negative margin gives the space back to the layout. Sized
@@ -804,6 +834,7 @@ function EntryLine({
       </button>
       <span className="text-xs text-ink-700 font-mono shrink-0 tabular-nums w-10 sm:w-14 text-right">
         {Math.round(kcal)}
+      </span>
       </span>
     </div>
   )

@@ -5,6 +5,7 @@ import Sidebar from './components/layout/Sidebar'
 import BottomNav from './components/layout/BottomNav'
 import ErrorBoundary from './components/layout/ErrorBoundary'
 import StorageBanner from './components/layout/StorageBanner'
+import UndoBar from './components/layout/UndoBar'
 import Home from './pages/Home'
 import Planner from './pages/Planner'
 import SignIn from './pages/SignIn'
@@ -131,6 +132,7 @@ function Shell() {
         </main>
         <BottomNav />
       </div>
+      <UndoBar />
     </>
   )
 }

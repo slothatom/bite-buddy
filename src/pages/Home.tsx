@@ -28,6 +28,7 @@ import { useRecipes } from '../store/useRecipeStore'
 import { useCookStore } from '../store/useCookStore'
 import { useBodyStore } from '../store/useBodyStore'
 import { scoreWeek } from '../lib/mediterranean'
+import { entryName } from '../lib/entryLabel'
 import { suggest } from '../lib/suggestions'
 import { kitchenNudges } from '../lib/kitchen'
 import { usePantry } from '../store/usePantryStore'
@@ -245,7 +246,7 @@ export default function Home() {
                           {SLOT_LABELS[slot]}
                         </span>
                         <span className="flex-1 min-w-0 text-ink-900">
-                          {meals.flatMap((m) => m.entries).map((e) => label(e, ctx)).join(', ')}
+                          {meals.flatMap((m) => m.entries).map((e) => entryName(e, ctx)).join(', ')}
                         </span>
                         <span className="shrink-0 text-xs font-mono text-ink-700 tabular-nums">
                           {Math.round(kcal)}
@@ -612,9 +613,4 @@ function relative(iso: string): string {
   return days === 1 ? 'yesterday' : `${days} days ago`
 }
 
-function label(entry: { kind: string; recipeId?: string; foodId?: string },
-  ctx: ReturnType<typeof useNutritionContext>): string {
-  return entry.kind === 'recipe'
-    ? ctx.recipes.get(entry.recipeId ?? '')?.name.en ?? 'Unknown'
-    : ctx.foods.get(entry.foodId ?? '')?.names.en ?? 'Unknown'
-}
+

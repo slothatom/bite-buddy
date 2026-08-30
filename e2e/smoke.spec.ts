@@ -29,6 +29,21 @@ async function goto(page: Page, route: string) {
   await page.waitForLoadState('networkidle')
 }
 
+/**
+ * Moves the planner's window on to a week that has not started yet.
+ *
+ * Several of these tests plan a whole week and then read it back, and the app
+ * will not plan or shop for a day that has gone. Run on a Wednesday that is
+ * fine; run on a Sunday the current week has one day left in it, and the same
+ * tests measured one seventh of what they meant to. The window is the
+ * planner's own and nothing else follows it, so this only moves the screen the
+ * test is working on.
+ */
+async function planAheadOfToday(page: Page) {
+  await goto(page, '/plan')
+  await page.getByRole('button', { name: 'Next week' }).click()
+}
+
 test.describe('every screen renders', () => {
   for (const route of ROUTES) {
     test(`${route} loads without errors`, async ({ page }) => {
@@ -124,7 +139,10 @@ test.describe('the main flow', () => {
     await goto(page, '/settings/history')
     await expect(page.getByRole('button', { name: /^Load$/ })).toHaveCount(14)
 
-    // 2. Loading one fills the planner.
+    // 2. Loading one fills the planner. Into next week, so all seven days are
+    // still ahead and the shopping list further down will offer all of them.
+    await planAheadOfToday(page)
+    await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await expect(page.getByRole('button', { name: /Loaded/ })).toBeVisible()
 
@@ -267,6 +285,7 @@ test.describe('the home screen', () => {
 
 test.describe('the shopping list', () => {
   test('is built from the days you choose, and can be corrected afterwards', async ({ page }) => {
+    await planAheadOfToday(page)
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await goto(page, '/grocery')
@@ -278,7 +297,10 @@ test.describe('the shopping list', () => {
     expect(all).toBeGreaterThan(20)
 
     await page.getByRole('button', { name: 'None' }).click()
-    const firstDay = page.locator('button[aria-pressed]').filter({ hasNotText: 'x' }).first()
+    // The first day that can actually be ticked. Days with nothing planned are
+    // shown but disabled, and the plan is in next week, so the first few cells
+    // in the picker are empty ones.
+    const firstDay = page.locator('button[aria-pressed]:not([disabled])').first()
     await firstDay.click()
     await page.getByRole('button', { name: 'Rebuild' }).click()
     const one = await page.locator('input[type=checkbox]').count()
@@ -302,7 +324,9 @@ test.describe('the shopping list', () => {
 
     await page.getByRole('button', { name: 'Edit Washing-up liquid' }).click()
     await page.getByRole('button', { name: 'Remove Washing-up liquid' }).click()
-    await expect(page.getByText('Washing-up liquid')).toHaveCount(0)
+    // The row, not the text: the undo bar names the line it just took away.
+    await expect(page.getByRole('button', { name: 'Washing-up liquid', exact: true }))
+      .toHaveCount(0)
   })
 })
 
@@ -1045,8 +1069,13 @@ test.describe('your data survives the browser', () => {
     await goto(page, '/settings')
     await page.getByRole('button', { name: 'Paste a backup' }).click()
     await page.getByPlaceholder(/Paste the contents/).fill(backup)
-    await page.getByRole('button', { name: 'Restore', exact: true }).click()
-    await expect(page.getByText(/Restored \d+ of/)).toBeVisible()
+
+    // Reading it and doing it are two steps now, with what would be replaced
+    // named in between.
+    await page.getByRole('button', { name: 'Read it' }).click()
+    await expect(page.getByText('your plan, weeks and shopping list')).toBeVisible()
+    await page.getByRole('button', { name: 'Replace it all' }).click()
+    await expect(page.getByText(/Restored everything/)).toBeVisible()
 
     await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
@@ -1060,9 +1089,11 @@ test.describe('your data survives the browser', () => {
     await page.getByRole('button', { name: 'Paste a backup' }).click()
     await page.getByPlaceholder(/Paste the contents/)
       .fill('{"app":"bite-buddy","schema":99,"stores":{"bite-buddy-mealplan-v2":{"plan":[]}}}')
-    await page.getByRole('button', { name: 'Restore', exact: true }).click()
+    await page.getByRole('button', { name: 'Read it' }).click()
 
     await expect(page.getByText(/left alone/)).toBeVisible()
+    // Refused at the reading step, so there is nothing to agree to.
+    await expect(page.getByRole('button', { name: 'Replace it all' })).toHaveCount(0)
     await goto(page, '/plan')
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
   })
@@ -1197,7 +1228,7 @@ test.describe('the cupboard', () => {
 
 test.describe('filling the gaps', () => {
   test('offers a week, lets you drop one, and only then writes anything', async ({ page }) => {
-    await goto(page, '/plan')
+    await planAheadOfToday(page)
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
 
     await expect(page.getByText('A week, if you like it')).toBeVisible()
@@ -1567,7 +1598,7 @@ test.describe('a week worth having again', () => {
   })
 
   test('keeps a planned week and writes it onto another one', async ({ page }) => {
-    await goto(page, '/plan')
+    await planAheadOfToday(page)
 
     // A week with something on it, courtesy of the assistant.
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
@@ -1979,6 +2010,137 @@ test.describe('a batch that lands in the week', () => {
     await expect(page.getByText('In the fridge')).toBeVisible()
     await goto(page, '/plan')
     await expect(page.locator('[data-entry-name]')).toHaveCount(0)
+  })
+})
+
+/**
+ * One step back, for a short while.
+ *
+ * Deleting a meal had neither a confirmation nor a way back, on a screen where
+ * the bin sits a thumb's width from the tick that says you ate it.
+ */
+test.describe('taking it back', () => {
+  async function aPlannedDay(page: Page) {
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+    await page.getByRole('button', { name: /^Add these/ }).click()
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+  }
+
+  test('a removed meal can be put back, with its name in the offer', async ({ page }) => {
+    await aPlannedDay(page)
+    const before = await page.locator('[data-entry-name]').count()
+    const name = await page.locator('[data-entry-name]').first().innerText()
+
+    await page.getByRole('button', { name: 'Remove meal' }).first().click()
+    await expect(page.locator('[data-entry-name]')).toHaveCount(before - 1)
+
+    // Named, so it can be checked against what was meant. "Item deleted" tells
+    // you nothing you did not just watch happen.
+    const bar = page.getByRole('status').filter({ hasText: 'Removed' })
+    await expect(bar).toContainText(name.split('\n')[0].trim().slice(0, 12))
+
+    await bar.getByRole('button', { name: 'Undo' }).click()
+    await expect(page.locator('[data-entry-name]')).toHaveCount(before)
+  })
+
+  test('a cleared day comes back whole', async ({ page }) => {
+    await aPlannedDay(page)
+    const before = await page.locator('[data-entry-name]').count()
+
+    await page.getByRole('button', { name: 'Clear day' }).click()
+    await page.getByRole('button', { name: /^Clear \d+ meals?$/ }).click()
+    await expect(page.locator('[data-entry-name]')).toHaveCount(0)
+
+    await page.getByRole('status').getByRole('button', { name: 'Undo' }).click()
+    await expect(page.locator('[data-entry-name]')).toHaveCount(before)
+  })
+
+  test('an emptied shopping list comes back, typed lines included', async ({ page }) => {
+    await goto(page, '/grocery')
+    await page.getByLabel('Add an item').fill('Washing-up liquid')
+    await page.getByLabel('Add an item').press('Enter')
+    await expect(page.getByText('Washing-up liquid')).toBeVisible()
+
+    await page.getByRole('button', { name: 'Empty list' }).click()
+
+    // A typed line cannot be rebuilt from the plan, so it is counted out
+    // separately rather than folded into a total that reads as recoverable.
+    await expect(page.getByText(/lines? you typed/)).toBeVisible()
+
+    await page.getByRole('button', { name: /^Throw away \d+ lines?$/ }).click()
+    await expect(page.getByText('Washing-up liquid')).toHaveCount(0)
+
+    await page.getByRole('status').getByRole('button', { name: 'Undo' }).click()
+    await expect(page.getByText('Washing-up liquid')).toBeVisible()
+  })
+
+  test('one line off the list comes back where it was', async ({ page }) => {
+    await goto(page, '/grocery')
+    await page.getByLabel('Add an item').fill('Bicarbonate of soda')
+    await page.getByLabel('Add an item').press('Enter')
+
+    // The bin lives inside the row's edit mode, which the name opens.
+    await page.getByRole('button', { name: 'Bicarbonate of soda', exact: true }).click()
+    await page.getByRole('button', { name: 'Remove Bicarbonate of soda' }).click()
+
+    // The row, not the text: the undo bar names the line too, which is rather
+    // the point of it.
+    const row = page.getByRole('button', { name: 'Bicarbonate of soda', exact: true })
+    await expect(row).toHaveCount(0)
+
+    await page.getByRole('status').getByRole('button', { name: 'Undo' }).click()
+    await expect(row).toBeVisible()
+  })
+})
+
+/**
+ * A restore replaces everything, which makes it the largest thing this app can
+ * do and the one place a confirmation is worth the interruption.
+ */
+test.describe('bringing a backup back', () => {
+  test('says what it is about to replace, and does nothing until told', async ({ page }) => {
+    await goto(page, '/settings')
+    await page.getByRole('button', { name: 'Paste a backup' }).click()
+
+    // Written out here rather than exported from the running app: the panel's
+    // own copy path needs clipboard permissions, and a backup of an app that
+    // has not been touched yet is empty anyway.
+    await page.getByPlaceholder(/Paste the contents of a backup/).fill(JSON.stringify({
+      app: 'bite-buddy',
+      schema: 3,
+      exportedAt: '2026-08-01T10:00:00.000Z',
+      stores: {
+        'bite-buddy-user-v2': { profile: { name: 'From the backup' } },
+        'bite-buddy-body': { weightEntries: [] },
+      },
+    }))
+    await page.getByRole('button', { name: 'Read it' }).click()
+
+    // Named in words, not counted in sections, and dated from the file.
+    await expect(page.getByText(/from a backup saved on 1 August 2026/)).toBeVisible()
+    await expect(page.getByText('your profile and targets')).toBeVisible()
+    await expect(page.getByText('your weights and measurements')).toBeVisible()
+
+    // Reading it is not doing it.
+    await page.getByRole('button', { name: 'Cancel' }).click()
+    await expect(page.getByText(/This will replace/)).toHaveCount(0)
+  })
+
+  test('refuses a file that is the wrong shape, and changes nothing', async ({ page }) => {
+    await goto(page, '/settings')
+    await page.getByRole('button', { name: 'Paste a backup' }).click()
+
+    await page.getByPlaceholder(/Paste the contents of a backup/).fill(JSON.stringify({
+      app: 'bite-buddy',
+      schema: 3,
+      exportedAt: '2026-08-01T10:00:00.000Z',
+      stores: { 'bite-buddy-body': { weightEntries: 'not a list at all' } },
+    }))
+    await page.getByRole('button', { name: 'Read it' }).click()
+
+    await expect(page.getByText(/nothing has been changed/)).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Replace it all' })).toHaveCount(0)
   })
 })
 

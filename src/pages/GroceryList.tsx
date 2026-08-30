@@ -3,6 +3,7 @@ import { RefreshCw, Trash2, ShoppingBasket, Plus, X, Check, Search, Share2 } fro
 import type { GroceryItem, MedCategory, PantryItem } from '../types'
 import { useMealPlanStore, getRangeDates, today } from '../store/useMealPlanStore'
 import { useThisWeek } from '../store/useThisWeek'
+import { offerUndo } from '../store/useUndo'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { EmptyState, SectionHeading } from '../components/ui'
@@ -27,7 +28,7 @@ export default function GroceryList() {
   const {
     groceryItems, generateGroceryList, toggleGroceryItem, addGroceryItem,
     updateGroceryItem, removeGroceryItem, clearCheckedItems, clearGroceryList,
-    plan,
+    restoreGroceryItems, plan,
   } = useMealPlanStore()
   const { profile } = useUserStore()
   const thisWeek = useThisWeek()
@@ -79,6 +80,22 @@ export default function GroceryList() {
   }, [groceryItems])
 
   const checked = groceryItems.filter((i) => i.checked).length
+  const typed = groceryItems.filter((i) => i.manual)
+
+  /**
+   * Takes lines off the list and offers them back for a few seconds.
+   *
+   * A typed line, the picked-up ones and the whole list all come back the same
+   * way and in the order the list was in. `remove` is passed in because the
+   * store already knows how to drop a set of lines in one write, and looping
+   * over the singular would put twenty rows through sync where one would do.
+   */
+  function drop(items: GroceryItem[], what: string, remove: () => void) {
+    if (!items.length) return
+    const before = groceryItems
+    remove()
+    offerUndo(what, () => restoreGroceryItems(before))
+  }
   const plannedMeals = picked.reduce((n, d) => n + (mealsByDate.get(d) ?? 0), 0)
 
   function build() {
@@ -137,7 +154,14 @@ export default function GroceryList() {
                 style={{ width: `${(checked / groceryItems.length) * 100}%` }} />
             </div>
             <div className="flex flex-wrap gap-2 mt-3">
-              <button className="btn-ghost text-sm" onClick={clearCheckedItems} disabled={!checked}>
+              <button
+                className="btn-ghost text-sm"
+                disabled={!checked}
+                onClick={() => drop(
+                  groceryItems.filter((i) => i.checked),
+                  `Cleared ${checked} picked up`,
+                  clearCheckedItems)}
+              >
                 Clear picked up
               </button>
               <ShareList items={groceryItems} />
@@ -145,7 +169,13 @@ export default function GroceryList() {
                 <>
                   <button
                     className="btn-primary text-sm"
-                    onClick={() => { clearGroceryList(); setEmptying(false) }}
+                    onClick={() => {
+                      drop(
+                        groceryItems,
+                        `Emptied the list, ${groceryItems.length} ${groceryItems.length === 1 ? 'line' : 'lines'}`,
+                        clearGroceryList)
+                      setEmptying(false)
+                    }}
                   >
                     <Trash2 size={14} /> Throw away {groceryItems.length}{' '}
                     {groceryItems.length === 1 ? 'line' : 'lines'}
@@ -153,6 +183,17 @@ export default function GroceryList() {
                   <button className="btn-secondary text-sm" onClick={() => setEmptying(false)}>
                     Keep them
                   </button>
+                  {/* The rest can be rebuilt from the plan in one tap. A line
+                      somebody typed cannot: nothing in the app knows it was
+                      ever there, so it is counted out separately rather than
+                      folded into a total that reads as recoverable. */}
+                  {typed.length > 0 && (
+                    <p className="w-full text-xs text-coral-600">
+                      {typed.length === 1
+                        ? `1 of those is a line you typed (${typed[0].name}), and rebuilding will not bring it back.`
+                        : `${typed.length} of those are lines you typed, and rebuilding will not bring them back.`}
+                    </p>
+                  )}
                 </>
               ) : (
                 <button className="btn-ghost text-sm text-coral-600" onClick={() => setEmptying(true)}>
@@ -195,7 +236,8 @@ export default function GroceryList() {
                     item={item}
                     onToggle={() => toggleGroceryItem(item.id)}
                     onSave={(updates) => updateGroceryItem(item.id, updates)}
-                    onRemove={() => removeGroceryItem(item.id)}
+                    onRemove={() => drop([item], `Removed ${item.name}`,
+                      () => removeGroceryItem(item.id))}
                     onHaveIt={item.foodId ? () => {
                       // Into the cupboard rather than merely off the list, so
                       // the next list does not ask again. Removing it here would
