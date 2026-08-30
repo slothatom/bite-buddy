@@ -80,6 +80,12 @@ function shortfalls(scored: GoalProgress[]): GoalProgress[] {
     .sort((a, b) => a.ratio - b.ratio)
 }
 
+/** A serving count in the words a person uses: "0", "1", "1.5". */
+function servingCount(n: number): string {
+  const rounded = Math.round(n * 2) / 2
+  return rounded === Math.round(rounded) ? String(Math.round(rounded)) : rounded.toFixed(1)
+}
+
 export function suggest({ days, recipes, ctx, today }: SuggestionInput): Suggestion[] {
   const out: Suggestion[] = []
   const planned = new Set(
@@ -99,9 +105,11 @@ export function suggest({ days, recipes, ctx, today }: SuggestionInput): Suggest
       id: `gap-${goal.category}`,
       kind: 'gap',
       title: dish ? dish.name.en : `More ${goal.label.toLowerCase()}`,
+      // "0.0 of 3" is a decimal place that says nothing: none is none, and a
+      // tenth of a serving of vegetables is not a quantity anybody counts in.
       reason: dish
-        ? `${goal.label} are at ${goal.servings.toFixed(1)} of ${goal.expected.toFixed(0)} servings this week, and this one is mostly ${goal.label.toLowerCase()}.`
-        : `${goal.label} are at ${goal.servings.toFixed(1)} of ${goal.expected.toFixed(0)} servings this week.`,
+        ? `${goal.label} are at ${servingCount(goal.servings)} of ${goal.expected.toFixed(0)} servings this week, and this one is mostly ${goal.label.toLowerCase()}.`
+        : `${goal.label} are at ${servingCount(goal.servings)} of ${goal.expected.toFixed(0)} servings this week.`,
       recipeId: dish?.id,
       to: '/recipes',
     })
@@ -113,7 +121,7 @@ export function suggest({ days, recipes, ctx, today }: SuggestionInput): Suggest
       id: `limit-${goal.category}`,
       kind: 'limit',
       title: `${goal.label} twice over`,
-      reason: `${goal.servings.toFixed(1)} servings against the ${goal.target} a week the guide suggests.`,
+      reason: `${servingCount(goal.servings)} servings against the ${goal.target} a week the guide suggests.`,
       to: '/plan',
     })
   }

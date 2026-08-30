@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom'
 import { Undo2, X } from 'lucide-react'
 import { useUndo, UNDO_SECONDS } from '../../store/useUndo'
 
@@ -17,8 +18,12 @@ export default function UndoBar() {
   const offer = useUndo((s) => s.offer)
   const takeUndo = useUndo((s) => s.takeUndo)
   const clearUndo = useUndo((s) => s.clearUndo)
+  const { pathname } = useLocation()
 
-  if (!offer) return null
+  // Only on the screen it belongs to. Compared in render rather than cleared
+  // from an effect, so navigating away and straight back inside the window
+  // still finds the offer standing.
+  if (!offer || offer.at !== pathname) return null
 
   return (
     <div

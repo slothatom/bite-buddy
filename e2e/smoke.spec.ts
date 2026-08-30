@@ -2137,6 +2137,18 @@ test.describe('taking it back', () => {
     await expect(page.getByText('Washing-up liquid')).toBeVisible()
   })
 
+  test('the offer stays on the screen it belongs to', async ({ page }) => {
+    await aPlannedDay(page)
+    await page.getByRole('button', { name: 'Remove meal' }).first().click()
+    await expect(page.getByRole('status').filter({ hasText: 'Removed' })).toBeVisible()
+
+    // It used to travel, and on Settings it sat over the restore confirmation,
+    // which is the one card on that screen that has to be read before it is
+    // answered.
+    await goto(page, '/settings')
+    await expect(page.getByRole('status').filter({ hasText: 'Removed' })).toHaveCount(0)
+  })
+
   test('one line off the list comes back where it was', async ({ page }) => {
     await goto(page, '/grocery')
     await page.getByLabel('Add an item').fill('Bicarbonate of soda')
