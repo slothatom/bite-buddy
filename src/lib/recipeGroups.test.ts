@@ -125,3 +125,51 @@ describe('the same dish written at different portions', () => {
     expect(grouped.reduce((n, g) => n + g.variants.length, 0)).toBe(ALL_RECIPES.length)
   })
 })
+
+/**
+ * The snack shelf was permanently empty. Every snack line was kept as plain
+ * food entries, so the app offered four shelves and could only ever stock
+ * three, and the tag that would have filled the fourth sat unreachable in the
+ * importer.
+ */
+describe('the shelf that used to have nothing on it', () => {
+  const snacks = ALL_RECIPES.filter((r) => r.tags.includes('snack'))
+
+  it('has snacks on it', () => {
+    expect(snacks.length).toBeGreaterThan(20)
+  })
+
+  it('holds combinations, not a mirror of the food library', () => {
+    // 152 of the 194 snack lines in these plans are one food and a weight,
+    // "150 g mere". A card called "Apple" is one nobody would open or cook,
+    // so those stay lines and only the assembled ones become recipes.
+    for (const snack of snacks) {
+      expect(snack.components.length, snack.name.en).toBeGreaterThan(1)
+    }
+  })
+
+  it('names a snack after what there is most of, not what has most calories', () => {
+    // 150 g of apple is 78 kcal and 15 g of cashews is 87, so ranking a snack
+    // the way a dinner is ranked produced "Cashews with apple" on one line and
+    // "Apple with walnuts" on the next.
+    const nuts = /^(Cashews|Walnuts|Almonds|Peanuts|Hazelnuts)\b/
+    for (const snack of snacks) {
+      expect(nuts.test(snack.name.en), `${snack.name.en} leads with the nuts`).toBe(false)
+    }
+  })
+
+  it('gives both snack slots the same face', () => {
+    // One apple-and-cashews got a red apple and the next a green one, purely
+    // by which slot of the day it had been written in.
+    const faces = new Set(snacks.filter((r) =>
+      r.components.every((c) => c.kind === 'food')).map((r) => r.emoji))
+    expect(faces.size).toBe(1)
+  })
+
+  it('costs no time on a hob, because nothing is cooked', () => {
+    for (const snack of snacks) {
+      expect(snack.cookMinutes, snack.name.en).toBe(0)
+      expect(snack.prepMinutes, snack.name.en).toBeGreaterThan(0)
+    }
+  })
+})

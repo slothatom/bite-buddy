@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import {
   ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays, MoveRight, Sparkles,
   Check, ShoppingBasket, Bookmark, Circle, CircleSlash, Minus,
@@ -680,6 +681,26 @@ function AmountDialog({
       ? ctx.recipes.get(entry.recipeId)?.name.en ?? 'This dish'
       : 'This portion'
 
+  /**
+   * What the number is allowed to be.
+   *
+   * It ran from zero to nothing at all, so the stepper would happily write a
+   * meal of 0 g, which is a meal that is not one, or 40 servings of stew, which
+   * is a slip of a thumb on a button that repeats.
+   *
+   * The floor is one step, because taking a line down to nothing means
+   * removing it and there is a bin for that. The ceiling is only a real
+   * constraint in one of the three cases: a tub in the fridge holds what it
+   * holds, and this entry has already taken some of it, so the most you can
+   * have is what is left plus what you took. The other two are round numbers
+   * chosen to stop a runaway, not to have an opinion about your dinner.
+   */
+  const inTheTub = entry.kind === 'portion'
+    ? round2((ctx.portions?.get(entry.portionId)?.servings ?? 0) + entry.servings)
+    : null
+  const most = isFood ? 3000 : inTheTub ?? 20
+  const capped = inTheTub !== null && value >= inTheTub
+
   const shown = isFood
     ? `${Math.round(value)} g`
     : `${value === Math.round(value) ? value : value.toFixed(2).replace(/0+$/, '')} ${
@@ -709,7 +730,8 @@ function AmountDialog({
         <div className="flex items-center justify-center gap-4 mb-5">
           <button
             className="btn-secondary btn-icon"
-            onClick={() => setValue((v) => Math.max(0, Math.round((v - step) * 100) / 100))}
+            onClick={() => setValue((v) => Math.max(step, round2(v - step)))}
+            disabled={value <= step}
             aria-label="Less"
           >
             <Minus size={18} />
@@ -722,12 +744,19 @@ function AmountDialog({
           </div>
           <button
             className="btn-secondary btn-icon"
-            onClick={() => setValue((v) => Math.round((v + step) * 100) / 100)}
+            onClick={() => setValue((v) => Math.min(most, round2(v + step)))}
+            disabled={value >= most}
             aria-label="More"
           >
             <Plus size={18} />
           </button>
         </div>
+
+        {capped && (
+          <p className="text-xs text-ink-500 text-center mb-4 -mt-2">
+            That is everything left in the tub.
+          </p>
+        )}
 
         <div className="flex gap-2">
           <button className="btn-primary flex-1" onClick={() => onSet(value)}>Save</button>
@@ -736,6 +765,36 @@ function AmountDialog({
       </div>
     </div>
   )
+}
+
+/**
+ * A meal's name, as a link when there is something behind it.
+ *
+ * Two renderings rather than a link with no destination, because an anchor
+ * with no href is not a link to a screen reader or to a keyboard and reads as
+ * one to everybody else.
+ */
+function Name({
+  to, title, className, children,
+}: {
+  to?: string
+  title?: string
+  className: string
+  children: ReactNode
+}) {
+  if (!to) {
+    return <span title={title} data-entry-name className={className}>{children}</span>
+  }
+  return (
+    <Link to={to} title={title} data-entry-name className={className}>
+      {children}
+    </Link>
+  )
+}
+
+/** Two decimals, which is as fine as a quarter portion or a gram ever needs. */
+function round2(n: number): number {
+  return Math.round(n * 100) / 100
 }
 
 function EntryLine({
@@ -758,6 +817,15 @@ function EntryLine({
   // itself comes from the shared helper, which already knows that a portion
   // says where it came from rather than what it is made of.
   const portion = entry.kind === 'portion' ? ctx.portions?.get(entry.portionId) : undefined
+
+  // A portion points at one too: the tub is a batch of something, and what
+  // went into it is the same question.
+  const opensId = entry.kind === 'recipe'
+    ? entry.recipeId
+    : entry.kind === 'portion' ? portion?.recipeId : undefined
+  const opensTo = opensId && ctx.recipes.has(opensId)
+    ? `/recipes?recipe=${encodeURIComponent(opensId)}`
+    : undefined
 
   const full = entryName(entry, ctx)
 
@@ -797,11 +865,16 @@ function EntryLine({
           line rather than underneath the emoji. */}
       <span className="flex-auto min-w-28 flex items-baseline gap-2">
       <span className="text-base leading-none shrink-0">{emoji}</span>
-      <span
+      {/* Through to the recipe, which the planner could not do at all. You
+          read "Cabbage soup with wholemeal bread" on Tuesday, wondered what
+          went in it, and had to go to Recipes and search for it by name. Only
+          the ones that are a recipe: a weighed food has no page to open, and
+          a link that sometimes goes nowhere is worse than no link. */}
+      <Name
+        to={opensTo}
         title={full === label ? undefined : full}
-        data-entry-name
         className={`min-w-0 ${isDeleted ? 'text-ink-500' : 'text-ink-900'} ${
-          struck ? 'line-through' : ''}`}
+          struck ? 'line-through' : ''} ${opensTo ? 'hover:text-bite-700 hover:underline' : ''}`}
       >
         {label}
         {entry.kind === 'portion' && (
@@ -814,7 +887,7 @@ function EntryLine({
             deleted
           </span>
         )}
-      </span>
+      </Name>
       </span>
       {/* The amount is the control. Tapping the line's name would fight with
           reading it, and a separate button would be a fourth thing in a row

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Plus, Check, Trash2, Search, Bell, Minus } from 'lucide-react'
-import type { CookSession } from '../types'
+import type { CookSession, MealSlot } from '../types'
 import { useCookStore } from '../store/useCookStore'
 import { useRecipes } from '../store/useRecipeStore'
 import { useMealPlanStore } from '../store/useMealPlanStore'
@@ -556,6 +556,43 @@ function CookedDialog({ session, onClose }: { session: CookSession; onClose: () 
     () => Object.fromEntries(suggested.map((p) => [p.id, 'fridge' as const])),
   )
 
+  /**
+   * Which days a batch lands on, and which meal it lands in.
+   *
+   * The week after the session, minus anything already gone, since a session
+   * is often ticked off a day or two late and nothing can be planned into
+   * Monday on Wednesday. Seven days was hardcoded, and so was dinner before
+   * lunch, which is a fine default and a poor rule: a batch of soup is lunch
+   * for most people, and cooking on a Sunday for a week away from home means
+   * choosing the days.
+   */
+  const offered = useMemo(() => {
+    const from = today()
+    return Array.from({ length: 7 }, (_, i) => addDays(session.date, i + 1))
+      .filter((d) => d >= from)
+  }, [session.date])
+
+  const [days, setDays] = useState<string[]>(offered)
+  const [first, setFirst] = useState<'dinner' | 'lunch'>('dinner')
+  const slots = useMemo<MealSlot[]>(
+    () => (first === 'dinner' ? ['dinner', 'lunch'] : ['lunch', 'dinner']),
+    [first],
+  )
+
+  // What ticking the box would actually do, worked out with the same function
+  // that does it. There are usually fewer portions than days, and a day you
+  // have already planned is skipped, so "put them in the days ahead" on its
+  // own was a promise with no number attached to it.
+  const landing = useMemo(
+    () => spreadPortions(
+      suggested
+        .map((p) => ({ id: p.id, servings: made[p.id] ?? p.servings }))
+        .filter((p) => p.servings > 0),
+      plan, days, slots,
+    ),
+    [suggested, made, plan, days, slots],
+  )
+
   function save() {
     const kept: { id: string; servings: number }[] = []
     for (const p of suggested) {
@@ -570,8 +607,7 @@ function CookedDialog({ session, onClose }: { session: CookSession; onClose: () 
     // each other: everything went in the fridge and you planned it back out
     // one slot at a time.
     if (spread) {
-      const days = Array.from({ length: 7 }, (_, i) => addDays(session.date, i + 1))
-      for (const place of spreadPortions(kept, plan, days, ['dinner', 'lunch'])) {
+      for (const place of spreadPortions(kept, plan, days, slots)) {
         takeFrom(place.portionId, place.servings)
         addEntry(place.date, place.slot, {
           kind: 'portion', portionId: place.portionId, servings: place.servings,
@@ -637,11 +673,63 @@ function CookedDialog({ session, onClose }: { session: CookSession; onClose: () 
           <span className="min-w-0">
             <span className="block text-sm text-ink-900">Put them in the days ahead</span>
             <span className="block text-xs text-ink-500">
-              One a day, into the first free dinner, then lunch. Days you have already planned
-              are left as they are.
+              One a day. Days you have already planned are left as they are.
             </span>
           </span>
         </label>
+
+        {spread && (
+          <div className="card-soft p-3 space-y-3">
+            <div>
+              <p className="label">Which days</p>
+              <div className="flex flex-wrap gap-1.5">
+                {offered.map((date) => {
+                  const on = days.includes(date)
+                  const d = new Date(date + 'T12:00:00')
+                  return (
+                    <button
+                      key={date}
+                      onClick={() => setDays((all) =>
+                        all.includes(date) ? all.filter((x) => x !== date) : [...all, date])}
+                      aria-pressed={on}
+                      aria-label={d.toLocaleDateString('en-GB', {
+                        weekday: 'long', day: 'numeric', month: 'long',
+                      })}
+                      className={`text-xs px-2.5 py-2 rounded-lg border transition-colors ${
+                        on ? 'bg-bite-500 border-bite-500 text-white font-semibold'
+                          : 'bg-paper border-border-200 text-ink-700 hover:border-bite-300'
+                      }`}
+                    >
+                      {d.toLocaleDateString('en-GB', { weekday: 'short' })} {d.getDate()}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div>
+              <p className="label">Which meal first</p>
+              <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
+                {(['dinner', 'lunch'] as const).map((slot) => (
+                  <button
+                    key={slot}
+                    onClick={() => setFirst(slot)}
+                    className={`capitalize ${first === slot ? 'tab-on' : 'tab-off'}`}
+                  >
+                    {slot}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <p className="text-xs text-ink-500">
+              {landing.length === 0
+                ? 'Nothing would land: either those days are already planned, or there is less than a whole portion to spread.'
+                : `${landing.length} ${landing.length === 1 ? 'portion goes' : 'portions go'} into ${
+                  new Set(landing.map((l) => l.date)).size} of those days. The rest stays in the fridge.`}
+            </p>
+          </div>
+        )}
 
         <div className="flex gap-2">
           <button className="btn-primary flex-1" onClick={save}>Into the fridge</button>

@@ -224,7 +224,26 @@ function componentKey(c: RecipeComponent): string {
  * how two meals that differ only by a spoonful of yogurt end up with two
  * names, rather than one name and a number in brackets.
  */
-function nameMeal(components: RecipeComponent[], pinned?: string): string {
+/**
+ * What decides which ingredient a meal is named after.
+ *
+ * Calories, for a plate of food: the thing carrying the meal is the thing the
+ * meal is called after, and 125 g of salmon beats 200 g of sweet potato.
+ *
+ * Weight, for a snack, because there the two come out the other way round.
+ * 150 g of apple is 78 kcal and 15 g of cashews is 87, so ranking a snack by
+ * calories produced "Cashews with apple" and, on the next line of the same
+ * plan, "Apple with walnuts". Nobody calls a piece of fruit with a few nuts on
+ * it after the nuts. A snack is named after what there is most of.
+ */
+type Ranking = 'calories' | 'weight'
+
+/** A dish outranks any single food, whichever way round the ranking runs. */
+function weightOf(c: RecipeComponent): number {
+  return c.kind === 'food' ? c.grams : 1000 * c.servings
+}
+
+function nameMeal(components: RecipeComponent[], pinned?: string, by: Ranking = 'calories'): string {
   // Anything already inside a dish in this meal must not also appear in the
   // name: "Apple & cinnamon porridge with apple" reads as a mistake, because
   // it is one.
@@ -250,9 +269,14 @@ function nameMeal(components: RecipeComponent[], pinned?: string): string {
       c,
       label: labelFor(c),
       kcal: componentsNutrients([c], ctx).calories + (c.kind === 'recipe' ? 400 : 0),
+      rank: by === 'weight'
+        ? weightOf(c)
+        : componentsNutrients([c], ctx).calories + (c.kind === 'recipe' ? 400 : 0),
     }))
+    // Still on calories: something with none of them has nothing to say about
+    // what the meal is, however much of it there is.
     .filter((r) => r.kcal > 0 || componentKey(r.c) === pinned)
-    .sort((a, b) => b.kcal - a.kcal)
+    .sort((a, b) => b.rank - a.rank)
 
   if (!ranked.length) return 'Meal'
 
@@ -281,7 +305,10 @@ function emojiFor(components: RecipeComponent[], slot: MealSlot): string {
       if (e) return e
     }
   }
-  return { breakfast: '🌅', snack1: '🍎', lunch: '🍽️', snack2: '🍏', dinner: '🌙' }[slot]
+  // Both snack slots get the same face. They are the same kind of thing, and
+  // the two were giving one apple-and-cashews a red apple and the next a green
+  // one purely by which slot of the day it had been written in.
+  return { breakfast: '🌅', snack1: '🍎', lunch: '🍽️', snack2: '🍎', dinner: '🌙' }[slot]
 }
 
 // ─── Merging ──────────────────────────────────────────────────────────────────
@@ -423,6 +450,11 @@ function variantsOf(group: Recipe[], reserved: Map<string, Recipe>): Variant[] {
   return out
 }
 
+/** Read back off the recipe, for the passes that rename after the fact. */
+function rankingFor(recipe: Recipe): Ranking {
+  return recipe.tags.includes('snack') ? 'weight' : 'calories'
+}
+
 function separate(group: Recipe[], reserved: Map<string, Recipe>): void {
   const variants = variantsOf(group, reserved)
   const ranked = differences(variants.map((v) => v.totals))
@@ -436,7 +468,9 @@ function separate(group: Recipe[], reserved: Map<string, Recipe>): void {
     ? variants.filter((v) => v.recipe && (v.totals.get(absentee.key) ?? 0) > 0)
     : []
   if (absentee && has.length && has.length < variants.length) {
-    for (const v of has) v.recipe!.name.en = nameMeal(v.recipe!.components, absentee.key)
+    for (const v of has) {
+      v.recipe!.name.en = nameMeal(v.recipe!.components, absentee.key, rankingFor(v.recipe!))
+    }
     // Naming the ingredient may still leave two recipes that both lack it
     // sharing a name. Those fall through to the weights.
     for (const sub of clashes(group, reserved)) qualify(sub, reserved)
@@ -527,16 +561,32 @@ export function buildLibrary(plans: PlanInput[]): Library {
         const entries = withoutDishDuplicates(items)
         if (entries.length) mappedLines++
 
-        // Snacks stay as plain food lines; main meals become named recipes.
+        /**
+         * Which lines become a named recipe.
+         *
+         * Every main meal, and a snack that is more than one thing. The snack
+         * shelf was permanently empty because snacks were kept as plain food
+         * entries wholesale, and the tag that would have filled it sat
+         * unreachable, so the app offered four shelves and could only ever
+         * stock three.
+         *
+         * But not every snack. 152 of the 194 in these plans are one food and
+         * a weight, "150 g mere", and turning those into recipes would mirror
+         * the food library onto the recipe shelf: a card called "Apple" that
+         * you would never open and never cook. The other 42 pair a fruit with
+         * a handful of nuts, which is a thing somebody assembles and worth a
+         * card you can favourite and plan.
+         */
         const isMain = meal.slot === 'breakfast' || meal.slot === 'lunch' || meal.slot === 'dinner'
-        if (!isMain || !entries.length) return { slot: meal.slot, text: meal.text, entries }
+        const worthNaming = isMain || entries.length > 1
+        if (!worthNaming || !entries.length) return { slot: meal.slot, text: meal.text, entries }
 
         const key = `${meal.slot}::${normaliseTerm(meal.text)}`
         let recipe = byText.get(key)
         if (!recipe) {
           recipe = {
             id: `meal-${meal.slot}-${String(recipes.length + 1).padStart(3, '0')}`,
-            name: { en: nameMeal(entries) },
+            name: { en: nameMeal(entries, undefined, meal.slot === 'snack1' || meal.slot === 'snack2' ? 'weight' : 'calories') },
             emoji: emojiFor(entries, meal.slot),
             servings: 1,
             prepMinutes: 0,

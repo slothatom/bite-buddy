@@ -174,6 +174,56 @@ test.describe('the main flow', () => {
     await expect(page.getByText('How your dietician wrote it')).toBeVisible()
   })
 
+  test('the snack shelf has snacks on it', async ({ page }) => {
+    // It was permanently empty: every snack line was kept as plain food
+    // entries, so the app offered four shelves and could stock three, and said
+    // so in an empty state rather than fixing it.
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Snacks/ }).click()
+
+    await expect(page.locator('[data-recipe-card]').first()).toBeVisible()
+    await expect(page.getByText('Snacks are not recipes here')).toHaveCount(0)
+  })
+
+  test('a planned meal opens the recipe it is', async ({ page }) => {
+    // The planner had no way through to a recipe at all. You read a name on
+    // Tuesday, wondered what went in it, and had to search for it by name.
+    await planAheadOfToday(page)
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/plan')
+
+    const named = page.locator('a[data-entry-name]').first()
+    await expect(named).toBeVisible()
+    const name = (await named.innerText()).trim()
+    await named.click()
+
+    // On the recipe, and on the wording that was planned rather than whichever
+    // of them happens to be first.
+    await expect(page.getByText('How your dietician wrote it')).toBeVisible()
+    await expect(page.getByRole('heading', { name: new RegExp(name.slice(0, 14).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }))
+      .toBeVisible()
+  })
+
+  test('a recipe can be starred while you are reading it', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.locator('[data-recipe-card]').first().click()
+
+    // The star was only ever on the card, so deciding you liked something
+    // while reading it meant closing the sheet to say so.
+    const star = page.getByRole('dialog').or(page.locator('body'))
+      .getByRole('button', { name: 'Add to favourites' }).last()
+    await star.click()
+    await expect(page.getByRole('button', { name: 'Remove from favourites' }).last())
+      .toBeVisible()
+
+    // And the card underneath agrees, because a dish is favourited, not one
+    // wording of it.
+    await page.getByRole('button', { name: 'Close' }).click()
+    await page.getByRole('button', { name: /^Favourites/ }).click()
+    await expect(page.locator('[data-recipe-card]')).toHaveCount(1)
+  })
+
   test('every screen that lists things actually lists something', async ({ page }) => {
     // Schedule filtered its list on recipes having a written method. Not one of
     // the 228 does, the dietician wrote portions, not instructions, so the
@@ -1987,6 +2037,18 @@ test.describe('a batch that lands in the week', () => {
     const spread = page.getByLabel('Put them in the days ahead')
     await expect(spread).not.toBeChecked()
     await spread.check()
+
+    // Ticking it opens the choice of days and which meal, and says what would
+    // actually land rather than leaving it as a promise with no number.
+    await expect(page.getByText(/portions? go into \d+ of those days|Nothing would land/))
+      .toBeVisible()
+
+    // Lunch instead of dinner, and only two of the days on offer.
+    await page.getByRole('button', { name: 'lunch', exact: true }).click()
+    const dayChips = page.locator('.card-soft button[aria-pressed]')
+    const spare = await dayChips.count()
+    for (let i = 2; i < spare; i += 1) await dayChips.nth(i).click()
+
     await page.getByRole('button', { name: 'Into the fridge' }).click()
 
     await goto(page, '/plan')
