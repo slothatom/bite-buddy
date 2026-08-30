@@ -105,6 +105,12 @@
     25% { transform: rotate(-6deg); }
     75% { transform: rotate(6deg); }
   }
+  /* The undo window emptying. Duration is set inline from UNDO_SECONDS, so
+     the bar and the timer that clears the offer cannot drift apart. */
+  @keyframes drain {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
 }
 
 @layer base {

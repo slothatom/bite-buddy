@@ -187,6 +187,18 @@ interface MealPlanStore {
    */
   recordEaten: (date: string, slot: MealSlot, entry: Component) => void
   removeMeal: (date: string, mealId: string) => void
+  /**
+   * Puts meals back on a day exactly as they were, ids and outcomes included.
+   *
+   * What undo needs and what `setMeal` cannot give it. `setMeal` writes a slot
+   * from scratch with a fresh id, so undoing a removal that way would lose the
+   * tick that said the meal was eaten, and would overwrite whatever has been
+   * added to the slot in the seconds since.
+   *
+   * Meals already present by id are left alone, so taking the offer twice, or
+   * after the same meal arrived back some other way, cannot duplicate a day.
+   */
+  restoreMeals: (date: string, meals: PlannedMeal[]) => void
   clearDay: (date: string) => void
   copyDay: (fromDate: string, toDate: string) => void
   /**
@@ -276,6 +288,15 @@ interface MealPlanStore {
   removeGroceryItem: (id: string) => void
   clearCheckedItems: () => void
   clearGroceryList: () => void
+  /**
+   * Puts grocery lines back where they were, for undo.
+   *
+   * By position rather than appended, because the list is walked in the order
+   * a shop is walked and a restored line arriving at the bottom is a line you
+   * do not find again. Lines already present by id are skipped, so taking the
+   * offer twice cannot double the list.
+   */
+  restoreGroceryItems: (items: GroceryItem[]) => void
 }
 
 export const useMealPlanStore = create<MealPlanStore>()(
@@ -339,6 +360,16 @@ export const useMealPlanStore = create<MealPlanStore>()(
               day.date === date
                 ? touch({ ...day, meals: day.meals.filter((m) => m.id !== mealId) })
                 : day),
+          })),
+
+        restoreMeals: (date, meals) =>
+          set((s) => ({
+            plan: withDay(s.plan, date, (day) => {
+              const here = new Set(day.meals.map((m) => m.id))
+              const missing = meals.filter((m) => !here.has(m.id))
+              if (!missing.length) return day
+              return touch({ ...day, meals: [...day.meals, ...missing] })
+            }),
           })),
 
         clearDay: (date) =>
@@ -669,6 +700,21 @@ export const useMealPlanStore = create<MealPlanStore>()(
           set((s) => ({ groceryItems: s.groceryItems.filter((i) => !i.checked) })),
 
         clearGroceryList: () => set({ groceryItems: [] }),
+
+        restoreGroceryItems: (items) =>
+          set((s) => {
+            const here = new Set(s.groceryItems.map((i) => i.id))
+            const missing = items.filter((i) => !here.has(i.id))
+            if (!missing.length) return {}
+
+            // The order the list was in, for the lines that are back, with
+            // anything added since kept on the end.
+            const wanted = new Map(items.map((i, at) => [i.id, at]))
+            const known = [...s.groceryItems, ...missing].filter((i) => wanted.has(i.id))
+            const rest = s.groceryItems.filter((i) => !wanted.has(i.id))
+            known.sort((a, b) => wanted.get(a.id)! - wanted.get(b.id)!)
+            return { groceryItems: [...known, ...rest] }
+          }),
       }
     },
     {

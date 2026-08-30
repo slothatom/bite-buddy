@@ -21,6 +21,14 @@ import { usePantryStore } from './usePantryStore'
 export interface PersistedStore {
   /** The store's persist key, also its key in a backup file and in the database. */
   name: string | undefined
+  /**
+   * What this holds, in the words somebody would use about their own data.
+   *
+   * A restore has to be able to say what it is about to replace, and
+   * "bite-buddy-mealplan-v2" is not a sentence anyone can weigh a decision
+   * against.
+   */
+  label: string
   read: () => unknown
   write: (state: object) => void
   subscribe: (fn: () => void) => () => void
@@ -33,7 +41,7 @@ export interface PersistedStore {
   upgrade: (state: unknown, fromVersion: number) => unknown
 }
 
-function persisted<T extends object>(store: {
+function persisted<T extends object>(label: string, store: {
   getState: () => T
   setState: (partial: Partial<T>) => void
   subscribe: (fn: (state: T) => void) => () => void
@@ -48,6 +56,7 @@ function persisted<T extends object>(store: {
   const { name, partialize, migrate } = store.persist.getOptions()
   return {
     name,
+    label,
     read: () => (partialize ? partialize(store.getState()) : store.getState()),
     write: (state) => store.setState(state as Partial<T>),
     subscribe: (fn) => store.subscribe(() => fn()),
@@ -56,9 +65,15 @@ function persisted<T extends object>(store: {
 }
 
 export const STORES: PersistedStore[] = [
-  persisted(useMealPlanStore), persisted(useUserStore), persisted(useRecipeStore),
-  persisted(useFoodStore), persisted(useBodyStore), persisted(useCookStore),
-  persisted(useActivityStore), persisted(usePortionStore), persisted(usePantryStore),
+  persisted('your plan, weeks and shopping list', useMealPlanStore),
+  persisted('your profile and targets', useUserStore),
+  persisted('your recipes and favourites', useRecipeStore),
+  persisted('your foods', useFoodStore),
+  persisted('your weights and measurements', useBodyStore),
+  persisted('your cooking sessions', useCookStore),
+  persisted('your workouts', useActivityStore),
+  persisted('what is in the fridge and freezer', usePortionStore),
+  persisted('what is in the cupboard', usePantryStore),
 ]
 
 export type StoreKey = string

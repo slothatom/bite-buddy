@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { createBackup, restoreBackup, backupFilename } from './backup'
+import { applyBackup, createBackup, inspectBackup, backupFilename } from './backup'
 import { useUserStore } from '../store/useUserStore'
 import { useBodyStore } from '../store/useBodyStore'
 import { SCHEMA_VERSION } from '../store/persist'
@@ -45,11 +45,18 @@ describe('createBackup', () => {
   })
 })
 
-describe('restoreBackup', () => {
+describe('bringing one back', () => {
   beforeEach(() => {
     useUserStore.getState().setName('Original')
     useBodyStore.setState({ weightEntries: [] })
   })
+
+  /** Reading and applying in one go, which is what a confirmed restore is. */
+  function restore(text: string) {
+    const read = inspectBackup(text)
+    if (read.ok) applyBackup(read.plan)
+    return read
+  }
 
   it('round-trips real changes', () => {
     useUserStore.getState().setName('Ana')
@@ -60,16 +67,14 @@ describe('restoreBackup', () => {
     useUserStore.getState().setName('Gone')
     useBodyStore.setState({ weightEntries: [] })
 
-    const result = restoreBackup(saved)
-    expect(result.ok).toBe(true)
+    expect(restore(saved).ok).toBe(true)
     expect(useUserStore.getState().profile.name).toBe('Ana')
     expect(useBodyStore.getState().weightEntries).toHaveLength(1)
     expect(useBodyStore.getState().weightEntries[0].weight).toBe(68.4)
   })
 
   it('leaves the actions intact, so the app still works afterwards', () => {
-    const result = restoreBackup(JSON.stringify(createBackup()))
-    expect(result.ok).toBe(true)
+    expect(restore(JSON.stringify(createBackup())).ok).toBe(true)
     expect(() => useUserStore.getState().setName('Still callable')).not.toThrow()
     expect(useUserStore.getState().profile.name).toBe('Still callable')
   })
@@ -87,8 +92,7 @@ describe('restoreBackup', () => {
       },
     }
 
-    const result = restoreBackup(JSON.stringify(backup))
-    expect(result.ok).toBe(true)
+    expect(restore(JSON.stringify(backup)).ok).toBe(true)
     expect(useBodyStore.getState().weightEntries).toHaveLength(1)
   })
 
@@ -96,8 +100,7 @@ describe('restoreBackup', () => {
     const backup = { ...createBackup(), schema: SCHEMA_VERSION + 1 }
     useUserStore.getState().setName('Untouched')
 
-    const result = restoreBackup(JSON.stringify(backup))
-    expect(result.ok).toBe(false)
+    expect(restore(JSON.stringify(backup)).ok).toBe(false)
     expect(useUserStore.getState().profile.name).toBe('Untouched')
   })
 
@@ -107,20 +110,106 @@ describe('restoreBackup', () => {
     ['{"app":"bite-buddy","schema":1}', 'no data in it'],
     ['{"app":"bite-buddy","schema":1,"stores":{"unknown-key":{}}}', 'matched this version'],
   ])('rejects %s', (input, expected) => {
-    const result = restoreBackup(input)
+    const result = inspectBackup(input)
     expect(result.ok).toBe(false)
     if (!result.ok) expect(result.error).toContain(expected)
   })
 
-  it('skips keys it does not recognise but restores the ones it does', () => {
+  it('leaves a name it does not recognise out, and says so', () => {
     const backup = createBackup()
     backup.stores['bite-buddy-from-the-future'] = { something: true }
 
-    const result = restoreBackup(JSON.stringify(backup))
-    expect(result.ok).toBe(true)
-    if (result.ok) {
-      expect(result.skipped).toEqual(['bite-buddy-from-the-future'])
-      expect(result.restored).toHaveLength(9)
+    const read = inspectBackup(JSON.stringify(backup))
+    expect(read.ok).toBe(true)
+    if (read.ok) {
+      expect(read.plan.unknown).toEqual(['bite-buddy-from-the-future'])
+      expect(read.plan.replacing).toHaveLength(9)
     }
+  })
+
+  it('says what it is about to replace, in words, before touching anything', () => {
+    useUserStore.getState().setName('Untouched')
+    const read = inspectBackup(JSON.stringify(createBackup()))
+
+    expect(read.ok).toBe(true)
+    if (read.ok) {
+      expect(read.plan.replacing).toContain('your profile and targets')
+      expect(read.plan.exportedAt).toBeTruthy()
+    }
+    // Reading it is not doing it.
+    expect(useUserStore.getState().profile.name).toBe('Untouched')
+  })
+})
+
+/**
+ * The failure that matters is a restore that half-works: it looks successful
+ * and quietly leaves the app holding a mixture of old and new state. Three
+ * valid sections and seven junk ones must leave everything alone.
+ */
+describe('a restore cannot half-succeed', () => {
+  beforeEach(() => {
+    useUserStore.getState().setName('Original')
+    useBodyStore.setState({ weightEntries: [] })
+  })
+
+  it('refuses the whole file when one section is the wrong shape', () => {
+    const backup = createBackup()
+    backup.stores['bite-buddy-body'] = { weightEntries: 'not a list at all' }
+
+    const read = inspectBackup(JSON.stringify(backup))
+    expect(read.ok).toBe(false)
+    if (!read.ok) {
+      expect(read.error).toContain('your weights and measurements')
+      expect(read.error).toContain('nothing has been changed')
+    }
+    expect(useUserStore.getState().profile.name).toBe('Original')
+  })
+
+  it('refuses a section carrying a key this version knows nothing about', () => {
+    const backup = createBackup()
+    backup.stores['bite-buddy-user-v2'] = { profile: {}, secretlyFromAnotherApp: [] }
+
+    const read = inspectBackup(JSON.stringify(backup))
+    expect(read.ok).toBe(false)
+    if (!read.ok) expect(read.error).toContain('secretlyFromAnotherApp')
+  })
+
+  it('writes nothing at all when a later section is bad', () => {
+    // The old loop wrote as it validated, so a good user store went in and a
+    // bad body store then stopped the run, leaving the app half restored.
+    useUserStore.getState().setName('Before')
+    const backup = createBackup()
+    backup.stores['bite-buddy-user-v2'] = { profile: { name: 'After' } }
+    backup.stores['bite-buddy-portions'] = { portions: 42 }
+
+    const read = inspectBackup(JSON.stringify(backup))
+    expect(read.ok).toBe(false)
+    expect(useUserStore.getState().profile.name).toBe('Before')
+  })
+
+  it('accepts a section missing a field this version added', () => {
+    // An honest old backup, not a bad one. The store merges over its defaults.
+    const backup = createBackup()
+    backup.stores['bite-buddy-body'] = {}
+
+    expect(inspectBackup(JSON.stringify(backup)).ok).toBe(true)
+  })
+
+  it('hands back the copy it replaced, so the restore can be undone', () => {
+    useUserStore.getState().setName('Before the restore')
+    const other = JSON.parse(JSON.stringify(createBackup())) as ReturnType<typeof createBackup>
+    ;(other.stores['bite-buddy-user-v2'] as { profile: { name: string } }).profile.name = 'From the file'
+
+    const read = inspectBackup(JSON.stringify(other))
+    expect(read.ok).toBe(true)
+    if (!read.ok) return
+
+    const snapshot = applyBackup(read.plan)
+    expect(useUserStore.getState().profile.name).toBe('From the file')
+
+    const back = inspectBackup(JSON.stringify(snapshot))
+    expect(back.ok).toBe(true)
+    if (back.ok) applyBackup(back.plan)
+    expect(useUserStore.getState().profile.name).toBe('Before the restore')
   })
 })
