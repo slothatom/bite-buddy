@@ -91,12 +91,27 @@ export default function Home() {
     [plan, weekDates],
   )
 
-  // How much of the guide the week keeps to, as one number. Limit categories
-  // count when you are under them, everything else when you are over.
+  /**
+   * How much of the guide the week keeps to, as one number.
+   *
+   * Only the goals you have to reach. Ceilings and floors were summed into one
+   * score, and a ceiling is met by eating nothing: an empty week reported "2 of
+   * 8 of the guide's goals", a quarter of the way there on no food at all,
+   * because red meat and treats were both comfortably under their limits.
+   *
+   * They are not dropped, they are counted separately. Staying under a limit is
+   * worth knowing; it is just not an achievement to be added to reaching one.
+   */
   const mediterranean = useMemo(() => {
     const scored = scoreWeek(weekPlan, ctx)
-    const met = scored.filter((g) => (g.isLimit ? g.ratio <= 1 : g.ratio >= 0.9)).length
-    return { met, of: scored.length }
+    const goals = scored.filter((g) => !g.isLimit)
+    const limits = scored.filter((g) => g.isLimit)
+    return {
+      met: goals.filter((g) => g.ratio >= 0.9).length,
+      of: goals.length,
+      within: limits.filter((g) => g.ratio <= 1).length,
+      limits: limits.length,
+    }
   }, [weekPlan, ctx])
 
   /**
@@ -195,7 +210,7 @@ export default function Home() {
             label="Mediterranean"
             value={`${mediterranean.met}`}
             unit={`of ${mediterranean.of}`}
-            note="of the guide's goals"
+            note="goals reached"
             to="/analytics"
           />
           {/* What is already cooked outranks what is planned to be: it is the

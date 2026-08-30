@@ -16,6 +16,7 @@ import { useMealPlanStore } from './store/useMealPlanStore'
 import { useUserStore } from './store/useUserStore'
 import { isConfigured } from './lib/supabase'
 import Zig from './components/brand/Mascot'
+import { lazyRoute } from './lib/lazyRoute'
 
 /**
  * Home and Planner load with the app; everything else on demand.
@@ -28,13 +29,13 @@ import Zig from './components/brand/Mascot'
  *
  * Home and Planner stay eager because one of them is always what you open.
  */
-const Recipes = lazy(() => import('./pages/Recipes'))
-const Foods = lazy(() => import('./pages/Foods'))
-const GroceryList = lazy(() => import('./pages/GroceryList'))
-const Schedule = lazy(() => import('./pages/Schedule'))
-const Activity = lazy(() => import('./pages/Activity'))
-const Analytics = lazy(() => import('./pages/Analytics'))
-const Settings = lazy(() => import('./pages/Settings'))
+const Recipes = lazy(lazyRoute(() => import('./pages/Recipes')))
+const Foods = lazy(lazyRoute(() => import('./pages/Foods')))
+const GroceryList = lazy(lazyRoute(() => import('./pages/GroceryList')))
+const Schedule = lazy(lazyRoute(() => import('./pages/Schedule')))
+const Activity = lazy(lazyRoute(() => import('./pages/Activity')))
+const Analytics = lazy(lazyRoute(() => import('./pages/Analytics')))
+const Settings = lazy(lazyRoute(() => import('./pages/Settings')))
 
 /** Deliberately quiet: a chunk off the local service worker arrives in a frame
     or two, and a spinner that flashes reads as jank rather than progress. */

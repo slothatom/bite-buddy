@@ -215,8 +215,14 @@ function MediterraneanTab() {
         </div>
       )}
 
+      {/* Two lists, not one. A goal and a limit are opposite questions and had
+          the same row and the same filling bar, so a nearly-full bar meant
+          "nearly there" on one and "nearly over" on the other, with only hue
+          to tell them apart. Split, the shape of the list says which is which
+          before any colour does. */}
+      <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">Aim for</p>
       <div className="card divide-y divide-border-100">
-        {goals.map((g) => {
+        {goals.filter((g) => !g.isLimit).map((g) => {
           const pct = Math.min(1, g.ratio)
           const met = g.isLimit ? g.ratio <= 1 : g.ratio >= 0.9
           return (
@@ -255,6 +261,29 @@ function MediterraneanTab() {
             </div>
           )
         })}
+      </div>
+
+      <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">Keep under</p>
+      <div className="card divide-y divide-border-100">
+        {goals.filter((g) => g.isLimit).map((g) => (
+          <div key={g.category} className="px-4 py-3 flex items-baseline justify-between gap-3">
+            <span className="text-sm font-semibold text-ink-900">
+              {g.label}
+              <span className="ml-2 text-xs font-normal text-ink-500">
+                at most {g.target} / {g.period}
+              </span>
+            </span>
+            {/* No bar at all. There is nothing to fill up here: you are either
+                inside the line or over it, and that is a word, not a length. */}
+            <span className={`text-xs font-mono shrink-0 ${
+              g.ratio > 1 ? 'text-coral-700' : 'text-ink-500'}`}>
+              {g.servings.toFixed(1)} of {g.expected.toFixed(0)}
+              <span className="ml-1.5 font-sans font-semibold">
+                {g.ratio > 1 ? 'over' : 'within'}
+              </span>
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   )

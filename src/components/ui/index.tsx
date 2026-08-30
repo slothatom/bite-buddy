@@ -108,7 +108,7 @@ export function CalorieRing({ value, target, size = 132 }: { value: number; targ
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-[28px] font-extrabold leading-none text-ink-900">
+          <span data-day-kcal className="text-[28px] font-extrabold leading-none text-ink-900">
             {Math.round(value).toLocaleString()}
           </span>
           <span className="text-[11px] font-bold text-ink-500 mt-1">of {target.toLocaleString()} kcal</span>
