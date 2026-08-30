@@ -70,6 +70,13 @@ describe('one step back, for a short while', () => {
     expect(useUndo.getState().offer?.what).toBe('Put Thursday back')
   })
 
+  it('remembers which screen it was offered on', () => {
+    // Off its own screen the offer is noise, and on Settings it landed on top
+    // of the one card that has to be read before it is answered.
+    offerUndo('Removed the soup', () => {})
+    expect(useUndo.getState().offer?.at).toBe('/')
+  })
+
   it('ignores a dismissal aimed at an offer that has already gone', () => {
     offerUndo('Removed the soup', () => {})
     useUndo.getState().clearUndo('undo-does-not-exist')

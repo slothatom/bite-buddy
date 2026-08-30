@@ -27,6 +27,16 @@ export interface UndoOffer {
   /** New for every offer, so a re-offer of the same wording re-animates. */
   id: string
   /**
+   * The screen it was offered on.
+   *
+   * An undo is about the thing you just did on the screen you were on, and it
+   * travelled: removing a meal and then opening Settings put the offer over
+   * the restore confirmation, which is the one card on that screen that has to
+   * be read before it is answered. Off its own screen the offer is at best
+   * noise and at worst in the way.
+   */
+  at: string
+  /**
    * What happened, in the past tense and naming the thing: "Removed Cabbage
    * soup with wholemeal bread". "Item deleted" tells you nothing you did not
    * just watch happen, and cannot be checked against what you meant to do.
@@ -55,6 +65,18 @@ interface UndoStore {
 let timer: ReturnType<typeof setTimeout> | undefined
 let counter = 0
 
+/**
+ * Which screen this is, without a router.
+ *
+ * The store is not inside one and should not need to be. HashRouter puts the
+ * route in the hash, so it is readable from the address directly, and in a
+ * test environment with no window at all there is one screen and this is it.
+ */
+function routeNow(): string {
+  if (typeof window === 'undefined') return '/'
+  return window.location.hash.replace(/^#/, '').split('?')[0] || '/'
+}
+
 export const useUndo = create<UndoStore>()((set, get) => ({
   offer: null,
 
@@ -62,7 +84,7 @@ export const useUndo = create<UndoStore>()((set, get) => ({
     if (timer) clearTimeout(timer)
     counter += 1
     const id = `undo-${counter}`
-    set({ offer: { id, what, restore } })
+    set({ offer: { id, what, restore, at: routeNow() } })
     timer = setTimeout(() => get().clearUndo(id), UNDO_SECONDS * 1000)
   },
 
