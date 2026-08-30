@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import {
   Search, Star, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
   ChevronDown, SlidersHorizontal, Minus, ExternalLink, CalendarPlus, Check,
@@ -61,6 +62,17 @@ export default function Recipes() {
   // contains, and a sheet holding a snapshot went on listing versions that had
   // just been folded away.
   const [openName, setOpenName] = useState<string | null>(null)
+  /**
+   * A recipe named in the address, so a planned meal can open the thing it is.
+   *
+   * The planner had no way through to a recipe at all: you read "Cabbage soup
+   * with wholemeal bread" on Tuesday, wanted to know what went in it, and had
+   * to come here and search for it by name. An id rather than a name because
+   * names get merged and re-worded, and the id also says which of the wordings
+   * was the one planned.
+   */
+  const [params, setParams] = useSearchParams()
+  const asked = params.get('recipe')
   const [editing, setEditing] = useState<Recipe | null | undefined>(undefined)
 
   const mine = useMemo(() => new Set(custom.map((r) => r.id)), [custom])
@@ -188,10 +200,18 @@ export default function Recipes() {
 
   // Looked up across the whole library, not the current shelf, so changing a
   // filter underneath an open recipe does not shut it.
-  const openCard = useMemo(
-    () => (openName ? groupVariants(recipes).find((c) => c.name === openName) ?? null : null),
-    [openName, recipes],
-  )
+  const openCard = useMemo(() => {
+    const cards = groupVariants(recipes)
+    if (asked) return cards.find((c) => c.variants.some((r) => r.id === asked)) ?? null
+    return openName ? cards.find((c) => c.name === openName) ?? null : null
+  }, [openName, asked, recipes])
+
+  // Closing a recipe that arrived from the address has to clear the address
+  // too, or it reopens on the next render and cannot be shut at all.
+  const closeRecipe = () => {
+    setOpenName(null)
+    if (asked) setParams({}, { replace: true })
+  }
 
   /**
    * Repeats across the whole library, not just this shelf, where every
@@ -367,9 +387,10 @@ export default function Recipes() {
       {openCard && (
         <RecipeDetail
           card={openCard}
+          startId={asked ?? undefined}
           isMine={(r) => mine.has(r.id)}
-          onEdit={(r) => { setEditing(r); setOpenName(null) }}
-          onClose={() => setOpenName(null)}
+          onEdit={(r) => { setEditing(r); closeRecipe() }}
+          onClose={closeRecipe}
         />
       )}
 
@@ -596,18 +617,9 @@ function EmptyShelf({
     )
   }
 
-  if (tab === 'snack') {
-    return (
-      <EmptyState title="Snacks are not recipes here" mood="thinking">
-        <p>
-          Your plans write them as lines rather than dishes (150 g apple, 10 g cashews), so they
-          are added straight to a day in the planner. Write one as a recipe if you would rather
-          reuse it.
-        </p>
-        <button className="btn-primary mt-4" onClick={onNew}><Plus size={16} /> Write one</button>
-      </EmptyState>
-    )
-  }
+  // The snack shelf used to have a sentence of its own explaining why it was
+  // permanently empty. It is not empty any more, so the explanation went with
+  // the emptiness.
 
   return (
     <EmptyState title={`Nothing on the ${GROUP_LABELS[tab].toLowerCase()} shelf`} mood="thinking">
@@ -646,17 +658,38 @@ function ShoppingNote({ recipe }: { recipe: Recipe }) {
 }
 
 function RecipeDetail({
-  card, isMine, onEdit, onClose,
+  card, isMine, onEdit, onClose, startId,
 }: {
   card: RecipeVariants
   isMine: (recipe: Recipe) => boolean
   onEdit: (recipe: Recipe) => void
   onClose: () => void
+  /**
+   * Which wording to open on, when the sheet was opened from a planned meal.
+   *
+   * The plans write the same dish several ways and the day names one of them.
+   * Landing on version 1 when Tuesday says version 3 would show a different
+   * portion and different calories from the ones on the day you came from.
+   */
+  startId?: string
 }) {
   const ctx = useNutritionContext()
-  const { mergeRecipes, unmergeRecipe } = useRecipeStore()
-  const [version, setVersion] = useState(0)
+  const { mergeRecipes, unmergeRecipe, favouriteIds, toggleFavourite } = useRecipeStore()
+  const [version, setVersion] = useState(() => {
+    const at = card.variants.findIndex((r) => r.id === startId)
+    return at >= 0 ? at : 0
+  })
   const [confirmMerge, setConfirmMerge] = useState(false)
+
+  // A dish is favourited, not one portion of it, so the star covers every
+  // wording of it. The same rule the card uses, because the two have to agree:
+  // starring here and finding the card unstarred would read as a bug.
+  const favourite = card.variants.some((r) => favouriteIds.includes(r.id))
+  const setFavourite = () => {
+    for (const r of card.variants) {
+      if (favouriteIds.includes(r.id) === favourite) toggleFavourite(r.id)
+    }
+  }
 
   const recipe = card.variants[Math.min(version, card.variants.length - 1)]
   const folded = useMergedInto(recipe.id)
@@ -696,6 +729,16 @@ function RecipeDetail({
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
+            {/* The star was only ever on the card, so deciding you like
+                something while reading it meant closing the sheet to say so. */}
+            <button
+              className="btn-ghost btn-icon"
+              onClick={setFavourite}
+              aria-pressed={favourite}
+              aria-label={favourite ? 'Remove from favourites' : 'Add to favourites'}
+            >
+              <Star size={17} className={favourite ? 'fill-coral-600 text-coral-600' : ''} />
+            </button>
             <button className="btn-ghost btn-icon" onClick={() => onEdit(recipe)} aria-label="Edit recipe"><Pencil size={17} /></button>
             <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
           </div>

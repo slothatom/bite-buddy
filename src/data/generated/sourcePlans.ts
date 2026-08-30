@@ -275,14 +275,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g nectarine, 10 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "nectarine",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-012",
+                "servings": 1
               }
             ]
           },
@@ -314,7 +309,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-012",
+                "recipeId": "meal-dinner-013",
                 "servings": 1
               }
             ]
@@ -331,7 +326,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-013",
+                "recipeId": "meal-breakfast-014",
                 "servings": 1
               }
             ]
@@ -353,7 +348,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-014",
+                "recipeId": "meal-lunch-015",
                 "servings": 1
               }
             ]
@@ -375,7 +370,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-012",
+                "recipeId": "meal-dinner-013",
                 "servings": 1
               }
             ]
@@ -392,7 +387,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-015",
+                "recipeId": "meal-breakfast-016",
                 "servings": 1
               }
             ]
@@ -414,7 +409,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-014",
+                "recipeId": "meal-lunch-015",
                 "servings": 1
               }
             ]
@@ -436,7 +431,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-017",
+                "recipeId": "meal-dinner-018",
                 "servings": 1
               }
             ]
@@ -463,7 +458,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-018",
+                "recipeId": "meal-breakfast-019",
                 "servings": 1
               }
             ]
@@ -473,14 +468,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 narancs + 10 g kesudio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "orange",
-                "grams": 180
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-020",
+                "servings": 1
               }
             ]
           },
@@ -490,7 +480,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-019",
+                "recipeId": "meal-lunch-021",
                 "servings": 1
               }
             ]
@@ -500,14 +490,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 alma + 10 g dio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-022",
+                "servings": 1
               }
             ]
           },
@@ -517,7 +502,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-020",
+                "recipeId": "meal-dinner-023",
                 "servings": 1
               }
             ]
@@ -534,7 +519,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-021",
+                "recipeId": "meal-breakfast-024",
                 "servings": 1
               }
             ]
@@ -544,14 +529,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 grapefruit + 10 g kesudio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "grapefruit",
-                "grams": 250
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-025",
+                "servings": 1
               }
             ]
           },
@@ -583,7 +563,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-023",
+                "recipeId": "meal-dinner-027",
                 "servings": 1
               }
             ]
@@ -600,7 +580,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-021",
+                "recipeId": "meal-breakfast-024",
                 "servings": 1
               }
             ]
@@ -610,14 +590,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 narancs + 10 g mandula",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "orange",
-                "grams": 180
-              },
-              {
-                "kind": "food",
-                "foodId": "almonds",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-028",
+                "servings": 1
               }
             ]
           },
@@ -649,7 +624,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-023",
+                "recipeId": "meal-dinner-027",
                 "servings": 1
               }
             ]
@@ -666,7 +641,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-025",
+                "recipeId": "meal-breakfast-030",
                 "servings": 1
               }
             ]
@@ -688,7 +663,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-026",
+                "recipeId": "meal-lunch-031",
                 "servings": 1
               }
             ]
@@ -710,7 +685,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-020",
+                "recipeId": "meal-dinner-023",
                 "servings": 1
               }
             ]
@@ -727,7 +702,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-015",
+                "recipeId": "meal-breakfast-016",
                 "servings": 1
               }
             ]
@@ -737,14 +712,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "fel mango + 10 g kesudio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "mango",
-                "grams": 100
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-033",
+                "servings": 1
               }
             ]
           },
@@ -754,7 +724,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-028",
+                "recipeId": "meal-lunch-034",
                 "servings": 1
               }
             ]
@@ -776,7 +746,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-029",
+                "recipeId": "meal-dinner-035",
                 "servings": 1
               }
             ]
@@ -793,7 +763,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-030",
+                "recipeId": "meal-breakfast-036",
                 "servings": 1
               }
             ]
@@ -803,14 +773,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 grapefruit + 5 g kesudio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "grapefruit",
-                "grams": 250
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 5
+                "kind": "recipe",
+                "recipeId": "meal-snack1-037",
+                "servings": 1
               }
             ]
           },
@@ -820,7 +785,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-028",
+                "recipeId": "meal-lunch-034",
                 "servings": 1
               }
             ]
@@ -830,14 +795,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 alma + 5 g kesudio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 5
+                "kind": "recipe",
+                "recipeId": "meal-snack2-039",
+                "servings": 1
               }
             ]
           },
@@ -847,7 +807,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-032",
+                "recipeId": "meal-dinner-040",
                 "servings": 1
               }
             ]
@@ -864,7 +824,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-030",
+                "recipeId": "meal-breakfast-036",
                 "servings": 1
               }
             ]
@@ -886,7 +846,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-033",
+                "recipeId": "meal-lunch-041",
                 "servings": 1
               }
             ]
@@ -896,14 +856,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 alma + 10 g dio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-022",
+                "servings": 1
               }
             ]
           },
@@ -913,7 +868,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-032",
+                "recipeId": "meal-dinner-040",
                 "servings": 1
               }
             ]
@@ -940,7 +895,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-034",
+                "recipeId": "meal-breakfast-042",
                 "servings": 1
               }
             ]
@@ -962,7 +917,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-035",
+                "recipeId": "meal-lunch-043",
                 "servings": 1
               }
             ]
@@ -984,7 +939,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-036",
+                "recipeId": "meal-dinner-044",
                 "servings": 1
               }
             ]
@@ -1001,7 +956,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-034",
+                "recipeId": "meal-breakfast-042",
                 "servings": 1
               }
             ]
@@ -1023,7 +978,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-035",
+                "recipeId": "meal-lunch-043",
                 "servings": 1
               }
             ]
@@ -1045,7 +1000,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-036",
+                "recipeId": "meal-dinner-044",
                 "servings": 1
               }
             ]
@@ -1062,7 +1017,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-038",
+                "recipeId": "meal-breakfast-046",
                 "servings": 1
               }
             ]
@@ -1084,7 +1039,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-039",
+                "recipeId": "meal-lunch-047",
                 "servings": 1
               }
             ]
@@ -1106,7 +1061,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-040",
+                "recipeId": "meal-dinner-048",
                 "servings": 1
               }
             ]
@@ -1123,7 +1078,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-038",
+                "recipeId": "meal-breakfast-046",
                 "servings": 1
               }
             ]
@@ -1145,7 +1100,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-039",
+                "recipeId": "meal-lunch-047",
                 "servings": 1
               }
             ]
@@ -1167,7 +1122,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-040",
+                "recipeId": "meal-dinner-048",
                 "servings": 1
               }
             ]
@@ -1184,7 +1139,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-041",
+                "recipeId": "meal-breakfast-049",
                 "servings": 1
               }
             ]
@@ -1206,7 +1161,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-042",
+                "recipeId": "meal-lunch-050",
                 "servings": 1
               }
             ]
@@ -1228,7 +1183,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-043",
+                "recipeId": "meal-dinner-051",
                 "servings": 1
               }
             ]
@@ -1245,7 +1200,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-044",
+                "recipeId": "meal-breakfast-052",
                 "servings": 1
               }
             ]
@@ -1267,7 +1222,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-045",
+                "recipeId": "meal-lunch-053",
                 "servings": 1
               }
             ]
@@ -1289,7 +1244,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-046",
+                "recipeId": "meal-dinner-054",
                 "servings": 1
               }
             ]
@@ -1306,7 +1261,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-044",
+                "recipeId": "meal-breakfast-052",
                 "servings": 1
               }
             ]
@@ -1328,7 +1283,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-045",
+                "recipeId": "meal-lunch-053",
                 "servings": 1
               }
             ]
@@ -1350,7 +1305,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-046",
+                "recipeId": "meal-dinner-054",
                 "servings": 1
               }
             ]
@@ -1377,7 +1332,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-047",
+                "recipeId": "meal-breakfast-055",
                 "servings": 1
               }
             ]
@@ -1399,7 +1354,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-048",
+                "recipeId": "meal-lunch-056",
                 "servings": 1
               }
             ]
@@ -1421,7 +1376,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-049",
+                "recipeId": "meal-dinner-057",
                 "servings": 1
               }
             ]
@@ -1438,7 +1393,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-047",
+                "recipeId": "meal-breakfast-055",
                 "servings": 1
               }
             ]
@@ -1499,7 +1454,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-051",
+                "recipeId": "meal-breakfast-059",
                 "servings": 1
               }
             ]
@@ -1521,7 +1476,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-052",
+                "recipeId": "meal-lunch-060",
                 "servings": 1
               }
             ]
@@ -1560,7 +1515,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-054",
+                "recipeId": "meal-breakfast-062",
                 "servings": 1
               }
             ]
@@ -1582,7 +1537,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-055",
+                "recipeId": "meal-lunch-063",
                 "servings": 1
               }
             ]
@@ -1592,14 +1547,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g kiwi, 15 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "kiwi",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 15
+                "kind": "recipe",
+                "recipeId": "meal-snack2-064",
+                "servings": 1
               }
             ]
           },
@@ -1609,7 +1559,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-056",
+                "recipeId": "meal-dinner-065",
                 "servings": 1
               }
             ]
@@ -1626,7 +1576,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-057",
+                "recipeId": "meal-breakfast-066",
                 "servings": 1
               }
             ]
@@ -1648,7 +1598,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-058",
+                "recipeId": "meal-lunch-067",
                 "servings": 1
               }
             ]
@@ -1670,7 +1620,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-056",
+                "recipeId": "meal-dinner-065",
                 "servings": 1
               }
             ]
@@ -1687,7 +1637,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-060",
+                "recipeId": "meal-breakfast-069",
                 "servings": 1
               }
             ]
@@ -1709,7 +1659,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-061",
+                "recipeId": "meal-lunch-070",
                 "servings": 1
               }
             ]
@@ -1748,7 +1698,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-062",
+                "recipeId": "meal-breakfast-071",
                 "servings": 1
               }
             ]
@@ -1758,14 +1708,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g kiwi, 10 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "kiwi",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-072",
+                "servings": 1
               }
             ]
           },
@@ -1824,7 +1769,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-051",
+                "recipeId": "meal-breakfast-059",
                 "servings": 1
               }
             ]
@@ -1846,7 +1791,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-063",
+                "recipeId": "meal-lunch-073",
                 "servings": 1
               }
             ]
@@ -1868,7 +1813,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-056",
+                "recipeId": "meal-dinner-065",
                 "servings": 1
               }
             ]
@@ -1929,7 +1874,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-056",
+                "recipeId": "meal-dinner-065",
                 "servings": 1
               }
             ]
@@ -1978,14 +1923,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g kiwi, 15 g nuci",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "kiwi",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 15
+                "kind": "recipe",
+                "recipeId": "meal-snack2-078",
+                "servings": 1
               }
             ]
           },
@@ -1995,7 +1935,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-068",
+                "recipeId": "meal-dinner-079",
                 "servings": 1
               }
             ]
@@ -2012,7 +1952,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-069",
+                "recipeId": "meal-breakfast-080",
                 "servings": 1
               }
             ]
@@ -2034,7 +1974,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-070",
+                "recipeId": "meal-lunch-081",
                 "servings": 1
               }
             ]
@@ -2056,7 +1996,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-071",
+                "recipeId": "meal-dinner-082",
                 "servings": 1
               }
             ]
@@ -2073,7 +2013,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-069",
+                "recipeId": "meal-breakfast-080",
                 "servings": 1
               }
             ]
@@ -2083,14 +2023,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g mere, 15 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 15
+                "kind": "recipe",
+                "recipeId": "meal-snack1-083",
+                "servings": 1
               }
             ]
           },
@@ -2100,7 +2035,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-070",
+                "recipeId": "meal-lunch-081",
                 "servings": 1
               }
             ]
@@ -2122,7 +2057,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-072",
+                "recipeId": "meal-dinner-084",
                 "servings": 1
               }
             ]
@@ -2139,7 +2074,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-069",
+                "recipeId": "meal-breakfast-080",
                 "servings": 1
               }
             ]
@@ -2161,7 +2096,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-073",
+                "recipeId": "meal-lunch-085",
                 "servings": 1
               }
             ]
@@ -2183,7 +2118,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-074",
+                "recipeId": "meal-dinner-086",
                 "servings": 1
               }
             ]
@@ -2200,7 +2135,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-034",
+                "recipeId": "meal-breakfast-042",
                 "servings": 1
               }
             ]
@@ -2222,7 +2157,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-073",
+                "recipeId": "meal-lunch-085",
                 "servings": 1
               }
             ]
@@ -2232,14 +2167,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g mere, 10 g migdale",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "almonds",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-088",
+                "servings": 1
               }
             ]
           },
@@ -2249,7 +2179,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-076",
+                "recipeId": "meal-dinner-089",
                 "servings": 1
               }
             ]
@@ -2276,7 +2206,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-034",
+                "recipeId": "meal-breakfast-042",
                 "servings": 1
               }
             ]
@@ -2298,7 +2228,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-077",
+                "recipeId": "meal-lunch-090",
                 "servings": 1
               }
             ]
@@ -2320,7 +2250,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-046",
+                "recipeId": "meal-dinner-054",
                 "servings": 1
               }
             ]
@@ -2337,7 +2267,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-068",
+                "recipeId": "meal-dinner-079",
                 "servings": 1
               }
             ]
@@ -2359,7 +2289,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-077",
+                "recipeId": "meal-lunch-090",
                 "servings": 1
               }
             ]
@@ -2381,7 +2311,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-046",
+                "recipeId": "meal-dinner-054",
                 "servings": 1
               }
             ]
@@ -2420,7 +2350,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-081",
+                "recipeId": "meal-lunch-094",
                 "servings": 1
               }
             ]
@@ -2442,7 +2372,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-082",
+                "recipeId": "meal-dinner-095",
                 "servings": 1
               }
             ]
@@ -2459,7 +2389,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-083",
+                "recipeId": "meal-breakfast-096",
                 "servings": 1
               }
             ]
@@ -2481,7 +2411,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-081",
+                "recipeId": "meal-lunch-094",
                 "servings": 1
               }
             ]
@@ -2503,7 +2433,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-084",
+                "recipeId": "meal-dinner-097",
                 "servings": 1
               }
             ]
@@ -2520,7 +2450,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-083",
+                "recipeId": "meal-breakfast-096",
                 "servings": 1
               }
             ]
@@ -2542,7 +2472,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-085",
+                "recipeId": "meal-lunch-098",
                 "servings": 1
               }
             ]
@@ -2564,7 +2494,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-086",
+                "recipeId": "meal-dinner-099",
                 "servings": 1
               }
             ]
@@ -2581,7 +2511,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-087",
+                "recipeId": "meal-breakfast-100",
                 "servings": 1
               }
             ]
@@ -2603,7 +2533,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-088",
+                "recipeId": "meal-lunch-101",
                 "servings": 1
               }
             ]
@@ -2625,7 +2555,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-086",
+                "recipeId": "meal-dinner-099",
                 "servings": 1
               }
             ]
@@ -2642,7 +2572,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-089",
+                "recipeId": "meal-breakfast-102",
                 "servings": 1
               }
             ]
@@ -2664,7 +2594,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-090",
+                "recipeId": "meal-lunch-103",
                 "servings": 1
               }
             ]
@@ -2686,7 +2616,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-091",
+                "recipeId": "meal-dinner-104",
                 "servings": 1
               }
             ]
@@ -2712,7 +2642,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-092",
+                "recipeId": "meal-breakfast-105",
                 "servings": 1
               }
             ]
@@ -2756,7 +2686,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-094",
+                "recipeId": "meal-dinner-107",
                 "servings": 1
               }
             ]
@@ -2773,7 +2703,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-095",
+                "recipeId": "meal-breakfast-108",
                 "servings": 1
               }
             ]
@@ -2817,7 +2747,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-096",
+                "recipeId": "meal-dinner-109",
                 "servings": 1
               }
             ]
@@ -2834,7 +2764,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-044",
+                "recipeId": "meal-breakfast-052",
                 "servings": 1
               }
             ]
@@ -2878,7 +2808,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-099",
+                "recipeId": "meal-dinner-112",
                 "servings": 1
               }
             ]
@@ -2895,7 +2825,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-044",
+                "recipeId": "meal-breakfast-052",
                 "servings": 1
               }
             ]
@@ -2939,7 +2869,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-099",
+                "recipeId": "meal-dinner-112",
                 "servings": 1
               }
             ]
@@ -2956,7 +2886,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-100",
+                "recipeId": "meal-breakfast-113",
                 "servings": 1
               }
             ]
@@ -2978,7 +2908,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-101",
+                "recipeId": "meal-lunch-114",
                 "servings": 1
               }
             ]
@@ -3000,7 +2930,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-102",
+                "recipeId": "meal-dinner-115",
                 "servings": 1
               }
             ]
@@ -3017,7 +2947,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-100",
+                "recipeId": "meal-breakfast-113",
                 "servings": 1
               }
             ]
@@ -3039,7 +2969,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-103",
+                "recipeId": "meal-lunch-116",
                 "servings": 1
               }
             ]
@@ -3061,7 +2991,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-104",
+                "recipeId": "meal-dinner-117",
                 "servings": 1
               }
             ]
@@ -3078,7 +3008,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-100",
+                "recipeId": "meal-breakfast-113",
                 "servings": 1
               }
             ]
@@ -3100,7 +3030,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-103",
+                "recipeId": "meal-lunch-116",
                 "servings": 1
               }
             ]
@@ -3122,7 +3052,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-104",
+                "recipeId": "meal-dinner-117",
                 "servings": 1
               }
             ]
@@ -3192,7 +3122,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-107",
+                "recipeId": "meal-dinner-120",
                 "servings": 1
               }
             ]
@@ -3209,7 +3139,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-095",
+                "recipeId": "meal-breakfast-108",
                 "servings": 1
               }
             ]
@@ -3219,14 +3149,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g portocale, 10 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "orange",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-122",
+                "servings": 1
               }
             ]
           },
@@ -3246,14 +3171,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g ananas, 10 g nuci",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "pineapple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-123",
+                "servings": 1
               }
             ]
           },
@@ -3263,7 +3183,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-049",
+                "recipeId": "meal-dinner-057",
                 "servings": 1
               }
             ]
@@ -3280,7 +3200,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-044",
+                "recipeId": "meal-breakfast-052",
                 "servings": 1
               }
             ]
@@ -3302,7 +3222,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-111",
+                "recipeId": "meal-lunch-126",
                 "servings": 1
               }
             ]
@@ -3324,7 +3244,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-112",
+                "recipeId": "meal-dinner-127",
                 "servings": 1
               }
             ]
@@ -3341,7 +3261,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-044",
+                "recipeId": "meal-breakfast-052",
                 "servings": 1
               }
             ]
@@ -3363,7 +3283,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-111",
+                "recipeId": "meal-lunch-126",
                 "servings": 1
               }
             ]
@@ -3385,7 +3305,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-112",
+                "recipeId": "meal-dinner-127",
                 "servings": 1
               }
             ]
@@ -3402,7 +3322,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-100",
+                "recipeId": "meal-breakfast-113",
                 "servings": 1
               }
             ]
@@ -3424,7 +3344,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-114",
+                "recipeId": "meal-lunch-129",
                 "servings": 1
               }
             ]
@@ -3463,7 +3383,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-100",
+                "recipeId": "meal-breakfast-113",
                 "servings": 1
               }
             ]
@@ -3473,14 +3393,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g pere, 10 g migdale",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "pear",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "almonds",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-131",
+                "servings": 1
               }
             ]
           },
@@ -3490,7 +3405,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-116",
+                "recipeId": "meal-lunch-132",
                 "servings": 1
               }
             ]
@@ -3500,14 +3415,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g mar + 10 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-133",
+                "servings": 1
               }
             ]
           },
@@ -3517,7 +3427,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-049",
+                "recipeId": "meal-dinner-057",
                 "servings": 1
               }
             ]
@@ -3534,7 +3444,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-100",
+                "recipeId": "meal-breakfast-113",
                 "servings": 1
               }
             ]
@@ -3556,7 +3466,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-116",
+                "recipeId": "meal-lunch-132",
                 "servings": 1
               }
             ]
@@ -3578,7 +3488,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-117",
+                "recipeId": "meal-dinner-134",
                 "servings": 1
               }
             ]
@@ -3605,7 +3515,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-118",
+                "recipeId": "meal-breakfast-135",
                 "servings": 1
               }
             ]
@@ -3627,7 +3537,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-119",
+                "recipeId": "meal-lunch-136",
                 "servings": 1
               }
             ]
@@ -3649,7 +3559,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-117",
+                "recipeId": "meal-dinner-134",
                 "servings": 1
               }
             ]
@@ -3666,7 +3576,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-057",
+                "recipeId": "meal-breakfast-066",
                 "servings": 1
               }
             ]
@@ -3676,14 +3586,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g pere, 10 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "pear",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-138",
+                "servings": 1
               }
             ]
           },
@@ -3693,7 +3598,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-119",
+                "recipeId": "meal-lunch-136",
                 "servings": 1
               }
             ]
@@ -3703,14 +3608,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g kiwi, 10 g nuci",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "kiwi",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-140",
+                "servings": 1
               }
             ]
           },
@@ -3720,7 +3620,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-049",
+                "recipeId": "meal-dinner-057",
                 "servings": 1
               }
             ]
@@ -3737,7 +3637,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-083",
+                "recipeId": "meal-breakfast-096",
                 "servings": 1
               }
             ]
@@ -3747,14 +3647,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g grapefruit, 10 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "grapefruit",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-142",
+                "servings": 1
               }
             ]
           },
@@ -3764,7 +3659,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-123",
+                "recipeId": "meal-lunch-143",
                 "servings": 1
               }
             ]
@@ -3786,7 +3681,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-124",
+                "recipeId": "meal-dinner-144",
                 "servings": 1
               }
             ]
@@ -3803,7 +3698,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-125",
+                "recipeId": "meal-breakfast-145",
                 "servings": 1
               }
             ]
@@ -3825,7 +3720,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-126",
+                "recipeId": "meal-lunch-146",
                 "servings": 1
               }
             ]
@@ -3847,7 +3742,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-127",
+                "recipeId": "meal-dinner-147",
                 "servings": 1
               }
             ]
@@ -3864,7 +3759,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-128",
+                "recipeId": "meal-breakfast-148",
                 "servings": 1
               }
             ]
@@ -3886,7 +3781,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-129",
+                "recipeId": "meal-lunch-149",
                 "servings": 1
               }
             ]
@@ -3908,7 +3803,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-127",
+                "recipeId": "meal-dinner-147",
                 "servings": 1
               }
             ]
@@ -3925,7 +3820,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-068",
+                "recipeId": "meal-dinner-079",
                 "servings": 1
               }
             ]
@@ -3947,7 +3842,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-131",
+                "recipeId": "meal-lunch-151",
                 "servings": 1
               }
             ]
@@ -3969,7 +3864,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-043",
+                "recipeId": "meal-dinner-051",
                 "servings": 1
               }
             ]
@@ -3986,7 +3881,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-034",
+                "recipeId": "meal-breakfast-042",
                 "servings": 1
               }
             ]
@@ -4008,7 +3903,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-133",
+                "recipeId": "meal-lunch-153",
                 "servings": 1
               }
             ]
@@ -4030,7 +3925,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-134",
+                "recipeId": "meal-dinner-154",
                 "servings": 1
               }
             ]
@@ -4057,7 +3952,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-062",
+                "recipeId": "meal-breakfast-071",
                 "servings": 1
               }
             ]
@@ -4079,7 +3974,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-136",
+                "recipeId": "meal-lunch-156",
                 "servings": 1
               }
             ]
@@ -4089,14 +3984,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g mere, 10 g nuci",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-022",
+                "servings": 1
               }
             ]
           },
@@ -4106,7 +3996,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-043",
+                "recipeId": "meal-dinner-051",
                 "servings": 1
               }
             ]
@@ -4123,7 +4013,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-057",
+                "recipeId": "meal-breakfast-066",
                 "servings": 1
               }
             ]
@@ -4145,7 +4035,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-139",
+                "recipeId": "meal-lunch-160",
                 "servings": 1
               }
             ]
@@ -4167,7 +4057,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-134",
+                "recipeId": "meal-dinner-154",
                 "servings": 1
               }
             ]
@@ -4184,7 +4074,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-140",
+                "recipeId": "meal-breakfast-161",
                 "servings": 1
               }
             ]
@@ -4206,7 +4096,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-141",
+                "recipeId": "meal-lunch-162",
                 "servings": 1
               }
             ]
@@ -4216,14 +4106,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g mere, 10 g migdale",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "almonds",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-088",
+                "servings": 1
               }
             ]
           },
@@ -4233,7 +4118,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-142",
+                "recipeId": "meal-dinner-163",
                 "servings": 1
               }
             ]
@@ -4250,7 +4135,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-143",
+                "recipeId": "meal-breakfast-164",
                 "servings": 1
               }
             ]
@@ -4272,7 +4157,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-144",
+                "recipeId": "meal-lunch-165",
                 "servings": 1
               }
             ]
@@ -4294,7 +4179,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-142",
+                "recipeId": "meal-dinner-163",
                 "servings": 1
               }
             ]
@@ -4311,7 +4196,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-145",
+                "recipeId": "meal-breakfast-166",
                 "servings": 1
               }
             ]
@@ -4333,7 +4218,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-146",
+                "recipeId": "meal-lunch-167",
                 "servings": 1
               }
             ]
@@ -4355,7 +4240,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-134",
+                "recipeId": "meal-dinner-154",
                 "servings": 1
               }
             ]
@@ -4372,7 +4257,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-145",
+                "recipeId": "meal-breakfast-166",
                 "servings": 1
               }
             ]
@@ -4394,7 +4279,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-146",
+                "recipeId": "meal-lunch-167",
                 "servings": 1
               }
             ]
@@ -4416,7 +4301,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-049",
+                "recipeId": "meal-dinner-057",
                 "servings": 1
               }
             ]
@@ -4443,7 +4328,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-068",
+                "recipeId": "meal-dinner-079",
                 "servings": 1
               }
             ]
@@ -4453,14 +4338,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g strugurei, 20 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "grapes",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 20
+                "kind": "recipe",
+                "recipeId": "meal-snack1-168",
+                "servings": 1
               }
             ]
           },
@@ -4470,7 +4350,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-147",
+                "recipeId": "meal-lunch-169",
                 "servings": 1
               }
             ]
@@ -4492,7 +4372,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-148",
+                "recipeId": "meal-dinner-170",
                 "servings": 1
               }
             ]
@@ -4509,7 +4389,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-149",
+                "recipeId": "meal-breakfast-171",
                 "servings": 1
               }
             ]
@@ -4519,14 +4399,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g strugurei, 5 g migdale",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "grapes",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "almonds",
-                "grams": 5
+                "kind": "recipe",
+                "recipeId": "meal-snack1-172",
+                "servings": 1
               }
             ]
           },
@@ -4536,7 +4411,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-150",
+                "recipeId": "meal-lunch-173",
                 "servings": 1
               }
             ]
@@ -4558,7 +4433,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-148",
+                "recipeId": "meal-dinner-170",
                 "servings": 1
               }
             ]
@@ -4575,7 +4450,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-151",
+                "recipeId": "meal-breakfast-174",
                 "servings": 1
               }
             ]
@@ -4597,7 +4472,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-152",
+                "recipeId": "meal-lunch-175",
                 "servings": 1
               }
             ]
@@ -4619,7 +4494,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-153",
+                "recipeId": "meal-dinner-176",
                 "servings": 1
               }
             ]
@@ -4636,7 +4511,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-034",
+                "recipeId": "meal-breakfast-042",
                 "servings": 1
               }
             ]
@@ -4646,14 +4521,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g nectarine / caise, 10 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "nectarine",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-012",
+                "servings": 1
               }
             ]
           },
@@ -4663,7 +4533,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-155",
+                "recipeId": "meal-lunch-179",
                 "servings": 1
               }
             ]
@@ -4702,7 +4572,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-034",
+                "recipeId": "meal-breakfast-042",
                 "servings": 1
               }
             ]
@@ -4712,14 +4582,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g visine, 15 g nuci",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "sour-cherries",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 15
+                "kind": "recipe",
+                "recipeId": "meal-snack1-180",
+                "servings": 1
               }
             ]
           },
@@ -4729,7 +4594,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-155",
+                "recipeId": "meal-lunch-179",
                 "servings": 1
               }
             ]
@@ -4751,7 +4616,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-156",
+                "recipeId": "meal-dinner-181",
                 "servings": 1
               }
             ]
@@ -4768,7 +4633,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-157",
+                "recipeId": "meal-breakfast-182",
                 "servings": 1
               }
             ]
@@ -4790,7 +4655,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-158",
+                "recipeId": "meal-lunch-183",
                 "servings": 1
               }
             ]
@@ -4812,7 +4677,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-159",
+                "recipeId": "meal-dinner-184",
                 "servings": 1
               }
             ]
@@ -4829,7 +4694,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-160",
+                "recipeId": "meal-breakfast-185",
                 "servings": 1
               }
             ]
@@ -4851,7 +4716,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-161",
+                "recipeId": "meal-lunch-186",
                 "servings": 1
               }
             ]
@@ -4873,7 +4738,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-134",
+                "recipeId": "meal-dinner-154",
                 "servings": 1
               }
             ]
@@ -4900,7 +4765,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-163",
+                "recipeId": "meal-breakfast-188",
                 "servings": 1
               }
             ]
@@ -4910,14 +4775,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g piersici, 20 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "peach",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 20
+                "kind": "recipe",
+                "recipeId": "meal-snack1-189",
+                "servings": 1
               }
             ]
           },
@@ -4927,7 +4787,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-164",
+                "recipeId": "meal-lunch-190",
                 "servings": 1
               }
             ]
@@ -4966,7 +4826,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-118",
+                "recipeId": "meal-breakfast-135",
                 "servings": 1
               }
             ]
@@ -4988,7 +4848,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-164",
+                "recipeId": "meal-lunch-190",
                 "servings": 1
               }
             ]
@@ -5016,7 +4876,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-166",
+                "recipeId": "meal-breakfast-192",
                 "servings": 1
               }
             ]
@@ -5038,7 +4898,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-167",
+                "recipeId": "meal-lunch-193",
                 "servings": 1
               }
             ]
@@ -5066,7 +4926,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-166",
+                "recipeId": "meal-breakfast-192",
                 "servings": 1
               }
             ]
@@ -5088,7 +4948,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-168",
+                "recipeId": "meal-lunch-194",
                 "servings": 1
               }
             ]
@@ -5116,7 +4976,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-140",
+                "recipeId": "meal-breakfast-161",
                 "servings": 1
               }
             ]
@@ -5138,7 +4998,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-170",
+                "recipeId": "meal-lunch-196",
                 "servings": 1
               }
             ]
@@ -5166,7 +5026,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-044",
+                "recipeId": "meal-breakfast-052",
                 "servings": 1
               }
             ]
@@ -5188,7 +5048,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-170",
+                "recipeId": "meal-lunch-196",
                 "servings": 1
               }
             ]
@@ -5210,7 +5070,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-172",
+                "recipeId": "meal-dinner-198",
                 "servings": 1
               }
             ]
@@ -5227,7 +5087,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-173",
+                "recipeId": "meal-breakfast-199",
                 "servings": 1
               }
             ]
@@ -5237,14 +5097,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g mere, 20 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 20
+                "kind": "recipe",
+                "recipeId": "meal-snack1-200",
+                "servings": 1
               }
             ]
           },
@@ -5254,7 +5109,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-174",
+                "recipeId": "meal-lunch-201",
                 "servings": 1
               }
             ]
@@ -5276,7 +5131,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-046",
+                "recipeId": "meal-dinner-054",
                 "servings": 1
               }
             ]
@@ -5303,7 +5158,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-176",
+                "recipeId": "meal-breakfast-203",
                 "servings": 1
               }
             ]
@@ -5313,14 +5168,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 narancs + 10 g kesudio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "orange",
-                "grams": 180
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-020",
+                "servings": 1
               }
             ]
           },
@@ -5330,7 +5180,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-033",
+                "recipeId": "meal-lunch-041",
                 "servings": 1
               }
             ]
@@ -5340,14 +5190,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g kiwi + 10 g dio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "kiwi",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-140",
+                "servings": 1
               }
             ]
           },
@@ -5357,7 +5202,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-177",
+                "recipeId": "meal-dinner-205",
                 "servings": 1
               }
             ]
@@ -5374,7 +5219,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-178",
+                "recipeId": "meal-breakfast-206",
                 "servings": 1
               }
             ]
@@ -5406,14 +5251,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 alma + 10 g kesudio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-133",
+                "servings": 1
               }
             ]
           },
@@ -5423,7 +5263,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-180",
+                "recipeId": "meal-dinner-209",
                 "servings": 1
               }
             ]
@@ -5440,7 +5280,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-181",
+                "recipeId": "meal-breakfast-210",
                 "servings": 1
               }
             ]
@@ -5450,14 +5290,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 narancs + 10 g mandula",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "orange",
-                "grams": 180
-              },
-              {
-                "kind": "food",
-                "foodId": "almonds",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-028",
+                "servings": 1
               }
             ]
           },
@@ -5467,7 +5302,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-182",
+                "recipeId": "meal-lunch-211",
                 "servings": 1
               }
             ]
@@ -5477,19 +5312,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g joghurt + 100 g erdei gyumolcs + 10 g mandula / dio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "yogurt",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "berries-mixed",
-                "grams": 100
-              },
-              {
-                "kind": "food",
-                "foodId": "almonds",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-212",
+                "servings": 1
               }
             ]
           },
@@ -5499,7 +5324,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-180",
+                "recipeId": "meal-dinner-209",
                 "servings": 1
               }
             ]
@@ -5516,7 +5341,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-183",
+                "recipeId": "meal-breakfast-213",
                 "servings": 1
               }
             ]
@@ -5526,14 +5351,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 alma + 15 g dio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 15
+                "kind": "recipe",
+                "recipeId": "meal-snack1-214",
+                "servings": 1
               }
             ]
           },
@@ -5543,7 +5363,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-184",
+                "recipeId": "meal-lunch-215",
                 "servings": 1
               }
             ]
@@ -5553,14 +5373,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "250 g pomelo + 10 g kesudio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "pomelo",
-                "grams": 250
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-216",
+                "servings": 1
               }
             ]
           },
@@ -5570,7 +5385,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-185",
+                "recipeId": "meal-dinner-217",
                 "servings": 1
               }
             ]
@@ -5587,7 +5402,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-186",
+                "recipeId": "meal-breakfast-218",
                 "servings": 1
               }
             ]
@@ -5609,7 +5424,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-187",
+                "recipeId": "meal-lunch-219",
                 "servings": 1
               }
             ]
@@ -5631,7 +5446,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-188",
+                "recipeId": "meal-dinner-220",
                 "servings": 1
               }
             ]
@@ -5648,7 +5463,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-186",
+                "recipeId": "meal-breakfast-218",
                 "servings": 1
               }
             ]
@@ -5670,7 +5485,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-187",
+                "recipeId": "meal-lunch-219",
                 "servings": 1
               }
             ]
@@ -5692,7 +5507,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-189",
+                "recipeId": "meal-dinner-221",
                 "servings": 1
               }
             ]
@@ -5719,14 +5534,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 narancs + 10 g dio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "orange",
-                "grams": 180
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-223",
+                "servings": 1
               }
             ]
           },
@@ -5736,7 +5546,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-191",
+                "recipeId": "meal-lunch-224",
                 "servings": 1
               }
             ]
@@ -5746,14 +5556,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "1 korte + 10 g dio",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "pear",
-                "grams": 170
-              },
-              {
-                "kind": "food",
-                "foodId": "walnuts",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-225",
+                "servings": 1
               }
             ]
           },
@@ -5763,7 +5568,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-192",
+                "recipeId": "meal-dinner-226",
                 "servings": 1
               }
             ]
@@ -5790,7 +5595,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-118",
+                "recipeId": "meal-breakfast-135",
                 "servings": 1
               }
             ]
@@ -5812,7 +5617,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-194",
+                "recipeId": "meal-lunch-228",
                 "servings": 1
               }
             ]
@@ -5834,7 +5639,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-043",
+                "recipeId": "meal-dinner-051",
                 "servings": 1
               }
             ]
@@ -5851,7 +5656,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-083",
+                "recipeId": "meal-breakfast-096",
                 "servings": 1
               }
             ]
@@ -5861,14 +5666,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g grapefruit, 20 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "grapefruit",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 20
+                "kind": "recipe",
+                "recipeId": "meal-snack1-229",
+                "servings": 1
               }
             ]
           },
@@ -5878,7 +5678,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-194",
+                "recipeId": "meal-lunch-228",
                 "servings": 1
               }
             ]
@@ -5900,7 +5700,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-049",
+                "recipeId": "meal-dinner-057",
                 "servings": 1
               }
             ]
@@ -5917,7 +5717,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-125",
+                "recipeId": "meal-breakfast-145",
                 "servings": 1
               }
             ]
@@ -5927,14 +5727,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g banana, 10 g caju",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "banana",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "cashews",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack1-230",
+                "servings": 1
               }
             ]
           },
@@ -5944,7 +5739,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-195",
+                "recipeId": "meal-lunch-231",
                 "servings": 1
               }
             ]
@@ -5966,7 +5761,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-056",
+                "recipeId": "meal-dinner-065",
                 "servings": 1
               }
             ]
@@ -6005,7 +5800,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-197",
+                "recipeId": "meal-lunch-233",
                 "servings": 1
               }
             ]
@@ -6027,7 +5822,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-198",
+                "recipeId": "meal-dinner-234",
                 "servings": 1
               }
             ]
@@ -6044,7 +5839,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-054",
+                "recipeId": "meal-breakfast-062",
                 "servings": 1
               }
             ]
@@ -6054,14 +5849,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g mere, 10 g migdale",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "apple",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "almonds",
-                "grams": 10
+                "kind": "recipe",
+                "recipeId": "meal-snack2-088",
+                "servings": 1
               }
             ]
           },
@@ -6071,7 +5861,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-200",
+                "recipeId": "meal-lunch-237",
                 "servings": 1
               }
             ]
@@ -6093,7 +5883,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-201",
+                "recipeId": "meal-dinner-238",
                 "servings": 1
               }
             ]
@@ -6110,7 +5900,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-057",
+                "recipeId": "meal-breakfast-066",
                 "servings": 1
               }
             ]
@@ -6120,14 +5910,9 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "text": "150 g pere, 15 g migdale",
             "entries": [
               {
-                "kind": "food",
-                "foodId": "pear",
-                "grams": 150
-              },
-              {
-                "kind": "food",
-                "foodId": "almonds",
-                "grams": 15
+                "kind": "recipe",
+                "recipeId": "meal-snack1-239",
+                "servings": 1
               }
             ]
           },
@@ -6137,7 +5922,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-202",
+                "recipeId": "meal-lunch-240",
                 "servings": 1
               }
             ]
@@ -6159,7 +5944,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-203",
+                "recipeId": "meal-dinner-241",
                 "servings": 1
               }
             ]
@@ -6176,7 +5961,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-204",
+                "recipeId": "meal-breakfast-242",
                 "servings": 1
               }
             ]
@@ -6198,7 +5983,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-202",
+                "recipeId": "meal-lunch-240",
                 "servings": 1
               }
             ]
@@ -6220,7 +6005,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-203",
+                "recipeId": "meal-dinner-241",
                 "servings": 1
               }
             ]

@@ -47,7 +47,7 @@ export const GROUP_BLURBS: Record<RecipeGroup, string> = {
   breakfast: 'How the plans started the day.',
   lunch: 'The midday meals, as your dietician wrote them.',
   dinner: 'Evening meals from the fourteen weeks.',
-  snack: 'Between meals, mostly a fruit and a handful of nuts.',
+  snack: 'Between meals. A fruit and a handful of nuts, mostly, and a single piece of fruit stays a line rather than a card.',
   dish: 'Cooked once and eaten across several meals. These are the ones with a method.',
 }
 
