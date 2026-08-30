@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { DayPlan, Food, PlannedMeal, Recipe } from '../types'
 import {
-  atwaterCalories, buildContext, calorieDrift, componentsNutrients, dayEaten, reportDay,
+  atwaterCalories, buildContext, calorieDrift, componentsNutrients, dayEaten, dayProgress, dayLabel, reportDay,
   recipePerServing, recipeTotal, scaleNutrients, addNutrients,
   reportNutrients, saltFromSodium, sodiumFromSalt, weekEaten,
 } from './nutrition'
@@ -196,14 +196,15 @@ describe('what a day amounted to', () => {
     expect(nutrients.calories).toBeGreaterThan(0)
   })
 
-  it('totals what was eaten as soon as anything is ticked', () => {
+  it('leaves a meal nobody has spoken about in the total', () => {
     const both = dayEaten(day([meal('a', 100), meal('b', 100)]), ctx).nutrients
     const one = dayEaten(day([meal('a', 100, 'eaten'), meal('b', 100)]), ctx)
 
-    // The untouched meal stops counting the moment the day becomes a record
-    // rather than an intention. Half the food, half the calories.
+    // Ticking breakfast at eight used to drop dinner, still hours away and
+    // untouched, out of the day: 580 kcal reported as 294 with "1,106
+    // remaining". "Not yet" is not "no".
     expect(one.recorded).toBe(true)
-    expect(one.nutrients.calories).toBeCloseTo(both.calories / 2, 5)
+    expect(one.nutrients.calories).toBeCloseTo(both.calories, 5)
   })
 
   it('counts a skipped meal as neither eaten nor planned', () => {
@@ -211,6 +212,52 @@ describe('what a day amounted to', () => {
 
     expect(recorded).toBe(true)
     expect(nutrients.calories).toBe(0)
+  })
+
+  it('drops only what was skipped, and keeps the rest', () => {
+    const one = dayEaten(day([meal('a', 100)]), ctx).nutrients
+    const mixed = dayEaten(day([
+      meal('a', 100, 'eaten'), meal('b', 100, 'skipped'), meal('c', 100),
+    ]), ctx)
+
+    // Eaten plus still to come, without the one that was skipped.
+    expect(mixed.nutrients.calories).toBeCloseTo(one.calories * 2, 5)
+  })
+})
+
+/**
+ * The badge over a day said one of two words for four different situations,
+ * and was wrong in two of them: an empty day announced itself PLANNED, and a
+ * day with one meal skipped and nothing eaten announced itself EATEN.
+ */
+describe('how far through a day is', () => {
+  const day = (meals: PlannedMeal[]): DayPlan => ({ date: '2026-08-29', meals })
+  const meal = (id: string, outcome?: PlannedMeal['outcome']): PlannedMeal => ({
+    id, slot: 'lunch', outcome,
+    entries: [{ kind: 'food', foodId: 'oats', grams: 100 }],
+  })
+
+  it('says nothing at all about a day with nothing on it', () => {
+    expect(dayProgress(day([])).state).toBe('empty')
+    expect(dayLabel(dayProgress(day([])))).toBeNull()
+    expect(dayLabel(dayProgress(undefined))).toBeNull()
+  })
+
+  it('calls a day nobody has touched a plan', () => {
+    expect(dayLabel(dayProgress(day([meal('a'), meal('b')])))).toBe('planned')
+  })
+
+  it('counts the way through, rather than picking one of two words', () => {
+    expect(dayLabel(dayProgress(day([meal('a', 'eaten'), meal('b'), meal('c')]))))
+      .toBe('1 of 3 eaten')
+  })
+
+  it('does not call a day eaten when everything on it was skipped', () => {
+    expect(dayLabel(dayProgress(day([meal('a', 'skipped')])))).toBe('skipped')
+  })
+
+  it('calls a finished day eaten', () => {
+    expect(dayLabel(dayProgress(day([meal('a', 'eaten'), meal('b', 'skipped')])))).toBe('eaten')
   })
 })
 

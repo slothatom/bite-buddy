@@ -320,7 +320,9 @@ test.describe('the home screen', () => {
 
     // Four tiles across the top.
     await expect(page.getByText('Mediterranean', { exact: false }).first()).toBeVisible()
-    await expect(page.getByText("of the guide's goals")).toBeVisible()
+    // Goals reached, not goals-plus-limits: a limit is met by eating nothing,
+    // and an empty week used to report a quarter of the guide achieved.
+    await expect(page.getByText('goals reached')).toBeVisible()
     await expect(page.getByText('days planned').first()).toBeVisible()
 
     // A fortnight of bars rather than a week: fourteen columns.
@@ -1880,9 +1882,11 @@ test.describe('what actually happened', () => {
     const tick = page.getByRole('button', { name: 'Mark as eaten' }).first()
     await tick.click()
 
-    // Eaten. The same button now offers the other thing you might mean.
+    // Eaten. The same button now offers the other thing you might mean, and
+    // the day counts how far through it is rather than picking one of two
+    // words for four different situations.
     await expect(page.getByRole('button', { name: /^Eaten\./ }).first()).toBeVisible()
-    await expect(page.getByText('eaten', { exact: true })).toBeVisible()
+    await expect(page.getByText(/\d+ of \d+ eaten/)).toBeVisible()
 
     await page.getByRole('button', { name: /^Eaten\./ }).first().click()
     await expect(page.getByRole('button', { name: /^Skipped\./ }).first()).toBeVisible()
@@ -1892,17 +1896,32 @@ test.describe('what actually happened', () => {
     await expect(page.getByRole('button', { name: 'Mark as eaten' }).first()).toBeVisible()
   })
 
-  test('the day counts what was eaten rather than what was hoped', async ({ page }) => {
+  test('a meal nobody has spoken about stays in the day', async ({ page }) => {
     await aPlannedDay(page)
 
-    // Before anything is said, the ring is about the plan and says so.
+    // Before anything is said, the day is about the plan and says so.
     await expect(page.getByText('planned', { exact: true })).toBeVisible()
+    const before = await page.locator('[data-day-kcal]').innerText()
 
     await page.getByRole('button', { name: 'Mark as eaten' }).first().click()
 
-    // The moment one meal is a fact, the day stops totalling intentions.
-    await expect(page.getByText('eaten', { exact: true })).toBeVisible()
+    // The badge moves on, and the total does not. Ticking breakfast used to
+    // drop dinner, still hours away and untouched, out of the day.
+    await expect(page.getByText(/\d+ of \d+ eaten/)).toBeVisible()
     await expect(page.getByText('planned', { exact: true })).toHaveCount(0)
+    expect(await page.locator('[data-day-kcal]').innerText(), 'the total moved').toBe(before)
+  })
+
+  test('a skipped meal leaves the day, and the rest of it stays', async ({ page }) => {
+    await aPlannedDay(page)
+    const before = Number((await page.locator('[data-day-kcal]').innerText()).replace(/\D/g, ''))
+
+    await page.getByRole('button', { name: 'Mark as eaten' }).first().click()
+    await page.getByRole('button', { name: /^Eaten\./ }).first().click()
+
+    const after = Number((await page.locator('[data-day-kcal]').innerText()).replace(/\D/g, ''))
+    expect(after, 'skipping took nothing off').toBeLessThan(before)
+    expect(after, 'skipping one meal emptied the day').toBeGreaterThan(0)
   })
 
   test('a skipped meal is dimmed rather than told off', async ({ page }) => {

@@ -217,12 +217,66 @@ export function dayEaten(day: DayPlan, ctx: NutritionContext): {
  * counted every planned meal, so a week where you skipped three dinners still
  * scored their vegetables. Two answers to "what did this day amount to" is one
  * too many.
+ *
+ * Three kinds of meal, and each one has an obvious answer once they are asked
+ * about separately. Eaten counts, because it happened. Skipped does not,
+ * because it did not. A meal nobody has said anything about counts as planned,
+ * because that is what it is.
+ *
+ * The rule used to be coarser: the first tick anywhere on a day switched the
+ * whole day to "eaten only". Tick Snack 1 at eleven and Lunch, still hours
+ * away and untouched, silently left the total, so a day of 580 kcal reported
+ * 294 and 1,106 remaining. Tick it skipped instead and the day read zero with
+ * Lunch sitting there in front of you. The app was treating "not yet" as "no".
  */
 export function mealsThatCount(day: DayPlan): { meals: PlannedMeal[]; recorded: boolean } {
-  const decided = day.meals.some((m) => m.outcome)
-  return decided
-    ? { meals: day.meals.filter((m) => m.outcome === 'eaten'), recorded: true }
-    : { meals: day.meals, recorded: false }
+  return {
+    meals: day.meals.filter((m) => m.outcome !== 'skipped'),
+    recorded: day.meals.some((m) => m.outcome),
+  }
+}
+
+/**
+ * How far through a day is, for the label that says what its number means.
+ *
+ * The badge read `recorded ? 'eaten' : 'planned'`, which got both ends wrong:
+ * an empty day with nothing in it announced itself as PLANNED, and a day where
+ * one meal of five had been skipped and nothing eaten announced itself EATEN.
+ */
+export interface DayProgress {
+  total: number
+  eaten: number
+  skipped: number
+  /** Nothing said about these yet. They still count towards the day. */
+  undecided: number
+  state: 'empty' | 'planned' | 'part' | 'done'
+}
+
+export function dayProgress(day: DayPlan | undefined): DayProgress {
+  const meals = day?.meals ?? []
+  const eaten = meals.filter((m) => m.outcome === 'eaten').length
+  const skipped = meals.filter((m) => m.outcome === 'skipped').length
+  const undecided = meals.length - eaten - skipped
+
+  const state = !meals.length ? 'empty'
+    : undecided === meals.length ? 'planned'
+      : undecided === 0 ? 'done'
+        : 'part'
+
+  return { total: meals.length, eaten, skipped, undecided, state }
+}
+
+/**
+ * What to call a day in two words.
+ *
+ * A count for the middle case rather than an adjective, because "part eaten"
+ * invites the question this is meant to answer.
+ */
+export function dayLabel(p: DayProgress): string | null {
+  if (p.state === 'empty') return null
+  if (p.state === 'planned') return 'planned'
+  if (p.state === 'part') return `${p.eaten} of ${p.total} eaten`
+  return p.eaten ? 'eaten' : 'skipped'
 }
 
 export function weekNutrients(days: DayPlan[], ctx: NutritionContext): Nutrients {

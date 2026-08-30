@@ -15,7 +15,7 @@ import { useUserStore } from '../store/useUserStore'
 import { targetsFor } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import {
-  componentsNutrients, dayEaten, weekEaten, emptyNutrients, addNutrients, reportDay,
+  componentsNutrients, dayEaten, dayProgress, dayLabel, weekEaten, emptyNutrients, addNutrients, reportDay,
 } from '../lib/nutrition'
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
 import { useUiStore } from '../store/useUiStore'
@@ -160,7 +160,10 @@ export default function Planner() {
   // Once anything on the day has been ticked this is a record rather than an
   // intention, and the ring says which. A ring built on the plan looked like a
   // tracker and was really a sum of things nobody had confirmed eating.
-  const { nutrients: selectedTotals, recorded } = dayEaten(selectedDay, ctx)
+  const { nutrients: selectedTotals } = dayEaten(selectedDay, ctx)
+  // Empty, all still ahead of you, part way through, or done. The badge used
+  // to have two states for four situations and was wrong in two of them.
+  const progress = dayProgress(selectedDay)
   // What the day's figures do not know. The planner totalled with a function
   // that discards it, so a day of foods with no sodium figure between them
   // still showed a salt total as though it were one.
@@ -174,9 +177,22 @@ export default function Planner() {
   // And for what those days came to rather than what was hoped for them: the
   // ring below this was already reporting the ticks while the range average
   // above it summed the plan, so the two disagreed about the same week.
+  /**
+   * The days the header is actually about.
+   *
+   * The month grid is padded out to whole weeks and shows the neighbours
+   * greyed, which is right: a Monday that belongs to July is still the Monday
+   * before this one. But the count underneath "AUGUST 2026" read "1 of 42 days
+   * planned", claiming five days of July and six of September as August's.
+   */
+  const counted = useMemo(
+    () => (range === 'month' ? dates.filter((d) => monthOf(d) === anchorMonth) : dates),
+    [dates, range, anchorMonth],
+  )
+
   const shownDays = useMemo(
-    () => dates.map((date) => byDate.get(date)).filter((d): d is DayPlan => Boolean(d)),
-    [dates, byDate],
+    () => counted.map((date) => byDate.get(date)).filter((d): d is DayPlan => Boolean(d)),
+    [counted, byDate],
   )
   const reading = useMemo(() => weekEaten(dates, plan, ctx), [dates, plan, ctx])
   const kcalByDate = useMemo(
@@ -252,7 +268,7 @@ export default function Planner() {
               {range === 'month' ? formatMonth(weekDates[0]) : 'Your week'}
             </h1>
             <p className="text-sm text-ink-700">
-              {formatRange(dates)} · {plannedDays} of {dates.length} days planned
+              {formatRange(dates)} · {plannedDays} of {counted.length} days planned
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -396,9 +412,11 @@ export default function Planner() {
         <section>
           <SectionHeading>
             {formatDate(selected)}
-            <span className="ml-2 text-[11px] font-bold uppercase tracking-wide text-ink-500">
-              {recorded ? 'eaten' : 'planned'}
-            </span>
+            {dayLabel(progress) && (
+              <span className="ml-2 text-[11px] font-bold uppercase tracking-wide text-ink-500">
+                {dayLabel(progress)}
+              </span>
+            )}
           </SectionHeading>
           {/* Two columns from lg. Five slots stacked full width meant a laptop
               showed two of them and the rest below the fold, which is the one
@@ -977,7 +995,10 @@ function MoveMealDialog({
           <button className="btn-primary flex-1" disabled={unchanged} onClick={() => onMove(date, slot)}>
             Move it
           </button>
-          <button className="btn-secondary flex-1" onClick={() => onCopy(date, slot)}>
+          {/* Disabled for the source slot too. It used to stay enabled there,
+              and tapping it appended a second identical copy to the same slot
+              with nothing said: Snack 1 went from 294 to 588 kcal. */}
+          <button className="btn-secondary flex-1" disabled={unchanged} onClick={() => onCopy(date, slot)}>
             Copy it
           </button>
         </div>
@@ -997,10 +1018,17 @@ function CopyDayDialog({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 backdrop-blur-xs p-4" onClick={onClose}>
-      <div className="bg-paper rounded-2xl p-5 w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
+      {/* The list of days is as long as the range, and in month view that is
+          42 of them: 1,452 px of panel inside a 1,110 px overlay, with the
+          heading off the top and Cancel off the bottom. The days scroll, the
+          heading and the way out do not. */}
+      <div
+        className="bg-paper rounded-2xl p-5 w-full max-w-sm shadow-xl max-h-[85vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="font-bold text-ink-900 mb-1">Copy {formatDate(from)}</h3>
         <p className="text-sm text-ink-700 mb-4">Pick the day to copy these meals into.</p>
-        <div className="space-y-1">
+        <div className="space-y-1 flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
           {dates.filter((d) => d !== from).map((d) => (
             <button key={d} onClick={() => onPick(d)}
               className="w-full text-left px-3 py-2 rounded-xl hover:bg-cream-50 text-sm text-ink-900">
@@ -1008,7 +1036,7 @@ function CopyDayDialog({
             </button>
           ))}
         </div>
-        <button className="btn-secondary w-full mt-4" onClick={onClose}>Cancel</button>
+        <button className="btn-secondary w-full mt-4 shrink-0" onClick={onClose}>Cancel</button>
       </div>
     </div>
   )
