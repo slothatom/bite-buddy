@@ -152,6 +152,17 @@ export function scoreGaps(days: DayPlan[], ctx: NutritionContext): ScoreGaps {
  * tested, but a number three times its target is worth doubting on sight rather
  * than believing because the arithmetic happened to run.
  */
+/**
+ * A serving count in the words a person uses: "0", "1", "1.5", "52.2".
+ *
+ * Whole numbers stay whole. "0.0 of 1" is a decimal place that says nothing,
+ * and it appeared next to "target 1400" and "1,400 kcal" on the same screens,
+ * which is three ways of writing a number in one app.
+ */
+export function servingCount(n: number): string {
+  return n === Math.round(n) ? String(Math.round(n)) : n.toFixed(1)
+}
+
 export const IMPLAUSIBLE_RATIO = 3
 
 export interface GoalProgress extends ServingGoal {

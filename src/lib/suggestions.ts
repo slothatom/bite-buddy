@@ -1,7 +1,7 @@
 import type { DayPlan, MedCategory, Recipe } from '../types'
 import type { NutritionContext } from './nutrition'
 import { flattenComponents } from './ingredients'
-import { scoreWeek, type GoalProgress } from './mediterranean'
+import { scoreWeek, servingCount, type GoalProgress } from './mediterranean'
 
 /**
  * Ideas for the week, from your own library.
@@ -80,12 +80,6 @@ function shortfalls(scored: GoalProgress[]): GoalProgress[] {
     .sort((a, b) => a.ratio - b.ratio)
 }
 
-/** A serving count in the words a person uses: "0", "1", "1.5". */
-function servingCount(n: number): string {
-  const rounded = Math.round(n * 2) / 2
-  return rounded === Math.round(rounded) ? String(Math.round(rounded)) : rounded.toFixed(1)
-}
-
 export function suggest({ days, recipes, ctx, today }: SuggestionInput): Suggestion[] {
   const out: Suggestion[] = []
   const planned = new Set(
@@ -108,8 +102,8 @@ export function suggest({ days, recipes, ctx, today }: SuggestionInput): Suggest
       // "0.0 of 3" is a decimal place that says nothing: none is none, and a
       // tenth of a serving of vegetables is not a quantity anybody counts in.
       reason: dish
-        ? `${goal.label} are at ${servingCount(goal.servings)} of ${goal.expected.toFixed(0)} servings this week, and this one is mostly ${goal.label.toLowerCase()}.`
-        : `${goal.label} are at ${servingCount(goal.servings)} of ${goal.expected.toFixed(0)} servings this week.`,
+        ? `${goal.label} are at ${servingCount(goal.servings)} of ${servingCount(goal.expected)} servings this week, and this one is mostly ${goal.label.toLowerCase()}.`
+        : `${goal.label} are at ${servingCount(goal.servings)} of ${servingCount(goal.expected)} servings this week.`,
       recipeId: dish?.id,
       to: '/recipes',
     })
