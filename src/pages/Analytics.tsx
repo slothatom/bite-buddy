@@ -13,7 +13,7 @@ import { PEOPLE, type PersonId } from '../lib/people'
 import { useNutritionContext } from '../store/useNutrition'
 import { today } from '../store/useMealPlanStore'
 import { weekEaten } from '../lib/nutrition'
-import { scoreWeek, scoreGaps, IMPLAUSIBLE_RATIO } from '../lib/mediterranean'
+import { scoreWeek, scoreGaps, servingCount, IMPLAUSIBLE_RATIO } from '../lib/mediterranean'
 import { STATUS_STYLES, targetStatus } from '../lib/status'
 import { EmptyState, SectionHeading } from '../components/ui'
 
@@ -239,7 +239,7 @@ function MediterraneanTab() {
                     : met ? 'text-bite-700' : 'text-ink-500'}`}>
                   {/* Named, because "42.1 of 21" with no unit reads as a
                       broken number rather than a big one. */}
-                  {g.servings.toFixed(1)} of {g.expected.toFixed(0)} servings
+                  {servingCount(g.servings)} of {servingCount(g.expected)} servings
                 </span>
               </div>
               <div className="h-2 rounded-full bg-border-100 overflow-hidden">
@@ -277,7 +277,7 @@ function MediterraneanTab() {
                 inside the line or over it, and that is a word, not a length. */}
             <span className={`text-xs font-mono shrink-0 ${
               g.ratio > 1 ? 'text-coral-700' : 'text-ink-500'}`}>
-              {g.servings.toFixed(1)} of {g.expected.toFixed(0)}
+              {servingCount(g.servings)} of {servingCount(g.expected)}
               <span className="ml-1.5 font-sans font-semibold">
                 {g.ratio > 1 ? 'over' : 'within'}
               </span>
