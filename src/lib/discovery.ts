@@ -209,9 +209,42 @@ export function lensReady(lens: Lens, input: LensInput): boolean {
 }
 
 /** Why a lens cannot answer, in a sentence that says what to do about it. */
-export function lensBlocker(lens: Lens): string {
-  if (lens === 'have') return 'Add a few things to the cupboard first, on the shopping list screen.'
-  if (lens === 'use-first') return 'Put a use-by date on something in the cupboard first.'
-  if (lens === 'fits') return 'Set a daily calorie target first, in Settings.'
-  return ''
+/**
+ * Why a lens cannot answer yet, and where to go and fix it.
+ *
+ * The reason existed and was only shown once the lens had been tapped, and the
+ * chip was at half opacity in the meantime, which reads as broken rather than
+ * as waiting for something. Worse, the fix was a sentence naming a screen you
+ * then had to find: the Cupboard is behind More, then Grocery, then a tab.
+ */
+export interface Blocker {
+  why: string
+  /** Where the fix is, when there is somewhere to go. */
+  to?: string
+  label?: string
+}
+
+export function lensBlocker(lens: Lens): Blocker {
+  if (lens === 'have') {
+    return {
+      why: 'Nothing in the cupboard yet, so there is nothing to match against.',
+      to: '/grocery',
+      label: 'Open the cupboard',
+    }
+  }
+  if (lens === 'use-first') {
+    return {
+      why: 'Nothing in the cupboard has a use-by date on it yet.',
+      to: '/grocery',
+      label: 'Open the cupboard',
+    }
+  }
+  if (lens === 'fits') {
+    return {
+      why: 'This needs a daily calorie target to measure against.',
+      to: '/settings',
+      label: 'Set a target',
+    }
+  }
+  return { why: '' }
 }

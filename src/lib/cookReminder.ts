@@ -46,6 +46,19 @@ export function dueReminders(sessions: CookSession[], now: Date): CookSession[] 
   })
 }
 
+/**
+ * A session whose time has been and gone, and which nobody has ticked.
+ *
+ * There was no such state. An unticked session from three days ago sat in the
+ * list looking exactly like one tomorrow, beside a line promising a reminder
+ * at a time that had already passed, which is the app saying it will do
+ * something it can no longer do.
+ */
+export function overdue(session: CookSession, now = new Date()): boolean {
+  if (session.completed) return false
+  return sessionStart(session.date, session.time).getTime() < now.getTime()
+}
+
 /** How the reminder time reads on screen, in the timezone it was set in. */
 export function reminderLabel(remindAt: string): string {
   return new Date(remindAt).toLocaleString('en-GB', {

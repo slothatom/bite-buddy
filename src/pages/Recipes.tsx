@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useDialog } from '../lib/useDialog'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import WhenPicker from '../components/planner/WhenPicker'
 import { slotNow } from '../lib/whenDates'
 import {
@@ -112,6 +112,22 @@ export default function Recipes() {
     })
   }, [recipes, query, category, filters, favesOnly, favouriteIds])
 
+  /**
+   * What each filter would leave, on the shelf you are looking at.
+   *
+   * A filter with no number beside it is a guess: ticking one and watching a
+   * list of forty change to a list of thirty-eight, somewhere below the fold,
+   * tells you nothing. Counted against everything the search and the other
+   * chips already allow, so the numbers answer "and this one too?".
+   */
+  const filterCounts = useMemo(() => {
+    const pool = tab === 'mine'
+      ? matching.filter((r) => mine.has(r.id))
+      : matching.filter((r) => groupsOf(r).includes(tab))
+    return new Map(QUICK_FILTERS.map((f) =>
+      [f, groupVariants(pool.filter((r) => hasQuickFilter(r, f))).length]))
+  }, [matching, tab, mine])
+
   const lensInput = useMemo(
     () => ({ recipes: matching, ctx, today, plan, pantry, targets: profile.targets }),
     [matching, ctx, today, plan, pantry, profile.targets],
@@ -159,13 +175,21 @@ export default function Recipes() {
 
     const list = onShelf.length === 0 && query.trim() ? lensed : onShelf
 
+    // A lens is an order as much as a filter. "Not lately" means longest gap
+    // first and "Quick tonight" means quickest first, and re-sorting the
+    // result alphabetically threw that away: turning one on changed the
+    // caption and the count while the list underneath stayed in exactly the
+    // order it was already in, which is indistinguishable from nothing having
+    // happened.
+    if (lens) return list
+
     // Favourites first, then alphabetical: the handful you actually cook should
     // not be somewhere in the middle of seventy.
     return [...list].sort((a, b) => {
       const fav = Number(favouriteIds.includes(b.id)) - Number(favouriteIds.includes(a.id))
       return fav || a.name.en.localeCompare(b.name.en)
     })
-  }, [lensed, tab, mine, favouriteIds, query])
+  }, [lensed, tab, mine, favouriteIds, query, lens])
 
   /** True when the shelf was set aside because it had no matches. */
   const searchedEverywhere = useMemo(() => {
@@ -290,9 +314,10 @@ export default function Recipes() {
                     key={l}
                     onClick={() => setLens(on ? null : l)}
                     aria-pressed={on}
+                    title={ready ? LENSES[l].rule : lensBlocker(l).why}
                     className={`shrink-0 whitespace-nowrap ${
                       on ? 'chip bg-teal-700 text-white border border-teal-700'
-                        : ready ? 'chip-off' : 'chip-off opacity-50'
+                        : ready ? 'chip-off' : 'chip-off text-ink-500'
                     }`}
                   >
                     {LENSES[l].emoji} {LENSES[l].label}
@@ -302,11 +327,18 @@ export default function Recipes() {
             </div>
           </div>
 
-          {lens && (
+          {lens && (lensReady(lens, lensInput) ? (
+            <p className="text-xs text-ink-500">{LENSES[lens].rule}</p>
+          ) : (
             <p className="text-xs text-ink-500">
-              {lensReady(lens, lensInput) ? LENSES[lens].rule : lensBlocker(lens)}
+              {lensBlocker(lens).why}{' '}
+              {lensBlocker(lens).to && (
+                <Link to={lensBlocker(lens).to!} className="text-bite-700 font-semibold underline">
+                  {lensBlocker(lens).label}
+                </Link>
+              )}
             </p>
-          )}
+          ))}
 
           <div className="flex flex-wrap items-center gap-1.5">
             <button
@@ -358,6 +390,7 @@ export default function Recipes() {
           <EmptyShelf
             tab={tab}
             filtered={filtered}
+            query={query}
             onNew={() => setEditing(null)}
             onClear={() => {
               setQuery(''); setCategory(null); setFilters([]); setFavesOnly(false); setLens(null)
@@ -423,9 +456,18 @@ export default function Recipes() {
 
       {sheet === 'filters' && (
         <PickerSheet title="Filters" onClose={() => setSheet(null)}>
+          {/* What the tag on the right means. It was on four rows with no
+              explanation anywhere, and "yours to apply" reads as an
+              instruction rather than as the fact it is. */}
+          <p className="px-4 pb-2 text-xs text-ink-500">
+            Each one says how many recipes it would leave. The tagged ones are not
+            worked out from the ingredients: they are there because somebody ticked
+            them on a recipe.
+          </p>
           {QUICK_FILTERS.map((f) => {
             const d = QUICK_FILTER_DEFINITIONS[f]
             const on = filters.includes(f)
+            const left = filterCounts.get(f) ?? 0
             return (
               <button
                 key={f}
@@ -437,9 +479,14 @@ export default function Recipes() {
                   <span className={`block text-sm ${on ? 'font-bold text-bite-700' : 'text-ink-900'}`}>{d.label}</span>
                   <span className="block text-xs text-ink-500">{d.note}</span>
                 </span>
-                {!d.derived && (
-                  <span className="text-[10px] text-ink-500 shrink-0 mt-1">yours to apply</span>
-                )}
+                <span className="shrink-0 mt-0.5 text-right">
+                  <span className={`block text-xs font-mono ${left ? 'text-ink-700' : 'text-ink-500'}`}>
+                    {left}
+                  </span>
+                  {!d.derived && (
+                    <span className="block text-[10px] text-ink-500">you set this</span>
+                  )}
+                </span>
               </button>
             )
           })}
@@ -596,10 +643,12 @@ function TidyBanner({ groups, onTidy }: { groups: RecipeVariants[]; onTidy: () =
 
 /** What an empty shelf should say depends on why it is empty. */
 function EmptyShelf({
-  tab, filtered, onNew, onClear,
+  tab, filtered, query, onNew, onClear,
 }: {
   tab: Tab
   filtered: boolean
+  /** What was typed, so the empty state can name it and offer to write it. */
+  query: string
   onNew: () => void
   onClear: () => void
 }) {
@@ -607,10 +656,25 @@ function EmptyShelf({
     // Three dimensions can combine into a corner with nothing in it and no
     // shelf to move to, every tab reading zero. Telling you to try another
     // shelf would be useless advice, so there is a way straight out.
+    //
+    // And when it was a search that found nothing, "No recipes match zzqq" was
+    // the whole answer: no way to write the thing you were looking for, and no
+    // hint that Foods is a separate library that might have it. Two screens
+    // that do not search each other and do not say so.
     return (
       <EmptyState title="Nothing matching that just yet">
-        <p>That combination has nothing in it.</p>
-        <button className="btn-primary mt-4" onClick={onClear}>Clear the filters</button>
+        <p>{query.trim() ? `Nothing here matches “${query.trim()}”.` : 'That combination has nothing in it.'}</p>
+        <div className="flex flex-wrap gap-2 justify-center mt-4">
+          <button className="btn-primary" onClick={onClear}>Clear the filters</button>
+          {query.trim() && (
+            <>
+              <button className="btn-secondary" onClick={onNew}>
+                <Plus size={16} /> Write it
+              </button>
+              <Link to="/foods" className="btn-secondary">Look in Foods</Link>
+            </>
+          )}
+        </div>
       </EmptyState>
     )
   }

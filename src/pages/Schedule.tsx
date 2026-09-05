@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react'
-import { Plus, Check, Trash2, Search, Bell, Minus } from 'lucide-react'
+import { Plus, Check, Trash2, Search, Bell, Minus, AlertTriangle } from 'lucide-react'
 import type { CookSession, MealSlot } from '../types'
 import { useDialog } from '../lib/useDialog'
+import { offerUndo } from '../store/useUndo'
 import { useCookStore } from '../store/useCookStore'
 import { useRecipes } from '../store/useRecipeStore'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { EmptyState } from '../components/ui'
-import { LEAD_MINUTES, reminderAt, reminderLabel } from '../lib/cookReminder'
+import { LEAD_MINUTES, overdue, reminderAt, reminderLabel } from '../lib/cookReminder'
 import { usePortionStore, useAvailablePortions } from '../store/usePortionStore'
 import {
   portionsFromSession, offerOrder, madeWhen, portionLabel, spreadPortions,
@@ -72,7 +73,8 @@ export default function Schedule() {
         ) : (
           <div className="space-y-2.5">
             {sessions.map((s) => (
-              <div key={s.id} className={`card p-4 ${s.completed ? 'opacity-60' : ''}`}>
+              <div key={s.id} className={`card p-4 ${s.completed ? 'opacity-60' : ''} ${
+                overdue(s) ? 'border border-coral-300' : ''}`}>
                 <div className="flex items-start gap-3">
                   <button
                     onClick={() => complete(s)}
@@ -90,9 +92,26 @@ export default function Schedule() {
                       {new Date(s.date + 'T12:00:00').toLocaleDateString('en-GB', {
                         weekday: 'long', day: 'numeric', month: 'long' })} · {s.time}
                     </p>
-                    {s.remindAt && !s.completed && (
+                    {/* A reminder that can no longer fire, sitting in a list
+                        looking pending, is the app telling you it is going to
+                        do something it cannot. A session that has gone says so
+                        instead, and offers the two things you would want:
+                        record what came out of it, or move it. */}
+                    {s.remindAt && !s.completed && !overdue(s) && (
                       <p className="text-xs text-ink-500 flex items-center gap-1 mt-1">
-                        <Bell size={12} /> Both phones buzz at {reminderLabel(s.remindAt)}
+                        {/* Not "both phones": the household is however many
+                            people have signed in, and the reminder goes to
+                            every device that has notifications turned on. */}
+                        <Bell size={12} /> A nudge at {reminderLabel(s.remindAt)}, on every phone
+                        signed in.
+                      </p>
+                    )}
+                    {overdue(s) && (
+                      <p className="text-xs text-coral-700 flex items-center gap-1 mt-1">
+                        <AlertTriangle size={12} />
+                        {s.remindAt
+                          ? 'That time has passed, so no reminder is coming.'
+                          : 'That time has passed.'}
                       </p>
                     )}
                     {s.recipeIds.length > 0 && (
@@ -105,7 +124,11 @@ export default function Schedule() {
                     )}
                   </div>
                   <button className="btn-ghost btn-icon text-ink-300 hover:text-coral-600"
-                    onClick={() => removeSession(s.id)} aria-label="Remove session">
+                    onClick={() => {
+                      removeSession(s.id)
+                      offerUndo(`Removed ${s.label || 'the cook session'}`, () => addSession(s))
+                    }}
+                    aria-label="Remove session">
                     <Trash2 size={15} />
                   </button>
                 </div>

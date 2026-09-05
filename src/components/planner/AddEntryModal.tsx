@@ -237,7 +237,15 @@ export default function AddEntryModal({
           })}
 
           {tab === 'recipes' && !matchedRecipes.length && (
-            <p className="text-sm text-ink-500 text-center py-8">No recipes match “{query}”.</p>
+            <div className="text-center py-8 space-y-2">
+              <p className="text-sm text-ink-500">No recipes match “{query}”.</p>
+              {/* The two libraries do not search each other, and used not to
+                  say so: a miss on one tab gave no hint that the other might
+                  have it. */}
+              <button className="btn-secondary" onClick={() => setTab('foods')}>
+                Look in foods instead
+              </button>
+            </div>
           )}
 
           {tab === 'foods' && matchedFoods.map((f) => {
@@ -289,7 +297,12 @@ export default function AddEntryModal({
           })}
 
           {tab === 'foods' && !matchedFoods.length && (
-            <p className="text-sm text-ink-500 text-center py-8">No foods match “{query}”.</p>
+            <div className="text-center py-8 space-y-2">
+              <p className="text-sm text-ink-500">No foods match “{query}”.</p>
+              <button className="btn-secondary" onClick={() => setTab('recipes')}>
+                Look in recipes instead
+              </button>
+            </div>
           )}
         </div>
       </div>
