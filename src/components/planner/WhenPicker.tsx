@@ -79,7 +79,11 @@ export default function WhenPicker({
                 })}${isToday ? ', today' : past ? ', already gone' : ''}`}
                 className={`relative rounded-lg py-2 min-h-11 text-center text-sm font-semibold border transition-colors ${
                   on ? 'bg-bite-500 border-bite-500 text-white'
-                    : off ? 'bg-cream-50 border-transparent text-ink-300'
+                    // A day you cannot choose is still a day you have to be
+                    // able to read: ink-300 on cream is 3.01:1, and a date is
+                    // text rather than an icon. Struck through rather than
+                    // faded, so the reason is in the shape.
+                    : off ? 'bg-cream-50 border-transparent text-ink-500 line-through'
                       : past ? 'bg-cream-50 border-transparent text-ink-500'
                         : 'bg-paper border-border-200 text-ink-900 hover:border-bite-300'
                 } ${isToday && !on ? 'ring-2 ring-bite-300' : ''}`}

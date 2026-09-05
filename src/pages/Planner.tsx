@@ -264,7 +264,7 @@ export default function Planner() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
+    <div className="flex-1 overflow-y-auto pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
         {/* Navigation */}
@@ -1125,15 +1125,20 @@ function DayCell({
           : 'bg-paper border-border-200 hover:border-bite-300 text-ink-900'
       } ${dim && !selected ? 'opacity-45' : ''}`}
     >
+      {/* White rather than bite-100 on the selected chip. The tint is 4.19:1
+          against bite-500, under the 4.5 that small text needs, and the number
+          underneath the date is the one thing on this strip you most want to
+          read. The checker never saw it: light foregrounds were exempted
+          wholesale as "deliberately on a coloured parent". */}
       {showWeekday && (
-        <div className={`text-[11px] sm:text-xs font-semibold uppercase tracking-wide ${selected ? 'text-bite-100' : 'text-ink-500'}`}>
+        <div className={`text-[11px] sm:text-xs font-semibold uppercase tracking-wide ${selected ? 'text-white' : 'text-ink-500'}`}>
           {d.toLocaleDateString('en-GB', { weekday: 'short' })}
         </div>
       )}
       <div className={`text-base sm:text-lg font-bold leading-tight ${isToday && !selected ? 'text-bite-700' : ''}`}>
         {d.getDate()}
       </div>
-      <div className={`text-[11px] sm:text-xs font-mono tabular-nums ${selected ? 'text-bite-100' : 'text-ink-500'}`}>
+      <div className={`text-[11px] sm:text-xs font-mono tabular-nums ${selected ? 'text-white' : 'text-ink-500'}`}>
         {kcal > 0 ? Math.round(kcal) : ''}
       </div>
     </button>

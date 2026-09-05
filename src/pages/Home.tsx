@@ -177,7 +177,7 @@ export default function Home() {
   )
 
   return (
-    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
+    <div className="flex-1 overflow-y-auto pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
         <MomentNote />
@@ -317,7 +317,15 @@ export default function Home() {
             </p>
 
             {/* A fortnight rather than a week: seven bars is a snapshot, two
-                weeks is the first length at which a habit is visible. */}
+                weeks is the first length at which a habit is visible.
+
+                It was drawn under a heading that said "This week" beside a
+                count that said "of 7", so a day planned yesterday landed in the
+                second week's column and appeared to sit in the future. The
+                chart is right; it was never labelled. */}
+            <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">
+              The last fortnight
+            </p>
             <div className="flex items-end gap-1 h-16">
               {fortnight.map(({ date, nutrients, recorded }) => {
                 const kcal = nutrients.calories
@@ -343,7 +351,8 @@ export default function Home() {
                       className={`w-full rounded-t transition-all ${kcal > 0 ? STATUS_STYLES[status.level].fill : 'bg-border-100'}`}
                       style={{ height: `${kcal > 0 ? Math.max((kcal / peak) * 100, 6) : 6}%` }}
                     />
-                    <span className={`text-[10px] leading-none ${date === today ? 'font-bold text-ink-900' : 'text-ink-500'}`}>
+                    <span className={`text-[10px] leading-none ${
+                      date === today ? 'font-bold text-ink-900 underline underline-offset-2' : 'text-ink-500'}`}>
                       {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'narrow' })}
                     </span>
                   </div>

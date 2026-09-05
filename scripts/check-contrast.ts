@@ -131,12 +131,26 @@ function pairs(palette: Map<string, string>): Pair[] {
             continue
           }
 
-          // No ground in this literal. Light text is always deliberately on a
+          // No ground in this literal. Light text is deliberately on a
           // coloured parent, so measuring it against a pale surface would
           // manufacture a failure. Dark text on a pale surface is the safe
           // assumption, and the common one.
           if (luminance(palette.get(fg)!) > 0.4) {
-            unresolved.push(`${fg} at ${where}`)
+            // Look for that coloured parent rather than giving up on it. This
+            // exemption was quietly excusing every light-on-colour pair in the
+            // app, which is where the one real failure was living: the calorie
+            // figure on a selected day chip, bite-100 on bite-500, 4.19:1
+            // against the 4.5 that small text needs, and the one number on
+            // that strip you most want to read.
+            const grounds = [...new Set(
+              [...inside.matchAll(/\bbg-([a-z]+-\d{2,3})\b/g)].map((m) => m[1]),
+            )].filter((b) => palette.has(b) && !SURFACES.includes(b))
+
+            if (!grounds.length) {
+              unresolved.push(`${fg} at ${where}`)
+              continue
+            }
+            for (const bg of grounds) if (fg !== bg) found.push({ fg, bg, where, large })
             continue
           }
           for (const bg of SURFACES) found.push({ fg, bg, where, large })
