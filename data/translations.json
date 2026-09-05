@@ -1,0 +1,387 @@
+[
+  {
+    "id": "flatbread-wholemeal",
+    "english": "Wholemeal flatbread",
+    "ro": "lipie integrală",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "rice-cakes",
+    "english": "Puffed rice cakes",
+    "ro": "orez expandat",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "bulgur",
+    "english": "Bulgur",
+    "ro": "bulgur",
+    "hu": "bulgur",
+    "why": [
+      "Romanian is the English word",
+      "Hungarian is the English word"
+    ]
+  },
+  {
+    "id": "quinoa",
+    "english": "Quinoa",
+    "ro": "quinoa",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "couscous",
+    "english": "Couscous",
+    "ro": "cușcuș",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "flour-wheat",
+    "english": "Wheat flour",
+    "ro": "făină",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "beans-white-cooked",
+    "english": "White beans, cooked",
+    "ro": "fasole albă",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "tofu",
+    "english": "Tofu",
+    "ro": "tofu",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "lentil-pate",
+    "english": "Lentil pâté",
+    "ro": "pate de linte",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "broccoli",
+    "english": "Broccoli",
+    "ro": "broccoli",
+    "hu": "brokkoli",
+    "why": [
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "clementine",
+    "english": "Clementine",
+    "ro": "clementine",
+    "hu": "klementin",
+    "why": [
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "grapefruit",
+    "english": "Grapefruit",
+    "ro": "grapefruit",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "pomelo",
+    "english": "Pomelo",
+    "ro": "pomelo",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "kiwi",
+    "english": "Kiwi",
+    "ro": "kiwi",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "mango",
+    "english": "Mango",
+    "ro": "mango",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "pineapple",
+    "english": "Pineapple",
+    "ro": "ananas",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "nectarine",
+    "english": "Nectarine",
+    "ro": "nectarine",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "avocado",
+    "english": "Avocado",
+    "ro": "avocado",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "peanut-butter",
+    "english": "Peanut butter",
+    "ro": "unt de arahide",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "kefir",
+    "english": "Kefir",
+    "ro": "chefir",
+    "hu": "kefir",
+    "why": [
+      "Hungarian is the English word"
+    ]
+  },
+  {
+    "id": "telemea",
+    "english": "Telemea (brined cheese)",
+    "ro": "telemea",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "feta",
+    "english": "Feta",
+    "ro": "feta",
+    "hu": "feta",
+    "why": [
+      "Romanian is the English word",
+      "Hungarian is the English word"
+    ]
+  },
+  {
+    "id": "mozzarella",
+    "english": "Mozzarella",
+    "ro": "mozzarella",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "halloumi",
+    "english": "Halloumi",
+    "ro": "halloumi",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "ricotta",
+    "english": "Ricotta",
+    "ro": "ricotta",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "cream-cheese",
+    "english": "Cream cheese",
+    "ro": "brânză cremoasă",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "goat-cheese",
+    "english": "Goat cheese",
+    "ro": "brânză de capră",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "cod",
+    "english": "Cod",
+    "ro": "cod",
+    "hu": "tőkehal",
+    "why": [
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "mackerel-smoked",
+    "english": "Smoked mackerel",
+    "ro": "macrou afumat",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "pork-loin",
+    "english": "Pork loin",
+    "ro": "cotlet de porc",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "pork-shoulder",
+    "english": "Pork shoulder",
+    "ro": "carne de porc pentru tocăniță",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "eggplant-salad",
+    "english": "Eggplant spread",
+    "ro": "salată de vinete",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "guacamole",
+    "english": "Guacamole",
+    "ro": "guacamole",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "tomato-sauce",
+    "english": "Tomato sauce",
+    "ro": "sos de roșii",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "vanilla-extract",
+    "english": "Vanilla extract",
+    "ro": "esență de vanilie",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "cake-coconut-raspberry",
+    "english": "Coconut & raspberry cake",
+    "ro": "prăjitură cu cocos și zmeură",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "banana-bread-chocolate",
+    "english": "Chocolate banana bread",
+    "ro": "banana bread cu ciocolată",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "brownie",
+    "english": "Brownie",
+    "ro": "brownie",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  },
+  {
+    "id": "cheese-blueberry-loaf",
+    "english": "Cheese & blueberry loaf",
+    "ro": "chec cu brânză și afine",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "milk-ice-bar",
+    "english": "Milk ice bar",
+    "ro": "iglu de lapte",
+    "hu": "",
+    "why": [
+      "no Hungarian"
+    ]
+  },
+  {
+    "id": "pizza-slice",
+    "english": "Pizza",
+    "ro": "pizza",
+    "hu": "",
+    "why": [
+      "no Hungarian",
+      "Romanian is the English word"
+    ]
+  }
+]

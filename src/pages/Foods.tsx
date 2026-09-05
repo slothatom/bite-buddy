@@ -88,10 +88,15 @@ export default function Foods() {
         <div className="space-y-3">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
+            {/* The stored names, not the aliases. This quoted "paine int",
+                which is how the plans write it and is correctly an alias, but
+                seeing it here made the app look like it holds a typo where it
+                actually holds "pâine integrală". Search still finds either,
+                which is the whole point of aliases. */}
             <input
               className="input pl-9"
               aria-label="Search foods"
-              placeholder="Search telemea, paine int, zabpehely, olive oil…"
+              placeholder="Search telemea, pâine integrală, zabpehely, olive oil…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
