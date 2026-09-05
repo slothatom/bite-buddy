@@ -25,7 +25,7 @@ export default function Activity() {
   const [tab, setTab] = useState<'exercise' | 'sleep'>('exercise')
 
   return (
-    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
+    <div className="flex-1 overflow-y-auto pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header>
           <h1 className="display text-xl sm:text-2xl text-ink-900">Movement</h1>

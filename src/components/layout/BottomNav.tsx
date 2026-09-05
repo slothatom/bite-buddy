@@ -55,6 +55,11 @@ export default function BottomNav() {
   return (
     <>
       <nav
+        /* 4rem of bar, plus a centre button sitting 1rem proud of it, plus
+           whatever the phone reserves at the bottom. Every screen pads
+           itself by 7rem plus that inset: pb-24 was 6rem flat, which
+           ignored the inset and left the button over the last line of a
+           card on Progress. */
         className="fixed bottom-0 inset-x-0 bg-paper/95 backdrop-blur border-t border-border-200 flex md:hidden z-30"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >

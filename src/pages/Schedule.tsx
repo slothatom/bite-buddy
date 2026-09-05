@@ -51,7 +51,7 @@ export default function Schedule() {
   const batchable = recipes.filter((r) => r.components.length > 0)
 
   return (
-    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
+    <div className="flex-1 overflow-y-auto pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header className="flex items-start justify-between gap-3">
           <div>

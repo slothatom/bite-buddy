@@ -120,7 +120,7 @@ export default function GroceryList() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto pb-24 lg:pb-8">
+    <div className="flex-1 overflow-y-auto pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -494,7 +494,9 @@ function DayPicker({
                     : 'bg-cream-50 border-transparent text-ink-500'
               }`}
             >
-              <span className={`block text-[11px] font-semibold uppercase ${on ? 'text-bite-100' : 'text-ink-500'}`}>
+              {/* White, for the same reason as the planner's day chips: the
+                  tint is 4.19:1 on bite-500 and this is small text. */}
+              <span className={`block text-[11px] font-semibold uppercase ${on ? 'text-white' : 'text-ink-500'}`}>
                 {d.toLocaleDateString('en-GB', { weekday: 'short' })}
               </span>
               <span className="block text-sm font-bold leading-tight">{d.getDate()}</span>
