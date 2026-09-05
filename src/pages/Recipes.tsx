@@ -735,7 +735,11 @@ function RecipeDetail({
             <div className="min-w-0">
               <h2 className="text-base font-extrabold text-ink-900 leading-snug">{card.name}</h2>
               {recipe.name.ro || recipe.name.hu ? (
-                <p className="text-xs text-ink-500">{[recipe.name.ro, recipe.name.hu].filter(Boolean).join(' · ')}</p>
+                <p className="text-xs text-ink-500">
+                  {recipe.name.ro && <span lang="ro">{recipe.name.ro}</span>}
+                  {recipe.name.ro && recipe.name.hu ? ' · ' : ''}
+                  {recipe.name.hu && <span lang="hu">{recipe.name.hu}</span>}
+                </p>
               ) : null}
             </div>
           </div>

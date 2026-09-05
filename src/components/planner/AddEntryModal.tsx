@@ -13,6 +13,7 @@ import { searchFoods } from '../../lib/foodSearch'
 import { buildFoodIndex } from '../../lib/foodSearch'
 import { useAvailablePortions } from '../../store/usePortionStore'
 import { today } from '../../store/useMealPlanStore'
+import { readAmount, MOST } from '../../lib/amounts'
 import WhenPicker from './WhenPicker'
 import { offerOrder, madeWhen, portionLabel } from '../../lib/portionsUse'
 import { usePantry } from '../../store/usePantryStore'
@@ -248,9 +249,14 @@ export default function AddEntryModal({
               <div key={f.id} className="p-3 rounded-xl hover:bg-cream-50 transition-colors">
                 <div className="min-w-0 mb-2">
                   <p className="text-sm font-semibold text-ink-900 truncate">{f.names.en}</p>
+                  {/* Marked as what it is. The document is English and these
+                      two words are not, so a screen reader that is not told
+                      will pronounce "paine integrala" as English. */}
                   {f.names.ro || f.names.hu ? (
                     <p className="text-xs text-ink-500 truncate">
-                      {[f.names.ro, f.names.hu].filter(Boolean).join(' · ')}
+                      {f.names.ro && <span lang="ro">{f.names.ro}</span>}
+                      {f.names.ro && f.names.hu ? ' · ' : ''}
+                      {f.names.hu && <span lang="hu">{f.names.hu}</span>}
                     </p>
                   ) : null}
                 </div>
@@ -260,8 +266,11 @@ export default function AddEntryModal({
                       type="number"
                       inputMode="numeric"
                       min={0}
+                      max={MOST.grams}
                       value={g}
-                      onChange={(e) => setGrams((s) => ({ ...s, [f.id]: Number(e.target.value) }))}
+                      onChange={(e) => setGrams((s) => ({
+                        ...s, [f.id]: readAmount(e.target.value, { max: MOST.grams }),
+                      }))}
                       className="input w-24 pr-7 text-right"
                       aria-label={`Grams of ${f.names.en}`}
                     />

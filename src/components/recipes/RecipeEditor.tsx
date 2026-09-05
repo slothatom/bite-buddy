@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useDialog } from '../../lib/useDialog'
+import { readAmount } from '../../lib/amounts'
 import {
   Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download,
 } from 'lucide-react'
@@ -240,7 +241,7 @@ export default function RecipeEditor({
           </Field>
 
           <div className="grid grid-cols-3 gap-2">
-            <NumberField label="Makes" unit="servings" value={draft.servings} min={1}
+            <NumberField label="Makes" unit="serving" value={draft.servings} min={1}
               onChange={(v) => patch({ servings: v })} />
             <NumberField label="Prep" unit="min" value={draft.prepMinutes}
               onChange={(v) => patch({ prepMinutes: v })} />
@@ -711,13 +712,15 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 function NumberField({
-  label, unit, value, onChange, min = 0,
+  label, unit, value, onChange, min = 0, max = 999,
 }: {
   label: string
+  /** Singular. The plural is worked out from the number beside it. */
   unit: string
   value: number
   onChange: (v: number) => void
   min?: number
+  max?: number
 }) {
   return (
     <label className="block min-w-0">
@@ -726,11 +729,17 @@ function NumberField({
         type="number"
         inputMode="numeric"
         min={min}
+        max={max}
         className="input w-full text-right"
         value={value}
-        onChange={(e) => onChange(Math.max(min, Number(e.target.value) || 0))}
+        onChange={(e) => onChange(readAmount(e.target.value, { min, max }))}
       />
-      <span className="block text-[11px] text-ink-500 mt-0.5 text-right">{unit}</span>
+      {/* "Makes 1 servings" was on screen for as long as this field has
+          existed, because the unit was a fixed string beside a variable
+          number. */}
+      <span className="block text-[11px] text-ink-500 mt-0.5 text-right">
+        {value === 1 ? unit : `${unit}s`}
+      </span>
     </label>
   )
 }
