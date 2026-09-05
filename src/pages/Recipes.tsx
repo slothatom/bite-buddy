@@ -976,7 +976,10 @@ function RecipeDetail({
                 >
                   <Minus size={15} />
                 </button>
-                <span className="text-sm font-mono text-ink-900 tabular-nums w-16 text-center">
+                {/* 4rem held "2 servings" on two lines in the middle of a
+                    control whose whole job is to be read at a glance between
+                    two buttons. */}
+                <span className="text-sm font-mono text-ink-900 tabular-nums min-w-24 text-center whitespace-nowrap">
                   {wanted} {wanted === 1 ? 'serving' : 'servings'}
                 </span>
                 <button
