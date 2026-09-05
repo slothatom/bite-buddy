@@ -25,7 +25,9 @@
     "db:check": "tsx scripts/check-db.ts",
     "check:contrast": "tsx scripts/check-contrast.ts",
     "function:build": "tsx scripts/build-function.ts",
-    "function:check": "tsx scripts/build-function.ts --check"
+    "function:check": "tsx scripts/build-function.ts --check",
+    "data:nutrients": "tsx scripts/fill-nutrients.ts",
+    "data:translations": "tsx scripts/list-translations.ts"
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
