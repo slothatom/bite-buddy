@@ -171,6 +171,21 @@ export default function Foods() {
                         <p className="text-xs text-ink-500">
                           Protein {f.per100g.protein} g · Carbs {f.per100g.carbs} g · Fat {f.per100g.fat} g
                         </p>
+                        {/* Fibre and salt are the two the app tracks as daily
+                            targets and the two most often missing: 107 of the
+                            122 foods have neither. Listing every other figure
+                            and not these hid the gap on the one screen where
+                            it could be fixed. Absent says absent, rather than
+                            not appearing at all. */}
+                        <p className="text-xs text-ink-500">
+                          Fibre {f.per100g.fiber == null
+                            ? <span className="text-coral-600">not known</span>
+                            : `${f.per100g.fiber} g`}
+                          {' · '}
+                          Salt {saltFromSodium(f.per100g.sodium) == null
+                            ? <span className="text-coral-600">not known</span>
+                            : `${saltFromSodium(f.per100g.sodium)!.toFixed(2)} g`}
+                        </p>
                       </div>
                     </div>
                   </button>

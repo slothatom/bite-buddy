@@ -32,8 +32,16 @@ export default function Activity() {
           <p className="text-sm text-ink-700">What you did, and how you slept.</p>
         </header>
 
-        <div className="flex flex-wrap gap-3">
-          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
+        {/* Two questions, and they used to look like one. Arany, Oli, Exercise
+            and Sleep sat side by side in identical pills, reading as a set of
+            four where picking Sleep might have deselected Oli. Named, and
+            pushed apart, so the row says which half is who and which is what. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <div
+            className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit"
+            role="tablist"
+            aria-label="Whose"
+          >
             {PEOPLE.map((p) => (
               <button
                 key={p.id}
@@ -47,7 +55,11 @@ export default function Activity() {
             ))}
           </div>
 
-          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
+          <div
+            className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit sm:ml-auto"
+            role="tablist"
+            aria-label="What to show"
+          >
             {(['exercise', 'sleep'] as const).map((t) => (
               <button
                 key={t}

@@ -33,7 +33,11 @@ export default function Analytics() {
         {/* Announced as tabs, like every other strip in the app. These were
             plain buttons, so nothing told a screen reader they were a set or
             which one was current. */}
-        <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
+        <div
+          className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit"
+          role="tablist"
+          aria-label="What to show"
+        >
           {([['week', 'This week'], ['mediterranean', 'Mediterranean'], ['body', 'Body']] as const).map(([k, label]) => (
             <button
               key={k}
@@ -313,8 +317,8 @@ function BodyTab() {
 
   return (
     <div className="space-y-5">
-      {/* Whose body. */}
-      <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
+      {/* Whose body. Named, so it does not read as more of the row above. */}
+      <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist" aria-label="Whose">
         {PEOPLE.map((p) => (
           <button
             key={p.id}
