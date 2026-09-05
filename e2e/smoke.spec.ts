@@ -247,7 +247,8 @@ test.describe('the main flow', () => {
     await page.locator('input[type=date]').fill(tomorrow)
     await page.getByRole('button', { name: 'Save', exact: true }).click()
 
-    await expect(page.getByText(/Both phones buzz at/)).toBeVisible()
+    // Not "both phones": the household is however many people have signed in.
+    await expect(page.getByText(/A nudge at .*, on every phone signed in/)).toBeVisible()
     // Eighteen hundred less a quarter of an hour.
     await expect(page.getByText(/17:45/)).toBeVisible()
   })
@@ -543,8 +544,8 @@ test.describe('the recipe library', () => {
     // Budget Friendly, Lazy, Leftovers, Fridge Clean-Out and Special Occasion
     // are judgements the data cannot supply, and the sheet says so rather than
     // pre-filling them with a guess.
-    await expect(page.getByText('yours to apply').first()).toBeVisible()
-    expect(await page.getByText('yours to apply').count()).toBe(5)
+    await expect(page.getByText('you set this').first()).toBeVisible()
+    expect(await page.getByText('you set this').count()).toBe(5)
   })
 
   test('the three dimensions narrow together', async ({ page }) => {
@@ -709,7 +710,9 @@ test.describe('the recipe library', () => {
     // Gone from the list, from search, and from favourites.
     await expect(page.getByText('Doomed dinner')).toHaveCount(0)
     await page.getByPlaceholder(/Search in English/).fill('Doomed dinner')
-    await expect(page.getByText('Doomed dinner')).toHaveCount(0)
+    // The card, not the text: the empty state now names what it could not
+    // find, which is the point of it.
+    await expect(page.locator('[data-recipe-card]')).toHaveCount(0)
     await page.getByPlaceholder(/Search in English/).fill('')
     await page.getByRole('button', { name: /Favourites/ }).click()
     await expect(page.getByText('Doomed dinner')).toHaveCount(0)
@@ -1400,7 +1403,9 @@ test.describe('asking the recipe list a question', () => {
     // honest version; an empty screen would read as "you have no recipes".
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /From the cupboard/ }).click()
-    await expect(page.getByText(/Add a few things to the cupboard/)).toBeVisible()
+    await expect(page.getByText(/Nothing in the cupboard yet/)).toBeVisible()
+    // And a way straight to the screen that fixes it, rather than its name.
+    await expect(page.getByRole('link', { name: 'Open the cupboard' })).toBeVisible()
   })
 
   test('the cupboard lens works once there is something in it', async ({ page }) => {
@@ -2282,6 +2287,28 @@ test.describe('the small sharp edges', () => {
 
     // And focus is back where it came from, rather than on the page body.
     await expect(opener).toBeFocused()
+  })
+
+  test('a filter that cannot answer says why, and where to fix it', async ({ page }) => {
+    // The chip sat at half opacity with the reason hidden until you tapped it,
+    // and the fix was a sentence naming a screen you then had to find: the
+    // Cupboard is behind More, then Grocery, then a tab.
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /From the cupboard/ }).click()
+
+    await expect(page.getByText(/Nothing in the cupboard yet/)).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Open the cupboard' })).toBeVisible()
+  })
+
+  test('a search that finds nothing offers a way out', async ({ page }) => {
+    // "No recipes match zzqq" was the whole answer: no way to write the thing
+    // you were looking for, and no hint that Foods is a separate library.
+    await goto(page, '/recipes')
+    await page.getByPlaceholder(/Search in English/).fill('zzqq')
+
+    await expect(page.getByText(/Nothing here matches/)).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Write it' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Look in Foods' })).toBeVisible()
   })
 
   test('the tab is named after the screen', async ({ page }) => {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { CookSession } from '../types'
-import { dueReminders, reminderAt, sessionStart } from './cookReminder'
+import { dueReminders, overdue, reminderAt, sessionStart } from './cookReminder'
 
 const session = (over: Partial<CookSession> = {}): CookSession => ({
   id: 's1', date: '2026-08-20', time: '18:00', recipeIds: [], label: 'Batch cook',
@@ -54,5 +54,28 @@ describe('the session start itself', () => {
   it('is read in the timezone of whoever typed it', () => {
     const start = sessionStart('2026-08-20', '18:00')
     expect(start.getHours()).toBe(18)
+  })
+})
+
+/**
+ * A reminder that can no longer fire, sitting in a list looking pending, is
+ * the app telling you it is going to do something it cannot.
+ */
+describe('a session whose time has gone', () => {
+  const now = new Date('2026-09-05T12:00:00')
+
+  it('is overdue once its start has passed', () => {
+    expect(overdue(session({ date: '2026-09-05', time: '09:00' }), now)).toBe(true)
+    expect(overdue(session({ date: '2026-09-04', time: '18:00' }), now)).toBe(true)
+  })
+
+  it('is not overdue while it is still ahead', () => {
+    expect(overdue(session({ date: '2026-09-05', time: '18:00' }), now)).toBe(false)
+    expect(overdue(session({ date: '2026-09-06', time: '09:00' }), now)).toBe(false)
+  })
+
+  it('is never overdue once it has been ticked off', () => {
+    // A session you cooked is finished, not late.
+    expect(overdue(session({ date: '2026-09-01', time: '18:00', completed: true }), now)).toBe(false)
   })
 })
