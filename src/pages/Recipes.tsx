@@ -1,11 +1,13 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import WhenPicker from '../components/planner/WhenPicker'
+import { slotNow } from '../lib/whenDates'
 import {
   Search, Star, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
   ChevronDown, SlidersHorizontal, Minus, ExternalLink, CalendarPlus, Check,
 } from 'lucide-react'
 import type { DishCategory, MealSlot, QuickFilter, Recipe } from '../types'
-import { DIFFICULTY_LABELS, MEAL_SLOTS, SLOT_LABELS } from '../types'
+import { DIFFICULTY_LABELS, MEAL_SLOTS } from '../types'
 import { safeUrl, linkLabel } from '../lib/links'
 import { useRecipes, useRecipeStore, useMergedInto } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
@@ -1011,15 +1013,23 @@ function PlanIntoDay({
   servings: number
   onClose: () => void
 }) {
-  const { weekDates, addEntry } = useMealPlanStore()
-  const [date, setDate] = useState(() => (weekDates.includes(todayDate()) ? todayDate() : weekDates[0]))
+  const { plan, addEntry } = useMealPlanStore()
+  const [date, setDate] = useState(todayDate)
+  const busy = useMemo(
+    () => new Set(plan.filter((d) => d.meals.length).map((d) => d.date)),
+    [plan],
+  )
 
-  // The recipe's own meal times, where it has them, so a breakfast opens on
-  // breakfast. The two vocabularies overlap by name rather than by type, and
-  // a slot the recipe says nothing about is not a reason to refuse.
+  /**
+   * The recipe's own meal times, where it has them, and the clock otherwise.
+   *
+   * It used to fall back to 'dinner', which meant opening a dinner recipe from
+   * the Dinner shelf in the evening and being offered Breakfast, because the
+   * fallback ran before the recipe's own tags were consulted for a match.
+   */
   const times = mealTimesOf(recipe).map(String)
   const [slot, setSlot] = useState<MealSlot>(
-    () => MEAL_SLOTS.find((s) => times.includes(s)) ?? 'dinner',
+    () => MEAL_SLOTS.find((s) => times.includes(s)) ?? slotNow(),
   )
 
   return (
@@ -1038,41 +1048,9 @@ function PlanIntoDay({
           {servings === 1 ? 'One serving' : `${servings} servings`}, on a day of your choosing.
         </p>
 
-        <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-1.5">Which day</p>
-        <div className="grid grid-cols-7 gap-1 mb-4">
-          {weekDates.map((d) => (
-            <button
-              key={d}
-              onClick={() => setDate(d)}
-              aria-pressed={date === d}
-              aria-label={new Date(d + 'T12:00:00').toLocaleDateString('en-GB', {
-                weekday: 'long', day: 'numeric', month: 'long' })}
-              className={`rounded-xl py-2 text-center text-xs font-semibold min-h-11 border ${
-                date === d
-                  ? 'bg-bite-500 text-white border-bite-500'
-                  : 'bg-cream-50 border-transparent text-ink-900'}`}
-            >
-              <span className="block text-[10px] font-bold uppercase tracking-wide opacity-80">
-                {new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })}
-              </span>
-              {new Date(d + 'T12:00:00').getDate()}
-            </button>
-          ))}
-        </div>
+        <WhenPicker date={date} onDate={setDate} slot={slot} onSlot={setSlot} busy={busy} />
 
-        <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-1.5">Which meal</p>
-        <div className="flex flex-wrap gap-1.5 mb-5">
-          {MEAL_SLOTS.map((s) => (
-            <button
-              key={s}
-              onClick={() => setSlot(s)}
-              aria-pressed={slot === s}
-              className={slot === s ? 'chip bg-bite-500 text-white border border-bite-500' : 'chip-off'}
-            >
-              {SLOT_LABELS[s]}
-            </button>
-          ))}
-        </div>
+        <div className="mt-5" />
 
         <div className="flex gap-2">
           <button

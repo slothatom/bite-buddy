@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Search, X } from 'lucide-react'
+import { Search, X, CalendarDays } from 'lucide-react'
 import type { Component, MealSlot, Recipe } from '../../types'
-import { SLOT_LABELS, MEAL_SLOTS } from '../../types'
+import { SLOT_LABELS } from '../../types'
 import { useRecipes } from '../../store/useRecipeStore'
 import { useFoods } from '../../store/useFoodStore'
 import { useNutritionContext } from '../../store/useNutrition'
@@ -11,6 +11,8 @@ import { mealTimesOf } from '../../lib/dishCategories'
 import { searchFoods } from '../../lib/foodSearch'
 import { buildFoodIndex } from '../../lib/foodSearch'
 import { useAvailablePortions } from '../../store/usePortionStore'
+import { today } from '../../store/useMealPlanStore'
+import WhenPicker from './WhenPicker'
 import { offerOrder, madeWhen, portionLabel } from '../../lib/portionsUse'
 import { usePantry } from '../../store/usePantryStore'
 import { availability, availabilityLabel } from '../../lib/pantry'
@@ -28,7 +30,7 @@ import { availability, availabilityLabel } from '../../lib/pantry'
  * app should say so before offering you 228 things to choose between.
  */
 export default function AddEntryModal({
-  date, slot, onClose, onAdd, mode = 'plan', onSlotChange,
+  date, slot, onClose, onAdd, mode = 'plan', onSlotChange, onDateChange,
 }: {
   date: string
   slot: MealSlot
@@ -45,15 +47,21 @@ export default function AddEntryModal({
    */
   mode?: 'plan' | 'ate'
   /**
-   * Lets the slot be corrected here, when the caller only guessed it.
+   * Lets the day and the meal be corrected here.
    *
-   * Home opens this from the clock, and the clock is often wrong: a late lunch
-   * at four is not an afternoon snack. Given the chance to fix it in place,
-   * rather than closing and reopening from a different button.
+   * The centre button used to mean today and Breakfast, always, at any hour
+   * and from any screen, with nothing on the sheet saying so and no way to
+   * change it. The most-tapped control in the app was the one most likely to
+   * file food in the wrong place.
+   *
+   * Now the sheet states where this is going before you have chosen what, in
+   * words rather than in a heading nobody reads, and one tap opens the picker.
    */
   onSlotChange?: (slot: MealSlot) => void
+  onDateChange?: (date: string) => void
 }) {
   const ate = mode === 'ate'
+  const [when, setWhen] = useState(false)
   const [query, setQuery] = useState('')
   // Snacks open on foods. The plans write them as lines rather than dishes
   // ("150 g mere, 10 g caju"), so the recipe tab for a snack slot was reliably
@@ -119,22 +127,36 @@ export default function AddEntryModal({
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-          {onSlotChange && (
-            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Which meal">
-              {MEAL_SLOTS.map((s) => (
+          {(onSlotChange || onDateChange) && (
+            <div className="card-soft p-3 space-y-3">
+              <div className="flex items-center gap-2">
+                <CalendarDays size={15} className="shrink-0 text-ink-500" />
+                <p className="flex-1 min-w-0 text-sm text-ink-900">
+                  <span className="font-semibold">{SLOT_LABELS[slot]}</span>
+                  {', '}
+                  {date === today()
+                    ? 'today'
+                    : new Date(date + 'T12:00:00').toLocaleDateString('en-GB', {
+                      weekday: 'long', day: 'numeric', month: 'long',
+                    })}
+                </p>
                 <button
-                  key={s}
-                  onClick={() => onSlotChange(s)}
-                  aria-pressed={s === slot}
-                  className={`text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
-                    s === slot
-                      ? 'bg-bite-500 border-bite-500 text-white font-semibold'
-                      : 'bg-paper border-border-200 text-ink-700 hover:border-bite-300'
-                  }`}
+                  className="btn-ghost text-xs shrink-0"
+                  aria-expanded={when}
+                  onClick={() => setWhen((v) => !v)}
                 >
-                  {SLOT_LABELS[s]}
+                  {when ? 'Done' : 'Change'}
                 </button>
-              ))}
+              </div>
+
+              {when && (
+                <WhenPicker
+                  date={date}
+                  onDate={(d) => onDateChange?.(d)}
+                  slot={onSlotChange ? slot : undefined}
+                  onSlot={onSlotChange}
+                />
+              )}
             </div>
           )}
 
