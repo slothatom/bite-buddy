@@ -113,6 +113,103 @@
   }
 }
 
+/* ─── Dark ──────────────────────────────────────────────────────────────────
+   The same app after dark, not a second design.
+
+   Every utility Tailwind generates from `@theme` refers to its token through
+   `var(--color-…)`, so redefining the tokens here changes the whole app and no
+   component has to know a theme exists. `scripts/check-contrast.ts` reads this
+   block by name and measures every colour pair in the app against it, exactly
+   as it does the light one, so a dark theme cannot ship below AA.
+
+   Two groups change, for two reasons.
+
+   The neutrals invert: the ground goes dark, the ink goes light, and both stay
+   warm. A neutral grey ground under this palette reads as a different product
+   with the same layout, and the warmth is most of what the brand is.
+
+   The mid brand shades change because of what they are used for. In daylight
+   bite-700, teal-700, coral-600 and mustard-700 are the shades dark enough to
+   read as text on paper; after dark they are the shades too dark to read on
+   anything. So they lighten, which does invert the ramp's ordering inside this
+   block: what a token names here is its job, not its position between 600 and
+   800. The steps used as fills rather than as words are left alone. */
+
+:root[data-theme='dark'] {
+  /* Neutrals. */
+  --color-cream-50: #17130f;   /* app background */
+  --color-paper: #221d18;      /* primary card surface */
+  --color-ink-900: #f7f2ea;    /* main text */
+  --color-ink-700: #d8cec1;    /* secondary text */
+  --color-ink-500: #a99d8d;    /* muted text, AA on the background above */
+  --color-ink-300: #857a6c;    /* icons and dividers only, never words */
+  --color-border-100: #2e2820;
+  --color-border-200: #3d352b;
+
+  /* The shades that carry words. */
+  --color-bite-700: #b7aaf0;
+  --color-teal-600: #4fd0c0;
+  --color-teal-700: #5fd8c9;
+  --color-coral-600: #ff9a9a;
+  --color-coral-700: #ffaeae;
+  --color-mustard-700: #e8c26a;
+  --color-mustard-800: #dfb659;
+
+  /* Soft grounds. In daylight these are tints of white; here they have to be
+     shades of the surface, or a "soft" card is the brightest thing on screen. */
+  --color-bite-50: #241f38;
+  --color-bite-100: #2f2849;
+  --color-coral-50: #331e1e;
+  --color-coral-100: #422626;
+  --color-teal-50: #102e2b;
+  --color-teal-100: #163b37;
+  --color-mustard-50: #2c2415;
+  --color-mustard-100: #382d19;
+
+  /* Shadow is the wrong instrument on a dark ground: there is nothing for it
+     to fall on. The surfaces are told apart by being lighter than the page. */
+  --shadow-e1: 0 1px 2px rgba(0, 0, 0, .5);
+  --shadow-e2: 0 2px 8px rgba(0, 0, 0, .55);
+  --shadow-e3: 0 10px 30px rgba(0, 0, 0, .6);
+}
+
+/* Following the device, which is what "system" means and what a profile that
+   has never been asked gets. Written as its own block rather than merged into
+   the one above so the checker reads one definition of the dark palette. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-cream-50: #17130f;
+    --color-paper: #221d18;
+    --color-ink-900: #f7f2ea;
+    --color-ink-700: #d8cec1;
+    --color-ink-500: #a99d8d;
+    --color-ink-300: #857a6c;
+    --color-border-100: #2e2820;
+    --color-border-200: #3d352b;
+
+    --color-bite-700: #b7aaf0;
+    --color-teal-600: #4fd0c0;
+    --color-teal-700: #5fd8c9;
+    --color-coral-600: #ff9a9a;
+    --color-coral-700: #ffaeae;
+    --color-mustard-700: #e8c26a;
+    --color-mustard-800: #dfb659;
+
+    --color-bite-50: #241f38;
+    --color-bite-100: #2f2849;
+    --color-coral-50: #331e1e;
+    --color-coral-100: #422626;
+    --color-teal-50: #102e2b;
+    --color-teal-100: #163b37;
+    --color-mustard-50: #2c2415;
+    --color-mustard-100: #382d19;
+
+    --shadow-e1: 0 1px 2px rgba(0, 0, 0, .5);
+    --shadow-e2: 0 2px 8px rgba(0, 0, 0, .55);
+    --shadow-e3: 0 10px 30px rgba(0, 0, 0, .6);
+  }
+}
+
 @layer base {
   *, ::after, ::before, ::backdrop, ::file-selector-button {
     border-color: var(--color-border-200);
@@ -158,7 +255,7 @@
 
 @utility btn-primary {
   @apply btn bg-bite-500 text-white hover:bg-bite-600 hover:-translate-y-px
-         active:translate-y-0 active:bg-bite-700 shadow-e1;
+         active:translate-y-0 active:bg-bite-800 shadow-e1;
 }
 
 @utility btn-secondary {
@@ -172,7 +269,7 @@
 }
 
 @utility btn-danger {
-  @apply btn bg-coral-500 text-white hover:bg-coral-600 active:bg-coral-700 shadow-e1;
+  @apply btn bg-coral-500 text-white hover:bg-coral-800 active:bg-coral-900 shadow-e1;
 }
 
 @utility btn-icon {

@@ -233,7 +233,7 @@ function DuplicateBanner({
 
   return (
     <div className="rounded-2xl border border-bite-200 bg-bite-50 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-      <Combine size={20} className="text-bite-600 shrink-0" />
+      <Combine size={20} className="text-bite-700 shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-ink-900">
           {count} {count === 1 ? 'ingredient is' : 'ingredients are'} in here more than once

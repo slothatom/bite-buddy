@@ -186,3 +186,66 @@ export function deviceLabel(agent: string = navigator.userAgent): string {
   if (/windows/i.test(agent)) return 'Windows'
   return 'This device'
 }
+
+// ─── Which of them you want ───────────────────────────────────────────────────
+
+/**
+ * The two things this app will ever send, each on its own switch.
+ *
+ * The panel had one switch for the whole device while the paragraph above it
+ * named two different notifications: a reminder before a cooking session, and
+ * a line when the other one of you changes the week. Wanting the first and not
+ * the second is an ordinary thing to want, and the only answer available was
+ * all or nothing.
+ *
+ * Per person rather than per device, which is the opposite of the on/off
+ * switch above and deliberate. Whether this phone is reachable is a fact about
+ * this phone. Whether you care about a cooking reminder is a fact about you,
+ * and it should not have to be set again on the tablet. The row lives in
+ * `notify_state`, which does not sync, so it is still yours rather than the
+ * household's: on the synced profile, turning one off would turn it off for
+ * both of you.
+ */
+export interface Wants {
+  cook: boolean
+  plan: boolean
+}
+
+/** Both on, which is what a member with no row yet already gets from the sender. */
+export const WANTS_ALL: Wants = { cook: true, plan: true }
+
+export async function readWants(): Promise<Wants> {
+  if (!supabase) return WANTS_ALL
+  const { data: user } = await supabase.auth.getUser()
+  if (!user?.user) return WANTS_ALL
+
+  const { data } = await supabase
+    .from('notify_state').select('want_cook, want_plan')
+    .eq('member_id', user.user.id).maybeSingle()
+
+  // No row is not a refusal. The sender defaults an absent row to both, so
+  // reading it as both is the app agreeing with what would actually happen.
+  return { cook: data?.want_cook ?? true, plan: data?.want_plan ?? true }
+}
+
+/**
+ * Writes both, as an upsert, because a member may have no row yet.
+ *
+ * `plan_seen_at` is deliberately not sent: it is the sender's bookmark for how
+ * far through your plan changes it has got, and overwriting it here would
+ * either replay a fortnight of notifications or swallow the next one.
+ */
+export async function writeWants(wants: Wants): Promise<{ ok: true } | { ok: false; reason: string }> {
+  if (!supabase) return { ok: false, reason: 'This copy runs on its own, with no account.' }
+  const { data: user } = await supabase.auth.getUser()
+  if (!user?.user) return { ok: false, reason: 'Sign in first.' }
+
+  const { error } = await supabase.from('notify_state').upsert({
+    member_id: user.user.id,
+    want_cook: wants.cook,
+    want_plan: wants.plan,
+    updated_at: new Date().toISOString(),
+  }, { onConflict: 'member_id' })
+
+  return error ? { ok: false, reason: error.message } : { ok: true }
+}

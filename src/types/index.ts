@@ -233,6 +233,15 @@ export interface Recipe {
   name: { en: string; ro?: string; hu?: string }
   /** Your own notes: what to watch, what you changed, who liked it. */
   description?: string
+  /**
+   * A photograph, as a path inside the storage bucket.
+   *
+   * The path and not a URL: the bucket is private, so a usable address is
+   * signed and expires within the hour, and a stored URL would also carry the
+   * project it came from. See lib/photos.ts. Absent on everything the app
+   * ships, which is 261 recipes nobody has cooked yet.
+   */
+  photo?: string
   /** Where it came from, when it came from somewhere. Http and https only. */
   sourceUrl?: string
   difficulty?: Difficulty
@@ -584,6 +593,16 @@ export interface Targets extends Macros {
 
 // ─── The user ─────────────────────────────────────────────────────────────────
 
+export type Theme = 'system' | 'light' | 'dark'
+
+export const THEMES: Theme[] = ['system', 'light', 'dark']
+
+export const THEME_LABELS: Record<Theme, string> = {
+  system: 'Follow my device',
+  light: 'Light',
+  dark: 'Dark',
+}
+
 export interface UserProfile {
   name: string
   /**
@@ -610,14 +629,29 @@ export interface UserProfile {
    * to compare them to, so the chart was a line with no destination. Optional
    * because plenty of people are not aiming anywhere, and a goal nobody set
    * should not appear.
+   *
+   * Always kilograms, whatever `weightUnit` says. A weight entry carries the
+   * unit it was typed in and this does not, so it needs one fixed answer or
+   * switching the setting would silently turn a 68 kg goal into a 68 lb one.
+   * The body screen converts on the way in and on the way out.
    */
   weightGoals?: Partial<Record<PersonId, number>>
   tdee: TdeeProfile
+  /** Which unit weights are read in. Nothing stored changes when this does. */
   weightUnit: 'kg' | 'lbs'
   weekStartsOn: WeekStart
   /** Which language to show food and recipe names in. */
   foodNameLanguage: 'en' | 'ro' | 'hu'
-  /** 'system' follows the device; the other two override it in either direction. */
+  /**
+   * Light, dark, or whatever the device says.
+   *
+   * 'system' follows the device and is what a profile that has never been
+   * asked gets, which is every profile written before this existed. The other
+   * two override it in either direction, because "my phone is on dark and I
+   * want this app light" is a real preference and following the device
+   * blindly makes it unsayable.
+   */
+  theme?: Theme
   /** Little things Zig has noticed. See lib/moments.ts for why these are not points. */
   moments: Moment[]
   /**

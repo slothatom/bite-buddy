@@ -2423,3 +2423,61 @@ test.describe('the dietician, in English', () => {
     await expect(page.getByText('sparanghel · spárga', { exact: false })).toBeVisible()
   })
 })
+
+test.describe('after dark', () => {
+  /** The page ground, as the browser has actually painted it. */
+  const ground = (page: Page) =>
+    page.evaluate(() => getComputedStyle(document.body).backgroundColor)
+
+  test('follows the device when nobody has said otherwise', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await goto(page, '/')
+
+    // No attribute for the device default: following the device is a media
+    // query, and an attribute would sit above it in the cascade matching
+    // nothing at all.
+    await expect(page.locator('html')).not.toHaveAttribute('data-theme', /./)
+
+    // Dark by the only test that matters, which is what was painted. The
+    // ground is a warm near-black, so every channel is low and none is zero.
+    const painted = await ground(page)
+    const [r, g, b] = painted.match(/\d+/g)!.map(Number)
+    expect(Math.max(r, g, b)).toBeLessThan(60)
+  })
+
+  test('takes light over a device set to dark, when you ask it to', async ({ page }) => {
+    // The preference this exists for: a phone on dark and a person who wants
+    // this one app light. Following the device blindly makes that unsayable.
+    await page.emulateMedia({ colorScheme: 'dark' })
+    await goto(page, '/settings')
+
+    await page.getByLabel('Appearance').selectOption('light')
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+
+    const painted = await ground(page)
+    expect(Math.min(...painted.match(/\d+/g)!.map(Number))).toBeGreaterThan(220)
+  })
+
+  test('remembers it, and gets there before the first paint', async ({ page }) => {
+    await goto(page, '/settings')
+    await page.getByLabel('Appearance').selectOption('dark')
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+
+    // Reloaded, the attribute is on the document from the start rather than
+    // after React's first effect, which would be a frame of cream on every
+    // launch for somebody who chose dark.
+    await page.reload()
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+    expect(Math.max(...(await ground(page)).match(/\d+/g)!.map(Number))).toBeLessThan(60)
+  })
+
+  test('paints the strip above the page to match', async ({ page }) => {
+    await goto(page, '/settings')
+    await page.getByLabel('Appearance').selectOption('dark')
+
+    // The one piece of a phone screen a stylesheet cannot reach. Left alone it
+    // stayed brand purple around a dark app.
+    await expect(page.locator('meta[name="theme-color"]'))
+      .toHaveAttribute('content', '#17130f')
+  })
+})

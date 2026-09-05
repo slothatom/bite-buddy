@@ -585,7 +585,7 @@ function SlotRow({
           ))}
           <button
             onClick={onAdd}
-            className="inline-flex items-center min-h-11 px-1 -mx-1 text-xs font-semibold text-bite-700 hover:text-bite-800"
+            className="inline-flex items-center min-h-11 px-1 -mx-1 text-xs font-semibold text-bite-700 hover:underline"
           >
             + Add another
           </button>

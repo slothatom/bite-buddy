@@ -17,6 +17,7 @@ import { recipePerServing, reportPerServing, roundNutrients } from '../lib/nutri
 import { normaliseTerm } from '../lib/units'
 import { NutrientSummary, EmptyState, SourceLine } from '../components/ui'
 import RecipeEditor from '../components/recipes/RecipeEditor'
+import Photo from '../components/recipes/Photo'
 import {
   RECIPE_GROUPS, GROUP_LABELS, GROUP_BLURBS,
   groupsOf, groupForTime, groupVariants, variantLabel,
@@ -320,7 +321,7 @@ export default function Recipes() {
                     aria-pressed={on}
                     title={ready ? LENSES[l].rule : lensBlocker(l).why}
                     className={`shrink-0 whitespace-nowrap ${
-                      on ? 'chip bg-teal-700 text-white border border-teal-700'
+                      on ? 'chip bg-teal-800 text-white border border-teal-800'
                         : ready ? 'chip-off' : 'chip-off text-ink-500'
                     }`}
                   >
@@ -347,7 +348,7 @@ export default function Recipes() {
           <div className="flex flex-wrap items-center gap-1.5">
             <button
               onClick={() => setFavesOnly((v) => !v)}
-              className={favesOnly ? 'chip bg-coral-700 text-white border border-coral-700' : 'chip-off'}
+              className={favesOnly ? 'chip bg-coral-800 text-white border border-coral-800' : 'chip-off'}
             >
               <Star size={12} className={favesOnly ? 'fill-current' : ''} /> Favourites
             </button>
@@ -539,7 +540,18 @@ function RecipeCard({
       </button>
       <button onClick={onOpen} data-recipe-card className="block w-full min-w-0 text-left">
         <span className="flex items-start gap-3 pr-10 min-w-0">
-          <span className="text-2xl leading-none shrink-0">{lead.emoji}</span>
+          {/* The photograph where there is one, the emoji where there is not.
+              Both, side by side, would be two pictures of the same dish
+              competing for the same corner. */}
+          {lead.photo ? (
+            <Photo
+              path={lead.photo}
+              alt={card.name}
+              className="w-12 h-12 rounded-xl shrink-0"
+            />
+          ) : (
+            <span className="text-2xl leading-none shrink-0">{lead.emoji}</span>
+          )}
           <span className="flex-1 min-w-0">
             <span className="block font-semibold text-ink-900 text-sm leading-snug">{card.name}</span>
             {lead.sourceLine ? (
@@ -626,7 +638,7 @@ function TidyBanner({ groups, onTidy }: { groups: RecipeVariants[]; onTidy: () =
     // Deliberately not `.card`: a card on this screen means a recipe, and this
     // is a notice about them.
     <div className="rounded-2xl border border-bite-200 bg-bite-50 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-      <Combine size={20} className="text-bite-600 shrink-0" />
+      <Combine size={20} className="text-bite-700 shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-ink-900">
           {groups.length} {groups.length === 1 ? 'dish is' : 'dishes are'} written down more than once
@@ -835,6 +847,14 @@ function RecipeDetail({
             <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
           </div>
         </header>
+
+        {/* Full width and under the header rather than inside it: a picture of
+            a dinner is the one thing on this sheet worth looking at before
+            reading, and squeezing it into the title row would make it a
+            thumbnail of something already named. */}
+        {recipe.photo && (
+          <Photo path={recipe.photo} alt={card.name} className="w-full aspect-video" />
+        )}
 
         <div className="p-5 space-y-5">
           {/* The plans write the same dish more than once, sometimes at a
@@ -1066,7 +1086,7 @@ function RecipeDetail({
               <ol className="space-y-2">
                 {recipe.steps.map((s, i) => (
                   <li key={s.id} className="flex gap-3 text-sm text-ink-900">
-                    <span className="shrink-0 w-5 h-5 rounded-full bg-bite-100 text-bite-800 text-xs font-bold grid place-items-center">
+                    <span className="shrink-0 w-5 h-5 rounded-full bg-bite-100 text-bite-700 text-xs font-bold grid place-items-center">
                       {i + 1}
                     </span>
                     <span className="min-w-0">{s.instruction}</span>

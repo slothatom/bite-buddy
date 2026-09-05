@@ -16,6 +16,9 @@ import { weekEaten } from '../lib/nutrition'
 import { scoreWeek, scoreGaps, servingCount, IMPLAUSIBLE_RATIO } from '../lib/mediterranean'
 import { STATUS_STYLES, targetStatus } from '../lib/status'
 import { EmptyState, SectionHeading } from '../components/ui'
+import { useMovementAcross } from '../store/useActivityStore'
+import type { DayMovement } from '../lib/movement'
+import { fromKg, inUnit, round1, toKg } from '../lib/weight'
 
 type Tab = 'week' | 'mediterranean' | 'body'
 
@@ -75,6 +78,9 @@ function WeekTab() {
   // summed the plan while the planner and Home reported what had been ticked,
   // so the app recorded the truth in one place and reported the intention here.
   const { days, recorded, planned: stillPlanned } = weekEaten(weekDates, plan, ctx)
+  // What was done as well as what was eaten. Logged on the Movement screen for
+  // months and never once mentioned on a screen about the week.
+  const moved = useMovementAcross(viewingAs, weekDates)
   const withFood = days.filter((d) => d.nutrients.calories > 0)
   const peak = Math.max(targets.calories, ...days.map((d) => d.nutrients.calories), 1)
 
@@ -104,6 +110,8 @@ function WeekTab() {
           {' · '}target {targets.calories}
         </p>
       </div>
+
+      <MovementWeek moved={moved} />
 
       <section>
         <SectionHeading>Calories by day</SectionHeading>
@@ -173,6 +181,78 @@ function WeekTab() {
 }
 
 /** Servings against the guide's goals, which is what the diet is actually about. */
+/**
+ * The week's movement, next to the week's food.
+ *
+ * Days rather than a total, because a week with four half hours in it and a
+ * week with one long Sunday are different weeks and one number cannot tell
+ * them apart. Nothing is subtracted from the food: see lib/movement.ts for why
+ * the target stays where the dietician put it.
+ */
+function MovementWeek({ moved }: { moved: { date: string; movement: DayMovement }[] }) {
+  const active = moved.filter((d) => d.movement.sessions > 0)
+  // Nothing logged is nothing to show. A card reporting zero of everything is
+  // a scolding rather than a summary.
+  if (!active.length) return null
+
+  const minutes = active.reduce((n, d) => n + d.movement.minutes, 0)
+  // Only the days that could be costed. Summing a week where one day has no
+  // weight behind it and calling the result the week's total would report a
+  // smaller number than the week actually was, without saying so.
+  const costed = active.filter((d) => d.movement.kcal != null)
+  const kcal = costed.reduce((n, d) => n + (d.movement.kcal ?? 0), 0)
+
+  return (
+    <section>
+      <SectionHeading>Movement</SectionHeading>
+      <div className="card p-5 space-y-3">
+        <p className="text-sm text-ink-700">
+          <strong className="font-mono text-ink-900">{active.length}</strong>
+          {active.length === 1 ? ' day' : ' days'} with something logged
+          {' · '}
+          <strong className="font-mono text-ink-900">{minutes}</strong> min
+          {costed.length > 0 && (
+            <> · about <strong className="font-mono text-ink-900">
+              {Math.round(kcal).toLocaleString()}
+            </strong> kcal</>
+          )}
+        </p>
+
+        {/* A bar per day of the week, in minutes. Same seven columns as the
+            calorie chart above it, so the two read against each other. */}
+        <div className="flex items-end gap-1 h-16" aria-hidden="true">
+          {moved.map(({ date, movement }) => {
+            const tallest = Math.max(...moved.map((d) => d.movement.minutes), 1)
+            return (
+              <div key={date} className="flex-1 flex flex-col justify-end h-full">
+                <div
+                  className={movement.minutes > 0 ? 'bg-teal-500 rounded-t-sm' : 'bg-border-200 rounded-t-sm'}
+                  style={{ height: `${Math.max(2, (movement.minutes / tallest) * 100)}%` }}
+                />
+              </div>
+            )
+          })}
+        </div>
+        <div className="flex gap-1 text-[10px] font-bold uppercase text-ink-500">
+          {moved.map(({ date, movement }) => (
+            <span key={date} className="flex-1 text-center">
+              {movement.minutes > 0 ? `${movement.minutes}m` : '·'}
+            </span>
+          ))}
+        </div>
+
+        <p className="text-xs text-ink-500">
+          {costed.length < active.length
+            ? 'Some days have no weight recorded, so they carry minutes but no calorie estimate. '
+            : ''}
+          Calories here are an estimate from a table of averages, and none of it is taken off your
+          food target: the plans were written for two people who move.
+        </p>
+      </div>
+    </section>
+  )
+}
+
 function MediterraneanTab() {
   const plan = useMealPlanStore((s) => s.plan)
   const weekDates = useThisWeek()
@@ -306,13 +386,33 @@ function BodyTab() {
   const unassigned = useUnassignedCount()
 
   const weights = useWeightFor(who)
-  const goal = profile.weightGoals?.[who]
   const measurements = useMeasurementsFor(who)
+
+  /*
+   * Everything on this screen, in the unit you asked to read in.
+   *
+   * The store keeps what you typed and the unit you typed it in, and this is
+   * where that becomes a number on a page. Before the setting was settable it
+   * did not matter: every entry said kg and so did the profile, so printing
+   * the stored figure with the profile's label next to it happened to be
+   * right. It stops being right the moment somebody switches, so the reading
+   * goes through lib/weight.ts and the store is left alone.
+   *
+   * Goals are held in kilograms whatever the reading unit, because a goal is a
+   * bare number with no unit of its own to remember.
+   */
+  const unit = profile.weightUnit
+  const shown = useMemo(() => weights.map((w) => inUnit(w, unit)), [weights, unit])
+  const goalKg = profile.weightGoals?.[who]
+  const goal = goalKg == null ? undefined : round1(fromKg(goalKg, unit))
 
   const [value, setValue] = useState('')
   const [sizes, setSizes] = useState<Partial<Record<MeasurementKey, string>>>({})
 
-  const change = weights.length > 1 ? weights[weights.length - 1].weight - weights[0].weight : 0
+  // Both ends in the same unit before subtracting: a first entry in pounds and
+  // a latest in kilograms differenced raw is not a change, it is a subtraction
+  // of two different things.
+  const change = shown.length > 1 ? round1(shown[shown.length - 1] - shown[0]) : 0
   const anySize = MEASUREMENT_KEYS.some((k) => Number(sizes[k]))
 
   return (
@@ -346,7 +446,7 @@ function BodyTab() {
 
       {/* ─── Weight ──────────────────────────────────────────────────────── */}
       <div className="card p-4">
-        <label className="label">Log today's weight ({profile.weightUnit})</label>
+        <label className="label">Log today's weight ({unit})</label>
         <div className="flex gap-2">
           <input
             type="number" step="0.1" className="input" placeholder="e.g. 68.4"
@@ -361,7 +461,11 @@ function BodyTab() {
                 id: `${Date.now()}`,
                 date: today(),
                 weight: Number(value),
-                unit: profile.weightUnit,
+                // Stored as typed, in the unit it was typed in. Converting on
+                // the way in would round somebody's 68.4 into 150.8 and back
+                // into 68.399, and the entry would drift every time the
+                // setting was flipped.
+                unit,
                 memberId: who,
               })
               setValue('')
@@ -380,19 +484,19 @@ function BodyTab() {
             <p className="text-xs font-bold uppercase tracking-wide text-ink-500">Since you started</p>
             <p className={`text-3xl font-extrabold font-mono ${change <= 0 ? 'text-bite-700' : 'text-coral-600'}`}>
               {change > 0 ? '+' : ''}{change.toFixed(1)}
-              <span className="text-base text-ink-500 font-semibold ml-1">{profile.weightUnit}</span>
+              <span className="text-base text-ink-500 font-semibold ml-1">{unit}</span>
             </p>
             {goal != null && weights.length > 0 && (
               <p className="text-xs text-ink-500 mt-1">
                 {(() => {
-                  const togo = weights[weights.length - 1].weight - goal
+                  const togo = shown[shown.length - 1] - (goal ?? 0)
                   return Math.abs(togo) < 0.05
                     ? 'At your goal.'
-                    : `${Math.abs(togo).toFixed(1)} ${profile.weightUnit} ${togo > 0 ? 'to go' : 'below your goal'}.`
+                    : `${Math.abs(togo).toFixed(1)} ${unit} ${togo > 0 ? 'to go' : 'below your goal'}.`
                 })()}
               </p>
             )}
-            <Sparkline values={weights.map((w) => w.weight)} goal={goal} />
+            <Sparkline values={shown} goal={goal} />
 
             <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border-100">
               <label className="label mb-0 shrink-0" htmlFor="goal">Aiming for</label>
@@ -401,9 +505,13 @@ function BodyTab() {
                 type="number" min={0} step={0.1} className="input w-24 px-2"
                 placeholder="none"
                 value={goal ?? ''}
-                onChange={(e) => setWeightGoal(who, e.target.value ? Number(e.target.value) : undefined)}
+                // Typed in whatever you read in, held in kilograms.
+                onChange={(e) => setWeightGoal(
+                  who,
+                  e.target.value ? toKg(Number(e.target.value), unit) : undefined,
+                )}
               />
-              <span className="text-sm text-ink-500">{profile.weightUnit}</span>
+              <span className="text-sm text-ink-500">{unit}</span>
             </div>
           </div>
 
@@ -412,7 +520,15 @@ function BodyTab() {
               <div key={w.id} className="flex items-center justify-between px-4 py-2.5">
                 <span className="text-sm text-ink-700">{formatDay(w.date)}</span>
                 <span className="flex items-center gap-3">
-                  <span className="text-sm font-mono font-semibold text-ink-900">{w.weight} {w.unit}</span>
+                  <span className="text-sm font-mono font-semibold text-ink-900">
+                  {inUnit(w, unit)} {unit}
+                  {/* What you actually typed, where it was another unit. The
+                      converted figure is the comparable one and the typed one
+                      is the true one, and dropping either loses something. */}
+                  {w.unit !== unit && (
+                    <span className="ml-1.5 font-normal text-ink-500">({w.weight} {w.unit})</span>
+                  )}
+                </span>
                   <button className="text-xs text-ink-500 hover:text-coral-600" onClick={() => removeWeightEntry(w.id)}>
                     Remove
                   </button>

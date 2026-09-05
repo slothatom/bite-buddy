@@ -3,6 +3,9 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import type { SleepEntry, StepEntry, Workout } from '../types'
+import { dayMovement, movementAcross, type DayMovement } from '../lib/movement'
+import { latestKg } from '../lib/weight'
+import { useWeightFor } from './useBodyStore'
 
 /**
  * Training and sleep, per person.
@@ -97,6 +100,36 @@ export function useWorkoutsFor(personId: string): Workout[] {
     () => workouts.filter((w) => w.personId === personId).sort(byDate),
     [workouts, personId],
   )
+}
+
+/**
+ * What one person's movement came to on one day.
+ *
+ * Here rather than in each screen, because Home, the planner and Progress were
+ * about to ask the same question three ways, and the weight it is costed at
+ * has to be that person's own: a household where one of you has never stepped
+ * on the scales must not cost the other's hour of cycling at their partner's
+ * weight.
+ */
+export function useDayMovement(personId: string, date: string): DayMovement {
+  const workouts = useWorkoutsFor(personId)
+  const weights = useWeightFor(personId)
+  const kg = useMemo(() => latestKg(weights), [weights])
+  return useMemo(() => dayMovement(workouts, date, kg), [workouts, date, kg])
+}
+
+/** The same across a run of days, for the week summaries. */
+export function useMovementAcross(
+  personId: string, dates: string[],
+): { date: string; movement: DayMovement }[] {
+  const workouts = useWorkoutsFor(personId)
+  const weights = useWeightFor(personId)
+  const kg = useMemo(() => latestKg(weights), [weights])
+  // Joined rather than passed as an array: a fresh array every render would
+  // rebuild this on every keystroke anywhere on the screen.
+  const key = dates.join()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => movementAcross(workouts, dates, kg), [workouts, key, kg])
 }
 
 export function useSleepFor(personId: string): SleepEntry[] {

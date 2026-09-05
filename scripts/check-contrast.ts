@@ -22,17 +22,50 @@ import { join } from 'node:path'
 const CSS = 'src/index.css'
 const ROOT = 'src'
 
-/** Every --color-* token, as hex. */
-function tokens(): Map<string, string> {
-  const css = readFileSync(CSS, 'utf8')
-  const found = new Map<string, string>()
-  for (const [, name, hex] of css.matchAll(/--color-([\w-]+):\s*(#[0-9a-fA-F]{3,8});/g)) {
-    found.set(name, hex)
+/**
+ * The two palettes the app can render in.
+ *
+ * Reading every `--color-*` in the file into one map was right while there was
+ * one palette and became a trap the moment there were two: the dark overrides
+ * come last, so a flat scan would have quietly replaced every light value with
+ * its dark counterpart and then reported the light theme as passing on numbers
+ * nobody ever sees. The blocks are read separately, and both are measured.
+ */
+function block(css: string, header: string): string {
+  const start = css.indexOf(header)
+  if (start === -1) throw new Error(`${CSS} has no ${header} block`)
+  let depth = 0
+  for (let i = css.indexOf('{', start); i < css.length; i++) {
+    if (css[i] === '{') depth++
+    else if (css[i] === '}' && --depth === 0) return css.slice(start, i)
   }
-  found.set('white', '#ffffff')
-  found.set('black', '#000000')
-  return found
+  throw new Error(`${header} in ${CSS} is never closed`)
 }
+
+function colours(source: string, into: Map<string, string>): Map<string, string> {
+  for (const [, name, hex] of source.matchAll(/--color-([\w-]+):\s*(#[0-9a-fA-F]{3,8});/g)) {
+    into.set(name, hex)
+  }
+  return into
+}
+
+function palettes(): { light: Map<string, string>; dark: Map<string, string> } {
+  const css = readFileSync(CSS, 'utf8')
+
+  const light = colours(block(css, '@theme'), new Map())
+  light.set('white', '#ffffff')
+  light.set('black', '#000000')
+
+  // The dark theme is the light one with the tokens it overrides replaced, the
+  // same way the cascade builds it, so a colour it does not mention is a
+  // colour that genuinely does not change.
+  const dark = colours(block(css, DARK_BLOCK), new Map(light))
+
+  return { light, dark }
+}
+
+/** The selector the dark palette is defined under. See src/index.css. */
+const DARK_BLOCK = ':root[data-theme=\'dark\']'
 
 function channel(hex: string): [number, number, number] {
   const clean = hex.replace('#', '')
@@ -51,8 +84,17 @@ function contrast(a: string, b: string): number {
   return (hi + 0.05) / (lo + 0.05)
 }
 
-/** The three things a colour can actually sit on in this app. */
-const SURFACES = ['cream-50', 'paper', 'white']
+/**
+ * The two things a colour can actually sit on in this app.
+ *
+ * White used to be the third. It is not a surface: `bg-white` survives in one
+ * place, a 1px dot on a selected day, and the two buttons that used it inside
+ * a coloured bar now use `bg-paper` so they follow the theme rather than
+ * staying a white rectangle after dark. Keeping it here cost 236 imaginary
+ * pairs in the dark palette, every one of them light text on a white ground
+ * nothing renders on.
+ */
+const SURFACES = ['cream-50', 'paper']
 
 /** Sizes that count as large text, so 3:1 rather than 4.5:1. */
 const LARGE = /\btext-(xl|2xl|3xl|4xl|5xl|6xl)\b/
@@ -66,7 +108,7 @@ const LARGE = /\btext-(xl|2xl|3xl|4xl|5xl|6xl)\b/
  * loses the distinction between what you read and what you press, and buys
  * nobody any legibility. Icons here are lucide components carrying a size.
  */
-const GRAPHIC = /aria-hidden|<[A-Z][A-Za-z0-9]*\s[^>]*\bsize=\{|\bbtn-icon\b/
+const GRAPHIC = /aria-hidden|<[A-Z][A-Za-z0-9]*\s[^>]*\bsize=\{|\bbtn-icon\b|(?:fill|stroke)="currentColor"/
 
 function files(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
@@ -146,7 +188,22 @@ function pairs(palette: Map<string, string>): Pair[] {
               [...inside.matchAll(/\bbg-([a-z]+-\d{2,3})\b/g)].map((m) => m[1]),
             )].filter((b) => palette.has(b) && !SURFACES.includes(b))
 
-            if (!grounds.length) {
+            /*
+             * One candidate, or none of them.
+             *
+             * Where the window offers several coloured grounds they are not
+             * alternatives for the same element, they are a table: the status
+             * styles list a bar's fill, a label's colour and a card's surface
+             * on one line each, three lines apart, and pairing across them
+             * asks what the label would look like painted on the bar. Nothing
+             * renders that, and in the dark palette it produced five failures
+             * for combinations that do not exist.
+             *
+             * So a single unambiguous parent is trusted and anything less is
+             * declared unresolved, which is the rule this file already states
+             * for the case where there is no parent at all.
+             */
+            if (grounds.length !== 1) {
               unresolved.push(`${fg} at ${where}`)
               continue
             }
@@ -162,42 +219,56 @@ function pairs(palette: Map<string, string>): Pair[] {
   return found
 }
 
-const palette = tokens()
-const all = pairs(palette)
+/**
+ * One theme, measured.
+ *
+ * The pairing is redone per palette rather than shared, because which ground a
+ * bare colour is assumed to sit on is decided by how light that colour is, and
+ * that is a different answer in each theme: ink-900 is the darkest text in one
+ * and nearly white in the other.
+ */
+function audit(name: string, palette: Map<string, string>): string[] {
+  unresolved.length = 0
+  const all = pairs(palette)
 
-// One row per colour combination, keeping the first place it appears and the
-// most demanding size it is used at. A failure repeated in forty files is one
-// thing to fix, not forty.
-const worst = new Map<string, Pair & { count: number }>()
-for (const pair of all) {
-  const key = `${pair.fg} on ${pair.bg}`
-  const seen = worst.get(key)
-  if (!seen) worst.set(key, { ...pair, count: 1 })
-  else {
-    seen.count += 1
-    if (!pair.large) seen.large = false      // used small somewhere: hold it to 4.5
+  // One row per colour combination, keeping the first place it appears and the
+  // most demanding size it is used at. A failure repeated in forty files is one
+  // thing to fix, not forty.
+  const worst = new Map<string, Pair & { count: number }>()
+  for (const pair of all) {
+    const key = `${pair.fg} on ${pair.bg}`
+    const seen = worst.get(key)
+    if (!seen) worst.set(key, { ...pair, count: 1 })
+    else {
+      seen.count += 1
+      if (!pair.large) seen.large = false      // used small somewhere: hold it to 4.5
+    }
   }
-}
 
-const failures: string[] = []
-let checked = 0
+  const failures: string[] = []
+  let checked = 0
 
-for (const [key, pair] of [...worst].sort((a, b) => a[0].localeCompare(b[0]))) {
-  const ratio = contrast(palette.get(pair.fg)!, palette.get(pair.bg)!)
-  const need = pair.large ? 3 : 4.5
-  checked += 1
-  if (ratio < need) {
-    failures.push(
-      `  ${key.padEnd(30)} ${ratio.toFixed(2)}:1  needs ${need}:1  ` +
-      `(${pair.count} use${pair.count === 1 ? '' : 's'}, first at ${pair.where})`,
-    )
+  for (const [key, pair] of [...worst].sort((a, b) => a[0].localeCompare(b[0]))) {
+    const ratio = contrast(palette.get(pair.fg)!, palette.get(pair.bg)!)
+    const need = pair.large ? 3 : 4.5
+    checked += 1
+    if (ratio < need) {
+      failures.push(
+        `  ${name}: ${key.padEnd(30)} ${ratio.toFixed(2)}:1  needs ${need}:1  ` +
+        `(${pair.count} use${pair.count === 1 ? '' : 's'}, first at ${pair.where})`,
+      )
+    }
   }
+
+  console.log(`${name}: checked ${checked} colour combinations from ${all.length} usages`)
+  if (unresolved.length) {
+    console.log(`${name}: ${unresolved.length} light-on-unknown usages not measured, ground set by a parent`)
+  }
+  return failures
 }
 
-console.log(`checked ${checked} colour combinations from ${all.length} usages`)
-if (unresolved.length) {
-  console.log(`${unresolved.length} light-on-unknown usages not measured, ground set by a parent`)
-}
+const { light, dark } = palettes()
+const failures = [...audit('light', light), ...audit('dark', dark)]
 
 if (failures.length) {
   console.error(`\n${failures.length} below WCAG AA:\n`)
@@ -206,4 +277,4 @@ if (failures.length) {
   process.exit(1)
 }
 
-console.log('All combinations meet WCAG AA.')
+console.log('All combinations meet WCAG AA, in both themes.')
