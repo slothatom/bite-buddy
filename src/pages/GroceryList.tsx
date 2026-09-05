@@ -82,6 +82,7 @@ export default function GroceryList() {
   const checked = groceryItems.filter((i) => i.checked).length
   const typed = groceryItems.filter((i) => i.manual)
 
+
   /**
    * Takes lines off the list and offers them back for a few seconds.
    *
@@ -97,6 +98,20 @@ export default function GroceryList() {
     offerUndo(what, () => restoreGroceryItems(before))
   }
   const plannedMeals = picked.reduce((n, d) => n + (mealsByDate.get(d) ?? 0), 0)
+  /**
+   * Why the button is grey, when the button is grey.
+   *
+   * The list only offers days that are still ahead, which is right: nobody
+   * shops backwards. But a plan that is entirely in the past then produced
+   * "Ready to build from 0 meals" and a disabled button with no explanation
+   * and no way out, which is a worse answer than the bug it replaced. The
+   * days are there; the food is behind you.
+   */
+  const behind = useMemo(
+    () => plan.some((d) => d.date < today() && d.meals.length),
+    [plan],
+  )
+  const nothingToBuild = !plannedMeals && (behind ? 'behind' : 'nothing')
 
   function build() {
     generateGroceryList(ctx, { dates: picked, pantry })
@@ -113,7 +128,9 @@ export default function GroceryList() {
             <p className="text-sm text-ink-700">
               {groceryItems.length
                 ? `${checked} of ${groceryItems.length} picked up`
-                : `Ready to build from ${plannedMeals} ${plannedMeals === 1 ? 'meal' : 'meals'}.`}
+                : nothingToBuild === 'behind'
+                  ? 'Everything planned is on a day that has gone.'
+                  : `Ready to build from ${plannedMeals} ${plannedMeals === 1 ? 'meal' : 'meals'}.`}
             </p>
           </div>
           <button className="btn-primary shrink-0" onClick={build} disabled={!picked.length}>
@@ -214,7 +231,9 @@ export default function GroceryList() {
           <EmptyState title="Nothing on the list yet">
             {plannedMeals
               ? 'Pick the days you are shopping for, then build it.'
-              : 'Plan some meals first, then build the list from them, or type a line in above.'}
+              : nothingToBuild === 'behind'
+                ? 'The meals you have planned are on days that have already gone, and a shopping list is for days ahead. Plan something for this week, or type a line in above.'
+                : 'Plan some meals first, then build the list from them, or type a line in above.'}
           </EmptyState>
         ) : (
           // Two columns from lg, laid out as masonry so a category with three

@@ -19,6 +19,7 @@ import { targetStatus, STATUS_STYLES } from '../lib/status'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import type { MealSlot } from '../types'
 import AddEntryModal from '../components/planner/AddEntryModal'
+import { slotNow } from '../lib/whenDates'
 import { CalorieRing, SectionHeading } from '../components/ui'
 import { isConfigured } from '../lib/supabase'
 import Zig from '../components/brand/Mascot'
@@ -49,7 +50,9 @@ export default function Home() {
   const weekDates = useThisWeek()
   // Which meal an unplanned bite gets filed under, guessed from the clock and
   // correctable in the sheet.
-  const [ateSlot, setAteSlot] = useState<MealSlot | null>(null)
+  // Which meal an unplanned bite gets filed under, and on which day. Guessed
+  // from the clock, stated on the sheet, and correctable there.
+  const [ate, setAte] = useState<{ date: string; slot: MealSlot } | null>(null)
   const recipes = useRecipes()
   const sessions = useCookStore((s) => s.sessions)
   const { profile } = useUserStore()
@@ -275,7 +278,7 @@ export default function Home() {
                 <Link to="/plan" className="btn-secondary">
                   Open the planner <ArrowRight size={15} />
                 </Link>
-                <button className="btn-secondary" onClick={() => setAteSlot(slotNow())}>
+                <button className="btn-secondary" onClick={() => setAte({ date: todayDate(), slot: slotNow() })}>
                   <Utensils size={15} /> I ate something else
                 </button>
               </div>
@@ -288,7 +291,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 <Link to="/plan" className="btn-primary">Plan today</Link>
-                <button className="btn-secondary" onClick={() => setAteSlot(slotNow())}>
+                <button className="btn-secondary" onClick={() => setAte({ date: todayDate(), slot: slotNow() })}>
                   <Utensils size={15} /> I ate something
                 </button>
                 <Link to="/settings/history" className="btn-secondary">Load a week</Link>
@@ -417,34 +420,21 @@ export default function Home() {
         )}
       </div>
 
-      {ateSlot && (
+      {ate && (
         <AddEntryModal
-          date={todayDate()}
-          slot={ateSlot}
+          date={ate.date}
+          slot={ate.slot}
           mode="ate"
-          onSlotChange={setAteSlot}
-          onClose={() => setAteSlot(null)}
-          onAdd={(entry) => recordEaten(todayDate(), ateSlot, entry)}
+          onSlotChange={(slot) => setAte({ ...ate, slot })}
+          onDateChange={(date) => setAte({ ...ate, date })}
+          onClose={() => setAte(null)}
+          onAdd={(entry) => recordEaten(ate.date, ate.slot, entry)}
         />
       )}
     </div>
   )
 }
 
-/**
- * Which meal it probably was, from the clock.
- *
- * A guess, and said as one: the sheet shows the slot and lets it be changed.
- * The alternative was making somebody pick before they can even search, which
- * is a question the clock can usually answer.
- */
-function slotNow(hour = new Date().getHours()): MealSlot {
-  if (hour < 10) return 'breakfast'
-  if (hour < 12) return 'snack1'
-  if (hour < 15) return 'lunch'
-  if (hour < 17) return 'snack2'
-  return 'dinner'
-}
 
 /**
  * One number, big enough to read while walking past.

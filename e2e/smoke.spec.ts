@@ -1165,7 +1165,8 @@ test.describe('rearranging the week', () => {
     expect(moved.length, 'no lunch to move').toBeGreaterThan(0)
 
     await lunch.getByRole('button', { name: 'Move or copy meal' }).first().click()
-    await page.getByLabel('Slot').selectOption('dinner')
+    // One shared picker now, the same one every other screen asks with.
+    await page.getByRole('button', { name: 'Dinner', exact: true }).click()
     await page.getByRole('button', { name: 'Move it' }).click()
 
     // Same day, different slot: it left lunch and arrived at dinner.
@@ -1184,7 +1185,7 @@ test.describe('rearranging the week', () => {
     const name = (await breakfast.locator('[data-entry-name]').first().textContent())?.trim() ?? ''
 
     await breakfast.getByRole('button', { name: 'Move or copy meal' }).first().click()
-    await page.getByLabel('Slot').selectOption('snack1')
+    await page.getByRole('button', { name: 'Snack 1', exact: true }).click()
     await page.getByRole('button', { name: 'Copy it' }).click()
 
     await expect(breakfast.locator('[data-entry-name]').filter({ hasText: name })).toBeVisible()
@@ -1843,6 +1844,30 @@ test.describe('the week you are actually in', () => {
     await expect(page.getByRole('button', { name: longDate(todayIso()) })).toBeVisible()
   })
 
+  test('one picker asks the same question everywhere', async ({ page }) => {
+    // Four of these disagreed about everything: 42 days including ones long
+    // gone, the current week, only days before today, and the next eight.
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /^Load$/ }).first().click()
+    await goto(page, '/plan')
+    await page.locator('button[aria-pressed]').filter({ hasText: /\d\d\d/ }).first().click()
+
+    const days = () => page.locator('[data-when-day]').count()
+
+    // Moving a meal.
+    await page.getByRole('button', { name: 'Move or copy meal' }).first().click()
+    const moving = await days()
+    expect(moving, 'the picker offered nothing').toBeGreaterThan(20)
+    await page.getByRole('button', { name: 'Cancel' }).click()
+
+    // Copying a whole day: the same window, and it now confirms rather than
+    // acting on the first tap.
+    await page.getByRole('button', { name: /^Copy day to/ }).click()
+    expect(await days()).toBe(moving)
+    await expect(page.getByRole('button', { name: 'Copy it there' })).toBeDisabled()
+    await page.getByRole('button', { name: 'Cancel' }).click()
+  })
+
   test('the plus button means today, wherever it is pressed', async ({ page }, testInfo) => {
     // The bar is the phone layout only; on a laptop there is no centre button.
     test.skip(testInfo.project.name !== 'mobile', 'the bottom bar is a phone thing')
@@ -1966,10 +1991,13 @@ test.describe('what actually happened', () => {
     const sheet = page.getByRole('heading', { name: /^Ate this for / })
     await expect(sheet).toBeVisible()
 
-    // The clock guessed a meal, and the guess can be corrected before anything
-    // is written.
+    // The sheet says where this is going before you have chosen what, and the
+    // clock's guess can be corrected there.
+    await expect(page.getByText(/, today$/)).toBeVisible()
+    await page.getByRole('button', { name: 'Change' }).click()
     await page.getByRole('button', { name: 'Snack 1', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Ate this for snack 1' })).toBeVisible()
+    await page.getByRole('button', { name: 'Done' }).click()
 
     await page.getByRole('button', { name: 'foods', exact: true }).click()
     await page.getByPlaceholder('What did you have?').fill('apple')

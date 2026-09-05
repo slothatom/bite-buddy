@@ -30,6 +30,8 @@ import WeekTemplates from '../components/planner/WeekTemplates'
 import type { Proposal } from '../lib/autoPlan'
 import { baseName } from '../lib/recipeGroups'
 import { entriesName, entryName } from '../lib/entryLabel'
+import { slotNow } from '../lib/whenDates'
+import WhenPicker from '../components/planner/WhenPicker'
 import { offerUndo } from '../store/useUndo'
 
 /**
@@ -214,7 +216,10 @@ export default function Planner() {
   const quickMeals = byDate.get(quickDay)?.meals ?? []
   const filledSlots = new Set(quickMeals.map((m) => m.slot))
   const openAdd = adding ?? (quickAdd
-    ? { date: quickDay, slot: MEAL_SLOTS.find((s) => !filledSlots.has(s)) ?? 'breakfast' }
+    // The clock rather than the first free slot. "The first slot with nothing
+    // in it" is breakfast on an empty day whatever the hour, which is how the
+    // centre button came to always say Breakfast.
+    ? { date: quickDay, slot: filledSlots.has(slotNow()) ? MEAL_SLOTS.find((s) => !filledSlots.has(s)) ?? slotNow() : slotNow() }
     : null)
 
   /**
@@ -455,6 +460,8 @@ export default function Planner() {
         <AddEntryModal
           date={openAdd.date}
           slot={openAdd.slot}
+          onSlotChange={(slot) => setAdding({ date: openAdd.date, slot })}
+          onDateChange={(date) => setAdding({ date, slot: openAdd.slot })}
           onClose={closeAdd}
           onAdd={(entry: Component) => addEntryTakingPortions(openAdd.date, openAdd.slot, entry)}
         />
@@ -471,7 +478,6 @@ export default function Planner() {
       {moving && (
         <MoveMealDialog
           from={moving}
-          dates={dates}
           onClose={() => setMoving(null)}
           onMove={(date, slot) => { moveMeal(moving.date, moving.mealId, date, slot); setMoving(null) }}
           onCopy={(date, slot) => { duplicateMeal(moving.date, moving.mealId, date, slot); setMoving(null) }}
@@ -498,7 +504,6 @@ export default function Planner() {
       {copyFrom && (
         <CopyDayDialog
           from={copyFrom}
-          dates={dates}
           onClose={() => setCopyFrom(null)}
           onPick={(to) => { copyDay(copyFrom, to); setCopyFrom(null) }}
         />
@@ -939,10 +944,9 @@ function EntryLine({
  * mean picking a destination twice to find out you wanted the other one.
  */
 function MoveMealDialog({
-  from, dates, onClose, onMove, onCopy,
+  from, onClose, onMove, onCopy,
 }: {
   from: { date: string; mealId: string }
-  dates: string[]
   onClose: () => void
   onMove: (date: string, slot: MealSlot) => void
   onCopy: (date: string, slot: MealSlot) => void
@@ -951,6 +955,10 @@ function MoveMealDialog({
   const meal = plan.find((d) => d.date === from.date)?.meals.find((m) => m.id === from.mealId)
   const [date, setDate] = useState(from.date)
   const [slot, setSlot] = useState<MealSlot>(meal?.slot ?? 'lunch')
+  const busy = useMemo(
+    () => new Set(plan.filter((d) => d.meals.length).map((d) => d.date)),
+    [plan],
+  )
 
   if (!meal) return null
   const unchanged = date === from.date && slot === meal.slot
@@ -964,31 +972,8 @@ function MoveMealDialog({
         <h3 className="font-bold text-ink-900 mb-1">Move or copy this meal</h3>
         <p className="text-sm text-ink-700 mb-4">Pick where it should go.</p>
 
-        <label className="label" htmlFor="move-slot">Slot</label>
-        <select
-          id="move-slot"
-          className="input mb-4"
-          value={slot}
-          onChange={(e) => setSlot(e.target.value as MealSlot)}
-        >
-          {MEAL_SLOTS.map((s) => (
-            <option key={s} value={s}>{SLOT_LABELS[s]}</option>
-          ))}
-        </select>
-
-        <p className="label">Day</p>
-        <div className="space-y-1 mb-4">
-          {dates.map((d) => (
-            <button
-              key={d}
-              onClick={() => setDate(d)}
-              className={`w-full text-left px-3 py-2 rounded-xl text-sm ${
-                d === date ? 'bg-bite-50 text-bite-700 font-semibold' : 'text-ink-900 hover:bg-cream-50'
-              }`}
-            >
-              {formatDate(d)}{d === from.date ? ' (where it is now)' : ''}
-            </button>
-          ))}
+        <div className="mb-5">
+          <WhenPicker date={date} onDate={setDate} slot={slot} onSlot={setSlot} busy={busy} />
         </div>
 
         <div className="flex gap-2">
@@ -1008,35 +993,66 @@ function MoveMealDialog({
   )
 }
 
+/**
+ * Copying a whole day onto another one.
+ *
+ * The same picker as everything else, without the slot, because a day carries
+ * its own slots with it. It used to be a list of every date in the range, one
+ * per row, which in month view was 42 rows of 1,452 px inside a 1,110 px
+ * overlay: the heading was off the top and Cancel was off the bottom, with no
+ * way to scroll to either.
+ */
 function CopyDayDialog({
-  from, dates, onClose, onPick,
+  from, onClose, onPick,
 }: {
   from: string
-  dates: string[]
   onClose: () => void
   onPick: (to: string) => void
 }) {
+  const plan = useMealPlanStore((s) => s.plan)
+  const busy = useMemo(
+    () => new Set(plan.filter((d) => d.meals.length).map((d) => d.date)),
+    [plan],
+  )
+  const [to, setTo] = useState<string | null>(null)
+
+  // What it would land on, said before it lands. Copying onto a day that
+  // already has meals is a legitimate thing to want and a horrible surprise.
+  const onto = to ? plan.find((d) => d.date === to)?.meals.length ?? 0 : 0
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 backdrop-blur-xs p-4" onClick={onClose}>
-      {/* The list of days is as long as the range, and in month view that is
-          42 of them: 1,452 px of panel inside a 1,110 px overlay, with the
-          heading off the top and Cancel off the bottom. The days scroll, the
-          heading and the way out do not. */}
       <div
-        className="bg-paper rounded-2xl p-5 w-full max-w-sm shadow-xl max-h-[85vh] flex flex-col"
+        className="bg-paper rounded-2xl p-5 w-full max-w-sm shadow-xl max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-bold text-ink-900 mb-1">Copy {formatDate(from)}</h3>
         <p className="text-sm text-ink-700 mb-4">Pick the day to copy these meals into.</p>
-        <div className="space-y-1 flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
-          {dates.filter((d) => d !== from).map((d) => (
-            <button key={d} onClick={() => onPick(d)}
-              className="w-full text-left px-3 py-2 rounded-xl hover:bg-cream-50 text-sm text-ink-900">
-              {formatDate(d)}
-            </button>
-          ))}
+
+        <WhenPicker
+          date={to ?? from}
+          onDate={setTo}
+          busy={busy}
+          disabled={(d) => d === from}
+        />
+
+        {onto > 0 && (
+          <p className="text-sm text-coral-700 mt-4">
+            That day already has {onto} {onto === 1 ? 'meal' : 'meals'} on it, and they would be
+            replaced.
+          </p>
+        )}
+
+        <div className="flex gap-2 mt-5">
+          <button
+            className="btn-primary flex-1"
+            disabled={!to}
+            onClick={() => to && onPick(to)}
+          >
+            Copy it there
+          </button>
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
         </div>
-        <button className="btn-secondary w-full mt-4 shrink-0" onClick={onClose}>Cancel</button>
       </div>
     </div>
   )
