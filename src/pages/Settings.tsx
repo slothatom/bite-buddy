@@ -134,13 +134,28 @@ function SettingsPanels() {
             ))}
           </div>
 
-          <p className="text-sm text-ink-700 mb-4">
+          <p className="text-sm text-ink-700 mb-2">
             {PEOPLE.find((p) => p.id === whose)?.name} is on{' '}
             <strong className="font-mono">{shown.calories} kcal</strong>{' '}
             (Protein {shown.protein} g · Carbs {shown.carbs} g · Fat {shown.fat} g), set{' '}
             {shown.source === 'from-plans' ? 'from your plans'
               : shown.source === 'tdee' ? 'by the calculator' : 'by hand'}
             {profile.targetsByPerson?.[whose] ? '' : ', which is the household figure'}.
+          </p>
+
+          {/* Two people have been able to have their own targets for a while,
+              and neither had set one, so switching between them on the planner
+              and Progress changed nothing on screen and read as decoration.
+              The machinery was not the missing part; saying it was there was. */}
+          <p className="text-sm text-ink-700 mb-4">
+            {profile.targetsByPerson?.[whose]
+              ? `This is ${PEOPLE.find((p) => p.id === whose)?.name}'s own figure. The plan and the
+                 shopping list stay shared, because a household cooks once. Only the line a day is
+                 measured against moves when you switch.`
+              : `Both of you are measured against the same figure until one of you is given their
+                 own. Set one below and the planner, Home and Progress will read ${
+                   PEOPLE.find((p) => p.id === whose)?.name}'s days against it. The plan itself
+                 stays shared either way.`}
           </p>
 
           <div className="space-y-3">

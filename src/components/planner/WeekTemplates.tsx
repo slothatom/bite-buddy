@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useDialog } from '../../lib/useDialog'
+import { offerUndo } from '../../store/useUndo'
 import { BookmarkPlus, Check, Trash2, X } from 'lucide-react'
 import type { WeekTemplate } from '../../types'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
@@ -22,8 +24,11 @@ export default function WeekTemplates({
   weekDates: string[]
   onClose: () => void
 }) {
-  const { plan, templates, saveTemplate, applyTemplate, removeTemplate } = useMealPlanStore()
+  const {
+    plan, templates, saveTemplate, applyTemplate, removeTemplate, restoreTemplate,
+  } = useMealPlanStore()
   const [name, setName] = useState('')
+  const panel = useDialog<HTMLDivElement>(onClose)
   const [confirming, setConfirming] = useState<string | null>(null)
   const [saved, setSaved] = useState<string | null>(null)
 
@@ -32,8 +37,18 @@ export default function WeekTemplates({
     .filter((d) => shown.has(d.date))
     .reduce((n, d) => n + d.meals.length, 0)
 
+  /**
+   * What to call it, if you do not.
+   *
+   * Saving with the field blank produced "Saved week", and saving twice
+   * produced two of them with no way to tell which was which. The week it came
+   * from is the one fact about it that is always true and always different.
+   */
+  const suggested = `Week of ${new Date(weekDates[0] + 'T12:00:00')
+    .toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
+
   function save() {
-    const template = saveTemplate(name)
+    const template = saveTemplate(name.trim() || suggested)
     if (!template) return
     setName('')
     setSaved(template.id)
@@ -45,6 +60,8 @@ export default function WeekTemplates({
       onClick={onClose}
     >
       <div
+        ref={panel}
+        aria-modal="true"
         className="bg-paper rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-md shadow-xl max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -71,7 +88,7 @@ export default function WeekTemplates({
             <div className="flex gap-2">
               <input
                 className="input flex-1"
-                placeholder="Name this week"
+                placeholder={suggested}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') save() }}
@@ -100,7 +117,13 @@ export default function WeekTemplates({
                 onAsk={() => setConfirming(template.id)}
                 onCancel={() => setConfirming(null)}
                 onApply={() => { applyTemplate(template.id); onClose() }}
-                onRemove={() => removeTemplate(template.id)}
+                onRemove={() => {
+                  // The guard used to be on the recoverable action and missing
+                  // from the permanent one: applying a week asked first, the
+                  // bin next to it did not.
+                  removeTemplate(template.id)
+                  offerUndo(`Forgot ${template.name}`, () => restoreTemplate(template))
+                }}
               />
             ))}
           </ul>
@@ -162,7 +185,9 @@ function Row({
           <div className="flex gap-2">
             <button className="btn-primary flex-1" onClick={onApply}>
               <Check size={15} />
-              {onScreen > 0 ? `Replace ${onScreen}` : 'Write the week'}
+              {onScreen > 0
+                ? `Replace ${onScreen} ${onScreen === 1 ? 'meal' : 'meals'}`
+                : 'Write the week'}
             </button>
             <button className="btn-secondary" onClick={onCancel}>Cancel</button>
           </div>

@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
+import { useDialog } from '../lib/useDialog'
 import { useSearchParams } from 'react-router-dom'
 import WhenPicker from '../components/planner/WhenPicker'
 import { slotNow } from '../lib/whenDates'
@@ -532,12 +533,16 @@ function PickerSheet({
   children: ReactNode
   onClose: () => void
 }) {
+  const panel = useDialog<HTMLDivElement>(onClose)
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4"
       onClick={onClose}
     >
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
         className="bg-paper w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[80vh] flex flex-col shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}
@@ -681,6 +686,7 @@ function RecipeDetail({
     const at = card.variants.findIndex((r) => r.id === startId)
     return at >= 0 ? at : 0
   })
+  const panel = useDialog<HTMLDivElement>(onClose)
   const [confirmMerge, setConfirmMerge] = useState(false)
 
   // A dish is favourited, not one portion of it, so the star covers every
@@ -716,6 +722,9 @@ function RecipeDetail({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
         className="bg-paper w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}
@@ -1014,6 +1023,7 @@ function PlanIntoDay({
   onClose: () => void
 }) {
   const { plan, addEntry } = useMealPlanStore()
+  const panel = useDialog<HTMLDivElement>(onClose)
   const [date, setDate] = useState(todayDate)
   const busy = useMemo(
     () => new Set(plan.filter((d) => d.meals.length).map((d) => d.date)),
@@ -1038,6 +1048,8 @@ function PlanIntoDay({
       onClick={onClose}
     >
       <div
+        ref={panel}
+        aria-modal="true"
         className="bg-paper rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-sm shadow-xl max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
         role="dialog"

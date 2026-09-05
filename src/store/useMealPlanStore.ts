@@ -254,6 +254,14 @@ interface MealPlanStore {
    */
   applyTemplate: (id: string) => void
   removeTemplate: (id: string) => void
+  /**
+   * Puts a forgotten week back, for undo.
+   *
+   * In its old position rather than on top, because the list is ordered by
+   * when each was saved and a restored week arriving at the front is a week
+   * that has quietly changed its date.
+   */
+  restoreTemplate: (template: WeekTemplate) => void
   renameTemplate: (id: string, name: string) => void
   /**
    * Moves the window to the week containing today, if it is not there already.
@@ -532,6 +540,14 @@ export const useMealPlanStore = create<MealPlanStore>()(
 
         removeTemplate: (id) =>
           set((s) => ({ templates: s.templates.filter((t) => t.id !== id) })),
+
+        restoreTemplate: (template) =>
+          set((s) => (s.templates.some((t) => t.id === template.id)
+            ? {}
+            : {
+              templates: [...s.templates, template]
+                .sort((a, b) => b.savedAt.localeCompare(a.savedAt)),
+            })),
 
         renameTemplate: (id, name) =>
           set((s) => ({

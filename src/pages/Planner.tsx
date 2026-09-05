@@ -31,6 +31,7 @@ import type { Proposal } from '../lib/autoPlan'
 import { baseName } from '../lib/recipeGroups'
 import { entriesName, entryName } from '../lib/entryLabel'
 import { slotNow } from '../lib/whenDates'
+import { useDialog } from '../lib/useDialog'
 import WhenPicker from '../components/planner/WhenPicker'
 import { offerUndo } from '../store/useUndo'
 
@@ -689,6 +690,7 @@ function AmountDialog({
   onSet: (value: number) => void
 }) {
   const ctx = useNutritionContext()
+  const panel = useDialog<HTMLDivElement>(onClose)
   const entry = day.meals.find((m) => m.id === mealId)?.entries[index]
 
   const current = entry ? (entry.kind === 'food' ? entry.grams : entry.servings) : 0
@@ -740,6 +742,8 @@ function AmountDialog({
       onClick={onClose}
     >
       <div
+        ref={panel}
+        aria-modal="true"
         className="bg-paper rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-sm shadow-xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -952,6 +956,7 @@ function MoveMealDialog({
   onCopy: (date: string, slot: MealSlot) => void
 }) {
   const plan = useMealPlanStore((s) => s.plan)
+  const panel = useDialog<HTMLDivElement>(onClose)
   const meal = plan.find((d) => d.date === from.date)?.meals.find((m) => m.id === from.mealId)
   const [date, setDate] = useState(from.date)
   const [slot, setSlot] = useState<MealSlot>(meal?.slot ?? 'lunch')
@@ -966,6 +971,10 @@ function MoveMealDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 backdrop-blur-xs p-4" onClick={onClose}>
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Move or copy this meal"
         className="bg-paper rounded-2xl p-5 w-full max-w-sm shadow-xl max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
@@ -1014,6 +1023,7 @@ function CopyDayDialog({
     () => new Set(plan.filter((d) => d.meals.length).map((d) => d.date)),
     [plan],
   )
+  const panel = useDialog<HTMLDivElement>(onClose)
   const [to, setTo] = useState<string | null>(null)
 
   // What it would land on, said before it lands. Copying onto a day that
@@ -1023,6 +1033,10 @@ function CopyDayDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40 backdrop-blur-xs p-4" onClick={onClose}>
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Copy a day"
         className="bg-paper rounded-2xl p-5 w-full max-w-sm shadow-xl max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >

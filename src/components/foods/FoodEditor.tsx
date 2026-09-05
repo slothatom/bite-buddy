@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useDialog } from '../../lib/useDialog'
 import { X, Trash2, Undo2, Combine } from 'lucide-react'
 import type { Food, MedCategory, MedTier, FoodState } from '../../types'
 import { useFoodStore, useFoodsMergedInto, isCuratedFood } from '../../store/useFoodStore'
@@ -19,6 +20,7 @@ import { CATEGORY_LABELS, CATEGORY_ORDER } from '../../lib/categories'
  * and what every calculation in the app expects. A blank is unknown, not zero.
  */
 export default function FoodEditor({ food, onClose }: { food: Food; onClose: () => void }) {
+  const panel = useDialog<HTMLDivElement>(onClose)
   const { updateFood, removeFood, revertFood, unmergeFood, custom } = useFoodStore()
   const folded = useFoodsMergedInto(food.id)
   const recipes = useRecipes()
@@ -69,6 +71,9 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4"
       onClick={onClose}>
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
         className="bg-paper w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[92vh] flex flex-col shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}

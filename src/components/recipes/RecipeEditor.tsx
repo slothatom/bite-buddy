@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
+import { useDialog } from '../../lib/useDialog'
 import {
   Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download,
 } from 'lucide-react'
@@ -46,6 +47,7 @@ export default function RecipeEditor({
   onClose: () => void
   onSaved?: (recipe: Recipe) => void
 }) {
+  const panel = useDialog<HTMLDivElement>(onClose)
   const { addRecipe, updateRecipe, removeRecipe, revertRecipe, custom } = useRecipeStore()
   const ctx = useNutritionContext()
   const plan = useMealPlanStore((s) => s.plan)
@@ -133,6 +135,9 @@ export default function RecipeEditor({
       onClick={onClose}
     >
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
         className="bg-paper w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[92vh] flex flex-col shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}
