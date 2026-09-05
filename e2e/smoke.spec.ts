@@ -205,6 +205,21 @@ test.describe('the main flow', () => {
       .toBeVisible()
   })
 
+  test('a recipe sheet fills its macro bars', async ({ page }) => {
+    // Protein 12 g, Carbs 39 g, Fat 17 g were printed above four bars that
+    // computed a zero fill every time, because a per-serving figure was passed
+    // no reference value at all.
+    await goto(page, '/recipes')
+    await page.locator('[data-recipe-card]').first().click()
+
+    const dialog = page.getByRole('dialog').first()
+    await expect(dialog.getByText(/one serving against .+s day/)).toBeVisible()
+
+    const filled = await dialog.locator('[data-macro-fill]').evaluateAll(
+      (bars) => bars.filter((b) => parseFloat((b as HTMLElement).style.width) > 0).length)
+    expect(filled, 'every macro bar rendered empty').toBeGreaterThan(0)
+  })
+
   test('a recipe can be starred while you are reading it', async ({ page }) => {
     await goto(page, '/recipes')
     await page.locator('[data-recipe-card]').first().click()

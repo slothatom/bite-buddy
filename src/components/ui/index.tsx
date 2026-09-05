@@ -58,6 +58,7 @@ export function MacroBar({
             as met when the figure was only the part the data knows about. The
             fill fades out at its end instead of stopping flat. */}
         <div
+          data-macro-fill
           className={`h-full rounded-full transition-all duration-500 ${styles.fill}`}
           style={{
             width: `${fillPct}%`,
