@@ -1,8 +1,10 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { photosAvailable, removePhoto, uploadPhoto } from '../../lib/photos'
+import Photo from './Photo'
 import { useDialog } from '../../lib/useDialog'
 import { readAmount } from '../../lib/amounts'
 import {
-  Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download,
+  Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download, ImagePlus,
 } from 'lucide-react'
 import type {
   Difficulty, DishCategory, RecipeComponent, PortionUnit, QuickFilter, Recipe, RecipeTag,
@@ -296,6 +298,13 @@ export default function RecipeEditor({
             </div>
           </Field>
 
+          <PhotoField
+            recipeId={draft.id}
+            path={draft.photo}
+            name={draft.name.en}
+            onChange={(photo) => patch({ photo })}
+          />
+
           <Field label="Notes">
             <textarea
               className="input min-h-20 resize-y"
@@ -326,7 +335,7 @@ export default function RecipeEditor({
             <div className="space-y-2">
               {draft.steps.map((s, i) => (
                 <div key={s.id} className="flex items-start gap-2">
-                  <span className="shrink-0 w-6 h-6 mt-1.5 rounded-full bg-bite-100 text-bite-800 text-xs font-bold grid place-items-center">
+                  <span className="shrink-0 w-6 h-6 mt-1.5 rounded-full bg-bite-100 text-bite-700 text-xs font-bold grid place-items-center">
                     {i + 1}
                   </span>
                   <textarea
@@ -748,6 +757,104 @@ function NumberField({
         {value === 1 ? unit : `${unit}s`}
       </span>
     </label>
+  )
+}
+
+/**
+ * Adding, replacing and removing a recipe's photograph.
+ *
+ * Absent entirely until storage answers that the bucket is there. The bucket is
+ * a piece of setup somebody runs once in the SQL editor (supabase/photos.sql),
+ * and a file picker that always failed would be worse than no file picker: it
+ * would look like the app was broken rather than like the feature was not set
+ * up.
+ *
+ * The old file is deleted only once the new one is safely stored. Doing it the
+ * other way round means a failed upload leaves a recipe with no photo and no
+ * way back to the one it had.
+ */
+function PhotoField({
+  recipeId, path, name, onChange,
+}: {
+  recipeId: string
+  path: string | undefined
+  name: string
+  onChange: (path: string | undefined) => void
+}) {
+  const [offered, setOffered] = useState<boolean | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [problem, setProblem] = useState<string | null>(null)
+
+  useEffect(() => {
+    let live = true
+    photosAvailable().then((yes) => { if (live) setOffered(yes) }).catch(() => { if (live) setOffered(false) })
+    return () => { live = false }
+  }, [])
+
+  // Nothing at all rather than a disabled control: there is no action anybody
+  // can take here, and a greyed-out button invites hunting for the reason.
+  if (offered !== true) return null
+
+  async function pick(file: File | undefined) {
+    if (!file) return
+    setBusy(true)
+    setProblem(null)
+    const result = await uploadPhoto(recipeId, file)
+    if (!result.ok) {
+      setProblem(result.reason)
+      setBusy(false)
+      return
+    }
+    const replaced = path
+    onChange(result.path)
+    if (replaced) await removePhoto(replaced)
+    setBusy(false)
+  }
+
+  return (
+    <Field label="Photo">
+      <div className="flex items-start gap-3">
+        {path && (
+          <Photo
+            path={path}
+            alt={name || 'This recipe'}
+            className="w-24 h-24 rounded-xl shrink-0 border border-border-200"
+          />
+        )}
+        <div className="min-w-0 space-y-2">
+          <label className="btn-secondary w-fit cursor-pointer">
+            <ImagePlus size={15} />
+            {busy ? 'Adding' : path ? 'Replace it' : 'Add a photo'}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="sr-only"
+              disabled={busy}
+              onChange={(e) => {
+                void pick(e.target.files?.[0])
+                // Cleared so choosing the same file twice fires again, which
+                // is what happens after a failed upload.
+                e.target.value = ''
+              }}
+            />
+          </label>
+          {path && (
+            <button
+              type="button"
+              className="btn-ghost text-ink-500 w-fit"
+              disabled={busy}
+              onClick={() => { const going = path; onChange(undefined); void removePhoto(going) }}
+            >
+              Remove it
+            </button>
+          )}
+          <p className="text-xs text-ink-500">
+            Shrunk before it is sent, and stored where only the two of you can see it.
+          </p>
+          {problem && <p className="text-xs text-coral-600">{problem}</p>}
+        </div>
+      </div>
+    </Field>
   )
 }
 

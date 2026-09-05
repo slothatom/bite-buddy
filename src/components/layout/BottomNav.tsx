@@ -88,7 +88,7 @@ export default function BottomNav() {
         <button
           onClick={() => setMoreOpen(true)}
           className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-14 text-[11px] font-bold
-            ${moreActive ? 'text-bite-600' : 'text-ink-500'}`}
+            ${moreActive ? 'text-bite-700' : 'text-ink-500'}`}
         >
           <MoreHorizontal size={20} />
           More
@@ -112,7 +112,7 @@ function Item({
     <NavLink
       to={to}
       className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-14 text-[11px] font-bold transition-colors
-        ${active ? 'text-bite-600' : 'text-ink-500'}`}
+        ${active ? 'text-bite-700' : 'text-ink-500'}`}
     >
       <Icon size={20} strokeWidth={active ? 2.6 : 2} />
       {label}

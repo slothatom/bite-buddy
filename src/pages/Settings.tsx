@@ -4,7 +4,8 @@ import {
   Sparkles, Calculator, Pencil, Upload, Check, X,
   Download, ClipboardCopy, ClipboardPaste, LogOut, Undo2,
 } from 'lucide-react'
-import type { ActivityLevel, Goal, Sex, Targets, WeekStart } from '../types'
+import type { ActivityLevel, Goal, Sex, Targets, Theme, UserProfile, WeekStart } from '../types'
+import { THEMES, THEME_LABELS } from '../types'
 import { useUserStore, targetsFor } from '../store/useUserStore'
 import { useUiStore } from '../store/useUiStore'
 import { PEOPLE } from '../lib/people'
@@ -28,7 +29,10 @@ import { SectionHeading } from '../components/ui'
 import { copyToClipboard } from '../lib/clipboard'
 import { PlanArchive } from '../components/settings/PlanArchive'
 import { useAuthStore } from '../store/useAuth'
-import { currentState, deviceLabel, disable, enable, type PushState } from '../lib/push'
+import {
+  currentState, deviceLabel, disable, enable, readWants, writeWants,
+  WANTS_ALL, type PushState, type Wants,
+} from '../lib/push'
 import { useSyncStatus } from '../store/useSync'
 import { probeSaving, type ProbeStep } from '../lib/rows/probe'
 import { isConfigured } from '../lib/supabase'
@@ -92,7 +96,9 @@ function TabLink({ to, label, on }: { to: string; label: string; on: boolean }) 
 }
 
 function SettingsPanels() {
-  const { profile, setName, setTargets, setTdee, setWeekStart } = useUserStore()
+  const {
+    profile, setName, setTargets, setTdee, setWeekStart, setWeightUnit, setTheme,
+  } = useUserStore()
   // The same person the rest of the app is showing figures for, so setting a
   // target and then reading it back are about the same human being.
   const whose = useUiStore((s) => s.viewingAs)
@@ -162,7 +168,7 @@ function SettingsPanels() {
             {/* From the plans */}
             <div className="card p-4">
               <div className="flex items-start gap-3">
-                <Sparkles size={18} className="text-bite-600 shrink-0 mt-0.5" />
+                <Sparkles size={18} className="text-bite-700 shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <h3 className="font-semibold text-ink-900 text-sm">From your dietician's plans</h3>
                   {planAverage ? (
@@ -190,7 +196,7 @@ function SettingsPanels() {
             {/* Calculator */}
             <div className="card p-4">
               <div className="flex items-start gap-3">
-                <Calculator size={18} className="text-bite-600 shrink-0 mt-0.5" />
+                <Calculator size={18} className="text-bite-700 shrink-0 mt-0.5" />
                 <div className="flex-1 space-y-3">
                   <div>
                     <h3 className="font-semibold text-ink-900 text-sm">Work it out from your body</h3>
@@ -316,6 +322,44 @@ function SettingsPanels() {
                 Tuesday; loading one lines its days up by weekday either way.
               </p>
             </div>
+            <div>
+              <label className="label" htmlFor="theme">Appearance</label>
+              <select
+                id="theme"
+                className="input"
+                value={profile.theme ?? 'system'}
+                onChange={(e) => setTheme(e.target.value as Theme)}
+              >
+                {THEMES.map((t) => <option key={t} value={t}>{THEME_LABELS[t]}</option>)}
+              </select>
+              <p className="text-xs text-ink-500 mt-1">
+                Following your device is the default and changes with it, so the app goes dark
+                when your phone does. Pick one of the other two to say otherwise.
+              </p>
+            </div>
+            <div>
+              <label className="label" htmlFor="weight-unit">Weights read in</label>
+              <select
+                id="weight-unit"
+                className="input"
+                value={profile.weightUnit}
+                onChange={(e) => setWeightUnit(e.target.value as UserProfile['weightUnit'])}
+              >
+                <option value="kg">Kilograms</option>
+                <option value="lbs">Pounds</option>
+              </select>
+              <p className="text-xs text-ink-500 mt-1">
+                {/* The reassurance is the point. This setting has existed as a
+                    field since the beginning with nothing to change it, and the
+                    body screen printed the stored number with whatever this
+                    said next to it, so making it settable without saying what
+                    it touches would look like a switch that rewrites your
+                    history. It does not: every entry keeps the unit you typed
+                    it in, and this changes the reading. */}
+                Changes how weights are shown, not what was saved. Every entry keeps the unit you
+                typed it in, and one logged in the other unit says so beside it.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -370,7 +414,7 @@ function ManualTargets({
   return (
     <div className="card p-4">
       <div className="flex items-start gap-3">
-        <Pencil size={18} className="text-bite-600 shrink-0 mt-0.5" />
+        <Pencil size={18} className="text-bite-700 shrink-0 mt-0.5" />
         <div className="flex-1 space-y-3">
           <h3 className="font-semibold text-ink-900 text-sm">Or set them yourself</h3>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -695,6 +739,10 @@ function NotificationsPanel() {
   const [state, setState] = useState<PushState | null>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  // Which of the two you want. Read once the panel knows there is anything to
+  // want: asking the database before that would be a query on every visit to
+  // Settings for a household that has never set a signing key up.
+  const [wants, setWants] = useState<Wants>(WANTS_ALL)
 
   // A rejection here used to leave the panel invisible for ever, because the
   // section rendered nothing until this resolved. A screen that says nothing
@@ -708,7 +756,25 @@ function NotificationsPanel() {
         setState({ kind: 'off' })
         setMessage(`Could not work out where this device stands: ${e.message}`)
       })
+    // Failing to read them is not worth a message: both on is what the sender
+    // does with a member who has no row, so the panel showing both on is the
+    // truth either way.
+    readWants().then(setWants).catch(() => {})
   }, [])
+
+  async function choose(next: Wants) {
+    const before = wants
+    // Moved first so the switch answers the thumb. Put back if the write is
+    // refused, which is the only way a switch can lie about what it set.
+    setWants(next)
+    const result = await writeWants(next)
+    if (!result.ok) {
+      setWants(before)
+      setMessage(`Could not save that: ${result.reason}`)
+    } else {
+      setMessage(null)
+    }
+  }
 
   async function turnOn() {
     setBusy(true)
@@ -732,8 +798,7 @@ function NotificationsPanel() {
       <SectionHeading>Notifications</SectionHeading>
       <div className="card p-4 space-y-3">
         <p className="text-sm text-ink-700">
-          A reminder before a cooking session, and a line when the other one of you changes the
-          week. Nothing else, and never more than one at a time for the same thing.
+          Two things, and nothing else. Never more than one at a time for the same thing.
         </p>
 
         {state === null && (
@@ -774,15 +839,76 @@ function NotificationsPanel() {
           </div>
         )}
 
+        {/* Which of the two, once there is anything to receive them. Hidden
+            while push is unsupported, unconfigured or blocked, where the
+            switches would be two controls over something that cannot happen. */}
+        {(state?.kind === 'off' || state?.kind === 'on') && (
+          <div className="border-t border-border-100 pt-3 space-y-2">
+            <p className="text-xs font-bold uppercase tracking-wide text-ink-500">
+              What to send
+            </p>
+            <Wanted
+              label="Before a cooking session"
+              note="A couple of hours before something you have scheduled to cook."
+              on={wants.cook}
+              onChange={(on) => void choose({ ...wants, cook: on })}
+            />
+            <Wanted
+              label="When the other one of you changes the week"
+              note="One line, after the change settles, rather than one per meal moved."
+              on={wants.plan}
+              onChange={(on) => void choose({ ...wants, plan: on })}
+            />
+            {!wants.cook && !wants.plan && state.kind === 'on' && (
+              <p className="text-xs text-ink-700">
+                Both off, so this device is subscribed and will never be sent anything. That is a
+                fine way to leave it, and turning the switch above off is the tidier one.
+              </p>
+            )}
+          </div>
+        )}
+
         {message && <p className="text-sm text-coral-600">{message}</p>}
 
         <p className="text-xs text-ink-500">
-          This is per device rather than per person, because a phone is what gets notified. Turning
-          it on here does nothing to the other one, and on Android it is more reliable once the app
-          has been added to the home screen.
+          The switch above is per device, because a phone is what gets notified, and turning it on
+          here does nothing to the other one. What to send is per person and follows you to any
+          device you sign in on. On Android notifications are more reliable once the app has been
+          added to the home screen.
         </p>
       </div>
     </section>
+  )
+}
+
+/**
+ * One kind of notification, on or off.
+ *
+ * A checkbox rather than a styled toggle: it is a real one under the label, so
+ * it is reachable by keyboard, announced as a checkbox, and toggled by tapping
+ * anywhere on the row rather than on a 20px switch.
+ */
+function Wanted({
+  label, note, on, onChange,
+}: {
+  label: string
+  note: string
+  on: boolean
+  onChange: (on: boolean) => void
+}) {
+  return (
+    <label className="flex items-start gap-3 py-1.5 cursor-pointer">
+      <input
+        type="checkbox"
+        className="mt-0.5 w-5 h-5 shrink-0 accent-bite-500"
+        checked={on}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      <span className="min-w-0">
+        <span className="block text-sm text-ink-900">{label}</span>
+        <span className="block text-xs text-ink-500">{note}</span>
+      </span>
+    </label>
   )
 }
 

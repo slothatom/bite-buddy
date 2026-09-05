@@ -23,6 +23,16 @@ export default defineConfig({
     baseURL: 'http://localhost:4173/',
     trace: 'on-first-retry',
     launchOptions: executablePath ? { executablePath } : {},
+    /*
+     * Light, unless a test asks otherwise.
+     *
+     * The app follows the device by default, so without this the theme every
+     * assertion runs against would be whatever the machine running the suite
+     * happens to prefer. Pinned here, and the dark theme gets its own test
+     * that opts in, rather than every other test quietly changing meaning on a
+     * laptop set to dark.
+     */
+    colorScheme: 'light',
   },
 
   projects: [

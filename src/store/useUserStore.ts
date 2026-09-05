@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
-import type { Moment, Targets, TdeeProfile, UserProfile, WeekStart } from '../types'
+import type { Moment, Targets, TdeeProfile, Theme, UserProfile, WeekStart } from '../types'
 import { type MomentKind, noticeMoments, type MomentContext } from '../lib/moments'
 import { DEFAULT_WEEK_START } from '../types'
 import { FALLBACK_TARGETS } from '../lib/targets'
@@ -24,6 +24,16 @@ interface UserStore {
   setWeightGoal: (person: PersonId, weight: number | undefined) => void
   setTdee: (tdee: TdeeProfile) => void
   setWeekStart: (day: WeekStart) => void
+  /**
+   * Which unit weights read in.
+   *
+   * Only the reading. Every entry keeps the unit it was typed in, and the
+   * goals are held in kilograms, so switching this changes what the screens
+   * say and never what the store holds. See lib/weight.ts.
+   */
+  setWeightUnit: (unit: UserProfile['weightUnit']) => void
+  /** Light, dark, or whatever the device says. */
+  setTheme: (theme: Theme) => void
   setFoodNameLanguage: (lang: UserProfile['foodNameLanguage']) => void
 
   /** Records anything newly true. Already-noticed moments are left alone. */
@@ -88,6 +98,8 @@ export const useUserStore = create<UserStore>()(
 
       setTdee: (tdee) => set((s) => ({ profile: stamped({ ...s.profile, tdee }) })),
       setWeekStart: (weekStartsOn) => set((s) => ({ profile: stamped({ ...s.profile, weekStartsOn }) })),
+      setWeightUnit: (weightUnit) => set((s) => ({ profile: stamped({ ...s.profile, weightUnit }) })),
+      setTheme: (theme) => set((s) => ({ profile: stamped({ ...s.profile, theme }) })),
       setFoodNameLanguage: (foodNameLanguage) =>
         set((s) => ({ profile: stamped({ ...s.profile, foodNameLanguage }) })),
 

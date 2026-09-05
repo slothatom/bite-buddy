@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   CalendarDays, ShoppingBasket, BookOpen, ArrowRight, Sparkles,
-  Cloud, CloudOff, RefreshCw, AlertTriangle, CookingPot, Scale, Utensils,
+  Cloud, CloudOff, RefreshCw, AlertTriangle, CookingPot, Scale, Utensils, Activity,
 } from 'lucide-react'
 import { useMealPlanStore, today as todayDate } from '../store/useMealPlanStore'
 import { useThisWeek } from '../store/useThisWeek'
@@ -33,6 +33,8 @@ import { entryName } from '../lib/entryLabel'
 import { suggest } from '../lib/suggestions'
 import { kitchenNudges } from '../lib/kitchen'
 import { usePantry } from '../store/usePantryStore'
+import { useDayMovement } from '../store/useActivityStore'
+import { movementLabel, type DayMovement } from '../lib/movement'
 import { PEOPLE } from '../lib/people'
 
 /**
@@ -69,6 +71,8 @@ export default function Home() {
   const todayPlan = plan.find((d) => d.date === today)
   const todayRecord = todayPlan ? dayEaten(todayPlan, ctx) : null
   const todayTotals = todayRecord?.nutrients ?? null
+  // What you did today, which every screen about today had never heard of.
+  const movedToday = useDayMovement(viewingAs, today)
 
   /**
    * This week, and only this week.
@@ -274,6 +278,7 @@ export default function Home() {
                   })}
                 </div>
               </div>
+              <MovedToday movement={movedToday} />
               <div className="flex flex-wrap gap-2">
                 <Link to="/plan" className="btn-secondary">
                   Open the planner <ArrowRight size={15} />
@@ -383,7 +388,7 @@ export default function Home() {
                 >
                   <Sparkles
                     size={16}
-                    className={`shrink-0 mt-0.5 ${idea.urgent ? 'text-mustard-600' : 'text-bite-600'}`}
+                    className={`shrink-0 mt-0.5 ${idea.urgent ? 'text-mustard-600' : 'text-bite-700'}`}
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-ink-900">{idea.title}</p>
@@ -487,6 +492,48 @@ function Tile({
  * is actually keeping a log rather than an empty box for the person who is
  * not.
  */
+/**
+ * What you did today, said beside the day rather than folded into it.
+ *
+ * The Movement screen has costed sessions for months and no other screen had
+ * ever mentioned one, so an hour of cycling was recorded and then invisible
+ * everywhere you would look for it.
+ *
+ * It does not move the target, and it says so. Two reasons, and the second is
+ * the one that matters: the estimate is loose enough that treating it as
+ * spendable would be a licence rather than a measurement, and the calorie
+ * figure the app measures a day against came from the dietician's own plans,
+ * which were written for two people who already move. Adding a bonus on top
+ * would count the same hour twice and hand back four hundred calories nobody
+ * prescribed.
+ */
+function MovedToday({ movement }: { movement: DayMovement }) {
+  const said = movementLabel(movement)
+  // Nothing logged is nothing to report. An empty row saying "0 min" reads as
+  // a reproach, which is not this app's business.
+  if (!said) return null
+
+  return (
+    <div className="card-soft p-3 flex items-start gap-3">
+      <Activity size={16} className="text-teal-700 shrink-0 mt-0.5" aria-hidden="true" />
+      <div className="min-w-0">
+        <p className="text-sm text-ink-900">
+          <span className="font-semibold">Moved today</span>
+          {' · '}
+          <span className="font-mono tabular-nums">{said}</span>
+        </p>
+        <p className="text-xs text-ink-500">
+          {movement.kcal == null
+            ? 'No weight recorded yet, so there is no calorie estimate for it.'
+            : movement.estimated
+              ? 'An estimate, and not added to your target: the plans were written for days you move.'
+              : 'Not added to your target: the plans were written for days you move.'}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 function WeightTile() {
   const weights = useBodyStore((s) => s.weightEntries)
 

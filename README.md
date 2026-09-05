@@ -650,6 +650,31 @@ added to the home screen.
 Without any of this the toggle still saves and the app simply never sends.
 Nothing else depends on it.
 
+Each person also chooses which of the two they want, under Settings. That is
+per person rather than per device, and the switch above it, whether this phone
+is reachable at all, is per device. The row lives in `notify_state`, which does
+not sync: on the shared profile, one of you turning a notification off would
+turn it off for both.
+
+### Photos on recipes
+
+Run `supabase/photos.sql` in the SQL editor. It creates one storage bucket and
+four policies, all gated on `is_member()` like every other table.
+
+Until you run it the app does not offer to add a photo at all: the editor asks
+storage whether the bucket exists and hides the control when it does not, so
+nothing appears half-built.
+
+The bucket is **private**. A public one would have been less code and the
+service worker could cache the images like any other file, but a public bucket
+is public to anybody who ever sees a URL, and these are photographs taken in
+your kitchen. The cost of the private one is that the app mints a signed URL to
+show a photo, cached for the session, so a photo will not appear on a phone
+that is fully offline and has not shown it before.
+
+Photos are shrunk in the browser before they are sent, to 1400px on the longest
+edge, which is well above anything the app displays.
+
 ---
 
 ## Running it

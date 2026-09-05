@@ -37,8 +37,8 @@ export default function UndoBar() {
           <p className="flex-1 min-w-0 text-sm">{offer.what}</p>
           <button
             onClick={takeUndo}
-            className="shrink-0 flex items-center gap-1.5 rounded-lg bg-white/95 text-ink-900
-                       font-semibold px-3 py-2 text-xs hover:bg-white"
+            className="shrink-0 flex items-center gap-1.5 rounded-lg bg-paper text-ink-900
+                       font-semibold px-3 py-2 text-xs hover:bg-cream-50"
           >
             <Undo2 size={14} /> Undo
           </button>

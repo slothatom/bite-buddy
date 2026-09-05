@@ -57,7 +57,7 @@ export default function StorageBanner() {
   return (
     <div
       role="alert"
-      className="fixed top-0 inset-x-0 z-50 bg-coral-600 text-white px-4 py-2.5 flex items-start gap-2.5 text-sm shadow-lg"
+      className="fixed top-0 inset-x-0 z-50 bg-coral-800 text-white px-4 py-2.5 flex items-start gap-2.5 text-sm shadow-lg"
       style={{ paddingTop: 'max(0.625rem, env(safe-area-inset-top))' }}
     >
       <AlertTriangle size={16} className="shrink-0 mt-0.5" />
@@ -70,8 +70,8 @@ export default function StorageBanner() {
       {held ? (
         <button
           onClick={() => allowDeletions(held.table)}
-          className="shrink-0 self-start rounded-lg bg-white/95 text-coral-700 font-semibold
-                     px-3 py-2 text-xs hover:bg-white"
+          className="shrink-0 self-start rounded-lg bg-paper text-coral-700 font-semibold
+                     px-3 py-2 text-xs hover:bg-cream-50"
         >
           I deleted those
         </button>

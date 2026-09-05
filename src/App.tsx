@@ -17,6 +17,7 @@ import { useUserStore } from './store/useUserStore'
 import { isConfigured } from './lib/supabase'
 import Zig from './components/brand/Mascot'
 import { lazyRoute } from './lib/lazyRoute'
+import { applyTheme } from './lib/theme'
 
 /**
  * Home and Planner load with the app; everything else on demand.
@@ -94,6 +95,31 @@ function useRouteTitle() {
       ?? TITLES[Object.keys(TITLES).filter((k) => k !== '/' && pathname.startsWith(k)).sort().pop() ?? '']
     document.title = name ? `${name} · Bite Buddy` : 'Bite Buddy'
   }, [pathname])
+}
+
+/**
+ * The chosen theme, on the document, kept in step with the device.
+ *
+ * Applied here rather than in Settings so it survives navigating away from
+ * Settings, and applied on every change to the profile so it follows a sync
+ * from the other phone. The listener is what makes 'system' mean the device
+ * *now*: without it, turning your phone to dark at sunset would leave this app
+ * light until the next reload.
+ */
+function useTheme() {
+  const theme = useUserStore((s) => s.profile.theme)
+
+  useEffect(() => {
+    applyTheme(theme)
+
+    if (theme && theme !== 'system') return
+    if (typeof window === 'undefined' || !window.matchMedia) return
+
+    const device = window.matchMedia('(prefers-color-scheme: dark)')
+    const follow = () => applyTheme(theme)
+    device.addEventListener('change', follow)
+    return () => device.removeEventListener('change', follow)
+  }, [theme])
 }
 
 /**
@@ -197,6 +223,10 @@ function Gate() {
 }
 
 export default function App() {
+  // Here rather than inside the signed-in shell: the sign-in screen is a screen
+  // too, and it was the one place a dark theme would have flashed white.
+  useTheme()
+
   return (
     <ErrorBoundary>
       <HashRouter>
