@@ -175,6 +175,29 @@ function withoutDishDuplicates(items: Stated[]): RecipeComponent[] {
   return out
 }
 
+/**
+ * The dietician's own line, with the typing tidied and the words left alone.
+ *
+ * These came out of fourteen .docx files typed by a person over fourteen
+ * weeks, and they carry what that always carries: a stray colon at the start
+ * of a line, a space before a comma, a space inside a bracket, the occasional
+ * double space. The app shows these verbatim under "How your dietician wrote
+ * it", so they are read, and they read as broken.
+ *
+ * Only whitespace and stray leading punctuation. Nothing here changes a word,
+ * a number or a unit, because this text is evidence rather than prose: it is
+ * the thing you check the app's arithmetic against.
+ */
+function tidy(text: string): string {
+  return text
+    .replace(/\s+/g, ' ')
+    .replace(/\(\s+/g, '(')
+    .replace(/\s+\)/g, ')')
+    .replace(/\s+([,;.!?])/g, '$1')
+    .replace(/^[\s:;,.]+/, '')
+    .trim()
+}
+
 // ─── Naming ───────────────────────────────────────────────────────────────────
 
 const SLOT_TAG: Record<MealSlot, RecipeTag> = {
@@ -554,8 +577,9 @@ export function buildLibrary(plans: PlanInput[]): Library {
     days: plan.days.map((day) => ({
       dayName: day.dayName,
       weekday: day.weekday,
-      meals: day.meals.map((meal) => {
+      meals: day.meals.map((raw) => {
         lineCount++
+        const meal = { ...raw, text: tidy(raw.text) }
         const items = fragmentsOf(meal.text)
           .flatMap((f) => toComponents(f, meal.slot, plan.file, unresolved))
         const entries = withoutDishDuplicates(items)

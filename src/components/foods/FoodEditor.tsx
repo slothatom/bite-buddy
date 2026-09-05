@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useDialog } from '../../lib/useDialog'
+import { readAmount, MOST } from '../../lib/amounts'
 import { X, Trash2, Undo2, Combine } from 'lucide-react'
 import type { Food, MedCategory, MedTier, FoodState } from '../../types'
 import { useFoodStore, useFoodsMergedInto, isCuratedFood } from '../../store/useFoodStore'
@@ -7,6 +8,18 @@ import { useRecipes } from '../../store/useRecipeStore'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
 import { saltFromSodium } from '../../lib/nutrition'
 import { CATEGORY_LABELS, CATEGORY_ORDER } from '../../lib/categories'
+
+/**
+ * The ceiling for one of a food's own figures, all of them per 100 g.
+ *
+ * A macro cannot exceed the 100 g it is measured in, calories top out around
+ * pure fat, and sodium's ceiling is salt itself.
+ */
+function ceiling(key: string): number {
+  if (key === 'calories') return MOST.caloriesPer100g
+  if (key === 'sodium') return MOST.sodiumPer100g
+  return MOST.gramsPer100g
+}
 
 /**
  * Editing a food, whether it came with the app or from a search.
@@ -47,7 +60,9 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
 
   /** A blank means unknown, so it is removed rather than stored as a zero. */
   function setNutrient(key: 'calories' | 'protein' | 'carbs' | 'fat' | 'fiber' | 'sugar' | 'sodium', raw: string) {
-    const value = raw === '' ? undefined : Math.max(0, Number(raw))
+    // Clamped rather than merely floored. `min` on the element blocks the
+    // stepper arrows and nothing else, so 999999 went straight through.
+    const value = raw === '' ? undefined : readAmount(raw, { max: ceiling(key), places: 1 })
     setDraft((d) => {
       const per100g = { ...d.per100g }
       if (value == null && key !== 'calories' && key !== 'protein' && key !== 'carbs' && key !== 'fat') {
@@ -145,7 +160,7 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
             {([['calories', 'kcal'], ['protein', 'Protein'], ['carbs', 'Carbs'], ['fat', 'Fat']] as const).map(([key, label]) => (
               <div key={key}>
                 <label className="label">{label}</label>
-                <input type="number" min={0} className="input px-2" aria-label={label}
+                <input type="number" min={0} max={ceiling(key)} className="input px-2" aria-label={label}
                   value={draft.per100g[key] ?? ''}
                   onChange={(e) => setNutrient(key, e.target.value)} />
               </div>
@@ -156,7 +171,7 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
             {([['fiber', 'Fibre g'], ['sugar', 'Sugar g'], ['sodium', 'Sodium mg']] as const).map(([key, label]) => (
               <div key={key}>
                 <label className="label">{label}</label>
-                <input type="number" min={0} className="input px-2" aria-label={label}
+                <input type="number" min={0} max={ceiling(key)} className="input px-2" aria-label={label}
                   value={draft.per100g[key] ?? ''}
                   onChange={(e) => setNutrient(key, e.target.value)} />
               </div>

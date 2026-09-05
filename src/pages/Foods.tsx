@@ -1,4 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
+import { readAmount, MOST } from '../lib/amounts'
 import { useDialog } from '../lib/useDialog'
 import { Search, Plus, X, Loader2, Combine } from 'lucide-react'
 import type { Food, MedCategory, MedTier } from '../types'
@@ -16,6 +17,18 @@ import {
 // @zxing is 477 kB, bigger than the rest of the app put together. Loading it
 // only when the Scan tab is opened keeps it out of everyone else's way.
 const BarcodeScanner = lazy(() => import('../components/recipes/BarcodeScanner'))
+
+/**
+ * The ceiling for one of a food's own figures, all of them per 100 g.
+ *
+ * A macro cannot exceed the 100 g it is measured in, calories top out around
+ * pure fat, and sodium's ceiling is salt itself.
+ */
+function ceiling(key: string): number {
+  if (key === 'calories') return MOST.caloriesPer100g
+  if (key === 'sodium') return MOST.sodiumPer100g
+  return MOST.gramsPer100g
+}
 
 /**
  * The food database.
@@ -77,6 +90,7 @@ export default function Foods() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
             <input
               className="input pl-9"
+              aria-label="Search foods"
               placeholder="Search telemea, paine int, zabpehely, olive oil…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -440,9 +454,11 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                 ] as const).map(([key, label]) => (
                   <div key={key}>
                     <label className="label">{label}</label>
-                    <input type="number" min={0} className="input px-2"
+                    <input type="number" min={0} max={ceiling(key)} className="input px-2"
                       value={draft[key]}
-                      onChange={(e) => setDraft({ ...draft, [key]: Number(e.target.value) })} />
+                      onChange={(e) => setDraft({
+                        ...draft, [key]: readAmount(e.target.value, { max: ceiling(key), places: 1 }),
+                      })} />
                   </div>
                 ))}
               </div>
@@ -455,9 +471,11 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                 ] as const).map(([key, label]) => (
                   <div key={key}>
                     <label className="label">{label}</label>
-                    <input type="number" min={0} className="input px-2"
+                    <input type="number" min={0} max={ceiling(key)} className="input px-2"
                       value={draft[key]}
-                      onChange={(e) => setDraft({ ...draft, [key]: Number(e.target.value) })} />
+                      onChange={(e) => setDraft({
+                        ...draft, [key]: readAmount(e.target.value, { max: ceiling(key), places: 1 }),
+                      })} />
                   </div>
                 ))}
               </div>

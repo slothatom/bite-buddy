@@ -33,7 +33,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "muschiulet de vita ( 100 g carne de vita, o lingurita de ulei / portie ), 200 g piure de pastarnac ( 70% pastarnac, 30% cartofi), salata de cruditati, o lingurita de ulei",
+    "sourceLine": "muschiulet de vita (100 g carne de vita, o lingurita de ulei / portie), 200 g piure de pastarnac (70% pastarnac, 30% cartofi), salata de cruditati, o lingurita de ulei",
     "sourcePlanId": "plan-01",
     "createdAt": "2022-06-06T00:00:00.000Z"
   },
@@ -116,7 +116,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "100 g piept de pui la gratar , 40 g bulgur nefiert, 50 g avocado, legume, o lingurita de ulei de masline",
+    "sourceLine": "100 g piept de pui la gratar, 40 g bulgur nefiert, 50 g avocado, legume, o lingurita de ulei de masline",
     "sourcePlanId": "plan-01",
     "createdAt": "2022-06-06T00:00:00.000Z"
   },
@@ -281,7 +281,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "50 g halloumi la gratar, spanac cu linte ( 40 g linte nefiarta, o lingurita de ulei de masline )",
+    "sourceLine": "50 g halloumi la gratar, spanac cu linte (40 g linte nefiarta, o lingurita de ulei de masline)",
     "sourcePlanId": "plan-01",
     "createdAt": "2022-06-06T00:00:00.000Z"
   },
@@ -320,7 +320,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "salata de cruditati , 135 g ton in suc propriu , o lingurita de ulei de masline , 15 g orez expandat",
+    "sourceLine": "salata de cruditati, 135 g ton in suc propriu, o lingurita de ulei de masline, 15 g orez expandat",
     "sourcePlanId": "plan-01",
     "createdAt": "2022-06-06T00:00:00.000Z"
   },
@@ -359,7 +359,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "50 g paine int , guacamole din 100 g avocado, jumatate de farfurie de legume, 25 g telemea",
+    "sourceLine": "50 g paine int, guacamole din 100 g avocado, jumatate de farfurie de legume, 25 g telemea",
     "sourcePlanId": "plan-01",
     "createdAt": "2022-06-06T00:00:00.000Z"
   },
@@ -422,7 +422,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "350 g ciorba de legume ( o lingurita de ulei de masline / portie), 25 g paine int , o lg de iaurt",
+    "sourceLine": "350 g ciorba de legume (o lingurita de ulei de masline / portie), 25 g paine int, o lg de iaurt",
     "sourcePlanId": "plan-01",
     "createdAt": "2022-06-06T00:00:00.000Z"
   },
@@ -490,7 +490,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "125 g somon, 250 g legume la cuptor , 50 g sos de usrutoi",
+    "sourceLine": "125 g somon, 250 g legume la cuptor, 50 g sos de usrutoi",
     "sourcePlanId": "plan-01",
     "createdAt": "2022-06-06T00:00:00.000Z"
   },
@@ -762,7 +762,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "40 g teljes kiorlesu kenyer + tonhalkrem (2 adag: 130 g tonhal, 100 g ricotta ) + fel tanyer zoldseg + 1 tk. olivaolaj",
+    "sourceLine": "40 g teljes kiorlesu kenyer + tonhalkrem (2 adag: 130 g tonhal, 100 g ricotta) + fel tanyer zoldseg + 1 tk. olivaolaj",
     "sourcePlanId": "plan-02",
     "createdAt": "2021-01-11T00:00:00.000Z"
   },
@@ -878,7 +878,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "spenotos rantotta ( spenot + 2 tojas, 1 tk. olivaolaj) + 50 g kenyer + 100 g ceklasalata",
+    "sourceLine": "spenotos rantotta (spenot + 2 tojas, 1 tk. olivaolaj) + 50 g kenyer + 100 g ceklasalata",
     "sourcePlanId": "plan-02",
     "createdAt": "2021-01-11T00:00:00.000Z"
   },
@@ -1203,7 +1203,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "50 g paine int, pasta de branza ( 100 g branza de vaci, 2 lg de iaurt, ceapa / marar / ardei cu chimen), jumatate de farfurie de legume",
+    "sourceLine": "50 g paine int, pasta de branza (100 g branza de vaci, 2 lg de iaurt, ceapa / marar / ardei cu chimen), jumatate de farfurie de legume",
     "sourcePlanId": "plan-03",
     "createdAt": "2022-06-28T00:00:00.000Z"
   },
@@ -1334,7 +1334,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "tocanita de porc ( 100 g carne, o lingurita de ulei / portie) , 200 g piure de telina , salata de varza, o lingurita de ulei de masline",
+    "sourceLine": "tocanita de porc (100 g carne, o lingurita de ulei / portie), 200 g piure de telina, salata de varza, o lingurita de ulei de masline",
     "sourcePlanId": "plan-03",
     "createdAt": "2022-06-28T00:00:00.000Z"
   },
@@ -1426,7 +1426,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "2 ochiuri, 250 g mancare de dovlecel ( o lingurita de ulei / portie)",
+    "sourceLine": "2 ochiuri, 250 g mancare de dovlecel (o lingurita de ulei / portie)",
     "sourcePlanId": "plan-03",
     "createdAt": "2022-06-28T00:00:00.000Z"
   },
@@ -1465,7 +1465,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "salata de cruditati, 50 g telemea, o lingurita de ulei de masline , 15 g orez expandat",
+    "sourceLine": "salata de cruditati, 50 g telemea, o lingurita de ulei de masline, 15 g orez expandat",
     "sourcePlanId": "plan-03",
     "createdAt": "2022-06-28T00:00:00.000Z"
   },
@@ -1528,7 +1528,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "cod cu sos de salsa ( 150 g cod, 50 g avocado, 50 g mango), 50 g orez brun nefiert",
+    "sourceLine": "cod cu sos de salsa (150 g cod, 50 g avocado, 50 g mango), 50 g orez brun nefiert",
     "sourcePlanId": "plan-03",
     "createdAt": "2022-06-28T00:00:00.000Z"
   },
@@ -1562,7 +1562,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "350 g ciorba varza ( o lingurita de ulei / portie), o lg de iaurt , 25 g paine int",
+    "sourceLine": "350 g ciorba varza (o lingurita de ulei / portie), o lg de iaurt, 25 g paine int",
     "sourcePlanId": "plan-03",
     "createdAt": "2022-06-28T00:00:00.000Z"
   },
@@ -1620,7 +1620,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "tigaie picanta: 120 g piept de pui, 300 g legume , o lingurita de ulei",
+    "sourceLine": "tigaie picanta: 120 g piept de pui, 300 g legume, o lingurita de ulei",
     "sourcePlanId": "plan-04",
     "createdAt": "2022-05-30T00:00:00.000Z"
   },
@@ -1693,7 +1693,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "50 g paine int , omleta cu spanac ( din 2 oua), jumatate de farfurie de legume",
+    "sourceLine": "50 g paine int, omleta cu spanac (din 2 oua), jumatate de farfurie de legume",
     "sourcePlanId": "plan-04",
     "createdAt": "2022-05-30T00:00:00.000Z"
   },
@@ -1727,7 +1727,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "125 g somon , 200 g piure de conopida ( 70% conopida, 30% cartofi) , salata de cruditati, o lingurita de ulei de masline",
+    "sourceLine": "125 g somon, 200 g piure de conopida (70% conopida, 30% cartofi), salata de cruditati, o lingurita de ulei de masline",
     "sourcePlanId": "plan-04",
     "createdAt": "2022-05-30T00:00:00.000Z"
   },
@@ -1761,7 +1761,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "50 g paine int, guacamole ( 100 g avocado), jumatate de farfurie de legume",
+    "sourceLine": "50 g paine int, guacamole (100 g avocado), jumatate de farfurie de legume",
     "sourcePlanId": "plan-04",
     "createdAt": "2022-05-30T00:00:00.000Z"
   },
@@ -1863,7 +1863,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "350 g supa de fasole verde ( o lingurita de ulei de masline / portie), 25 g paine int , o lg de iaurt",
+    "sourceLine": "350 g supa de fasole verde (o lingurita de ulei de masline / portie), 25 g paine int, o lg de iaurt",
     "sourcePlanId": "plan-04",
     "createdAt": "2022-05-30T00:00:00.000Z"
   },
@@ -1892,7 +1892,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "budinca de chia: 150 ml lapte , 20 g seminte de chia, 30 g fulgi de ovaz, 100 g capsuni",
+    "sourceLine": "budinca de chia: 150 ml lapte, 20 g seminte de chia, 30 g fulgi de ovaz, 100 g capsuni",
     "sourcePlanId": "plan-04",
     "createdAt": "2022-05-30T00:00:00.000Z"
   },
@@ -1926,7 +1926,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "rulouri de vinete ( ½ din reteta), 50 g bulgur nefiert, salata de cruditati, o lingurita de ulei de masline",
+    "sourceLine": "rulouri de vinete (½ din reteta), 50 g bulgur nefiert, salata de cruditati, o lingurita de ulei de masline",
     "sourcePlanId": "plan-04",
     "createdAt": "2022-05-30T00:00:00.000Z"
   },
@@ -1994,7 +1994,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "rulouri de vinete ( ½ din reteta), 45 g bulgur nefiert, muraturi",
+    "sourceLine": "rulouri de vinete (½ din reteta), 45 g bulgur nefiert, muraturi",
     "sourcePlanId": "plan-04",
     "createdAt": "2022-05-30T00:00:00.000Z"
   },
@@ -2101,7 +2101,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "salata cezar : 120 g piept de curcan , 85 g porumb fiert, salata de cruditati, 75 g sos de usturoi , 25 g paine int",
+    "sourceLine": "salata cezar : 120 g piept de curcan, 85 g porumb fiert, salata de cruditati, 75 g sos de usturoi, 25 g paine int",
     "sourcePlanId": "plan-05",
     "createdAt": "2022-11-14T00:00:00.000Z"
   },
@@ -2165,7 +2165,7 @@ export const MEAL_RECIPES: Recipe[] = [
       "dinner",
       "breakfast"
     ],
-    "sourceLine": "50 g paine int , pasta de avocado din 100 g avocado, jumatate de farfurie de legume",
+    "sourceLine": "50 g paine int, pasta de avocado din 100 g avocado, jumatate de farfurie de legume",
     "sourcePlanId": "plan-05",
     "createdAt": "2022-11-14T00:00:00.000Z"
   },
@@ -2194,7 +2194,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "o portie de banana bread cu ciocolata , 150 g iaurt",
+    "sourceLine": "o portie de banana bread cu ciocolata, 150 g iaurt",
     "sourcePlanId": "plan-05",
     "createdAt": "2022-11-14T00:00:00.000Z"
   },
@@ -2223,7 +2223,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "jumatate din reteta de shakshuka cu naut ( cu o mica schimbare: 100 g naut fiert / portie), 25 g paine int",
+    "sourceLine": "jumatate din reteta de shakshuka cu naut (cu o mica schimbare: 100 g naut fiert / portie), 25 g paine int",
     "sourcePlanId": "plan-05",
     "createdAt": "2022-11-14T00:00:00.000Z"
   },
@@ -2349,7 +2349,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "100 g piept de curcan la grill, 250 g mancare de dovlecel ( o lingurita de ulei / portie )",
+    "sourceLine": "100 g piept de curcan la grill, 250 g mancare de dovlecel (o lingurita de ulei / portie)",
     "sourcePlanId": "plan-05",
     "createdAt": "2022-11-14T00:00:00.000Z"
   },
@@ -2490,7 +2490,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "cartofi cu ou ( 200 g cartofi fierti, 1 ou fiert, sos: ½ ou, 100 g iaurt 2%, 50 g telemea), castraveti murati",
+    "sourceLine": "cartofi cu ou (200 g cartofi fierti, 1 ou fiert, sos: ½ ou, 100 g iaurt 2%, 50 g telemea), castraveti murati",
     "sourcePlanId": "plan-06",
     "createdAt": "2022-11-21T00:00:00.000Z"
   },
@@ -2519,7 +2519,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "50 g halloumi la gratar, 300 g legume wok ( o lingurita de ulei)",
+    "sourceLine": "50 g halloumi la gratar, 300 g legume wok (o lingurita de ulei)",
     "sourcePlanId": "plan-06",
     "createdAt": "2022-11-21T00:00:00.000Z"
   },
@@ -2592,7 +2592,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "50 g paine int, 150 g pasta de vinete cu ardei copti ( o lingurita de ulei), jumatate de farfurie de legume",
+    "sourceLine": "50 g paine int, 150 g pasta de vinete cu ardei copti (o lingurita de ulei), jumatate de farfurie de legume",
     "sourcePlanId": "plan-06",
     "createdAt": "2022-11-21T00:00:00.000Z"
   },
@@ -2621,7 +2621,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "salata tabbouleh cu naut ( 50 g quinoa nefiarta, 120 g naut fiert, legume, o lingurita de ulei de masline )",
+    "sourceLine": "salata tabbouleh cu naut (50 g quinoa nefiarta, 120 g naut fiert, legume, o lingurita de ulei de masline)",
     "sourcePlanId": "plan-06",
     "createdAt": "2022-11-21T00:00:00.000Z"
   },
@@ -2699,7 +2699,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "mamaliga ( din 50 g faina de malai), 100 g branza de vaci, o lg de iaurt",
+    "sourceLine": "mamaliga (din 50 g faina de malai), 100 g branza de vaci, o lg de iaurt",
     "sourcePlanId": "plan-06",
     "createdAt": "2022-11-21T00:00:00.000Z"
   },
@@ -2840,7 +2840,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "mini pizza de vinete cu mozzarella ( jumatate de vinete , o lingurita de ulei de masline, rosii, 60 g mozzarella), 50 g orez brun nefiert, castraveti murati",
+    "sourceLine": "mini pizza de vinete cu mozzarella (jumatate de vinete, o lingurita de ulei de masline, rosii, 60 g mozzarella), 50 g orez brun nefiert, castraveti murati",
     "sourcePlanId": "plan-06",
     "createdAt": "2022-11-21T00:00:00.000Z"
   },
@@ -2869,7 +2869,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "350 g supa crema de spanac ( o lingurita de ulei / portie), 25 g paine int",
+    "sourceLine": "350 g supa crema de spanac (o lingurita de ulei / portie), 25 g paine int",
     "sourcePlanId": "plan-06",
     "createdAt": "2022-11-21T00:00:00.000Z"
   },
@@ -3320,7 +3320,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "60 g halloumi la gratar , salata tabbouleh ( 40 g quinoa nefiarta, legume, o lingurita de ulei de masline )",
+    "sourceLine": "60 g halloumi la gratar, salata tabbouleh (40 g quinoa nefiarta, legume, o lingurita de ulei de masline)",
     "sourcePlanId": "plan-08",
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
@@ -3509,7 +3509,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "40 g paine int , pasta de ton ( pt 2 portii: 135 g ton in suc propriu, 50 g branza cremoasa President, ceapa, sare, piper, 1 lg de iaurt, zeama de lamaie) + jumatate de farfurie de legume",
+    "sourceLine": "40 g paine int, pasta de ton (pt 2 portii: 135 g ton in suc propriu, 50 g branza cremoasa President, ceapa, sare, piper, 1 lg de iaurt, zeama de lamaie) + jumatate de farfurie de legume",
     "sourcePlanId": "plan-08",
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
@@ -3543,7 +3543,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "omleta ( din 2 oua + 25 g telemea) + jumatate de farfurie de legume, 50 g paine int",
+    "sourceLine": "omleta (din 2 oua + 25 g telemea) + jumatate de farfurie de legume, 50 g paine int",
     "sourcePlanId": "plan-09",
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
@@ -3577,7 +3577,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "100 g cotlet sub capac ( o lingurita de ulei / 100 g carne), 200 g piure de telina (70% telina, 30% cartof) , muraturi",
+    "sourceLine": "100 g cotlet sub capac (o lingurita de ulei / 100 g carne), 200 g piure de telina (70% telina, 30% cartof), muraturi",
     "sourcePlanId": "plan-09",
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
@@ -3698,7 +3698,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "150 g tofu cu o lingurita de ulei de masline , mancare de linte ( o lingurita de ulei si 50 g linte uscata / portie) + o lg de iaurt",
+    "sourceLine": "150 g tofu cu o lingurita de ulei de masline, mancare de linte (o lingurita de ulei si 50 g linte uscata / portie) + o lg de iaurt",
     "sourcePlanId": "plan-09",
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
@@ -3766,7 +3766,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "50 g paine int , 150 g salata de vinete cu iaurt, jumatate de farfurie de legume, 50 g telemea",
+    "sourceLine": "50 g paine int, 150 g salata de vinete cu iaurt, jumatate de farfurie de legume, 50 g telemea",
     "sourcePlanId": "plan-09",
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
@@ -3800,7 +3800,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "2 ochiuri , mancare de linte ( o lingurita de ulei si 50 g linte uscata / portie) + o lg de iaurt",
+    "sourceLine": "2 ochiuri, mancare de linte (o lingurita de ulei si 50 g linte uscata / portie) + o lg de iaurt",
     "sourcePlanId": "plan-09",
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
@@ -3829,7 +3829,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "350 g ciorba a la grec ( cu carne de curcan 30 g / portie ) , 25 g paine int",
+    "sourceLine": "350 g ciorba a la grec (cu carne de curcan 30 g / portie), 25 g paine int",
     "sourcePlanId": "plan-09",
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
@@ -3863,7 +3863,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "terci de ovaz ( 100 ml apa, 100 ml lapte, 40 g fulgi de ovaz, 1 mar razuit, scortisoara) + 15 g ciocolata neagra",
+    "sourceLine": "terci de ovaz (100 ml apa, 100 ml lapte, 40 g fulgi de ovaz, 1 mar razuit, scortisoara) + 15 g ciocolata neagra",
     "sourcePlanId": "plan-09",
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
@@ -3936,7 +3936,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "2 ochiuri , 250 g mancare de spanac ( o lg de ulei si o lg rasa de faina / 2 portii portii, ), 25 g paine int",
+    "sourceLine": "2 ochiuri, 250 g mancare de spanac (o lg de ulei si o lg rasa de faina / 2 portii portii,), 25 g paine int",
     "sourcePlanId": "plan-09",
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
@@ -3965,7 +3965,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "80 g halloumi la gratar, 250 g mancare de spanac ( o lg de ulei si o lg rasa de faina / 2 portii portii )",
+    "sourceLine": "80 g halloumi la gratar, 250 g mancare de spanac (o lg de ulei si o lg rasa de faina / 2 portii portii)",
     "sourcePlanId": "plan-09",
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
@@ -4004,7 +4004,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "salata de cruditati + 160 g fasole rosie, o lingurita de ulei de masline , 15 g orez expandat",
+    "sourceLine": "salata de cruditati + 160 g fasole rosie, o lingurita de ulei de masline, 15 g orez expandat",
     "sourcePlanId": "plan-09",
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
@@ -4038,7 +4038,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "100 g chiftelute de dovlecel, 50 g bulgur nefiert , 150 g ardei copti",
+    "sourceLine": "100 g chiftelute de dovlecel, 50 g bulgur nefiert, 150 g ardei copti",
     "sourcePlanId": "plan-10",
     "createdAt": "2022-05-24T00:00:00.000Z"
   },
@@ -4077,7 +4077,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "shaorma sanatoasa : 64 g lipie int, 100 g piept de pui la gratar , 25 g telemea razuita, legume, 50 g sos de baza de iaurt si usturoi",
+    "sourceLine": "shaorma sanatoasa : 64 g lipie int, 100 g piept de pui la gratar, 25 g telemea razuita, legume, 50 g sos de baza de iaurt si usturoi",
     "sourcePlanId": "plan-10",
     "createdAt": "2022-05-24T00:00:00.000Z"
   },
@@ -4116,7 +4116,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "50 g paine int , pasta de ou ( 2 oua, 1 lg de iaurt, ceapa, sare, piper), jumatate de farfurie de legume",
+    "sourceLine": "50 g paine int, pasta de ou (2 oua, 1 lg de iaurt, ceapa, sare, piper), jumatate de farfurie de legume",
     "sourcePlanId": "plan-10",
     "createdAt": "2022-05-24T00:00:00.000Z"
   },
@@ -4160,7 +4160,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "pizza : 64 g lipie int, sos de rosii, 50 g mozzarella , busuioc, ciuperci, ardei, ceapa",
+    "sourceLine": "pizza : 64 g lipie int, sos de rosii, 50 g mozzarella, busuioc, ciuperci, ardei, ceapa",
     "sourcePlanId": "plan-10",
     "createdAt": "2022-05-24T00:00:00.000Z"
   },
@@ -4189,7 +4189,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "350 g supa crema de conopida ( o lingurita de ulei de masline / portie), 25 g paine int",
+    "sourceLine": "350 g supa crema de conopida (o lingurita de ulei de masline / portie), 25 g paine int",
     "sourcePlanId": "plan-10",
     "createdAt": "2022-05-24T00:00:00.000Z"
   },
@@ -4417,7 +4417,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "350 g supa crema de rosii ( o lingurita de ulei / portie), 25 g paine int",
+    "sourceLine": "350 g supa crema de rosii (o lingurita de ulei / portie), 25 g paine int",
     "sourcePlanId": "plan-11",
     "createdAt": "2022-07-04T00:00:00.000Z"
   },
@@ -4509,7 +4509,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "110 g piept de curcan la gratar, salata tabbouleh ( 50 g quinoa nefiarta, legume, o lingurita de ulei de masline )",
+    "sourceLine": "110 g piept de curcan la gratar, salata tabbouleh (50 g quinoa nefiarta, legume, o lingurita de ulei de masline)",
     "sourcePlanId": "plan-11",
     "createdAt": "2022-07-04T00:00:00.000Z"
   },
@@ -4640,7 +4640,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "125 g somon la gratar , salata de cruditati, o lingurita de ulei de masline , 50 g sos de usturoi",
+    "sourceLine": "125 g somon la gratar, salata de cruditati, o lingurita de ulei de masline, 50 g sos de usturoi",
     "sourcePlanId": "plan-11",
     "createdAt": "2022-07-04T00:00:00.000Z"
   },
@@ -4776,7 +4776,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "mini pizza de vinete: ½ vinete , o lingurita de ulei, rosii, 65 g mozzarella in apa , busuioc + 50 g bulgur nefiert",
+    "sourceLine": "mini pizza de vinete: ½ vinete, o lingurita de ulei, rosii, 65 g mozzarella in apa, busuioc + 50 g bulgur nefiert",
     "sourcePlanId": "plan-11",
     "createdAt": "2022-07-04T00:00:00.000Z"
   },
@@ -4815,7 +4815,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "salata de cruditati, 75 g branza de capra, o lingurita de ulei de masline , 15 g orez expandat",
+    "sourceLine": "salata de cruditati, 75 g branza de capra, o lingurita de ulei de masline, 15 g orez expandat",
     "sourcePlanId": "plan-11",
     "createdAt": "2022-07-04T00:00:00.000Z"
   },
@@ -4849,7 +4849,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "50 g paine int , omleta cu ciuperci ( 2 oua, 3-4 ciuperci) , jumatate de farfurie de legume",
+    "sourceLine": "50 g paine int, omleta cu ciuperci (2 oua, 3-4 ciuperci), jumatate de farfurie de legume",
     "sourcePlanId": "plan-11",
     "createdAt": "2022-07-04T00:00:00.000Z"
   },
@@ -4888,7 +4888,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "mini pizza de vinete: ½ vinete , o lingurita de ulei, rosii, 60 g mozzarella in apa + 40 g bulgur nefiert",
+    "sourceLine": "mini pizza de vinete: ½ vinete, o lingurita de ulei, rosii, 60 g mozzarella in apa + 40 g bulgur nefiert",
     "sourcePlanId": "plan-11",
     "createdAt": "2022-07-04T00:00:00.000Z"
   },
@@ -4922,7 +4922,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "150 g iaurt , 40 g fulgi de ovaz, 100 g fructe de padure",
+    "sourceLine": "150 g iaurt, 40 g fulgi de ovaz, 100 g fructe de padure",
     "sourcePlanId": "plan-12",
     "createdAt": "2022-07-11T00:00:00.000Z"
   },
@@ -4985,7 +4985,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "100 g cotlet la gratar , 200 g varza calita ( o lingurita de ulei / portie), o lg de iaurt",
+    "sourceLine": "100 g cotlet la gratar, 200 g varza calita (o lingurita de ulei / portie), o lg de iaurt",
     "sourcePlanId": "plan-12",
     "createdAt": "2022-07-11T00:00:00.000Z"
   },
@@ -5024,7 +5024,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "50 g paine int, 150 g vinete, jumatate de farfurie de legume , 25 g telemea",
+    "sourceLine": "50 g paine int, 150 g vinete, jumatate de farfurie de legume, 25 g telemea",
     "sourcePlanId": "plan-12",
     "createdAt": "2022-07-11T00:00:00.000Z"
   },
@@ -5107,7 +5107,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "salata cu mozzarella : salata de cruditati, 125 g mozzarella, o lingurita de ulei de masline , 40 g paine int",
+    "sourceLine": "salata cu mozzarella : salata de cruditati, 125 g mozzarella, o lingurita de ulei de masline, 40 g paine int",
     "sourcePlanId": "plan-12",
     "createdAt": "2022-07-11T00:00:00.000Z"
   },
@@ -5146,7 +5146,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "salata de quinoa: o mana de spanac crud, 50 g quinoa nefiarta, 5-6 buc. de ciuperci calite intr-o lingurita de ulei de masline , 50 g feta",
+    "sourceLine": "salata de quinoa: o mana de spanac crud, 50 g quinoa nefiarta, 5-6 buc. de ciuperci calite intr-o lingurita de ulei de masline, 50 g feta",
     "sourcePlanId": "plan-12",
     "createdAt": "2022-07-11T00:00:00.000Z"
   },
@@ -5773,7 +5773,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "150 g tofu + lencsefozelek ( 65 g nyers lencse es 1 tk. olivaolaj / adag)",
+    "sourceLine": "150 g tofu + lencsefozelek (65 g nyers lencse es 1 tk. olivaolaj / adag)",
     "sourcePlanId": "plan-13",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
@@ -5894,7 +5894,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "150 g feher husu hal + 250 g zoldsegkoret ( cukkini, paradicsom, edeskrumpli, brokkoli, 2 tk. olivaolaj )",
+    "sourceLine": "150 g feher husu hal + 250 g zoldsegkoret (cukkini, paradicsom, edeskrumpli, brokkoli, 2 tk. olivaolaj)",
     "sourcePlanId": "plan-13",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
@@ -5957,7 +5957,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": ": 300 g marhahusos csorba (35 g marhahus, 1 tk. olivaolaj / adag) + 1 ek. joghurt + 25 g teljes kiorlesu kenyer",
+    "sourceLine": "300 g marhahusos csorba (35 g marhahus, 1 tk. olivaolaj / adag) + 1 ek. joghurt + 25 g teljes kiorlesu kenyer",
     "sourcePlanId": "plan-13",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
@@ -5991,7 +5991,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "piept de pui cu mozzarella si sos de rosii (100 g piept de pui, 30 g mozzarella), 50 g bulgur nefiert , castraveti murati",
+    "sourceLine": "piept de pui cu mozzarella si sos de rosii (100 g piept de pui, 30 g mozzarella), 50 g bulgur nefiert, castraveti murati",
     "sourcePlanId": "plan-14",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
@@ -6180,7 +6180,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "2 ochiuri, 250 g mancare de spanac ( o lingurita de ulei / portie)",
+    "sourceLine": "2 ochiuri, 250 g mancare de spanac (o lingurita de ulei / portie)",
     "sourcePlanId": "plan-14",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
@@ -6282,7 +6282,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "lunch"
     ],
-    "sourceLine": "100 g cotlet la gratar, salata tabbouleh ( 50 g quinoa nefiarta, legume, o lingurita de ulei de masline )",
+    "sourceLine": "100 g cotlet la gratar, salata tabbouleh (50 g quinoa nefiarta, legume, o lingurita de ulei de masline)",
     "sourcePlanId": "plan-14",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
@@ -6311,7 +6311,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "dinner"
     ],
-    "sourceLine": "350 g supa crema de sparanghel ( o lingurita de ulei de masline / portie), 25 g paine int",
+    "sourceLine": "350 g supa crema de sparanghel (o lingurita de ulei de masline / portie), 25 g paine int",
     "sourcePlanId": "plan-14",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },

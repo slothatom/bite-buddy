@@ -126,10 +126,24 @@ describe('the same meal, written twice', () => {
       plan(['lunch', '125 g somon, 250 g legume la cuptor , 50 g sos de usturoi']),
     ])
 
+    // The stray space before the comma goes, and both spellings stay,
+    // including the typed-in-a-hurry one. Whitespace is not wording.
     expect(plans.map((p) => p.days[0].meals[0].text)).toEqual([
-      '125 g somon, 250 g legume la cuptor , 50 g sos de usrutoi',
-      '125 g somon, 250 g legume la cuptor , 50 g sos de usturoi',
+      '125 g somon, 250 g legume la cuptor, 50 g sos de usrutoi',
+      '125 g somon, 250 g legume la cuptor, 50 g sos de usturoi',
     ])
+  })
+
+  it('tidies the typing without touching a word, a number or a unit', () => {
+    // Fourteen .docx files typed by a person over fourteen weeks carry what
+    // that always carries. The app shows these verbatim under "How your
+    // dietician wrote it", so they are read, and they read as broken.
+    const { plans } = buildLibrary([
+      plan(['lunch', ': 300 g ciorba de legume ( o lingurita de ulei ),  25 g paine int ']),
+    ])
+
+    expect(plans[0].days[0].meals[0].text)
+      .toBe('300 g ciorba de legume (o lingurita de ulei), 25 g paine int')
   })
 
   it('is the dish itself when that is all it is', () => {
