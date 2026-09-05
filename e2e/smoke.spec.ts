@@ -2014,7 +2014,9 @@ test.describe('what actually happened', () => {
     await page.locator('[data-recipe-card]').first().click()
 
     await page.getByRole('button', { name: 'Put it in a day' }).click()
-    const dialog = page.getByRole('dialog')
+    // Named, because the recipe sheet behind it is a dialog too now that every
+    // one of them announces itself.
+    const dialog = page.getByRole('dialog', { name: /^Put .* in a day$/ })
     await expect(dialog).toBeVisible()
     await dialog.getByRole('button', { name: 'Put it in', exact: true }).click()
 
@@ -2266,6 +2268,22 @@ test.describe('bringing a backup back', () => {
 })
 
 test.describe('the small sharp edges', () => {
+  test('a dialog can be escaped, and gives focus back', async ({ page }) => {
+    // Clicking the backdrop always worked, which hid the gap: on a phone that
+    // is the only way most people would close one, so nothing looked broken.
+    await goto(page, '/plan')
+
+    const opener = page.getByRole('button', { name: 'Saved weeks' })
+    await opener.click()
+    await expect(page.getByRole('dialog', { name: 'Saved weeks' })).toBeVisible()
+
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog', { name: 'Saved weeks' })).toHaveCount(0)
+
+    // And focus is back where it came from, rather than on the page body.
+    await expect(opener).toBeFocused()
+  })
+
   test('the tab is named after the screen', async ({ page }) => {
     await goto(page, '/plan')
     await expect(page).toHaveTitle(/^Planner · Bite Buddy$/)

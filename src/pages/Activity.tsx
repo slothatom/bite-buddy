@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useDialog } from '../lib/useDialog'
 import { Plus, Trash2, Upload, X, Search, Moon, Footprints } from 'lucide-react'
 import type { ExerciseKind, SleepEntry, StepEntry, Workout, WorkoutEntry } from '../types'
 import { PEOPLE, type PersonId } from '../lib/people'
@@ -594,12 +595,16 @@ function Sheet({
   onClose: () => void
   children: React.ReactNode
 }) {
+  const panel = useDialog<HTMLDivElement>(onClose)
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4"
       onClick={onClose}
     >
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
         className="bg-paper w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] flex flex-col shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >

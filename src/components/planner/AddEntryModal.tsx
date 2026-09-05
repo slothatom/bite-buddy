@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useDialog } from '../../lib/useDialog'
 import { Search, X, CalendarDays } from 'lucide-react'
 import type { Component, MealSlot, Recipe } from '../../types'
 import { SLOT_LABELS } from '../../types'
@@ -62,6 +63,7 @@ export default function AddEntryModal({
 }) {
   const ate = mode === 'ate'
   const [when, setWhen] = useState(false)
+  const panel = useDialog<HTMLDivElement>(onClose)
   const [query, setQuery] = useState('')
   // Snacks open on foods. The plans write them as lines rather than dishes
   // ("150 g mere, 10 g caju"), so the recipe tab for a snack slot was reliably
@@ -102,6 +104,9 @@ export default function AddEntryModal({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs p-0 sm:p-4"
       onClick={onClose}>
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
         className="bg-paper w-full sm:max-w-2xl sm:rounded-2xl rounded-t-2xl max-h-[88vh] flex flex-col shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}

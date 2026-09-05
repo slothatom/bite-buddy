@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useDialog } from '../../lib/useDialog'
 import { Sparkles, X } from 'lucide-react'
 import type { Component, MealSlot } from '../../types'
 import { SLOT_LABELS } from '../../types'
@@ -67,6 +68,7 @@ export default function FillGaps({
     return open ? ('nothing-to-offer' as const) : ('full' as const)
   }, [dates, plan])
 
+  const panel = useDialog<HTMLDivElement>(onClose)
   const [dropped, setDropped] = useState<string[]>([])
   const key = (p: Proposal) => `${p.date}-${p.slot}`
   const kept = proposals.filter((p) => !dropped.includes(key(p)))
@@ -80,6 +82,9 @@ export default function FillGaps({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
         className="bg-paper w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] flex flex-col shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}

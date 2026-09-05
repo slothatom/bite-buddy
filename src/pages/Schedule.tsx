@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Plus, Check, Trash2, Search, Bell, Minus } from 'lucide-react'
 import type { CookSession, MealSlot } from '../types'
+import { useDialog } from '../lib/useDialog'
 import { useCookStore } from '../store/useCookStore'
 import { useRecipes } from '../store/useRecipeStore'
 import { useMealPlanStore } from '../store/useMealPlanStore'
@@ -139,6 +140,7 @@ function SessionDialog({
   onClose: () => void
   onSave: (s: CookSession) => void
 }) {
+  const panel = useDialog<HTMLDivElement>(onClose)
   const plan = useMealPlanStore((s) => s.plan)
   const [label, setLabel] = useState('')
   const [date, setDate] = useState(today())
@@ -187,6 +189,9 @@ function SessionDialog({
           padding replaced the bottom padding rather than adding to it, so the
           buttons sat flush against the edge of the card. */}
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
         className="bg-paper w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] flex flex-col shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
@@ -385,6 +390,7 @@ function FridgeList() {
  * write it down would mean the app only knows about the tidy half of cooking.
  */
 function LeftoversDialog({ onClose }: { onClose: () => void }) {
+  const panel = useDialog<HTMLDivElement>(onClose)
   const recipes = useRecipes()
   const { addPortion } = usePortionStore()
   const [query, setQuery] = useState('')
@@ -424,6 +430,9 @@ function LeftoversDialog({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
         className="bg-paper w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl p-5 space-y-4"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}
@@ -535,6 +544,7 @@ function LeftoversDialog({ onClose }: { onClose: () => void }) {
  * insists otherwise is wrong by Tuesday.
  */
 function CookedDialog({ session, onClose }: { session: CookSession; onClose: () => void }) {
+  const panel = useDialog<HTMLDivElement>(onClose)
   const ctx = useNutritionContext()
   const { addPortion, takeFrom } = usePortionStore()
   const { plan, addEntry } = useMealPlanStore()
@@ -620,6 +630,9 @@ function CookedDialog({ session, onClose }: { session: CookSession; onClose: () 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
         className="bg-paper w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl p-5 space-y-4"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         onClick={(e) => e.stopPropagation()}

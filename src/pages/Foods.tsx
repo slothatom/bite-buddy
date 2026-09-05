@@ -1,4 +1,5 @@
 import { lazy, Suspense, useMemo, useState } from 'react'
+import { useDialog } from '../lib/useDialog'
 import { Search, Plus, X, Loader2, Combine } from 'lucide-react'
 import type { Food, MedCategory, MedTier } from '../types'
 import { isCuratedFood, useFoods, useFoodStore } from '../store/useFoodStore'
@@ -219,6 +220,7 @@ function DuplicateBanner({
 }
 
 function AddFoodModal({ onClose }: { onClose: () => void }) {
+  const panel = useDialog<HTMLDivElement>(onClose)
   const { addFood } = useFoodStore()
   const [tab, setTab] = useState<'manual' | 'lookup' | 'scan'>('manual')
   const [scanError, setScanError] = useState<string | null>(null)
@@ -315,7 +317,11 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
-      <div className="bg-paper w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
+      <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        className="bg-paper w-full sm:max-w-lg sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }} onClick={(e) => e.stopPropagation()}>
         <header className="flex items-center justify-between px-5 py-4 border-b border-border-200">
           <h2 className="text-base font-extrabold text-ink-900">Add a food</h2>
