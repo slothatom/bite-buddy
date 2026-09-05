@@ -112,7 +112,10 @@ describe('the library it produces', () => {
       return r.prepMinutes + r.cookMinutes
     }
 
-    expect(time('Rolled oats with yogurt & mixed berries (30 g rolled oats)'))
+    // By name alone: the three portions of this one all cook the same, since
+    // a cooking time comes from what the dish is rather than how much of it
+    // there is, and the portion is no longer part of the name.
+    expect(time('Rolled oats with yogurt & mixed berries'))
       .toBe(time('Yogurt with rolled oats & mixed berries'))
   })
 
@@ -127,7 +130,7 @@ describe('the library it produces', () => {
       return r.prepMinutes + r.cookMinutes
     }
 
-    expect(time('Rolled oats with yogurt & mixed berries (30 g rolled oats)'))
+    expect(time('Rolled oats with yogurt & mixed berries'))
       .toBeLessThan(time('Cabbage soup with wholemeal bread & yogurt'))
   })
 })

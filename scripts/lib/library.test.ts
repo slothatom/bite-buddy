@@ -33,6 +33,9 @@ function plan(...lines: [MealSlot, string][]): PlanInput {
 }
 
 const names = (plans: PlanInput[]) => buildLibrary(plans).recipes.map((r) => r.name.en)
+/** Name and portion as the library holds them: two fields, not one string. */
+const titles = (plans: PlanInput[]) =>
+  buildLibrary(plans).recipes.map((r) => [r.name.en, r.variant] as const)
 
 describe('a dish that lists its own ingredients', () => {
   it('does not serve them twice', () => {
@@ -157,24 +160,34 @@ describe('the same meal, written twice', () => {
 })
 
 describe('two recipes that need telling apart', () => {
-  it('never settles for a number in brackets', () => {
-    const built = names([
+  it('never settles for a bare number, and leaves no two the same', () => {
+    const built = titles([
       plan(['breakfast', '150 g iaurt , 30 g fulgi de ovaz, 100 g fructe de padure']),
       plan(['breakfast', '150 g iaurt , 45 g fulgi de ovaz, 100 g fructe de padure']),
     ])
 
-    expect(built.some((name) => / \(\d+\)$/.test(name))).toBe(false)
-    expect(new Set(built).size).toBe(built.length)
+    expect(built.some(([, portion]) => /^\d+$/.test(portion ?? ''))).toBe(false)
+    expect(new Set(built.map((t) => t.join('\u0000'))).size).toBe(built.length)
   })
 
-  it('says the weight that differs, on both of them', () => {
-    const built = names([
+  it('says the weight that differs beside the name, not inside it', () => {
+    const built = titles([
       plan(['breakfast', '150 g iaurt , 30 g fulgi de ovaz, 100 g fructe de padure']),
       plan(['breakfast', '150 g iaurt , 45 g fulgi de ovaz, 100 g fructe de padure']),
     ])
 
-    expect(built).toContain('Rolled oats with yogurt & mixed berries (30 g rolled oats)')
-    expect(built).toContain('Rolled oats with yogurt & mixed berries (45 g rolled oats)')
+    expect(built).toContainEqual(['Rolled oats with yogurt & mixed berries', '30 g rolled oats'])
+    expect(built).toContainEqual(['Rolled oats with yogurt & mixed berries', '45 g rolled oats'])
+  })
+
+  it('leaves the quantity out of every name it writes', () => {
+    // The whole point of holding the portion in its own field. A weight in the
+    // name made "Grapefruit with cashews (10 g cashews, 250 g grapefruit)" a
+    // headline three lines deep on a phone, and left every screen that wanted
+    // the dish stripping the bracket back off with a regular expression.
+    for (const [name] of titles(REAL_WEEK)) {
+      expect(name).not.toMatch(/\(/)
+    }
   })
 
   it('folds an ingredient one of them has into its name', () => {
@@ -188,23 +201,25 @@ describe('two recipes that need telling apart', () => {
   })
 
   it('does not let a meal shadow the dish it is named after', () => {
-    const built = names([plan(['dinner', '300 gombakremleves (1 tk. olivaolaj)'])])
+    // Same name as the hand-written dish, which is right: it is that soup.
+    // What stops them being the same card is the portion beside it.
+    const built = titles([plan(['dinner', '300 gombakremleves (1 tk. olivaolaj)'])])
 
-    expect(built).toEqual(['Cream of mushroom soup (300 g)'])
+    expect(built).toEqual([['Cream of mushroom soup', '300 g']])
     expect(DISHES.map((d) => d.name.en)).toContain('Cream of mushroom soup')
   })
 
   it('would rather name an ingredient than a pinch of seasoning', () => {
-    const built = names([
+    const built = titles([
       plan(['lunch', 'mini pizza de vinete: ½ vinete , o lingurita de ulei, rosii, 65 g mozzarella in apa , busuioc + 50 g bulgur nefiert']),
       plan(['lunch', 'mini pizza de vinete: ½ vinete , o lingurita de ulei, rosii, 60 g mozzarella in apa + 40 g bulgur nefiert']),
     ])
 
     // One of these has a few leaves of basil and the other does not, but they
     // also carry 50 g and 40 g of bulgur, which is the difference worth saying.
-    expect(built.some((name) => /basil/i.test(name))).toBe(false)
-    expect(built).toContain('Eggplant mini pizzas with bulgur & tomatoes (50 g bulgur)')
-    expect(built).toContain('Eggplant mini pizzas with bulgur & tomatoes (40 g bulgur)')
+    expect(built.some(([name, portion]) => /basil/i.test(`${name} ${portion ?? ''}`))).toBe(false)
+    expect(built).toContainEqual(['Eggplant mini pizzas with bulgur & tomatoes', '50 g bulgur'])
+    expect(built).toContainEqual(['Eggplant mini pizzas with bulgur & tomatoes', '40 g bulgur'])
   })
 })
 

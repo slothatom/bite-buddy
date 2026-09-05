@@ -19,7 +19,7 @@ import { NutrientSummary, EmptyState, SourceLine } from '../components/ui'
 import RecipeEditor from '../components/recipes/RecipeEditor'
 import {
   RECIPE_GROUPS, GROUP_LABELS, GROUP_BLURBS,
-  groupsOf, groupForTime, groupVariants,
+  groupsOf, groupForTime, groupVariants, variantLabel,
   type RecipeGroup, type RecipeVariants,
 } from '../lib/recipeGroups'
 import {
@@ -108,8 +108,10 @@ export default function Recipes() {
       if (!n) return true
       // The dietician's own line is searched too, so "telemea" finds the meals
       // that were written in Romanian.
+      // The portion too, so "45 g rolled oats" still finds the version it
+      // names now that the quantity has come out of the name.
       const haystack = normaliseTerm(
-        [r.name.en, r.name.ro, r.name.hu, r.sourceLine].filter(Boolean).join(' '))
+        [r.name.en, r.name.ro, r.name.hu, r.variant, r.sourceLine].filter(Boolean).join(' '))
       return haystack.includes(n)
     })
   }, [recipes, query, category, filters, favesOnly, favouriteIds])
@@ -803,6 +805,12 @@ function RecipeDetail({
             <span className="text-2xl leading-none">{recipe.emoji}</span>
             <div className="min-w-0">
               <h2 className="text-base font-extrabold text-ink-900 leading-snug">{card.name}</h2>
+              {/* Which of them you are reading. The header showed the shared
+                  name alone, so flipping between versions changed the numbers
+                  underneath and nothing said why. */}
+              {card.variants.length > 1 && (
+                <p className="text-xs font-semibold text-bite-700">{variantLabel(recipe, version)}</p>
+              )}
               {recipe.name.ro || recipe.name.hu ? (
                 <p className="text-xs text-ink-500">
                   {recipe.name.ro && <span lang="ro">{recipe.name.ro}</span>}
@@ -846,8 +854,14 @@ function RecipeDetail({
                       key={v.id}
                       onClick={() => setVersion(i)}
                       className={i === version ? 'chip-on' : 'chip-off'}
+                      aria-pressed={i === version}
                     >
-                      {i + 1}
+                      {/* What this version is, rather than where it sits in
+                          the row. These said "1", "2", "3", "4", so the one
+                          thing you came here to decide, which portion, was the
+                          one thing they would not tell you, and the importer's
+                          answer was being computed and then thrown away. */}
+                      {variantLabel(v, i)}
                       <span className="ml-1.5 font-mono opacity-70">{kcal}</span>
                     </button>
                   )
@@ -1148,6 +1162,11 @@ function PlanIntoDay({
       >
         <h3 className="font-bold text-ink-900 mb-1">{recipe.emoji} {recipe.name.en}</h3>
         <p className="text-sm text-ink-700 mb-4">
+          {/* Which portion, where there is more than one of this dish and you
+              have flipped to one of them. Said plainly rather than in the
+              heading, which is the line this dialog had to wrap over three
+              of. */}
+          {recipe.variant ? `${recipe.variant}. ` : ''}
           {servings === 1 ? 'One serving' : `${servings} servings`}, on a day of your choosing.
         </p>
 

@@ -427,18 +427,25 @@ function amountLabel(key: string, amount: number, base: string): string {
 }
 
 /**
- * Gives every recipe a name of its own, saying what makes it that one.
+ * Gives every recipe something of its own, saying what makes it that one.
  *
- * Two rules, in order. Where some of them have an ingredient the others lack,
- * the ingredient joins their names: "Feta with puffed rice cakes, raw
- * vegetable salad & extra virgin olive oil". Whatever that leaves sharing a
- * name is told apart by weight, in brackets, naming the ingredient whose
- * difference matters most: "Rolled oats with yogurt & mixed berries (45 g
- * rolled oats)".
+ * Two rules, in order, and they put their answers in two different places.
+ * Where some of them have an ingredient the others lack, that is a different
+ * dish and the ingredient joins their *names*: "Feta with puffed rice cakes,
+ * raw vegetable salad & extra virgin olive oil". Whatever that leaves sharing
+ * a name is the same dish at a different portion, so it keeps the name and
+ * gets a *variant* instead, naming the ingredient whose difference matters
+ * most: "45 g rolled oats".
  *
- * A bare number in brackets tells the reader nothing and is never used. If two
- * recipes cannot be told apart by these rules they are the same recipe, and
- * the merge above will already have folded them together.
+ * The variant used to be appended to the name in brackets, which is what put
+ * "Grapefruit with cashews (10 g cashews, 250 g grapefruit)" on a card as a
+ * headline. Kept apart, the shelf can show one card per dish with the portions
+ * inside it, which is what the library already wanted to do and was undoing
+ * with a regular expression.
+ *
+ * A bare number tells the reader nothing and is never used. If two recipes
+ * cannot be told apart by these rules they are the same recipe, and the merge
+ * above will already have folded them together.
  */
 function distinguish(recipes: Recipe[], dishes: Recipe[]): void {
   const reserved = new Map(dishes.map((d) => [d.name.en, d]))
@@ -504,11 +511,11 @@ function separate(group: Recipe[], reserved: Map<string, Recipe>): void {
 }
 
 /**
- * Ends each name with the weight that tells these recipes apart.
+ * Gives each one the weight that tells these recipes apart.
  *
  * One ingredient is nearly always enough. A second is added only when the
- * first leaves two of them still identical, and no more than that: a name is
- * for recognising a meal, not for reciting it.
+ * first leaves two of them still identical, and no more than that: this is for
+ * recognising a portion, not for reciting it.
  */
 function qualify(group: Recipe[], reserved: Map<string, Recipe>): void {
   if (settled(group, reserved)) return
@@ -521,17 +528,29 @@ function qualify(group: Recipe[], reserved: Map<string, Recipe>): void {
     for (const v of variants) {
       if (!v.recipe) continue
       const said = chosen.map((c) => amountLabel(c.key, Math.round(v.totals.get(c.key) ?? 0), base))
-      v.recipe.name.en = `${base} (${said.join(', ')})`
+      v.recipe.variant = said.join(', ')
     }
     if (settled(group, reserved) || chosen.length === 2) return
   }
 }
 
+/**
+ * Whether these are all telling themselves apart yet.
+ *
+ * Name and variant together, because that pair is what the library shows: one
+ * card per name, and the variants inside it. A hand-written dish of the same
+ * name counts as holding that name with no variant, so a generated meal that
+ * clashes with one still has to say which portion it is.
+ */
 function settled(group: Recipe[], reserved: Map<string, Recipe>): boolean {
   const seen = new Set<string>()
+  const dish = reserved.get(group[0].name.en)
+  if (dish) seen.add(`${dish.name.en}\u0000`)
+
   for (const r of group) {
-    if (seen.has(r.name.en) || reserved.has(r.name.en)) return false
-    seen.add(r.name.en)
+    const key = `${r.name.en}\u0000${r.variant ?? ''}`
+    if (seen.has(key)) return false
+    seen.add(key)
   }
   return true
 }
@@ -643,9 +662,20 @@ export function buildLibrary(plans: PlanInput[]): Library {
   const bySignature = new Map<string, Recipe>()
   const kept: Recipe[] = []
   for (const recipe of recipes) {
-    // "1 portie de fulgi de ovaz la cuptor" is the baked oats in the dish
-    // library, not a second recipe that happens to contain it. Meals that
-    // amount to exactly one serving of one dish become that dish.
+    /*
+     * "1 portie de fulgi de ovaz la cuptor" is the baked oats in the dish
+     * library, not a second recipe that happens to contain it. A meal that is
+     * exactly one serving of one dish becomes that dish.
+     *
+     * Exactly one, and not half a pot. Two meals here are 300 g of a soup the
+     * dish library already holds, which is 0.51 and 0.62 of a serving, and
+     * folding those would mean the alias carrying a multiplier as well as an
+     * id. The aliases are also what makes a day you planned months ago still
+     * resolve, and they are read as a plain id → id map by everything that
+     * resolves one; a scale threaded through there would silently restate an
+     * old meal as twice the soup it was. They keep their own recipe, and the
+     * variant says which portion.
+     */
     const only = recipe.components.length === 1 ? recipe.components[0] : undefined
     if (only?.kind === 'recipe' && only.servings === 1 && dishById.has(only.recipeId)) {
       aliases[recipe.id] = only.recipeId

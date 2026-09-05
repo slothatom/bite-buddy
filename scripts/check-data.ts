@@ -141,23 +141,42 @@ for (const recipe of recipes) {
   }
 }
 
-// 6. Names are unique, so the library has no indistinguishable entries.
+// 6. No two entries are indistinguishable: name and portion together.
 //
-// A duplicate name used to be settled by appending a number, which told the
-// reader nothing: 68 of the 204 imported recipes ended up as "Baked oats (2)".
-// The importer now says what differs instead, so a duplicate reaching here is
-// a rule that failed rather than a name waiting to be numbered.
+// A duplicate used to be settled by appending a number, which told the reader
+// nothing: 68 of the 204 imported recipes ended up as "Baked oats (2)". The
+// importer says what differs instead, so a duplicate reaching here is a rule
+// that failed rather than a name waiting to be numbered.
+//
+// The pair rather than the name alone, because the plans write the same dish at
+// several portions and those genuinely share a name: three of "Rolled oats with
+// yogurt & mixed berries" at 30, 40 and 45 g of oats. The library shows one card
+// per name with the portions inside it, so a shared name is the arrangement
+// working. What must not happen is two entries with nothing at all between them.
 const names = new Map<string, Recipe[]>()
-for (const r of recipes) names.set(r.name.en, [...(names.get(r.name.en) ?? []), r])
-for (const [name, group] of names) {
+for (const r of recipes) {
+  const key = `${r.name.en}\u0000${r.variant ?? ''}`
+  names.set(key, [...(names.get(key) ?? []), r])
+}
+for (const group of names.values()) {
+  const { name, variant } = group[0]
+  const said = variant ? `"${name.en}" (${variant})` : `"${name.en}"`
   if (group.length > 1) {
     problems.push(
-      `duplicate recipe name: "${name}" ×${group.length} (${group.map((r) => r.id).join(', ')}), `
-      + 'the importer could not find an ingredient to tell them apart',
+      `${said} ×${group.length} (${group.map((r) => r.id).join(', ')}), `
+      + 'the importer could not find an ingredient or a weight to tell them apart',
     )
   }
-  if (/ \(\d+\)$/.test(name)) {
-    problems.push(`${name}: a number in brackets says nothing about the recipe`)
+  if (/ \(\d+\)$/.test(name.en)) {
+    problems.push(`${name.en}: a number in brackets says nothing about the recipe`)
+  }
+  // The whole reason the portion has a field of its own. A quantity in the
+  // name is a headline that wraps, and a bracket every screen has to strip.
+  if (/\(\s*(?:no\s|\d)/.test(name.en)) {
+    problems.push(`${name.en}: a quantity belongs in the portion, not in the name`)
+  }
+  if (variant !== undefined && !variant.trim()) {
+    problems.push(`${name.en}: an empty portion tells a reader nothing`)
   }
 }
 

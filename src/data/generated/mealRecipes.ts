@@ -463,7 +463,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-015",
     "name": {
-      "en": "Roasted vegetables with salmon & yogurt garlic sauce (125 g salmon)"
+      "en": "Roasted vegetables with salmon & yogurt garlic sauce"
     },
     "emoji": "🍠",
     "servings": 1,
@@ -492,7 +492,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "125 g somon, 250 g legume la cuptor, 50 g sos de usrutoi",
     "sourcePlanId": "plan-01",
-    "createdAt": "2022-06-06T00:00:00.000Z"
+    "createdAt": "2022-06-06T00:00:00.000Z",
+    "variant": "125 g salmon"
   },
   {
     "id": "meal-breakfast-016",
@@ -565,7 +566,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-019",
     "name": {
-      "en": "Rolled oats with yogurt & mixed berries (30 g rolled oats)"
+      "en": "Rolled oats with yogurt & mixed berries"
     },
     "emoji": "🌅",
     "servings": 1,
@@ -594,12 +595,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g joghurt + 30 g zabpehely + 100 g erdei gyumolcs",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "30 g rolled oats"
   },
   {
     "id": "meal-snack1-020",
     "name": {
-      "en": "Orange with cashews (180 g orange)"
+      "en": "Orange with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -623,7 +625,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "1 narancs + 10 g kesudio",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "180 g orange"
   },
   {
     "id": "meal-lunch-021",
@@ -662,7 +665,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack2-022",
     "name": {
-      "en": "Apple with walnuts (10 g walnuts)"
+      "en": "Apple with walnuts"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -686,7 +689,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "1 alma + 10 g dio",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "10 g walnuts"
   },
   {
     "id": "meal-dinner-023",
@@ -769,7 +773,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack1-025",
     "name": {
-      "en": "Grapefruit with cashews (10 g cashews, 250 g grapefruit)"
+      "en": "Grapefruit with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -793,12 +797,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "1 grapefruit + 10 g kesudio",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "10 g cashews, 250 g grapefruit"
   },
   {
     "id": "meal-dinner-027",
     "name": {
-      "en": "Cream of mushroom soup (300 g)"
+      "en": "Cream of mushroom soup"
     },
     "emoji": "🍄",
     "servings": 1,
@@ -817,7 +822,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "300 g gombakremleves (1 tk. olivaolajjal)",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "300 g"
   },
   {
     "id": "meal-snack1-028",
@@ -948,7 +954,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-034",
     "name": {
-      "en": "Roasted vegetables with salmon & yogurt garlic sauce (100 g salmon)"
+      "en": "Roasted vegetables with salmon & yogurt garlic sauce"
     },
     "emoji": "🍠",
     "servings": 1,
@@ -977,12 +983,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "100 g lazac + 300 g lerben / parolva zoldsegek 1 tk. olivaolajjal + 75 g joghurtos fokhagyma szosz",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "100 g salmon"
   },
   {
     "id": "meal-dinner-035",
     "name": {
-      "en": "Mozzarella with raw vegetable salad & extra virgin olive oil (60 g mozzarella)"
+      "en": "Mozzarella with raw vegetable salad & extra virgin olive oil"
     },
     "emoji": "🌙",
     "servings": 1,
@@ -1011,7 +1018,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "vegyes salata + 60 g mozzarella + 1 tk. olivaolaj",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "60 g mozzarella"
   },
   {
     "id": "meal-breakfast-036",
@@ -1060,7 +1068,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack1-037",
     "name": {
-      "en": "Grapefruit with cashews (5 g cashews, 250 g grapefruit)"
+      "en": "Grapefruit with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -1084,12 +1092,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "1 grapefruit + 5 g kesudio",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "5 g cashews, 250 g grapefruit"
   },
   {
     "id": "meal-snack2-039",
     "name": {
-      "en": "Apple with cashews (5 g cashews)"
+      "en": "Apple with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -1113,12 +1122,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "1 alma + 5 g kesudio",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "5 g cashews"
   },
   {
     "id": "meal-dinner-040",
     "name": {
-      "en": "Greek-style sour soup (300 g)"
+      "en": "Greek-style sour soup"
     },
     "emoji": "🍲",
     "servings": 1,
@@ -1137,7 +1147,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "300 g gorog csorba (30 g rizs / ket adag)",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "300 g"
   },
   {
     "id": "meal-lunch-041",
@@ -1278,7 +1289,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-046",
     "name": {
-      "en": "Cheese & blueberry loaf with yogurt (150 g cheese & blueberry loaf)"
+      "en": "Cheese & blueberry loaf with yogurt"
     },
     "emoji": "🌅",
     "servings": 1,
@@ -1302,7 +1313,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g chec cu branza si afine, 150 g iaurt",
     "sourcePlanId": "plan-03",
-    "createdAt": "2022-06-28T00:00:00.000Z"
+    "createdAt": "2022-06-28T00:00:00.000Z",
+    "variant": "150 g cheese & blueberry loaf"
   },
   {
     "id": "meal-lunch-047",
@@ -1341,7 +1353,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-048",
     "name": {
-      "en": "Eggplant spread with wholemeal bread & mixed vegetables (40 g wholemeal bread)"
+      "en": "Eggplant spread with wholemeal bread & mixed vegetables"
     },
     "emoji": "🌙",
     "servings": 1,
@@ -1370,12 +1382,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "40 g paine int, 150 g salata de vinete, jumatate de farfurie de legume",
     "sourcePlanId": "plan-03",
-    "createdAt": "2022-06-28T00:00:00.000Z"
+    "createdAt": "2022-06-28T00:00:00.000Z",
+    "variant": "40 g wholemeal bread"
   },
   {
     "id": "meal-breakfast-049",
     "name": {
-      "en": "Cheese & blueberry loaf with yogurt (130 g cheese & blueberry loaf)"
+      "en": "Cheese & blueberry loaf with yogurt"
     },
     "emoji": "🌅",
     "servings": 1,
@@ -1399,7 +1412,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "130 g chec cu branza si afine, 150 g iaurt",
     "sourcePlanId": "plan-03",
-    "createdAt": "2022-06-28T00:00:00.000Z"
+    "createdAt": "2022-06-28T00:00:00.000Z",
+    "variant": "130 g cheese & blueberry loaf"
   },
   {
     "id": "meal-lunch-050",
@@ -1598,7 +1612,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-056",
     "name": {
-      "en": "Spicy chicken & vegetable pan (300 g mixed vegetables)"
+      "en": "Spicy chicken & vegetable pan"
     },
     "emoji": "🌶️",
     "servings": 1,
@@ -1622,7 +1636,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "tigaie picanta: 120 g piept de pui, 300 g legume, o lingurita de ulei",
     "sourcePlanId": "plan-04",
-    "createdAt": "2022-05-30T00:00:00.000Z"
+    "createdAt": "2022-05-30T00:00:00.000Z",
+    "variant": "300 g mixed vegetables"
   },
   {
     "id": "meal-dinner-057",
@@ -1807,7 +1822,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack2-064",
     "name": {
-      "en": "Kiwi with cashews (15 g cashews)"
+      "en": "Kiwi with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -1831,7 +1846,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g kiwi, 15 g caju",
     "sourcePlanId": "plan-04",
-    "createdAt": "2022-05-30T00:00:00.000Z"
+    "createdAt": "2022-05-30T00:00:00.000Z",
+    "variant": "15 g cashews"
   },
   {
     "id": "meal-dinner-065",
@@ -2001,7 +2017,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-071",
     "name": {
-      "en": "Oat porridge with dark chocolate & apple (10 g dark chocolate)"
+      "en": "Oat porridge with dark chocolate & apple"
     },
     "emoji": "🥣",
     "servings": 1,
@@ -2030,12 +2046,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "terci de ovaz: 100 ml apa, 100 ml lapte, 40 g fulgi de ovaz, 100 g mar razuit, scortisoara, 10 g ciocolata neagra",
     "sourcePlanId": "plan-04",
-    "createdAt": "2022-05-30T00:00:00.000Z"
+    "createdAt": "2022-05-30T00:00:00.000Z",
+    "variant": "10 g dark chocolate"
   },
   {
     "id": "meal-snack1-072",
     "name": {
-      "en": "Kiwi with cashews (10 g cashews)"
+      "en": "Kiwi with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -2059,7 +2076,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g kiwi, 10 g caju",
     "sourcePlanId": "plan-04",
-    "createdAt": "2022-05-30T00:00:00.000Z"
+    "createdAt": "2022-05-30T00:00:00.000Z",
+    "variant": "10 g cashews"
   },
   {
     "id": "meal-lunch-073",
@@ -2108,7 +2126,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack2-078",
     "name": {
-      "en": "Kiwi with walnuts (15 g walnuts)"
+      "en": "Kiwi with walnuts"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -2132,7 +2150,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g kiwi, 15 g nuci",
     "sourcePlanId": "plan-05",
-    "createdAt": "2022-11-14T00:00:00.000Z"
+    "createdAt": "2022-11-14T00:00:00.000Z",
+    "variant": "15 g walnuts"
   },
   {
     "id": "meal-dinner-079",
@@ -2264,7 +2283,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack1-083",
     "name": {
-      "en": "Apple with cashews (15 g cashews)"
+      "en": "Apple with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -2288,7 +2307,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g mere, 15 g caju",
     "sourcePlanId": "plan-05",
-    "createdAt": "2022-11-14T00:00:00.000Z"
+    "createdAt": "2022-11-14T00:00:00.000Z",
+    "variant": "15 g cashews"
   },
   {
     "id": "meal-dinner-084",
@@ -2565,7 +2585,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-096",
     "name": {
-      "en": "Eggplant spread with wholemeal bread & mixed vegetables (50 g wholemeal bread)"
+      "en": "Eggplant spread with wholemeal bread & mixed vegetables"
     },
     "emoji": "🌅",
     "servings": 1,
@@ -2594,7 +2614,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "50 g paine int, 150 g pasta de vinete cu ardei copti (o lingurita de ulei), jumatate de farfurie de legume",
     "sourcePlanId": "plan-06",
-    "createdAt": "2022-11-21T00:00:00.000Z"
+    "createdAt": "2022-11-21T00:00:00.000Z",
+    "variant": "50 g wholemeal bread"
   },
   {
     "id": "meal-dinner-097",
@@ -2672,7 +2693,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-099",
     "name": {
-      "en": "Polenta with cottage cheese & yogurt (15 g yogurt)"
+      "en": "Polenta with cottage cheese & yogurt"
     },
     "emoji": "🌽",
     "servings": 1,
@@ -2701,7 +2722,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "mamaliga (din 50 g faina de malai), 100 g branza de vaci, o lg de iaurt",
     "sourcePlanId": "plan-06",
-    "createdAt": "2022-11-21T00:00:00.000Z"
+    "createdAt": "2022-11-21T00:00:00.000Z",
+    "variant": "15 g yogurt"
   },
   {
     "id": "meal-breakfast-100",
@@ -2740,7 +2762,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-101",
     "name": {
-      "en": "Salmon with sweet potato & raw vegetable salad (50 g yogurt garlic sauce)"
+      "en": "Salmon with sweet potato & raw vegetable salad"
     },
     "emoji": "🍽️",
     "servings": 1,
@@ -2774,7 +2796,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "125 g somon cu 200 g cartofi dulci la cuptor, salata de cruditati, 50 g sos de usturoi pe baza de iaurt",
     "sourcePlanId": "plan-06",
-    "createdAt": "2022-11-21T00:00:00.000Z"
+    "createdAt": "2022-11-21T00:00:00.000Z",
+    "variant": "50 g yogurt garlic sauce"
   },
   {
     "id": "meal-breakfast-102",
@@ -3070,7 +3093,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-114",
     "name": {
-      "en": "Sweet potato with trout & raw vegetable salad (100 g trout)"
+      "en": "Sweet potato with trout & raw vegetable salad"
     },
     "emoji": "🍽️",
     "servings": 1,
@@ -3099,12 +3122,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "100 g pastrav + 250 g cartofi dulci cruzi, salata de cruditati",
     "sourcePlanId": "plan-07",
-    "createdAt": "2022-01-01T00:00:00.000Z"
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "100 g trout"
   },
   {
     "id": "meal-dinner-115",
     "name": {
-      "en": "Bruschetta with telemea, feta (100 g feta)"
+      "en": "Bruschetta with telemea, feta"
     },
     "emoji": "🍞",
     "servings": 1,
@@ -3128,7 +3152,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "bruschete cu telemea, feta",
     "sourcePlanId": "plan-07",
-    "createdAt": "2022-01-01T00:00:00.000Z"
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "100 g feta"
   },
   {
     "id": "meal-lunch-116",
@@ -3235,7 +3260,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack1-122",
     "name": {
-      "en": "Orange with cashews (150 g orange)"
+      "en": "Orange with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -3259,7 +3284,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g portocale, 10 g caju",
     "sourcePlanId": "plan-08",
-    "createdAt": "2022-01-01T00:00:00.000Z"
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "150 g orange"
   },
   {
     "id": "meal-snack2-123",
@@ -3356,7 +3382,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-129",
     "name": {
-      "en": "Sweet potato with trout & raw vegetable salad (150 g trout)"
+      "en": "Sweet potato with trout & raw vegetable salad"
     },
     "emoji": "🍽️",
     "servings": 1,
@@ -3385,12 +3411,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g pastrav cantarit crud + 300 g cartofi dulci cantariti cruzi, salata de cruditati",
     "sourcePlanId": "plan-08",
-    "createdAt": "2022-01-01T00:00:00.000Z"
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "150 g trout"
   },
   {
     "id": "meal-snack1-131",
     "name": {
-      "en": "Pear with almonds (10 g almonds)"
+      "en": "Pear with almonds"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -3414,7 +3441,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g pere, 10 g migdale",
     "sourcePlanId": "plan-08",
-    "createdAt": "2022-01-01T00:00:00.000Z"
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "10 g almonds"
   },
   {
     "id": "meal-lunch-132",
@@ -3453,7 +3481,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack2-133",
     "name": {
-      "en": "Apple with cashews (10 g cashews)"
+      "en": "Apple with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -3477,12 +3505,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g mar + 10 g caju",
     "sourcePlanId": "plan-08",
-    "createdAt": "2022-01-01T00:00:00.000Z"
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "10 g cashews"
   },
   {
     "id": "meal-dinner-134",
     "name": {
-      "en": "Tuna spread with wholemeal bread & mixed vegetables (40 g wholemeal bread)"
+      "en": "Tuna spread with wholemeal bread & mixed vegetables"
     },
     "emoji": "🐟",
     "servings": 1,
@@ -3511,7 +3540,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "40 g paine int, pasta de ton (pt 2 portii: 135 g ton in suc propriu, 50 g branza cremoasa President, ceapa, sare, piper, 1 lg de iaurt, zeama de lamaie) + jumatate de farfurie de legume",
     "sourcePlanId": "plan-08",
-    "createdAt": "2022-01-01T00:00:00.000Z"
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "40 g wholemeal bread"
   },
   {
     "id": "meal-breakfast-135",
@@ -3613,7 +3643,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack2-140",
     "name": {
-      "en": "Kiwi with walnuts (10 g walnuts)"
+      "en": "Kiwi with walnuts"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -3637,12 +3667,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g kiwi, 10 g nuci",
     "sourcePlanId": "plan-09",
-    "createdAt": "2022-04-18T00:00:00.000Z"
+    "createdAt": "2022-04-18T00:00:00.000Z",
+    "variant": "10 g walnuts"
   },
   {
     "id": "meal-snack1-142",
     "name": {
-      "en": "Grapefruit with cashews (10 g cashews, 150 g grapefruit)"
+      "en": "Grapefruit with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -3666,7 +3697,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g grapefruit, 10 g caju",
     "sourcePlanId": "plan-09",
-    "createdAt": "2022-04-18T00:00:00.000Z"
+    "createdAt": "2022-04-18T00:00:00.000Z",
+    "variant": "10 g cashews, 150 g grapefruit"
   },
   {
     "id": "meal-lunch-143",
@@ -3705,7 +3737,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-144",
     "name": {
-      "en": "Bruschetta with telemea, feta (50 g feta)"
+      "en": "Bruschetta with telemea, feta"
     },
     "emoji": "🍞",
     "servings": 1,
@@ -3729,7 +3761,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "bruschete: 50 g paine int prajita, 50 g feta, rosii, busuioc, o lingurita de ulei de masline",
     "sourcePlanId": "plan-09",
-    "createdAt": "2022-04-18T00:00:00.000Z"
+    "createdAt": "2022-04-18T00:00:00.000Z",
+    "variant": "50 g feta"
   },
   {
     "id": "meal-breakfast-145",
@@ -3836,7 +3869,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-148",
     "name": {
-      "en": "Oat porridge with dark chocolate & apple (15 g dark chocolate)"
+      "en": "Oat porridge with dark chocolate & apple"
     },
     "emoji": "🥣",
     "servings": 1,
@@ -3865,7 +3898,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "terci de ovaz (100 ml apa, 100 ml lapte, 40 g fulgi de ovaz, 1 mar razuit, scortisoara) + 15 g ciocolata neagra",
     "sourcePlanId": "plan-09",
-    "createdAt": "2022-04-18T00:00:00.000Z"
+    "createdAt": "2022-04-18T00:00:00.000Z",
+    "variant": "15 g dark chocolate"
   },
   {
     "id": "meal-lunch-149",
@@ -3943,7 +3977,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-153",
     "name": {
-      "en": "Creamed spinach with halloumi (80 g halloumi)"
+      "en": "Creamed spinach with halloumi"
     },
     "emoji": "🥬",
     "servings": 1,
@@ -3967,7 +4001,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "80 g halloumi la gratar, 250 g mancare de spanac (o lg de ulei si o lg rasa de faina / 2 portii portii)",
     "sourcePlanId": "plan-09",
-    "createdAt": "2022-04-18T00:00:00.000Z"
+    "createdAt": "2022-04-18T00:00:00.000Z",
+    "variant": "80 g halloumi"
   },
   {
     "id": "meal-dinner-154",
@@ -4269,7 +4304,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-166",
     "name": {
-      "en": "Tuna spread with wholemeal bread & mixed vegetables (50 g wholemeal bread)"
+      "en": "Tuna spread with wholemeal bread & mixed vegetables"
     },
     "emoji": "🐟",
     "servings": 1,
@@ -4298,12 +4333,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "50 g paine integrala, pasta de ton (2 portii: 135 g ton in suc propriu, 100 g branza cremoasa, ceapa, zeama de lamaie, sare, piper), jumatate de farfurie de legume",
     "sourcePlanId": "plan-10",
-    "createdAt": "2022-05-24T00:00:00.000Z"
+    "createdAt": "2022-05-24T00:00:00.000Z",
+    "variant": "50 g wholemeal bread"
   },
   {
     "id": "meal-lunch-167",
     "name": {
-      "en": "Creamed spinach with halloumi (50 g halloumi)"
+      "en": "Creamed spinach with halloumi"
     },
     "emoji": "🥬",
     "servings": 1,
@@ -4327,7 +4363,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "50 g halloumi, 250 g mancare de spanac",
     "sourcePlanId": "plan-10",
-    "createdAt": "2022-05-24T00:00:00.000Z"
+    "createdAt": "2022-05-24T00:00:00.000Z",
+    "variant": "50 g halloumi"
   },
   {
     "id": "meal-snack1-168",
@@ -4550,7 +4587,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-175",
     "name": {
-      "en": "Mozzarella with raw vegetable salad & extra virgin olive oil (125 g mozzarella)"
+      "en": "Mozzarella with raw vegetable salad & extra virgin olive oil"
     },
     "emoji": "🍽️",
     "servings": 1,
@@ -4579,7 +4616,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "salata cu mozzarella : salata de cruditati, 125 g mozzarella, o lingurita de ulei de masline",
     "sourcePlanId": "plan-11",
-    "createdAt": "2022-07-04T00:00:00.000Z"
+    "createdAt": "2022-07-04T00:00:00.000Z",
+    "variant": "125 g mozzarella"
   },
   {
     "id": "meal-dinner-176",
@@ -4739,7 +4777,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-183",
     "name": {
-      "en": "Eggplant mini pizzas with bulgur & tomatoes (50 g bulgur)"
+      "en": "Eggplant mini pizzas with bulgur & tomatoes"
     },
     "emoji": "🍆",
     "servings": 1,
@@ -4778,7 +4816,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "mini pizza de vinete: ½ vinete, o lingurita de ulei, rosii, 65 g mozzarella in apa, busuioc + 50 g bulgur nefiert",
     "sourcePlanId": "plan-11",
-    "createdAt": "2022-07-04T00:00:00.000Z"
+    "createdAt": "2022-07-04T00:00:00.000Z",
+    "variant": "50 g bulgur"
   },
   {
     "id": "meal-dinner-184",
@@ -4856,7 +4895,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-186",
     "name": {
-      "en": "Eggplant mini pizzas with bulgur & tomatoes (40 g bulgur)"
+      "en": "Eggplant mini pizzas with bulgur & tomatoes"
     },
     "emoji": "🍆",
     "servings": 1,
@@ -4890,12 +4929,13 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "mini pizza de vinete: ½ vinete, o lingurita de ulei, rosii, 60 g mozzarella in apa + 40 g bulgur nefiert",
     "sourcePlanId": "plan-11",
-    "createdAt": "2022-07-04T00:00:00.000Z"
+    "createdAt": "2022-07-04T00:00:00.000Z",
+    "variant": "40 g bulgur"
   },
   {
     "id": "meal-breakfast-188",
     "name": {
-      "en": "Rolled oats with yogurt & mixed berries (40 g rolled oats)"
+      "en": "Rolled oats with yogurt & mixed berries"
     },
     "emoji": "🌅",
     "servings": 1,
@@ -4924,7 +4964,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g iaurt, 40 g fulgi de ovaz, 100 g fructe de padure",
     "sourcePlanId": "plan-12",
-    "createdAt": "2022-07-11T00:00:00.000Z"
+    "createdAt": "2022-07-11T00:00:00.000Z",
+    "variant": "40 g rolled oats"
   },
   {
     "id": "meal-snack1-189",
@@ -5153,7 +5194,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-dinner-198",
     "name": {
-      "en": "Polenta with cottage cheese & yogurt (30 g yogurt)"
+      "en": "Polenta with cottage cheese & yogurt"
     },
     "emoji": "🌽",
     "servings": 1,
@@ -5182,7 +5223,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "200 g mamaliga, 100 g branza de vaci, 2 lg de iaurt",
     "sourcePlanId": "plan-12",
-    "createdAt": "2022-07-11T00:00:00.000Z"
+    "createdAt": "2022-07-11T00:00:00.000Z",
+    "variant": "30 g yogurt"
   },
   {
     "id": "meal-breakfast-199",
@@ -5216,7 +5258,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack1-200",
     "name": {
-      "en": "Apple with cashews (20 g cashews)"
+      "en": "Apple with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -5240,7 +5282,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g mere, 20 g caju",
     "sourcePlanId": "plan-12",
-    "createdAt": "2022-07-11T00:00:00.000Z"
+    "createdAt": "2022-07-11T00:00:00.000Z",
+    "variant": "20 g cashews"
   },
   {
     "id": "meal-lunch-201",
@@ -5279,7 +5322,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-203",
     "name": {
-      "en": "Rolled oats with yogurt & mixed berries (45 g rolled oats)"
+      "en": "Rolled oats with yogurt & mixed berries"
     },
     "emoji": "🌅",
     "servings": 1,
@@ -5308,7 +5351,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g joghurt + 45 g zabpehely + 100 g erdei gyumolcs",
     "sourcePlanId": "plan-13",
-    "createdAt": "2021-01-18T00:00:00.000Z"
+    "createdAt": "2021-01-18T00:00:00.000Z",
+    "variant": "45 g rolled oats"
   },
   {
     "id": "meal-dinner-205",
@@ -5581,7 +5625,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack1-214",
     "name": {
-      "en": "Apple with walnuts (15 g walnuts)"
+      "en": "Apple with walnuts"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -5605,7 +5649,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "1 alma + 15 g dio",
     "sourcePlanId": "plan-13",
-    "createdAt": "2021-01-18T00:00:00.000Z"
+    "createdAt": "2021-01-18T00:00:00.000Z",
+    "variant": "15 g walnuts"
   },
   {
     "id": "meal-lunch-215",
@@ -5998,7 +6043,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack1-229",
     "name": {
-      "en": "Grapefruit with cashews (20 g cashews, 150 g grapefruit)"
+      "en": "Grapefruit with cashews"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -6022,7 +6067,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g grapefruit, 20 g caju",
     "sourcePlanId": "plan-14",
-    "createdAt": "2022-05-09T00:00:00.000Z"
+    "createdAt": "2022-05-09T00:00:00.000Z",
+    "variant": "20 g cashews, 150 g grapefruit"
   },
   {
     "id": "meal-snack1-230",
@@ -6090,7 +6136,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-233",
     "name": {
-      "en": "Salmon with sweet potato & raw vegetable salad (no yogurt garlic sauce)"
+      "en": "Salmon with sweet potato & raw vegetable salad"
     },
     "emoji": "🍽️",
     "servings": 1,
@@ -6119,7 +6165,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "125 g somon, 200 g cartofi dulci la cuptor, salata de cruditati",
     "sourcePlanId": "plan-14",
-    "createdAt": "2022-05-09T00:00:00.000Z"
+    "createdAt": "2022-05-09T00:00:00.000Z",
+    "variant": "no yogurt garlic sauce"
   },
   {
     "id": "meal-dinner-234",
@@ -6226,7 +6273,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-snack1-239",
     "name": {
-      "en": "Pear with almonds (15 g almonds)"
+      "en": "Pear with almonds"
     },
     "emoji": "🍎",
     "servings": 1,
@@ -6250,7 +6297,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g pere, 15 g migdale",
     "sourcePlanId": "plan-14",
-    "createdAt": "2022-05-09T00:00:00.000Z"
+    "createdAt": "2022-05-09T00:00:00.000Z",
+    "variant": "15 g almonds"
   },
   {
     "id": "meal-lunch-240",

@@ -248,6 +248,22 @@ export interface Recipe {
   /** Circumstance rather than food, see QuickFilter. */
   quickFilters?: QuickFilter[]
   /**
+   * What tells this one apart from the others of the same name.
+   *
+   * The plans write the same dish at different portions all the time: rolled
+   * oats with yogurt and berries at 30 g of oats, then 40, then 45. The
+   * importer works out which ingredient carries the difference and says so
+   * here, as "45 g rolled oats".
+   *
+   * It used to say so inside the name, which put the quantity in the one place
+   * it does not belong. "Grapefruit with cashews (10 g cashews, 250 g
+   * grapefruit)" is a headline three lines deep on a phone, and every screen
+   * that wanted the dish rather than the portion had to strip the bracket back
+   * off with a regular expression. Held apart, the name is the dish and this is
+   * the portion, and each goes where it reads.
+   */
+  variant?: string
+  /**
    * The dietician's original line, kept verbatim. Shown as provenance in the UI
    * and used to verify that every source line maps to something.
    */
