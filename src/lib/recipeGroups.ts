@@ -113,19 +113,41 @@ export function withGroups(tags: RecipeTag[], groups: RecipeGroup[]): RecipeTag[
  *
  * A recipe is generated for every distinct line across the fourteen plans, and
  * the dietician repeats a dish at different portions all the time: "Rolled oats
- * with yogurt & mixed berries" appears at 30, 40 and 45 g of oats. The importer
- * says so in the name, since a card has to be able to stand alone, but three
- * near-identical names in a row is not a library, it is a list.
+ * with yogurt & mixed berries" appears at 30, 40 and 45 g of oats. Grouped,
+ * they are one dish you can flip between portions of, which is what they always
+ * were. An ingredient that differs is folded into the name instead, and that
+ * really is another dish.
  *
- * Grouped, they are one dish you can flip between portions of, which is what
- * they always were. The bracket at the end is what marks a portion: an ingredient
- * that differs is folded into the name instead, and that really is another dish.
+ * Which portion each one is now lives in `recipe.variant`, so a name is a dish
+ * and nothing else. It used to be appended to the name in brackets, and every
+ * screen that wanted the dish had to take it back off, which is what `baseName`
+ * below was for. Two things still need it: a recipe of yours saved from a build
+ * that predates the split, and a name you typed yourself.
  */
 export function baseName(name: string): string {
   // Only the importer's own shapes, "(45 g rolled oats)", "(300 g)", "(no
   // yogurt garlic sauce)", and the numbering it used to append. A recipe you
   // named "Porridge (the good one)" keeps its bracket.
   return name.replace(/\s*\((?:\d+|\d+ g(?: [^()]+)?|no [^()]+)\)\s*$/, '')
+}
+
+/**
+ * What to call one version of a dish, on a chip beside its siblings.
+ *
+ * The importer's own answer where it has one. Where it does not, the position
+ * in the group, which is what these chips said before they said anything: a
+ * hand-written dish sharing a name with an imported meal has no portion to
+ * report, and neither has a second copy you made yourself.
+ */
+export function variantLabel(recipe: Pick<Recipe, 'name' | 'variant'>, index: number): string {
+  return recipe.variant ?? bracketOf(recipe.name.en) ?? `Version ${index + 1}`
+}
+
+/** The portion an older saved recipe still carries inside its name. */
+function bracketOf(name: string): string | undefined {
+  const stripped = baseName(name)
+  if (stripped === name) return undefined
+  return name.slice(stripped.length).trim().replace(/^\(|\)$/g, '')
 }
 
 export interface RecipeVariants {

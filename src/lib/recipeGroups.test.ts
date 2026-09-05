@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import type { RecipeTag } from '../types'
 import {
-  groupsOf, primaryGroupOf, groupForTime, withGroups, baseName, groupVariants,
+  groupsOf, primaryGroupOf, groupForTime, withGroups, baseName, groupVariants, variantLabel,
   RECIPE_GROUPS,
 } from './recipeGroups'
 import type { Recipe } from '../types'
@@ -118,6 +118,38 @@ describe('the same dish written at different portions', () => {
     expect(baseName('Creamed spinach with halloumi (80 g halloumi)')).toBe('Creamed spinach with halloumi')
     expect(baseName('Salmon with sweet potato (no yogurt garlic sauce)')).toBe('Salmon with sweet potato')
     expect(baseName('Porridge (the good one)')).toBe('Porridge (the good one)')
+  })
+
+  it('holds the portion in its own field, out of the name', () => {
+    // Finding 30. "Grapefruit with cashews (10 g cashews, 250 g grapefruit)"
+    // was a headline three lines deep on a phone, and every screen that wanted
+    // the dish had to take the bracket back off. The library ships the two
+    // apart now, so nothing in it needs stripping.
+    for (const r of ALL_RECIPES) {
+      expect(r.name.en, r.id).not.toMatch(/\(/)
+    }
+    const grapefruit = ALL_RECIPES.filter((r) => r.name.en === 'Grapefruit with cashews')
+    expect(grapefruit).toHaveLength(4)
+    expect(grapefruit.map((r) => r.variant)).toContain('20 g cashews, 150 g grapefruit')
+  })
+
+  it('labels a version by what it is, not by where it sits', () => {
+    const oats = ALL_RECIPES.filter((r) => r.name.en === 'Rolled oats with yogurt & mixed berries')
+    expect(oats.map((r, i) => variantLabel(r, i)).sort())
+      .toEqual(['30 g rolled oats', '40 g rolled oats', '45 g rolled oats'])
+  })
+
+  it('falls back to a position for a version with no portion to report', () => {
+    // A hand-written dish sharing a name with an imported meal has no portion,
+    // and neither has a second copy you made yourself.
+    expect(variantLabel({ name: { en: 'Omelette' } }, 1)).toBe('Version 2')
+  })
+
+  it('reads the portion back out of a name saved before the split', () => {
+    // Your own copy of a shipped recipe, persisted from an older build, still
+    // carries the bracket. It is a portion, so it is shown as one.
+    expect(variantLabel({ name: { en: 'Creamed spinach with halloumi (80 g halloumi)' } }, 0))
+      .toBe('80 g halloumi')
   })
 
   it('loses nothing on the way', () => {

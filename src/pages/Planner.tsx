@@ -856,12 +856,12 @@ function EntryLine({
 
   const full = entryName(entry, ctx)
 
-  // Without the portion in brackets. A library name has to stand alone, so
-  // "Eggplant spread with wholemeal bread & mixed vegetables (50 g wholemeal
-  // bread)" is right on a card you might meet cold. Here the ingredients are
-  // written out directly underneath, weights and all, so the bracket is saying
-  // it twice, and saying it in the one place where a second line costs a slot
-  // its place on the screen.
+  // The dish, without the portion. The importer keeps the two apart now, so
+  // this is already the dish for anything the app shipped; the strip is still
+  // here for a recipe of yours saved from a build that put the portion in the
+  // name. Here the ingredients are written out directly underneath, weights
+  // and all, so the portion would be saying it twice, and saying it in the one
+  // place where a second line costs a slot its place on the screen.
   const label = baseName(full)
 
   const detail = entry.kind === 'food'

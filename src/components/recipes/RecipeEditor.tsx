@@ -122,6 +122,13 @@ export default function RecipeEditor({
       // one is refused at the point of typing rather than kept and skipped
       // silently at the point of showing.
       sourceUrl: safeUrl(draft.sourceUrl)?.href,
+      // The portion is the importer's summary of how this version differs from
+      // the others of its name: "45 g rolled oats". Change what is in the
+      // recipe and that stops being true, and a label naming a weight the
+      // recipe no longer holds is worse than no label. The source line stays,
+      // because that is what the plan said and editing your copy does not
+      // change what was written.
+      variant: sameComponents(recipe?.components, draft.components) ? draft.variant : undefined,
     }
 
     if (isNew) addRecipe(cleaned)
@@ -742,6 +749,20 @@ function NumberField({
       </span>
     </label>
   )
+}
+
+/** Whether the ingredients came through the editor untouched. */
+function sameComponents(before: RecipeComponent[] | undefined, after: RecipeComponent[]): boolean {
+  if (!before || before.length !== after.length) return false
+  return before.every((c, i) => {
+    const d = after[i]
+    if (c.kind !== d.kind) return false
+    return c.kind === 'food' && d.kind === 'food'
+      ? c.foodId === d.foodId && c.grams === d.grams
+      : c.kind === 'recipe' && d.kind === 'recipe'
+        ? c.recipeId === d.recipeId && c.servings === d.servings
+        : false
+  })
 }
 
 function blankRecipe(): Recipe {

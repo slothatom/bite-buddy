@@ -478,8 +478,20 @@ test.describe('the recipe library', () => {
     await expect(page.locator('.card')).toHaveCount(1)
     await expect(page.getByText(/3 versions/)).toBeVisible()
 
+    // Finding 30: the quantity is not in the headline. It used to be, and
+    // "Grapefruit with cashews (10 g cashews, 250 g grapefruit)" ran to three
+    // lines on a phone.
+    await expect(page.locator('.card')).not.toContainText('(30 g rolled oats)')
+
     await page.locator('.card button').nth(1).click()
     await expect(page.getByText(/Written 3 times across the plans/)).toBeVisible()
+
+    // The chips said "1", "2", "3", so the one thing you opened this to
+    // decide, which portion, was the one thing they would not tell you.
+    for (const oats of ['30 g rolled oats', '40 g rolled oats', '45 g rolled oats']) {
+      await expect(page.locator('.bg-paper').getByRole('button', { name: new RegExp(oats) }))
+        .toBeVisible()
+    }
 
     // What changes when you flip between them is the dietician's own line.
     const line = page.locator('.card-soft').first()
