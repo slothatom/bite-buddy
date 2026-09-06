@@ -53,20 +53,9 @@ describe('getRangeDates', () => {
     expect(fortnight[13]).toBe('2026-08-23')
   })
 
-  it('pads a month out to whole weeks', () => {
-    // August 2026 starts on a Saturday, so a Monday-start grid begins on
-    // 27 July and runs to 6 September: six whole weeks.
-    const month = getRangeDates('2026-08-10', 'month')
-    expect(month.length % 7).toBe(0)
-    expect(month[0]).toBe('2026-07-27')
-    expect(month[month.length - 1]).toBe('2026-09-06')
-    expect(month).toContain('2026-08-01')
-    expect(month).toContain('2026-08-31')
-  })
-
   it('follows the week start you chose', () => {
     // Wednesday, the day every one of the dietician's plans begins on.
-    expect(getRangeDates('2026-08-12', 'month', 3)[0]).toBe('2026-07-29')
+    expect(getRangeDates('2026-08-12', 'fortnight', 3)[0]).toBe('2026-08-12')
   })
 })
 

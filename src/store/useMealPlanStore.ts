@@ -47,12 +47,19 @@ export function today(now: Date = new Date()): string {
 }
 
 /** How much of the plan you are looking at. */
-export type PlanRange = 'week' | 'fortnight' | 'month'
+/*
+ * Today, a week, a fortnight. Not a month.
+ *
+ * A month of meal slots is 150 boxes, and at that size a day is a rectangle
+ * with nothing legible in it, so the view that showed the most showed the
+ * least. A fortnight is the longest range where you can still read what is
+ * planned, which is the only reason to look at a range at all.
+ */
+export type PlanRange = 'week' | 'fortnight'
 
 export const RANGE_LABELS: Record<PlanRange, string> = {
   week: '1 week',
   fortnight: '2 weeks',
-  month: '1 month',
 }
 
 /** A date a number of days along, read at noon so a timezone cannot shift it. */

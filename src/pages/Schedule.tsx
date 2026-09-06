@@ -331,19 +331,24 @@ function FridgeList() {
   const ctx = useNutritionContext()
   const available = useAvailablePortions()
   const { updatePortion, removePortion } = usePortionStore()
-  const [adding, setAdding] = useState(false)
-
-  if (!available.length && !adding) {
+  /*
+   * Nothing is typed into the fridge by hand any more.
+   *
+   * A tub gets here by being cooked: you tick a session off and the portions
+   * it made appear. The "Leftovers" button was a second way in that asked you
+   * to describe food you had already made, name it, date it, say where it was
+   * and how many servings, which is a form for something the app was already
+   * watching you do. Two ways to the same shelf, and the one nobody used was
+   * the one with the typing.
+   */
+  if (!available.length) {
     return (
       <div className="card p-4 flex items-center gap-3">
         <span className="text-xl">🥡</span>
         <p className="flex-1 min-w-0 text-sm text-ink-700">
-          Nothing cooked and waiting. Tick a session off when you have cooked it, or add
-          leftovers by hand.
+          Nothing cooked and waiting. Tick a session off once you have cooked it and its
+          portions land here.
         </p>
-        <button className="btn-secondary shrink-0" onClick={() => setAdding(true)}>
-          <Plus size={15} /> Leftovers
-        </button>
       </div>
     )
   }
@@ -352,9 +357,6 @@ function FridgeList() {
     <section>
       <div className="flex items-center justify-between gap-3 mb-2">
         <h2 className="text-xs font-bold uppercase tracking-wide text-ink-500">In the fridge</h2>
-        <button className="btn-ghost text-xs" onClick={() => setAdding(true)}>
-          <Plus size={14} /> Leftovers
-        </button>
       </div>
 
       <div className="space-y-2">
@@ -400,163 +402,10 @@ function FridgeList() {
         ))}
       </div>
 
-      {adding && <LeftoversDialog onClose={() => setAdding(false)} />}
     </section>
   )
 }
 
-/**
- * Recording what is left after a meal.
- *
- * A recipe when it was one, and free text when it was not, because half a
- * lasagne somebody improvised is a real thing in a real fridge and refusing to
- * write it down would mean the app only knows about the tidy half of cooking.
- */
-function LeftoversDialog({ onClose }: { onClose: () => void }) {
-  const panel = useDialog<HTMLDivElement>(onClose)
-  const recipes = useRecipes()
-  const { addPortion } = usePortionStore()
-  const [query, setQuery] = useState('')
-  const [label, setLabel] = useState('')
-  const [servings, setServings] = useState(1)
-  const [storage, setStorage] = useState<'fridge' | 'freezer'>('fridge')
-  const [recipeId, setRecipeId] = useState<string | null>(null)
-
-  // When it was cooked, not when it was written down. Half a lasagne from
-  // Sunday, logged on Wednesday, used to be stamped today and then reported as
-  // three days fresher than it was, which is the one number a fridge card is
-  // for. Today by default, because most of the time it is.
-  const [madeOn, setMadeOn] = useState(today())
-
-  const matches = useMemo(() => {
-    const n = query.trim().toLowerCase()
-    if (!n) return []
-    return recipes.filter((r) => r.name.en.toLowerCase().includes(n)).slice(0, 6)
-  }, [query, recipes])
-
-  const chosen = recipes.find((r) => r.id === recipeId)
-
-  function save() {
-    if (!chosen && !label.trim()) return
-    addPortion({
-      id: `leftover-${Date.now().toString(36)}`,
-      recipeId: chosen?.id,
-      label: chosen ? undefined : label.trim(),
-      servings,
-      madeOn,
-      storage,
-      source: 'leftover',
-    })
-    onClose()
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4" onClick={onClose}>
-      <div
-        ref={panel}
-        role="dialog"
-        aria-modal="true"
-        className="bg-paper w-full sm:max-w-md sm:rounded-2xl rounded-t-2xl max-h-[90vh] overflow-y-auto shadow-xl p-5 space-y-4"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="display text-lg text-ink-900">What is left?</h3>
-
-        {chosen ? (
-          <div className="card-soft p-3 flex items-center gap-2">
-            <span className="text-lg">{chosen.emoji}</span>
-            <span className="flex-1 min-w-0 text-sm font-semibold text-ink-900 truncate">
-              {chosen.name.en}
-            </span>
-            <button className="btn-ghost text-xs" onClick={() => setRecipeId(null)}>Change</button>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
-              <input
-                className="input pl-9"
-                placeholder="Search your recipes"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </div>
-
-            {matches.map((r) => (
-              <button
-                key={r.id}
-                onClick={() => { setRecipeId(r.id); setQuery('') }}
-                className="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-cream-50 text-left"
-              >
-                <span>{r.emoji}</span>
-                <span className="flex-1 min-w-0 text-sm text-ink-900 truncate">{r.name.en}</span>
-              </button>
-            ))}
-
-            <div>
-              <label className="label" htmlFor="leftover-label">Or just say what it is</label>
-              <input
-                id="leftover-label"
-                className="input"
-                placeholder="Half a lasagne"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-              />
-              <p className="text-xs text-ink-500 mt-1">
-                Written this way it has no calories, because nothing knows what went in it.
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div>
-          <label className="label" htmlFor="leftover-made-on">Cooked on</label>
-          <input
-            id="leftover-made-on"
-            type="date"
-            className="input"
-            max={today()}
-            value={madeOn}
-            onChange={(e) => setMadeOn(e.target.value || today())}
-          />
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div>
-            <label className="label" htmlFor="leftover-servings">Portions</label>
-            <input
-              id="leftover-servings"
-              type="number" min={0.5} step={0.5} className="input w-24 px-2"
-              value={servings}
-              onChange={(e) => setServings(Number(e.target.value))}
-            />
-          </div>
-          <div className="flex-1">
-            <p className="label">Kept in</p>
-            <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
-              {(['fridge', 'freezer'] as const).map((where) => (
-                <button
-                  key={where}
-                  onClick={() => setStorage(where)}
-                  className={`capitalize ${storage === where ? 'tab-on' : 'tab-off'}`}
-                >
-                  {where}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <button className="btn-primary flex-1" disabled={!chosen && !label.trim()} onClick={save}>
-            Keep it
-          </button>
-          <button className="btn-secondary" onClick={onClose}>Cancel</button>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 /**
  * What came out of the session, and where it went.

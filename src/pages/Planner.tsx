@@ -7,7 +7,7 @@ import {
 import type { Component, DayPlan, MealOutcome, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import {
-  useMealPlanStore, getWeekDates, getRangeDates, monthOf, today,
+  useMealPlanStore, getWeekDates, getRangeDates, today,
   RANGE_LABELS, type PlanRange,
 } from '../store/useMealPlanStore'
 import { useDeletedIds } from '../store/useRecipeStore'
@@ -153,7 +153,6 @@ export default function Planner() {
     () => getRangeDates(weekDates[0], range, profile.weekStartsOn),
     [weekDates, range, profile.weekStartsOn],
   )
-  const anchorMonth = monthOf(weekDates[0])
 
   // The button first, then whatever you tapped, then today if it is on screen.
   const selected = quickAdd
@@ -188,10 +187,7 @@ export default function Planner() {
    * before this one. But the count underneath "AUGUST 2026" read "1 of 42 days
    * planned", claiming five days of July and six of September as August's.
    */
-  const counted = useMemo(
-    () => (range === 'month' ? dates.filter((d) => monthOf(d) === anchorMonth) : dates),
-    [dates, range, anchorMonth],
-  )
+  const counted = dates
 
   const shownDays = useMemo(
     () => counted.map((date) => byDate.get(date)).filter((d): d is DayPlan => Boolean(d)),
@@ -251,11 +247,10 @@ export default function Planner() {
     clearQuickAdd()
   }
 
-  /** Steps by whatever you are looking at: a week, a fortnight, or a month. */
+  /** Steps by whatever you are looking at: a week or a fortnight. */
   function shift(direction: -1 | 1) {
     const ref = new Date(weekDates[0] + 'T12:00:00')
-    if (range === 'month') ref.setMonth(ref.getMonth() + direction)
-    else ref.setDate(ref.getDate() + direction * (range === 'fortnight' ? 14 : 7))
+    ref.setDate(ref.getDate() + direction * (range === 'fortnight' ? 14 : 7))
 
     goToWeek(ref, profile.weekStartsOn)
     setChosen(getRangeDates(
@@ -271,7 +266,7 @@ export default function Planner() {
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="display text-xl sm:text-2xl text-ink-900">
-              {range === 'month' ? formatMonth(weekDates[0]) : 'Your week'}
+              Your week
             </h1>
             <p className="text-sm text-ink-700">
               {formatRange(dates)} · {plannedDays} of {counted.length} days planned
@@ -358,7 +353,6 @@ export default function Planner() {
                 kcal={kcalByDate.get(date) ?? 0}
                 selected={date === selected}
                 showWeekday={dates.length <= 7}
-                dim={range === 'month' && monthOf(date) !== anchorMonth}
                 onSelect={() => setChosen(date)}
               />
             ))}
@@ -452,14 +446,14 @@ export default function Planner() {
               cannot see in any case. */}
           <span>
             {plannedDays === 0 ? (
-              <>Nothing planned {range === 'week' ? 'this week' : range === 'fortnight' ? 'in this fortnight' : 'this month'} yet.</>
+              <>Nothing planned {range === 'week' ? 'this week' : 'in this fortnight'} yet.</>
             ) : (
               <>
                 <strong className="font-mono">
                   {Math.round(weekTotal.calories / plannedDays)}
                 </strong>{' '}
                 kcal a day on average, across {plannedDays} planned {plannedDays === 1 ? 'day' : 'days'}
-                {range === 'week' ? ' this week' : range === 'fortnight' ? ' in this fortnight' : ' this month'}.
+                {range === 'week' ? ' this week' : ' in this fortnight'}.
               </>
             )}
           </span>
@@ -1099,9 +1093,6 @@ function formatRange(dates: string[]): string {
   return `${first} to ${last}`
 }
 
-function formatMonth(date: string): string {
-  return new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
-}
 
 /**
  * One day in the grid.
@@ -1111,13 +1102,12 @@ function formatMonth(date: string): string {
  * days you can plan but not the ones you came to look at.
  */
 function DayCell({
-  date, kcal, selected, showWeekday, dim, onSelect,
+  date, kcal, selected, showWeekday, onSelect,
 }: {
   date: string
   kcal: number
   selected: boolean
   showWeekday: boolean
-  dim: boolean
   onSelect: () => void
 }) {
   const isToday = date === today()
@@ -1132,7 +1122,7 @@ function DayCell({
         selected
           ? 'bg-bite-500 text-white border-bite-500 shadow-xs'
           : 'bg-paper border-border-200 hover:border-bite-300 text-ink-900'
-      } ${dim && !selected ? 'opacity-45' : ''}`}
+      }`}
     >
       {/* White rather than bite-100 on the selected chip. The tint is 4.19:1
           against bite-500, under the 4.5 that small text needs, and the number
