@@ -146,6 +146,50 @@ export interface Candidate {
  */
 const PROCESSED = /\b(canned|salted|with salt|in brine|pickled|instant|fortified|dry mix|restaurant|fast ?food|baby ?food|infant|sweetened|breaded|fried)\b/i
 
+/**
+ * A drink is not the vegetable it was pressed from.
+ *
+ * Beetroot juice, mixed vegetable and fruit juice drink, and a Navajo red
+ * berry beverage all cleared the macro check, because a juice really does
+ * carry roughly the calories and sugars of the thing it came from. What it
+ * does not carry is the fibre, which is most of why any of this is being
+ * fetched, and its sodium belongs to whatever was added at the factory.
+ *
+ * Refused only where the food's own name does not claim to be one. The library
+ * holds lemon juice, and "Lemon juice, raw" is exactly the right row for it.
+ * ("squash" is deliberately not in this list: it is a drink in Britain and a
+ * vegetable everywhere else, and "Squash, zucchini, baby, raw" is the right
+ * answer for a courgette.)
+ */
+const DRINK = /\b(juice|beverage|drink|nectar|smoothie|cordial|soda)\b/i
+
+/**
+ * And a snack made of a grain is not the grain.
+ *
+ * "Snacks, rice cakes, brown rice, buckwheat, unsalted" was matched to brown
+ * rice, which it mentions and is not. Puffed, baked and salted, it has a
+ * different density and a different everything.
+ *
+ * Same rule as the drinks, and for the same reason it has to be a rule about
+ * the pair rather than about the row: the library also holds "Puffed rice
+ * cakes", for which that row is exactly right. The category cannot tell them
+ * apart, both being grains. The name can.
+ */
+const SNACK = /\b(snacks?|crisps|chips|bar|puffed|extruded|cakes)\b/i
+
+/**
+ * Whether the row introduces a kind the food's own name never claimed.
+ *
+ * "Brown rice" against "Snacks, rice cakes, brown rice" and "Beetroot" against
+ * "BEETROOT JUICE" are the same mistake: the description is about the food,
+ * and is not the food. Where the name says the same word the row is welcome,
+ * which is what keeps lemon juice and puffed rice cakes matched to the rows
+ * that are genuinely theirs.
+ */
+function introduces(kind: RegExp, description: string, food: Food): boolean {
+  return kind.test(description) && !kind.test(food.names.en)
+}
+
 /** What a plain, unmessed-with row tends to say about itself. */
 const PLAIN = /\b(raw|without salt|unsalted|boiled, drained|drained solids|uncooked|dry|whole)\b/i
 
@@ -211,6 +255,11 @@ export function pick(candidates: Candidate[], food: Food): Candidate | undefined
     // A row with neither figure answers neither question.
     const has = c.foodNutrients?.some((n) => n.nutrientId === FIBRE || n.nutrientId === SODIUM)
     if (!has || PROCESSED.test(c.description)) return false
+    // A drink for a food that is not one, or a snack for a food that is not
+    // one. Both cleared the macros, which is why neither is caught there: a
+    // juice carries roughly the calories of what it was pressed from.
+    if (introduces(DRINK, c.description, food)) return false
+    if (introduces(SNACK, c.description, food)) return false
     if (!resembles(c, food)) {
       turnedDown += 1
       return false

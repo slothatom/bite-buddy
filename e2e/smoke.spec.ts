@@ -673,8 +673,16 @@ test.describe('the recipe library', () => {
     await expect(page.getByText('Per serving')).toBeVisible()
     await page.getByRole('button', { name: 'Add recipe' }).click()
 
-    await page.getByRole('button', { name: /^Yours/ }).click()
-    await expect(page.getByText('Midnight beans')).toBeVisible()
+    // It says it saved, and offers the way back. Adding was the one action in
+    // the app that happened in silence while removing announced itself.
+    await expect(page.getByText('Saved Midnight beans')).toBeVisible()
+
+    // And it is on screen without being asked for. This used to close on
+    // Dishes, because a new recipe has no meal tags and that is where the tag
+    // rules put it, so the thing you had just written was nowhere in sight.
+    // No clicking through to Yours first: that is the whole assertion.
+    await expect(page.locator('[data-recipe-card]').filter({ hasText: 'Midnight beans' }))
+      .toBeVisible()
   })
 
   test('a shipped recipe can be edited, and put back the way it was', async ({ page }) => {
@@ -724,6 +732,8 @@ test.describe('the recipe library', () => {
     // Star it, so the delete has a favourite to clear.
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Yours/ }).click()
+    await expect(page.locator('[data-recipe-card]').filter({ hasText: 'Doomed dinner' }))
+      .toBeVisible()
     await page.getByRole('button', { name: 'Add to favourites' }).first().click()
 
     // Delete it. The confirmation names it and says what will not be affected.
@@ -734,15 +744,19 @@ test.describe('the recipe library', () => {
     await expect(page.getByText(/[Hh]istorical meal data/)).toBeVisible()
     await page.getByRole('button', { name: 'Yes, delete' }).click()
 
-    // Gone from the list, from search, and from favourites.
-    await expect(page.getByText('Doomed dinner')).toHaveCount(0)
+    // Gone from the list, from search, and from favourites. The card rather
+    // than the text: the undo bar names what it just did, and the delete
+    // confirmation named it a moment ago.
+    await expect(page.locator('[data-recipe-card]').filter({ hasText: 'Doomed dinner' }))
+      .toHaveCount(0)
     await page.getByPlaceholder(/Search in English/).fill('Doomed dinner')
     // The card, not the text: the empty state now names what it could not
     // find, which is the point of it.
     await expect(page.locator('[data-recipe-card]')).toHaveCount(0)
     await page.getByPlaceholder(/Search in English/).fill('')
     await page.getByRole('button', { name: /Favourites/ }).click()
-    await expect(page.getByText('Doomed dinner')).toHaveCount(0)
+    await expect(page.locator('[data-recipe-card]').filter({ hasText: 'Doomed dinner' }))
+      .toHaveCount(0)
 
     // Gone from the planner's picker. Scoped to the sheet, since the plan
     // behind it still shows the meal, that is the point of the next assertion.
@@ -766,7 +780,12 @@ test.describe('the recipe library', () => {
     await page.getByRole('button', { name: 'Restore' }).first().click()
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Yours/ }).click()
-    await expect(page.getByText('Doomed dinner')).toBeVisible()
+    // The card. An undo offer stands for its window and is deliberately found
+    // again on coming back to the screen it was made on, so within these few
+    // seconds "Saved Doomed dinner" is still on the page and the bare text
+    // matches twice.
+    await expect(page.locator('[data-recipe-card]').filter({ hasText: 'Doomed dinner' }))
+      .toBeVisible()
   })
 
   test('deleting a recipe leaves its ingredients alone', async ({ page }) => {

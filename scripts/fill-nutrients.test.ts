@@ -136,3 +136,69 @@ describe('a row that is a different food entirely', () => {
     expect(resembles(noEnergy, ours(264, 14.2, 4.1, 21.3))).toBe(true)
   })
 })
+
+/**
+ * The rows that cleared the macro check and were still the wrong food.
+ *
+ * A juice carries roughly the calories of what it was pressed from, so four
+ * figures cannot tell beetroot from beetroot juice. What can is that the row
+ * says "juice" and the food never did.
+ */
+describe('a row that is about the food rather than the food', () => {
+  const row2 = (description: string): Candidate => ({
+    fdcId: 1,
+    description,
+    foodNutrients: [
+      { nutrientId: 1008, value: 43 }, { nutrientId: 1003, value: 1.6 },
+      { nutrientId: 1005, value: 10 }, { nutrientId: 1004, value: 0.2 },
+      { nutrientId: 1079, value: 2 }, { nutrientId: 1093, value: 54 },
+    ],
+  })
+  const beetroot = food({
+    names: { en: 'Beetroot' }, state: 'raw',
+    per100g: { calories: 43, protein: 1.6, carbs: 10, fat: 0.2 },
+  })
+
+  it('refuses the juice for the vegetable it was pressed from', () => {
+    expect(pick([row2('BEETROOT JUICE, BEETROOT')], beetroot)).toBeUndefined()
+  })
+
+  it('keeps the juice for a food that is one', () => {
+    // "Lemon juice, raw" is exactly the right row for lemon juice, so the rule
+    // has to be about the pair rather than about the word.
+    const lemon = food({
+      names: { en: 'Lemon juice' }, state: 'raw',
+      per100g: { calories: 43, protein: 1.6, carbs: 10, fat: 0.2 },
+    })
+    expect(pick([row2('Lemon juice, raw')], lemon)?.fdcId).toBe(1)
+  })
+
+  it('refuses a snack made of the grain, for the grain', () => {
+    const rice = food({
+      names: { en: 'Brown rice' }, state: 'dry',
+      per100g: { calories: 43, protein: 1.6, carbs: 10, fat: 0.2 },
+    })
+    expect(pick([row2('Snacks, rice cakes, brown rice, buckwheat, unsalted')], rice))
+      .toBeUndefined()
+  })
+
+  it('keeps it for the rice cakes, which the category cannot tell apart', () => {
+    // Both are filed under grains. Only the name says which is the snack.
+    const cakes = food({
+      names: { en: 'Puffed rice cakes' }, state: 'as-sold',
+      per100g: { calories: 43, protein: 1.6, carbs: 10, fat: 0.2 },
+    })
+    expect(pick([row2('Snacks, rice cakes, brown rice, buckwheat, unsalted')], cakes)?.fdcId)
+      .toBe(1)
+  })
+
+  it('does not read a courgette as a soft drink', () => {
+    // "Squash" is a drink in Britain and a vegetable everywhere else, which is
+    // why it is not in the list.
+    const zucchini = food({
+      names: { en: 'Zucchini' }, state: 'raw',
+      per100g: { calories: 43, protein: 1.6, carbs: 10, fat: 0.2 },
+    })
+    expect(pick([row2('Squash, zucchini, baby, raw')], zucchini)?.fdcId).toBe(1)
+  })
+})

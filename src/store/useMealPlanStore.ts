@@ -188,6 +188,16 @@ interface MealPlanStore {
   recordEaten: (date: string, slot: MealSlot, entry: Component) => void
   removeMeal: (date: string, mealId: string) => void
   /**
+   * Takes one entry back out of a slot, and the meal with it if that empties it.
+   *
+   * The inverse of `addEntry`, which had none. `restoreMeals` puts back a meal
+   * that was removed whole and is no help here: undoing an add means taking
+   * something out, not putting something back. Without this, adding a meal was
+   * the one action in the app that could not be confirmed, because there was
+   * nothing to offer alongside the confirmation.
+   */
+  removeEntry: (date: string, slot: MealSlot, index: number) => void
+  /**
    * Puts meals back on a day exactly as they were, ids and outcomes included.
    *
    * What undo needs and what `setMeal` cannot give it. `setMeal` writes a slot
@@ -358,6 +368,24 @@ export const useMealPlanStore = create<MealPlanStore>()(
                   id: newId(), slot, entries: [entry],
                   outcome: 'eaten', outcomeAt: new Date().toISOString(),
                 }],
+              })
+            }),
+          })),
+
+        removeEntry: (date, slot, index) =>
+          set((s) => ({
+            plan: s.plan.map((day) => {
+              if (day.date !== date) return day
+              return touch({
+                ...day,
+                meals: day.meals.flatMap((m) => {
+                  if (m.slot !== slot) return [m]
+                  const entries = m.entries.filter((_, at) => at !== index)
+                  // A slot with nothing in it is not a meal you skipped, it is
+                  // a meal that was never there. The planner draws the empty
+                  // slots it needs.
+                  return entries.length ? [{ ...m, entries }] : []
+                }),
               })
             }),
           })),
