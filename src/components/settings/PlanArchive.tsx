@@ -18,7 +18,16 @@ import { componentsNutrients } from '../../lib/nutrition'
  * this app's interpretation, not the dietician's.
  */
 export function PlanArchive() {
-  const [openId, setOpenId] = useState<string | null>(SOURCE_PLANS[0]?.id ?? null)
+  /*
+   * Nothing open to begin with.
+   *
+   * This opened `SOURCE_PLANS[0]`, the first of the fourteen in the order they
+   * were imported, while the list on screen is sorted newest first. So it was
+   * not even the top row that unfolded: it was a week from June 2022 somewhere
+   * down the page, expanded on every visit, for no reason anybody could see.
+   * An archive is a list you pick from.
+   */
+  const [openId, setOpenId] = useState<string | null>(null)
   const [loadedId, setLoadedId] = useState<string | null>(null)
   const { loadSourcePlan, weekDates } = useMealPlanStore()
   const notice = useUserStore((s) => s.notice)

@@ -30,6 +30,29 @@ async function goto(page: Page, route: string) {
 }
 
 /**
+ * A tub in the fridge, without cooking a session to get one.
+ *
+ * These used to be created through a "Leftovers" dialog on the schedule, which
+ * has since gone: a tub arrives by being cooked, and a form asking you to
+ * describe food you had already made was a second way to the same shelf that
+ * nobody used. The tests that only wanted a tub to exist seed one, which is
+ * what they always meant.
+ */
+async function putATubInTheFridge(page: Page, label: string) {
+  await page.evaluate((what) => {
+    localStorage.setItem('bite-buddy-portions', JSON.stringify({
+      version: 3,
+      state: { portions: [{
+        id: 'tub-1', label: what, servings: 2,
+        madeOn: new Date().toISOString().slice(0, 10),
+        storage: 'fridge', source: 'leftover',
+      }] },
+    }))
+  }, label)
+  await page.reload()
+}
+
+/**
  * Moves the planner's window on to a week that has not started yet.
  *
  * Several of these tests plan a whole week and then read it back, and the app
@@ -399,7 +422,7 @@ test.describe('the shopping list', () => {
 })
 
 test.describe('the planner', () => {
-  test('shows a week, a fortnight or a month, and keeps what you planned', async ({ page }) => {
+  test('shows a week or a fortnight, and keeps what you planned', async ({ page }) => {
     await goto(page, '/plan')
 
     const days = page.locator('button[aria-pressed]')
@@ -408,14 +431,14 @@ test.describe('the planner', () => {
     await page.getByRole('tab', { name: '2 weeks' }).click()
     await expect(days).toHaveCount(14)
 
-    await page.getByRole('tab', { name: '1 month' }).click()
-    const monthDays = await days.count()
-    expect(monthDays % 7, 'a month grid should be whole weeks').toBe(0)
-    expect(monthDays).toBeGreaterThanOrEqual(28)
+    // A month is not offered any more. 150 meal slots is a grid where a day is
+    // a rectangle with nothing readable in it, so the view that showed the
+    // most showed the least.
+    await expect(page.getByRole('tab', { name: '1 month' })).toHaveCount(0)
 
-    // Plan something, step a month forward and back: it is still there. The
-    // plan used to hold only the seven days on screen, so moving the window
-    // threw the rest away.
+    // Plan something, step forward and back: it is still there. The plan used
+    // to hold only the seven days on screen, so moving the window threw the
+    // rest away.
     await page.getByRole('tab', { name: '1 week' }).click()
     await page.getByRole('button', { name: /Pop something in/ }).first().click()
     await page.getByPlaceholder(/What are we having/).fill('Bruschetta')
@@ -1272,16 +1295,6 @@ test.describe('cooking once and eating twice', () => {
     await expect(page.getByText('fridge').first()).toBeVisible()
   })
 
-  test('leftovers can be written down by hand', async ({ page }) => {
-    await goto(page, '/schedule')
-    await page.getByRole('button', { name: 'Leftovers' }).click()
-
-    await page.getByLabel('Or just say what it is').fill('Half a lasagne')
-    await page.getByRole('button', { name: 'Keep it' }).click()
-
-    await expect(page.getByText('Half a lasagne')).toBeVisible()
-    await expect(page.getByText(/cooked today/)).toBeVisible()
-  })
 })
 
 test.describe('the cupboard', () => {
@@ -1364,9 +1377,7 @@ test.describe('filling the gaps', () => {
 test.describe('what the kitchen has to say', () => {
   test('leftovers with nothing planned to eat them reach the home screen', async ({ page }) => {
     await goto(page, '/schedule')
-    await page.getByRole('button', { name: 'Leftovers' }).click()
-    await page.getByLabel('Or just say what it is').fill('Half a lasagne')
-    await page.getByRole('button', { name: 'Keep it' }).click()
+    await putATubInTheFridge(page, 'Half a lasagne')
 
     await goto(page, '/')
     await expect(page.getByText(/waiting|cooked and waiting/).first()).toBeVisible()
@@ -1374,9 +1385,7 @@ test.describe('what the kitchen has to say', () => {
 
   test('it stops once something is planned to eat them', async ({ page }) => {
     await goto(page, '/schedule')
-    await page.getByRole('button', { name: 'Leftovers' }).click()
-    await page.getByLabel('Or just say what it is').fill('Half a lasagne')
-    await page.getByRole('button', { name: 'Keep it' }).click()
+    await putATubInTheFridge(page, 'Half a lasagne')
 
     await goto(page, '/plan')
     await page.getByRole('button', { name: /Pop something in/ }).first().click()
@@ -2425,6 +2434,11 @@ test.describe('the small sharp edges', () => {
 test.describe('the dietician, in English', () => {
   test('the archive says what a line means, and keeps what it said', async ({ page }) => {
     await goto(page, '/settings/history')
+
+    // Opened, because nothing is expanded to begin with. It used to unfold one
+    // week of June 2022 on every visit, and not even the top row: the first of
+    // the fourteen in import order, while the list is sorted newest first.
+    await page.getByRole('button', { name: /Show|Open|week/i }).first().click()
 
     // Both, because the original is the record: a plan you cannot check
     // against what was actually prescribed is one you have to take on faith.
