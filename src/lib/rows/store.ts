@@ -36,7 +36,23 @@ export const useSyncState = create<SyncStateStore>()(
     }),
     {
       name: 'bite-buddy-sync-state',
-      version: 1,
+      /*
+       * v1 → v2 throws the bookkeeping away once, on purpose.
+       *
+       * Until the fix in `localChanges`, a row whose id came back from the dead
+       * was written without mentioning `deleted_at`, and an upsert only writes
+       * the columns it is given, so the server kept calling it deleted while
+       * this device called it alive. Those rows are still poisoned, and the fix
+       * alone does not reach them: they match the agreed snapshot, so nothing
+       * resends them, and the next pull that meets the tombstone removes them.
+       *
+       * Forgetting what was agreed makes the next round re-send every live row,
+       * this time saying null, which clears the tombstones. It costs one round
+       * trip and cannot lose anything: deletions are computed from this
+       * snapshot, so an empty one produces no deletions at all.
+       */
+      version: 2,
+      migrate: () => ({ tables: {} }) as SyncStateStore,
       storage: safeStorage<SyncStateStore>(),
       partialize: (s) => ({ tables: s.tables }) as SyncStateStore,
     },

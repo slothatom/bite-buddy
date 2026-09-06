@@ -77,7 +77,19 @@ export function localChanges(
     seen.add(row.id)
     const print = fingerprint(row)
     rows[row.id] = print
-    if (snapshot.rows[row.id] !== print) send.push(row)
+    // `deleted_at: null` explicitly, because an id here can come back.
+    //
+    // A grocery line's id is the food's id, so `tomatoes` is deleted and
+    // re-created every time a staple leaves a list and returns. The upsert
+    // only writes the columns it is given, so a revived row that mentions no
+    // `deleted_at` leaves the old timestamp standing: the device believes the
+    // row is alive, the server still calls it deleted, and the next pull that
+    // reaches that tombstone removes it. That is a shopping list emptying
+    // itself a second after you touch it, with nobody having deleted anything.
+    //
+    // Saying null costs nothing else: `fingerprint` drops null fields, so the
+    // row compares exactly as it did before and no extra traffic follows.
+    if (snapshot.rows[row.id] !== print) send.push({ ...row, deleted_at: null })
   }
 
   for (const [id, print] of Object.entries(snapshot.rows)) {
