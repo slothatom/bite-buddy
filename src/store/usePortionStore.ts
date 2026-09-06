@@ -83,6 +83,9 @@ export const usePortionStore = create<PortionStore>()(
         // Nothing to bring forward: this store did not exist at either version.
         1: (state) => state,
         2: (state) => state,
+        // v3 → v4: the two numbered snack slots became one. Nothing in this
+        // store holds a slot, so there is nothing to bring forward.
+        3: (state) => state,
       }),
       partialize: (s) => ({ portions: s.portions }) as PortionStore,
     },

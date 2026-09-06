@@ -130,6 +130,9 @@ export const useRecipeStore = create<RecipeStore>()(
         1: (state) => state,
         // v2 → v3: XP left the user profile; nothing here changed either.
         2: (state) => state,
+        // v3 → v4: the two numbered snack slots became one. Nothing in this
+        // store holds a slot, so there is nothing to bring forward.
+        3: (state) => state,
       }),
     },
   ),

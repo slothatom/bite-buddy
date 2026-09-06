@@ -239,9 +239,9 @@ describe('the whole archive', () => {
 
 const REAL_WEEK: PlanInput[] = [plan(
   ['breakfast', '50 g paine int, pasta de branza ( 100 g branza de vaci, 2 lg de iaurt, ceapa), legume'],
-  ['snack1', '200 g capsuni'],
+  ['snack', '200 g capsuni'],
   ['lunch', 'tigaie picanta: 120 g piept de pui, 300 g legume , o lingurita de ulei'],
-  ['snack2', '150 g grapefruit'],
+  ['snack', '150 g grapefruit'],
   ['dinner', '350 g ciorba de varza ( o lingurita de ulei / portie), o lg de iaurt , 25 g paine int'],
 )]
 

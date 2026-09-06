@@ -136,6 +136,10 @@ export const useUserStore = create<UserStore>()(
             }
             return { ...s, profile: { ...profile, moments: [] } }
           },
+          // v3 → v4: the two numbered snack slots became one. The profile
+          // holds no slots, so there is nothing to bring forward, but the step
+          // has to exist: a gap in the chain refuses the whole file.
+          3: (s) => s,
         })(state, version)
         if (!carried?.profile) return carried
         // The week used to default to Wednesday, following the dietician's own

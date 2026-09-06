@@ -14,9 +14,9 @@ import type { MealSlot, PlanLanguage } from '../../src/types/index.js'
 
 const SLOT_KEYS: Record<string, MealSlot> = {
   // Romanian
-  md: 'breakfast', g1: 'snack1', pranz: 'lunch', p: 'lunch', g2: 'snack2', cina: 'dinner', c: 'dinner',
+  md: 'breakfast', g1: 'snack', pranz: 'lunch', p: 'lunch', g2: 'snack', cina: 'dinner', c: 'dinner',
   // Hungarian
-  reggeli: 'breakfast', uzsi1: 'snack1', ebed: 'lunch', uzsi2: 'snack2', vacsi: 'dinner',
+  reggeli: 'breakfast', uzsi1: 'snack', ebed: 'lunch', uzsi2: 'snack', vacsi: 'dinner',
 }
 
 const DAY_NAMES: Record<string, number> = {

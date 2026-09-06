@@ -55,9 +55,9 @@ describe('the window every picker offers', () => {
 describe('the meal the clock suggests', () => {
   it('follows the day round', () => {
     expect(slotNow(8)).toBe('breakfast')
-    expect(slotNow(11)).toBe('snack1')
+    expect(slotNow(11)).toBe('snack')
     expect(slotNow(13)).toBe('lunch')
-    expect(slotNow(16)).toBe('snack2')
+    expect(slotNow(16)).toBe('snack')
     expect(slotNow(19)).toBe('dinner')
   })
 

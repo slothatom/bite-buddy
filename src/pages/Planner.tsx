@@ -745,6 +745,7 @@ function MealCell({
       data-planned
       onClick={onOpen}
       aria-label={`${SLOT_LABELS[slot]} on ${formatDate(date)}: ${name}${
+        meals.length > 1 ? `, ${meals.length} meals` : ''}${
         eaten ? ', eaten' : skipped ? ', skipped' : ', planned'}`}
       className={`relative rounded-lg px-1 py-1 text-left leading-tight border
                   ${eaten ? 'bg-teal-50 border-teal-200' : 'bg-cream-50 border-transparent'}
@@ -769,6 +770,12 @@ function MealCell({
                     ${!full && eaten ? 'pr-2.5' : ''}`}
       >
         {full ? name : shortName(name)}
+        {/* A slot holds as many meals as you had, and the snack slot now
+            regularly holds two. Naming the first and saying nothing about the
+            rest is a cell claiming a day is smaller than it was. */}
+        {!full && meals.length > 1 && (
+          <span className="text-ink-500"> +{meals.length - 1}</span>
+        )}
       </span>
     </button>
   )

@@ -803,6 +803,41 @@ export const useMealPlanStore = create<MealPlanStore>()(
         }),
         // v2 → v3: XP left the user profile; the plan is unaffected.
         2: (state) => state,
+        /*
+         * v3 → v4: Snack 1 and Snack 2 became one Snacks slot.
+         *
+         * Both are remapped rather than one kept and one dropped, so a day
+         * that had a morning apple and an afternoon orange keeps both: a slot
+         * has always been a list of meals, so they simply sit together now.
+         * A meal carries its own id, so nothing collides.
+         *
+         * Templates are walked too. A saved week is the same shape as a
+         * planned one and would otherwise put its snacks into a slot that no
+         * longer exists, which reads on screen as a week that lost half its
+         * food the moment you loaded it.
+         */
+        3: (state) => {
+          // Read as a plain string: what is in storage was written under the
+          // old shape and holds slot names this build's type no longer has.
+          const gone = (slot: string) => slot === 'snack1' || slot === 'snack2'
+          const move = (meals: PlannedMeal[]) => meals.map((meal) => (
+            gone(meal.slot) ? { ...meal, slot: 'snack' as MealSlot } : meal
+          ))
+          return {
+            ...state,
+            plan: Array.isArray(state.plan)
+              ? state.plan.map((day) => ({ ...day, meals: move(day.meals ?? []) }))
+              : state.plan,
+            templates: Array.isArray(state.templates)
+              ? state.templates.map((t) => ({
+                ...t,
+                days: Array.isArray(t.days)
+                  ? t.days.map((day: DayPlan) => ({ ...day, meals: move(day.meals ?? []) }))
+                  : t.days,
+              }))
+              : state.templates,
+          }
+        },
       }),
     },
   ),

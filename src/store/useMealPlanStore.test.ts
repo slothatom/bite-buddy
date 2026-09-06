@@ -449,7 +449,7 @@ describe('something you ate that was never planned', () => {
 
   it('lands as a record, not as a plan waiting to be ticked', () => {
     aThursday()
-    useMealPlanStore.getState().recordEaten(date, 'snack1', apple)
+    useMealPlanStore.getState().recordEaten(date, 'snack', apple)
 
     const [meal] = day().meals
     expect(meal.outcome).toBe('eaten')
@@ -474,9 +474,9 @@ describe('something you ate that was never planned', () => {
 
   it('adds a second bite to the record it already made', () => {
     aThursday()
-    useMealPlanStore.getState().recordEaten(date, 'snack1', apple)
+    useMealPlanStore.getState().recordEaten(date, 'snack', apple)
     useMealPlanStore.getState()
-      .recordEaten(date, 'snack1', { kind: 'food', foodId: 'food-apple', grams: 40 })
+      .recordEaten(date, 'snack', { kind: 'food', foodId: 'food-apple', grams: 40 })
 
     expect(day().meals).toHaveLength(1)
     expect(day().meals[0].entries).toHaveLength(2)
@@ -592,5 +592,40 @@ describe('a list that comes back shorter says why', () => {
     useMealPlanStore.getState().generateGroceryList(ctx)
 
     expect(useMealPlanStore.getState().cupboardCovered).toHaveLength(0)
+  })
+})
+
+describe('a day written when there were two snack slots', () => {
+  it('keeps both of them when they become one', async () => {
+    // A morning apple and an afternoon orange are two meals, and a slot has
+    // always been a list of meals. Keeping one and dropping the other would
+    // have been a day quietly losing food on the version it was upgraded.
+    const { useMealPlanStore: store } = await import('./useMealPlanStore')
+    const options = store.persist.getOptions()
+
+    const old = {
+      plan: [{
+        date: '2026-09-06',
+        updatedAt: '2026-09-06T10:00:00.000Z',
+        meals: [
+          { id: 'a', slot: 'snack1', entries: [{ kind: 'food', foodId: 'apple', grams: 150 }] },
+          { id: 'b', slot: 'lunch', entries: [{ kind: 'food', foodId: 'salmon', grams: 140 }] },
+          { id: 'c', slot: 'snack2', entries: [{ kind: 'food', foodId: 'orange', grams: 180 }] },
+        ],
+      }],
+      templates: [{
+        id: 't1', name: 'Our usual', savedAt: '2026-09-01T00:00:00.000Z',
+        days: [{ date: '2026-09-01', meals: [{ id: 'd', slot: 'snack2', entries: [] }] }],
+      }],
+    }
+
+    const carried = options.migrate?.(old, 3) as unknown as typeof old
+    const slots = carried.plan[0].meals.map((m) => m.slot)
+
+    expect(slots).toEqual(['snack', 'lunch', 'snack'])
+    expect(carried.plan[0].meals).toHaveLength(3)
+    // A saved week is the same shape and would otherwise load into a slot that
+    // no longer exists, which reads as a week that lost half its food.
+    expect(carried.templates[0].days[0].meals[0].slot).toBe('snack')
   })
 })

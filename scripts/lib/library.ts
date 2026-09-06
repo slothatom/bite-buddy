@@ -201,7 +201,7 @@ function tidy(text: string): string {
 // ─── Naming ───────────────────────────────────────────────────────────────────
 
 const SLOT_TAG: Record<MealSlot, RecipeTag> = {
-  breakfast: 'breakfast', snack1: 'snack', lunch: 'lunch', snack2: 'snack', dinner: 'dinner',
+  breakfast: 'breakfast', snack: 'snack', lunch: 'lunch', dinner: 'dinner',
 }
 
 function labelFor(c: RecipeComponent): string {
@@ -331,7 +331,7 @@ function emojiFor(components: RecipeComponent[], slot: MealSlot): string {
   // Both snack slots get the same face. They are the same kind of thing, and
   // the two were giving one apple-and-cashews a red apple and the next a green
   // one purely by which slot of the day it had been written in.
-  return { breakfast: '🌅', snack1: '🍎', lunch: '🍽️', snack2: '🍎', dinner: '🌙' }[slot]
+  return { breakfast: '🌅', snack: '🍎', lunch: '🍽️', dinner: '🌙' }[slot]
 }
 
 // ─── Merging ──────────────────────────────────────────────────────────────────
@@ -629,7 +629,7 @@ export function buildLibrary(plans: PlanInput[]): Library {
         if (!recipe) {
           recipe = {
             id: `meal-${meal.slot}-${String(recipes.length + 1).padStart(3, '0')}`,
-            name: { en: nameMeal(entries, undefined, meal.slot === 'snack1' || meal.slot === 'snack2' ? 'weight' : 'calories') },
+            name: { en: nameMeal(entries, undefined, meal.slot === 'snack' ? 'weight' : 'calories') },
             emoji: emojiFor(entries, meal.slot),
             servings: 1,
             prepMinutes: 0,
@@ -803,6 +803,18 @@ export const TIMES_PLANNED: Record<string, number> = ${JSON.stringify(library.ti
   }
 }
 
+/**
+ * The archive's own words for a slot, brought up to date.
+ *
+ * The dietician writes a mid-morning and a mid-afternoon snack, and the app
+ * carried both as numbered slots for as long as it read them that way. It has
+ * one snack slot now, so both land in it, and an archive written before the
+ * change still rebuilds into the shape the app holds today.
+ */
+function currentSlot(slot: string): MealSlot {
+  return slot === 'snack1' || slot === 'snack2' ? 'snack' : slot as MealSlot
+}
+
 /** Rebuilds the library from the committed archive, for the drift check. */
 export function rebuildFromArchive(plans: SourcePlan[]): Library {
   return buildLibrary(plans.map((plan) => ({
@@ -815,7 +827,7 @@ export function rebuildFromArchive(plans: SourcePlan[]): Library {
     days: plan.days.map((day) => ({
       dayName: day.dayName,
       weekday: day.weekday,
-      meals: day.meals.map((meal) => ({ slot: meal.slot, text: meal.text })),
+      meals: day.meals.map((meal) => ({ slot: currentSlot(meal.slot), text: meal.text })),
     })),
   })))
 }
