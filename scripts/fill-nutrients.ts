@@ -443,6 +443,10 @@ const round = (n: number, places: number) => Math.round(n * 10 ** places) / 10 *
  * off a commercial one and the roasted vegetables 235 mg off a congee. Neither
  * figure is about food anybody here has eaten.
  *
+ * Guacamole joined them after two runs of this same script came back with 344
+ * and 383 mg for it, off two different tubs. The salt in a guacamole is
+ * whatever the person mashing it put in, so there is no figure to go and find.
+ *
  * A list rather than a rule, because there is no signal to read: they are
  * `source: 'curated'` like everything else, and "is this a thing you buy or a
  * thing you make" is a fact about a kitchen. Named here, reported at the end,
@@ -452,7 +456,7 @@ const COMPOSED = new Set([
   'vegetables-roasted', 'salad-raw', 'vegetables-mixed', 'berries-mixed',
   'lentil-pate', 'eggplant-salad', 'yogurt-garlic-sauce',
   'cake-coconut-raspberry', 'banana-bread-chocolate', 'cheese-blueberry-loaf',
-  'milk-ice-bar',
+  'milk-ice-bar', 'guacamole',
 ])
 
 async function main() {
