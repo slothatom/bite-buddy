@@ -312,7 +312,7 @@ export default function Planner() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto pb-[calc(7rem+env(safe-area-inset-bottom))] lg:pb-8">
+    <div className="flex-1 overflow-y-auto pb-[calc(2rem+env(safe-area-inset-bottom))]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
         {/* Navigation */}

@@ -3,11 +3,12 @@ import { Undo2, X } from 'lucide-react'
 import { useUndo, UNDO_SECONDS } from '../../store/useUndo'
 
 /**
- * The offer to take it back, sitting above the bottom bar.
+ * The offer to take it back, in the bottom corner of the screen.
  *
- * Above rather than over: the nav is 3.5rem plus the safe area on a phone, and
- * a bar that covers it turns "I did not mean that" into "I cannot leave this
- * screen". On a laptop the nav is not there and this sits in the corner.
+ * It used to sit clear of the phone's bottom nav, which was 3.5rem plus the
+ * safe area: a bar covering that turned "I did not mean that" into "I cannot
+ * leave this screen". The nav is at the top now, so this sits where a
+ * transient message belongs, a thumb's reach from the bottom edge.
  *
  * The countdown is drawn rather than counted out in numbers. A digit ticking
  * down reads as pressure; a bar quietly emptying reads as a window closing,
@@ -29,7 +30,7 @@ export default function UndoBar() {
     <div
       role="status"
       className="fixed inset-x-0 z-40 px-4 pointer-events-none
-                 bottom-[calc(4rem+env(safe-area-inset-bottom))] md:bottom-6 md:inset-x-auto md:right-6"
+                 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] md:bottom-6 md:inset-x-auto md:right-6"
     >
       {/* An inverted slab, which is what a transient message should be: it has
           to read as not-the-page. `text-white` was wrong on a token that
