@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { RefreshCw, Trash2, ShoppingBasket, Plus, X, Check, Search, Share2 } from 'lucide-react'
 import type { GroceryItem, MedCategory, PantryItem } from '../types'
 import { useMealPlanStore, getRangeDates, today } from '../store/useMealPlanStore'
@@ -34,7 +35,21 @@ export default function GroceryList() {
   const thisWeek = useThisWeek()
   const ctx = useNutritionContext()
   const [justBuilt, setJustBuilt] = useState(false)
-  const [tab, setTab] = useState<'list' | 'cupboard'>('list')
+  /*
+   * Which half of this screen, readable from the address.
+   *
+   * "Nothing in the cupboard yet" on the Recipes screen offers a link called
+   * "Open the cupboard", and it landed you on To Buy, leaving you to find the
+   * Cupboard tab yourself, which was the entire job of the link. A tab that
+   * cannot be named in a URL is a tab nothing can link to.
+   */
+  const [params, setParams] = useSearchParams()
+  const tab: 'list' | 'cupboard' = params.get('tab') === 'cupboard' ? 'cupboard' : 'list'
+  const setTab = (next: 'list' | 'cupboard') => {
+    // Replaced rather than pushed: flipping a tab is not a place you want the
+    // back button to walk you through one at a time.
+    setParams(next === 'cupboard' ? { tab: 'cupboard' } : {}, { replace: true })
+  }
   const [emptying, setEmptying] = useState(false)
   const pantry = usePantry()
   const { keep } = usePantryStore()
@@ -411,37 +426,51 @@ function PantryRow({
   onStaple: () => void
   onDrop: () => void
 }) {
+  /*
+   * The name first, and never squeezed to nothing.
+   *
+   * `flex-1` gives an item a basis of zero, so the name only ever got what the
+   * fixed-width controls left over. At 331 px that was 20 px: "Wholemeal
+   * bread" rendered as a single letter and an ellipsis, on the one row where
+   * the name is the only thing you are reading. Measured, not guessed.
+   *
+   * So the row wraps, the name holds a floor of 7rem, and the controls travel
+   * together to a second line rather than shrinking. Same shape as the
+   * planner's entry rows, which met this a fortnight earlier.
+   */
   return (
-    <div className="flex items-center gap-2 p-3">
-      <span className="flex-1 min-w-0 text-sm text-ink-900 truncate">{name}</span>
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-2 p-3">
+      <span className="flex-auto min-w-28 text-sm text-ink-900 truncate">{name}</span>
 
-      <input
-        type="number"
-        min={0}
-        className="input w-24 px-2 text-sm"
-        placeholder="enough"
-        aria-label={`How much ${name}`}
-        value={item.grams ?? ''}
-        onChange={(e) => onAmount(e.target.value === '' ? undefined : Number(e.target.value))}
-      />
-      <span className="text-xs text-ink-500 shrink-0 w-4">{item.grams ? 'g' : ''}</span>
+      <span className="flex items-center gap-2 shrink-0 ml-auto">
+        <input
+          type="number"
+          min={0}
+          className="input w-24 px-2 text-sm"
+          placeholder="enough"
+          aria-label={`How much ${name}`}
+          value={item.grams ?? ''}
+          onChange={(e) => onAmount(e.target.value === '' ? undefined : Number(e.target.value))}
+        />
+        <span className="text-xs text-ink-500 shrink-0 w-3">{item.grams ? 'g' : ''}</span>
 
-      <button
-        onClick={onStaple}
-        aria-pressed={Boolean(item.staple)}
-        aria-label={`Always have ${name}`}
-        className={item.staple ? 'chip-on shrink-0' : 'chip-off shrink-0'}
-      >
-        Always
-      </button>
+        <button
+          onClick={onStaple}
+          aria-pressed={Boolean(item.staple)}
+          aria-label={`Always have ${name}`}
+          className={item.staple ? 'chip-on shrink-0' : 'chip-off shrink-0'}
+        >
+          Always
+        </button>
 
-      <button
-        className="btn-ghost btn-icon text-ink-300 hover:text-coral-600 shrink-0"
-        onClick={onDrop}
-        aria-label={`Remove ${name} from the cupboard`}
-      >
-        <X size={15} />
-      </button>
+        <button
+          className="btn-ghost btn-icon text-ink-300 hover:text-coral-600 shrink-0"
+          onClick={onDrop}
+          aria-label={`Remove ${name} from the cupboard`}
+        >
+          <X size={15} />
+        </button>
+      </span>
     </div>
   )
 }

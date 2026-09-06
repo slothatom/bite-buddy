@@ -33,6 +33,17 @@ export type MicroPer100g = Partial<Record<
   number
 >>
 
+/*
+ * Energy under any of the three ids USDA states it as.
+ *
+ * 1008 is kcal on most rows; the Foundation set gives Atwater general (2047)
+ * or specific (2048) on some instead. Reading only 1008 meant those rows
+ * arrived with `calories: 0`, and a 0 kcal ingredient does not fail loudly, it
+ * quietly zeroes the recipe it is added to, and then the day, and then the
+ * week.
+ */
+const ENERGY_IDS = [1008, 2048, 2047]
+
 // USDA nutrient IDs. https://fdc.nal.usda.gov/
 const N = {
   calories:     1008,
@@ -88,6 +99,7 @@ function parseUSDAFood(food: USDAFood): NutritionResult {
   }
 
   const sodium = m.get(N.sodium)
+  const energy = ENERGY_IDS.map((id) => m.get(id)).find((v) => v != null)
 
   return {
     name: food.description,
@@ -97,13 +109,31 @@ function parseUSDAFood(food: USDAFood): NutritionResult {
     basePortion: { amount: 100, unit: 'g' },
     saltAsGiven: sodium != null ? { kind: 'sodium', value: r(sodium), unit: 'mg' } : undefined,
     per100g: {
-      calories: r(m.get(N.calories) ?? 0),
+      calories: r(energy ?? 0),
       protein:  r(m.get(N.protein)  ?? 0, 10),
       carbs:    r(m.get(N.carbs)    ?? 0, 10),
       fat:      r(m.get(N.fat)      ?? 0, 10),
     },
     micros,
   }
+}
+
+/**
+ * Whether a search result is worth offering as an ingredient.
+ *
+ * USDA returns rows that state a handful of nutrients and no energy at all,
+ * "Chicken, breast, boneless, skinless, raw" among them, and they arrived in
+ * the picker reading 0 kcal per 100 g with nothing to say they were unknown
+ * rather than empty. Adding one silently zeroed the recipe's calories, and
+ * that recipe then fed the planner, the day rings and Progress.
+ *
+ * Left out rather than flagged. Everywhere else this app marks an unknown and
+ * carries on, because there the unknown is one field of something you already
+ * have; here it is a thing you have not added yet and there are six other rows
+ * on the list that do state their energy.
+ */
+export function worthOffering(result: NutritionResult): boolean {
+  return result.per100g.calories > 0
 }
 
 /**
@@ -247,7 +277,9 @@ export async function searchFoods(query: string, signal?: AbortSignal): Promise<
   if (off.status === 'fulfilled') results.push(...off.value)
   else problems.push({ source: 'openfoodfacts', reason: reasonFor(off.reason) })
 
-  return { results: results.slice(0, 14), problems }
+  // A row with no energy figure is not an ingredient anybody can use. See
+  // `worthOffering`: adding one zeroes whatever it is added to.
+  return { results: results.filter(worthOffering).slice(0, 14), problems }
 }
 
 async function searchUSDA(query: string, signal?: AbortSignal): Promise<NutritionResult[]> {

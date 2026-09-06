@@ -486,17 +486,26 @@ function ComponentRow({
     setUnit(next)
   }
 
+  /*
+   * The ingredient's name, given room before the controls take it.
+   *
+   * Same fault as the cupboard row and the same fix: `flex-1` is a basis of
+   * zero, so at 331 px "Chicken breast" was rendering as "Chi…" beside a
+   * quantity box that never shrank. The row wraps and the name holds a floor
+   * instead.
+   */
   return (
     <div className="py-1">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
         <GripVertical size={14} className="shrink-0 text-ink-300" aria-hidden />
-        <span className="flex-1 min-w-0">
+        <span className="flex-auto min-w-28">
           <span className="block text-sm text-ink-900 truncate">{name}</span>
           <span className="block text-xs font-mono text-ink-500">
             {kcal} kcal
             {component.kind === 'food' && unit !== 'g' ? ` · ${Math.round(component.grams)} g` : ''}
           </span>
         </span>
+        <span className="flex items-center gap-2 shrink-0 ml-auto">
         <input
           type="number"
           inputMode="decimal"
@@ -522,6 +531,7 @@ function ComponentRow({
         <button className="btn-ghost btn-icon shrink-0 text-ink-500" onClick={onRemove} aria-label={`Remove ${name}`}>
           <Trash2 size={16} />
         </button>
+        </span>
       </div>
       {component.kind === 'food' && APPROXIMATE_UNITS.includes(unit) && (
         <p className="text-[11px] text-ink-500 pl-6">

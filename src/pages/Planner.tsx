@@ -446,13 +446,22 @@ export default function Planner() {
         {/* Week summary */}
         <section className="card-soft p-4 flex items-center gap-3 text-sm text-ink-700">
           <CalendarDays size={18} className="text-ink-500 shrink-0" />
+          {/* Nothing planned is not an average of nought. "A cosy 0 kcal a day
+              on average, across 0 planned days" is the app describing an empty
+              week as though it were a diet, and "cosy" was a verdict on food it
+              cannot see in any case. */}
           <span>
-            A cosy{' '}
-            <strong className="font-mono">
-              {plannedDays ? Math.round(weekTotal.calories / plannedDays) : 0}
-            </strong>{' '}
-            kcal a day on average, across {plannedDays} planned {plannedDays === 1 ? 'day' : 'days'}
-            {range === 'week' ? ' this week' : range === 'fortnight' ? ' in this fortnight' : ' this month'}.
+            {plannedDays === 0 ? (
+              <>Nothing planned {range === 'week' ? 'this week' : range === 'fortnight' ? 'in this fortnight' : 'this month'} yet.</>
+            ) : (
+              <>
+                <strong className="font-mono">
+                  {Math.round(weekTotal.calories / plannedDays)}
+                </strong>{' '}
+                kcal a day on average, across {plannedDays} planned {plannedDays === 1 ? 'day' : 'days'}
+                {range === 'week' ? ' this week' : range === 'fortnight' ? ' in this fortnight' : ' this month'}.
+              </>
+            )}
           </span>
         </section>
       </div>

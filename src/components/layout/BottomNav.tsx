@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDialog } from '../../lib/useDialog'
 import { useLocation, NavLink, useNavigate } from 'react-router-dom'
 import {
   CalendarDays, BookOpen, ShoppingBasket, Plus, MoreHorizontal,
@@ -126,9 +127,18 @@ function MoreSheet({
   onClose: () => void
   isActive: (to: string) => boolean
 }) {
+  // The same three manners every other dialog has: Escape closes it, Tab stays
+  // inside it, focus goes back to what opened it, and the page behind it holds
+  // still. This one was written before that hook existed and never got them.
+  const panel = useDialog<HTMLDivElement>(onClose)
+
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-ink-900/40 backdrop-blur-xs md:hidden" onClick={onClose}>
       <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-label="More"
         className="bg-paper w-full rounded-t-3xl p-5 shadow-e3"
         style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}
         onClick={(e) => e.stopPropagation()}

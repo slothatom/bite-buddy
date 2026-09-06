@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { searchFoods, lookupBarcode } from './nutritionApi'
+import { searchFoods, lookupBarcode, worthOffering } from './nutritionApi'
+import type { NutritionResult } from './nutritionApi'
 
 /**
  * These cover the failure paths, not the happy one.
@@ -86,6 +87,15 @@ describe('lookupBarcode', () => {
   })
 })
 
+/*
+ * Every fixture here states an energy figure, including the ones testing salt
+ * and micronutrients that do not look at it.
+ *
+ * Not decoration: `searchFoods` drops a result with no energy, because a 0
+ * kcal ingredient does not fail loudly, it silently zeroes the recipe it is
+ * added to. A fixture without one is a food the picker would never offer, so
+ * testing anything else about it would be testing a row nobody can reach.
+ */
 describe('what comes back from a source', () => {
   const usdaFood = {
     fdcId: 171077,
@@ -152,7 +162,7 @@ describe('what comes back from a source', () => {
   it('puts USDA first, because it is the reference for a generic ingredient', async () => {
     mockFetch((url) => (url.includes('nal.usda.gov')
       ? json({ foods: [usdaFood] })
-      : json({ products: [{ code: '123', product_name: 'Chicken thing', nutriments: {} }] })))
+      : json({ products: [{ code: '123', product_name: 'Chicken thing', nutriments: { 'energy-kcal_100g': 120 } }] })))
 
     const { results } = await searchFoods('chicken')
     expect(results[0].source).toBe('usda')
@@ -162,7 +172,7 @@ describe('what comes back from a source', () => {
   it('turns a European salt figure into sodium, and remembers it was salt', async () => {
     mockFetch((url) => (url.includes('nal.usda.gov')
       ? json({ foods: [] })
-      : json({ products: [{ code: '5000112637922', product_name: 'Yogurt', nutriments: { salt_100g: 0.25 } }] })))
+      : json({ products: [{ code: '5000112637922', product_name: 'Yogurt', nutriments: { 'energy-kcal_100g': 61, salt_100g: 0.25 } }] })))
 
     const { results } = await searchFoods('yogurt')
     expect(results[0].micros?.sodium).toBe(100)
@@ -172,7 +182,7 @@ describe('what comes back from a source', () => {
   it('prefers a stated sodium over a stated salt', async () => {
     mockFetch((url) => (url.includes('nal.usda.gov')
       ? json({ foods: [] })
-      : json({ products: [{ code: '1', product_name: 'Thing', nutriments: { salt_100g: 1, sodium_100g: 0.2 } }] })))
+      : json({ products: [{ code: '1', product_name: 'Thing', nutriments: { 'energy-kcal_100g': 200, salt_100g: 1, sodium_100g: 0.2 } }] })))
 
     const { results } = await searchFoods('thing')
     expect(results[0].micros?.sodium).toBe(200)
@@ -183,6 +193,7 @@ describe('what comes back from a source', () => {
     mockFetch((url) => (url.includes('nal.usda.gov')
       ? json({ foods: [] })
       : json({ products: [{ code: '1', product_name: 'Cereal', nutriments: {
+          'energy-kcal_100g': 379,
           calcium_100g: 0.12,        // 120 mg
           'vitamin-d_100g': 0.0000042, // 4.2 mcg
         } }] })))
@@ -209,6 +220,7 @@ describe('rounding on the way in', () => {
     mockFetch((url) => (url.includes('nal.usda.gov')
       ? json({ foods: [] })
       : json({ products: [{ code: '1', product_name: 'Milk', nutriments: {
+          'energy-kcal_100g': 64,
           'vitamin-b12_100g': 0.00000045, // 0.45 mcg
           'vitamin-d_100g': 0.0000012,    // 1.2 mcg
           zinc_100g: 0.0004,              // 0.4 mg
@@ -218,5 +230,25 @@ describe('rounding on the way in', () => {
     expect(results[0].micros?.vitaminB12).toBeCloseTo(0.45, 2)
     expect(results[0].micros?.vitaminD).toBeCloseTo(1.2, 1)
     expect(results[0].micros?.zinc).toBeCloseTo(0.4, 1)
+  })
+})
+
+describe('a search result with no energy figure', () => {
+  const result = (calories: number): NutritionResult => ({
+    name: 'Chicken, breast, boneless, skinless, raw',
+    source: 'usda',
+    basePortion: { amount: 100, unit: 'g' },
+    per100g: { calories, protein: 22.5, carbs: 0, fat: 2.6 },
+  })
+
+  it('is not offered as an ingredient', () => {
+    // USDA returns rows stating a handful of nutrients and no energy. They
+    // reached the picker reading 0 kcal, and adding one silently zeroed the
+    // recipe, then the day, then the week.
+    expect(worthOffering(result(0))).toBe(false)
+  })
+
+  it('leaves the ones that do state it alone', () => {
+    expect(worthOffering(result(120))).toBe(true)
   })
 })
