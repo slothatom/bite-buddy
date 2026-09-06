@@ -291,16 +291,28 @@ export interface Recipe {
 
 // ─── Meal Plan ────────────────────────────────────────────────────────────────
 
-export type MealSlot = 'breakfast' | 'snack1' | 'lunch' | 'snack2' | 'dinner'
+/**
+ * The four parts of a day.
+ *
+ * There were five, with two numbered snack slots because the dietician's plans
+ * are written with a mid-morning and a mid-afternoon one. That put an empty
+ * numbered box in every day for a household that eats when it is hungry, and
+ * made "which snack was that" a question the app asked and nobody wanted.
+ *
+ * One slot holds as many as you had, since a slot has always been a list of
+ * meals rather than a single one. It sits last rather than mid-morning: it is
+ * not tied to a clock any more, and a single slot placed at eleven implies an
+ * afternoon snack belongs somewhere else, when there is nowhere else.
+ */
+export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack'
 
-export const MEAL_SLOTS: MealSlot[] = ['breakfast', 'snack1', 'lunch', 'snack2', 'dinner']
+export const MEAL_SLOTS: MealSlot[] = ['breakfast', 'lunch', 'dinner', 'snack']
 
 export const SLOT_LABELS: Record<MealSlot, string> = {
   breakfast: 'Breakfast',
-  snack1:    'Snack 1',
   lunch:     'Lunch',
-  snack2:    'Snack 2',
   dinner:    'Dinner',
+  snack:     'Snacks',
 }
 
 /**

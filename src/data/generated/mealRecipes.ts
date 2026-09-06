@@ -364,7 +364,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-06-06T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-012",
+    "id": "meal-snack-012",
     "name": {
       "en": "Nectarine with cashews"
     },
@@ -599,7 +599,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "30 g rolled oats"
   },
   {
-    "id": "meal-snack1-020",
+    "id": "meal-snack-020",
     "name": {
       "en": "Orange with cashews"
     },
@@ -663,7 +663,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-11T00:00:00.000Z"
   },
   {
-    "id": "meal-snack2-022",
+    "id": "meal-snack-022",
     "name": {
       "en": "Apple with walnuts"
     },
@@ -771,7 +771,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-11T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-025",
+    "id": "meal-snack-025",
     "name": {
       "en": "Grapefruit with cashews"
     },
@@ -826,7 +826,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "300 g"
   },
   {
-    "id": "meal-snack1-028",
+    "id": "meal-snack-028",
     "name": {
       "en": "Orange with almonds"
     },
@@ -923,7 +923,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-11T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-033",
+    "id": "meal-snack-033",
     "name": {
       "en": "Mango with cashews"
     },
@@ -1066,7 +1066,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-11T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-037",
+    "id": "meal-snack-037",
     "name": {
       "en": "Grapefruit with cashews"
     },
@@ -1096,7 +1096,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "5 g cashews, 250 g grapefruit"
   },
   {
-    "id": "meal-snack2-039",
+    "id": "meal-snack-039",
     "name": {
       "en": "Apple with cashews"
     },
@@ -1820,7 +1820,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-30T00:00:00.000Z"
   },
   {
-    "id": "meal-snack2-064",
+    "id": "meal-snack-064",
     "name": {
       "en": "Kiwi with cashews"
     },
@@ -2050,7 +2050,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "10 g dark chocolate"
   },
   {
-    "id": "meal-snack1-072",
+    "id": "meal-snack-072",
     "name": {
       "en": "Kiwi with cashews"
     },
@@ -2124,7 +2124,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-11-14T00:00:00.000Z"
   },
   {
-    "id": "meal-snack2-078",
+    "id": "meal-snack-078",
     "name": {
       "en": "Kiwi with walnuts"
     },
@@ -2281,7 +2281,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-11-14T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-083",
+    "id": "meal-snack-083",
     "name": {
       "en": "Apple with cashews"
     },
@@ -2408,7 +2408,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-11-14T00:00:00.000Z"
   },
   {
-    "id": "meal-snack2-088",
+    "id": "meal-snack-088",
     "name": {
       "en": "Apple with almonds"
     },
@@ -3258,7 +3258,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-122",
+    "id": "meal-snack-122",
     "name": {
       "en": "Orange with cashews"
     },
@@ -3288,7 +3288,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "150 g orange"
   },
   {
-    "id": "meal-snack2-123",
+    "id": "meal-snack-123",
     "name": {
       "en": "Pineapple with walnuts"
     },
@@ -3415,7 +3415,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "150 g trout"
   },
   {
-    "id": "meal-snack1-131",
+    "id": "meal-snack-131",
     "name": {
       "en": "Pear with almonds"
     },
@@ -3479,7 +3479,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack2-133",
+    "id": "meal-snack-133",
     "name": {
       "en": "Apple with cashews"
     },
@@ -3612,7 +3612,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-138",
+    "id": "meal-snack-138",
     "name": {
       "en": "Pear with cashews"
     },
@@ -3641,7 +3641,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-04-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack2-140",
+    "id": "meal-snack-140",
     "name": {
       "en": "Kiwi with walnuts"
     },
@@ -3671,7 +3671,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "10 g walnuts"
   },
   {
-    "id": "meal-snack1-142",
+    "id": "meal-snack-142",
     "name": {
       "en": "Grapefruit with cashews"
     },
@@ -4367,7 +4367,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "50 g halloumi"
   },
   {
-    "id": "meal-snack1-168",
+    "id": "meal-snack-168",
     "name": {
       "en": "Grapes with cashews"
     },
@@ -4488,7 +4488,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-07-04T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-172",
+    "id": "meal-snack-172",
     "name": {
       "en": "Grapes with almonds"
     },
@@ -4683,7 +4683,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-07-04T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-180",
+    "id": "meal-snack-180",
     "name": {
       "en": "Sour cherries with walnuts"
     },
@@ -4968,7 +4968,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "40 g rolled oats"
   },
   {
-    "id": "meal-snack1-189",
+    "id": "meal-snack-189",
     "name": {
       "en": "Peach with cashews"
     },
@@ -5256,7 +5256,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-07-11T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-200",
+    "id": "meal-snack-200",
     "name": {
       "en": "Apple with cashews"
     },
@@ -5550,7 +5550,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack2-212",
+    "id": "meal-snack-212",
     "name": {
       "en": "Yogurt with mixed berries & almonds"
     },
@@ -5623,7 +5623,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-214",
+    "id": "meal-snack-214",
     "name": {
       "en": "Apple with walnuts"
     },
@@ -5697,7 +5697,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack2-216",
+    "id": "meal-snack-216",
     "name": {
       "en": "Pomelo with cashews"
     },
@@ -5886,7 +5886,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-223",
+    "id": "meal-snack-223",
     "name": {
       "en": "Orange with walnuts"
     },
@@ -5944,7 +5944,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack2-225",
+    "id": "meal-snack-225",
     "name": {
       "en": "Pear with walnuts"
     },
@@ -6041,7 +6041,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-229",
+    "id": "meal-snack-229",
     "name": {
       "en": "Grapefruit with cashews"
     },
@@ -6071,7 +6071,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "20 g cashews, 150 g grapefruit"
   },
   {
-    "id": "meal-snack1-230",
+    "id": "meal-snack-230",
     "name": {
       "en": "Banana with cashews"
     },
@@ -6203,7 +6203,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-237",
+    "id": "meal-lunch-236",
     "name": {
       "en": "Fried eggs with creamed spinach"
     },
@@ -6232,7 +6232,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-238",
+    "id": "meal-dinner-237",
     "name": {
       "en": "Lentils with puffed rice cakes & raw vegetable salad"
     },
@@ -6271,7 +6271,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-snack1-239",
+    "id": "meal-snack-238",
     "name": {
       "en": "Pear with almonds"
     },
@@ -6301,7 +6301,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "15 g almonds"
   },
   {
-    "id": "meal-lunch-240",
+    "id": "meal-lunch-239",
     "name": {
       "en": "Tabbouleh with pork loin under the lid & mixed vegetables"
     },
@@ -6335,7 +6335,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-241",
+    "id": "meal-dinner-240",
     "name": {
       "en": "Cream of asparagus soup with wholemeal bread"
     },
@@ -6364,7 +6364,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-242",
+    "id": "meal-breakfast-241",
     "name": {
       "en": "Carrot salad with mozzarella & wholemeal bread"
     },

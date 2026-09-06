@@ -27,7 +27,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -49,7 +49,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g grapefruit",
             "entries": [
               {
@@ -88,7 +88,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -110,7 +110,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -149,7 +149,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g caise",
             "entries": [
               {
@@ -171,7 +171,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -210,7 +210,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g nectarine",
             "entries": [
               {
@@ -232,7 +232,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -271,12 +271,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g nectarine, 10 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-012",
+                "recipeId": "meal-snack-012",
                 "servings": 1
               }
             ]
@@ -293,7 +293,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -332,7 +332,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g banana",
             "entries": [
               {
@@ -354,7 +354,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -393,7 +393,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -415,7 +415,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -464,12 +464,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 narancs + 10 g kesudio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-020",
+                "recipeId": "meal-snack-020",
                 "servings": 1
               }
             ]
@@ -486,12 +486,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "1 alma + 10 g dio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-022",
+                "recipeId": "meal-snack-022",
                 "servings": 1
               }
             ]
@@ -525,12 +525,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 grapefruit + 10 g kesudio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-025",
+                "recipeId": "meal-snack-025",
                 "servings": 1
               }
             ]
@@ -547,7 +547,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "1 narancs",
             "entries": [
               {
@@ -586,12 +586,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 narancs + 10 g mandula",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-028",
+                "recipeId": "meal-snack-028",
                 "servings": 1
               }
             ]
@@ -608,7 +608,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g joghurt",
             "entries": [
               {
@@ -647,7 +647,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 korte",
             "entries": [
               {
@@ -669,7 +669,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "1 alma",
             "entries": [
               {
@@ -708,12 +708,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "fel mango + 10 g kesudio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-033",
+                "recipeId": "meal-snack-033",
                 "servings": 1
               }
             ]
@@ -730,7 +730,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "1 korte",
             "entries": [
               {
@@ -769,12 +769,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 grapefruit + 5 g kesudio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-037",
+                "recipeId": "meal-snack-037",
                 "servings": 1
               }
             ]
@@ -791,12 +791,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "1 alma + 5 g kesudio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-039",
+                "recipeId": "meal-snack-039",
                 "servings": 1
               }
             ]
@@ -830,7 +830,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g klementin / narancs",
             "entries": [
               {
@@ -852,12 +852,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "1 alma + 10 g dio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-022",
+                "recipeId": "meal-snack-022",
                 "servings": 1
               }
             ]
@@ -901,7 +901,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g visine",
             "entries": [
               {
@@ -923,7 +923,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g caise / nectarine",
             "entries": [
               {
@@ -962,7 +962,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g visine",
             "entries": [
               {
@@ -984,7 +984,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mango",
             "entries": [
               {
@@ -1023,7 +1023,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g caise",
             "entries": [
               {
@@ -1045,7 +1045,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -1084,7 +1084,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g nectarine / caise",
             "entries": [
               {
@@ -1106,7 +1106,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pepene",
             "entries": [
               {
@@ -1145,7 +1145,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g visine",
             "entries": [
               {
@@ -1167,7 +1167,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pepene",
             "entries": [
               {
@@ -1206,7 +1206,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g visine",
             "entries": [
               {
@@ -1228,7 +1228,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pepene",
             "entries": [
               {
@@ -1267,7 +1267,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -1289,7 +1289,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g fructe de padure",
             "entries": [
               {
@@ -1338,7 +1338,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -1360,7 +1360,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g pere",
             "entries": [
               {
@@ -1399,7 +1399,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g grapefruit",
             "entries": [
               {
@@ -1421,7 +1421,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -1460,7 +1460,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -1482,7 +1482,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -1521,7 +1521,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g pere",
             "entries": [
               {
@@ -1543,12 +1543,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi, 15 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-064",
+                "recipeId": "meal-snack-064",
                 "servings": 1
               }
             ]
@@ -1582,7 +1582,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g afine",
             "entries": [
               {
@@ -1604,7 +1604,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -1643,7 +1643,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g pere",
             "entries": [
               {
@@ -1665,7 +1665,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -1704,12 +1704,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g kiwi, 10 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-072",
+                "recipeId": "meal-snack-072",
                 "servings": 1
               }
             ]
@@ -1726,7 +1726,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -1775,7 +1775,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g portocale",
             "entries": [
               {
@@ -1797,7 +1797,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pomelo",
             "entries": [
               {
@@ -1836,7 +1836,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -1858,7 +1858,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pomelo",
             "entries": [
               {
@@ -1897,7 +1897,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "250 g pomelo",
             "entries": [
               {
@@ -1919,12 +1919,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi, 15 g nuci",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-078",
+                "recipeId": "meal-snack-078",
                 "servings": 1
               }
             ]
@@ -1958,7 +1958,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g portocale / clementine",
             "entries": [
               {
@@ -1980,7 +1980,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g struguri",
             "entries": [
               {
@@ -2019,12 +2019,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere, 15 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-083",
+                "recipeId": "meal-snack-083",
                 "servings": 1
               }
             ]
@@ -2041,7 +2041,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g struguri",
             "entries": [
               {
@@ -2080,7 +2080,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g portocale",
             "entries": [
               {
@@ -2102,7 +2102,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -2141,7 +2141,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g pere",
             "entries": [
               {
@@ -2163,12 +2163,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere, 10 g migdale",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-088",
+                "recipeId": "meal-snack-088",
                 "servings": 1
               }
             ]
@@ -2212,7 +2212,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g prune",
             "entries": [
               {
@@ -2234,7 +2234,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g clementine",
             "entries": [
               {
@@ -2273,7 +2273,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g prune",
             "entries": [
               {
@@ -2295,7 +2295,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g clementine",
             "entries": [
               {
@@ -2334,7 +2334,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g clementine",
             "entries": [
               {
@@ -2356,7 +2356,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -2395,7 +2395,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g clementine",
             "entries": [
               {
@@ -2417,7 +2417,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -2456,7 +2456,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g banana",
             "entries": [
               {
@@ -2478,7 +2478,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -2517,7 +2517,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g banana",
             "entries": [
               {
@@ -2539,7 +2539,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -2578,7 +2578,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g grapefruit",
             "entries": [
               {
@@ -2600,7 +2600,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -2648,7 +2648,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g piersici",
             "entries": [
               {
@@ -2670,7 +2670,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -2709,7 +2709,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g afine",
             "entries": [
               {
@@ -2731,7 +2731,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -2770,7 +2770,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g afine",
             "entries": [
               {
@@ -2792,7 +2792,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -2831,7 +2831,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g piersici / nectarine",
             "entries": [
               {
@@ -2853,7 +2853,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -2892,7 +2892,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g zmeura si afine",
             "entries": [
               {
@@ -2914,7 +2914,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -2953,7 +2953,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -2975,7 +2975,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pepene",
             "entries": [
               {
@@ -3014,7 +3014,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -3036,7 +3036,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pepene",
             "entries": [
               {
@@ -3084,7 +3084,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -3106,7 +3106,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g ananas",
             "entries": [
               {
@@ -3145,12 +3145,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g portocale, 10 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-122",
+                "recipeId": "meal-snack-122",
                 "servings": 1
               }
             ]
@@ -3167,12 +3167,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g ananas, 10 g nuci",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-123",
+                "recipeId": "meal-snack-123",
                 "servings": 1
               }
             ]
@@ -3206,7 +3206,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g grapefruit",
             "entries": [
               {
@@ -3228,7 +3228,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mar",
             "entries": [
               {
@@ -3267,7 +3267,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g portocale",
             "entries": [
               {
@@ -3289,7 +3289,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -3328,7 +3328,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -3350,7 +3350,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mar",
             "entries": [
               {
@@ -3389,12 +3389,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g pere, 10 g migdale",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-131",
+                "recipeId": "meal-snack-131",
                 "servings": 1
               }
             ]
@@ -3411,12 +3411,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mar + 10 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-133",
+                "recipeId": "meal-snack-133",
                 "servings": 1
               }
             ]
@@ -3450,7 +3450,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g portocale",
             "entries": [
               {
@@ -3472,7 +3472,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -3521,7 +3521,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -3543,7 +3543,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -3582,12 +3582,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g pere, 10 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-138",
+                "recipeId": "meal-snack-138",
                 "servings": 1
               }
             ]
@@ -3604,12 +3604,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi, 10 g nuci",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-140",
+                "recipeId": "meal-snack-140",
                 "servings": 1
               }
             ]
@@ -3643,12 +3643,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g grapefruit, 10 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-142",
+                "recipeId": "meal-snack-142",
                 "servings": 1
               }
             ]
@@ -3665,7 +3665,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g portocale",
             "entries": [
               {
@@ -3704,7 +3704,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -3726,7 +3726,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g portocale",
             "entries": [
               {
@@ -3765,7 +3765,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g struguri",
             "entries": [
               {
@@ -3787,7 +3787,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -3826,7 +3826,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g struguri",
             "entries": [
               {
@@ -3848,7 +3848,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mar",
             "entries": [
               {
@@ -3887,7 +3887,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g portocale",
             "entries": [
               {
@@ -3909,7 +3909,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -3958,7 +3958,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -3980,12 +3980,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere, 10 g nuci",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-022",
+                "recipeId": "meal-snack-022",
                 "servings": 1
               }
             ]
@@ -4019,7 +4019,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g grapefruit",
             "entries": [
               {
@@ -4041,7 +4041,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -4080,7 +4080,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -4102,12 +4102,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere, 10 g migdale",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-088",
+                "recipeId": "meal-snack-088",
                 "servings": 1
               }
             ]
@@ -4141,7 +4141,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g pere",
             "entries": [
               {
@@ -4163,7 +4163,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -4202,7 +4202,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g banana",
             "entries": [
               {
@@ -4224,7 +4224,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -4263,7 +4263,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g pere",
             "entries": [
               {
@@ -4285,7 +4285,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -4334,12 +4334,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g strugurei, 20 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-168",
+                "recipeId": "meal-snack-168",
                 "servings": 1
               }
             ]
@@ -4356,7 +4356,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g nectarine",
             "entries": [
               {
@@ -4395,12 +4395,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g strugurei, 5 g migdale",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-172",
+                "recipeId": "meal-snack-172",
                 "servings": 1
               }
             ]
@@ -4417,7 +4417,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g nectarine",
             "entries": [
               {
@@ -4456,7 +4456,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g caise",
             "entries": [
               {
@@ -4478,7 +4478,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -4517,12 +4517,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g nectarine / caise, 10 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-012",
+                "recipeId": "meal-snack-012",
                 "servings": 1
               }
             ]
@@ -4539,7 +4539,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pepene",
             "entries": [
               {
@@ -4578,12 +4578,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g visine, 15 g nuci",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-180",
+                "recipeId": "meal-snack-180",
                 "servings": 1
               }
             ]
@@ -4600,7 +4600,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pepene",
             "entries": [
               {
@@ -4639,7 +4639,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g visine",
             "entries": [
               {
@@ -4661,7 +4661,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pepene",
             "entries": [
               {
@@ -4700,7 +4700,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -4722,7 +4722,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g fructe de padure",
             "entries": [
               {
@@ -4771,12 +4771,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g piersici, 20 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-189",
+                "recipeId": "meal-snack-189",
                 "servings": 1
               }
             ]
@@ -4793,7 +4793,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -4832,7 +4832,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g piersici",
             "entries": [
               {
@@ -4854,7 +4854,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g visine",
             "entries": [
               {
@@ -4882,7 +4882,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g visine",
             "entries": [
               {
@@ -4904,7 +4904,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -4932,7 +4932,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "250 g lebenita",
             "entries": [
               {
@@ -4954,7 +4954,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -4982,7 +4982,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g visine",
             "entries": [
               {
@@ -5004,7 +5004,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -5032,7 +5032,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g visine",
             "entries": [
               {
@@ -5054,7 +5054,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pepene",
             "entries": [
               {
@@ -5093,12 +5093,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere, 20 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-200",
+                "recipeId": "meal-snack-200",
                 "servings": 1
               }
             ]
@@ -5115,7 +5115,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pepene",
             "entries": [
               {
@@ -5164,12 +5164,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 narancs + 10 g kesudio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-020",
+                "recipeId": "meal-snack-020",
                 "servings": 1
               }
             ]
@@ -5186,12 +5186,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi + 10 g dio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-140",
+                "recipeId": "meal-snack-140",
                 "servings": 1
               }
             ]
@@ -5225,7 +5225,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 grapefruit",
             "entries": [
               {
@@ -5247,12 +5247,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "1 alma + 10 g kesudio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-133",
+                "recipeId": "meal-snack-133",
                 "servings": 1
               }
             ]
@@ -5286,12 +5286,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 narancs + 10 g mandula",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-028",
+                "recipeId": "meal-snack-028",
                 "servings": 1
               }
             ]
@@ -5308,12 +5308,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g joghurt + 100 g erdei gyumolcs + 10 g mandula / dio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-212",
+                "recipeId": "meal-snack-212",
                 "servings": 1
               }
             ]
@@ -5347,12 +5347,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 alma + 15 g dio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-214",
+                "recipeId": "meal-snack-214",
                 "servings": 1
               }
             ]
@@ -5369,12 +5369,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "250 g pomelo + 10 g kesudio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-216",
+                "recipeId": "meal-snack-216",
                 "servings": 1
               }
             ]
@@ -5408,7 +5408,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 alma",
             "entries": [
               {
@@ -5430,7 +5430,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "1 narancs",
             "entries": [
               {
@@ -5469,7 +5469,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 grapefruit",
             "entries": [
               {
@@ -5491,7 +5491,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "1 alma",
             "entries": [
               {
@@ -5530,12 +5530,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "1 narancs + 10 g dio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-223",
+                "recipeId": "meal-snack-223",
                 "servings": 1
               }
             ]
@@ -5552,12 +5552,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "1 korte + 10 g dio",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-225",
+                "recipeId": "meal-snack-225",
                 "servings": 1
               }
             ]
@@ -5601,7 +5601,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g pere",
             "entries": [
               {
@@ -5623,7 +5623,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -5662,12 +5662,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g grapefruit, 20 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-229",
+                "recipeId": "meal-snack-229",
                 "servings": 1
               }
             ]
@@ -5684,7 +5684,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -5723,12 +5723,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g banana, 10 g caju",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-230",
+                "recipeId": "meal-snack-230",
                 "servings": 1
               }
             ]
@@ -5745,7 +5745,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -5784,7 +5784,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g pere",
             "entries": [
               {
@@ -5806,7 +5806,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g kiwi",
             "entries": [
               {
@@ -5845,12 +5845,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g mere, 10 g migdale",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack2-088",
+                "recipeId": "meal-snack-088",
                 "servings": 1
               }
             ]
@@ -5861,13 +5861,13 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-237",
+                "recipeId": "meal-lunch-236",
                 "servings": 1
               }
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -5883,7 +5883,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-238",
+                "recipeId": "meal-dinner-237",
                 "servings": 1
               }
             ]
@@ -5906,12 +5906,12 @@ export const SOURCE_PLANS: SourcePlan[] = [
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g pere, 15 g migdale",
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack1-239",
+                "recipeId": "meal-snack-238",
                 "servings": 1
               }
             ]
@@ -5922,13 +5922,13 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-240",
+                "recipeId": "meal-lunch-239",
                 "servings": 1
               }
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "200 g capsuni",
             "entries": [
               {
@@ -5944,7 +5944,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-241",
+                "recipeId": "meal-dinner-240",
                 "servings": 1
               }
             ]
@@ -5961,13 +5961,13 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-242",
+                "recipeId": "meal-breakfast-241",
                 "servings": 1
               }
             ]
           },
           {
-            "slot": "snack1",
+            "slot": "snack",
             "text": "150 g grapefruit",
             "entries": [
               {
@@ -5983,13 +5983,13 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-240",
+                "recipeId": "meal-lunch-239",
                 "servings": 1
               }
             ]
           },
           {
-            "slot": "snack2",
+            "slot": "snack",
             "text": "150 g mere",
             "entries": [
               {
@@ -6005,7 +6005,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-241",
+                "recipeId": "meal-dinner-240",
                 "servings": 1
               }
             ]

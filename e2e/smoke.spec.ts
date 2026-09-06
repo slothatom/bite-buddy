@@ -1333,11 +1333,11 @@ test.describe('rearranging the week', () => {
     const name = (await breakfast.locator('[data-entry-name]').first().textContent())?.trim() ?? ''
 
     await breakfast.getByRole('button', { name: 'Move or copy meal' }).first().click()
-    await page.getByRole('button', { name: 'Snack 1', exact: true }).click()
+    await page.getByRole('button', { name: 'Snacks', exact: true }).click()
     await page.getByRole('button', { name: 'Copy it' }).click()
 
     await expect(breakfast.locator('[data-entry-name]').filter({ hasText: name })).toBeVisible()
-    await expect(page.locator('.card').filter({ hasText: 'Snack 1' }).first()
+    await expect(page.locator('.card').filter({ hasText: 'Snacks' }).first()
       .locator('[data-entry-name]').filter({ hasText: name })).toBeVisible()
   })
 })
@@ -1569,7 +1569,8 @@ test.describe('a laptop is not a large phone', () => {
     // All five slots, in the viewport, at once. Stacked full width a laptop
     // showed two and put the rest below the fold, which is the one thing a big
     // screen should never do to a day.
-    for (const slot of ['Breakfast', 'Snack 1', 'Lunch', 'Snack 2', 'Dinner']) {
+    // Four now, not five: the two numbered snack slots became one.
+    for (const slot of ['Breakfast', 'Lunch', 'Dinner', 'Snacks']) {
       const box = await page.getByText(slot, { exact: true }).first().boundingBox()
       expect(box, `${slot} is missing`).not.toBeNull()
       expect(box!.y, `${slot} is below the fold`).toBeLessThan(950)
@@ -2140,8 +2141,8 @@ test.describe('what actually happened', () => {
     // clock's guess can be corrected there.
     await expect(page.getByText(/, today$/)).toBeVisible()
     await page.getByRole('button', { name: 'Change' }).click()
-    await page.getByRole('button', { name: 'Snack 1', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Ate this for snack 1' })).toBeVisible()
+    await page.getByRole('button', { name: 'Snacks', exact: true }).click()
+    await expect(page.getByRole('heading', { name: 'Ate this for snacks' })).toBeVisible()
     await page.getByRole('button', { name: 'Done' }).click()
 
     await page.getByRole('button', { name: 'foods', exact: true }).click()

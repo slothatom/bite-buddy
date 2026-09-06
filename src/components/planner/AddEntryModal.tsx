@@ -69,7 +69,7 @@ export default function AddEntryModal({
   // Snacks open on foods. The plans write them as lines rather than dishes
   // ("150 g mere, 10 g caju"), so the recipe tab for a snack slot was reliably
   // empty, an empty list is a worse answer than the right list.
-  const isSnack = slot === 'snack1' || slot === 'snack2'
+  const isSnack = slot === 'snack'
   const available = useAvailablePortions()
   const pantry = usePantry()
   const [tab, setTab] = useState<'fridge' | 'recipes' | 'foods'>(

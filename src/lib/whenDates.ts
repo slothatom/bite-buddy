@@ -36,8 +36,8 @@ export function whenDates(from: string, weekStartsOn: WeekStart): string[] {
  */
 export function slotNow(hour = new Date().getHours()): MealSlot {
   if (hour < 10) return 'breakfast'
-  if (hour < 12) return 'snack1'
+  if (hour < 12) return 'snack'
   if (hour < 15) return 'lunch'
-  if (hour < 17) return 'snack2'
+  if (hour < 17) return 'snack'
   return 'dinner'
 }
