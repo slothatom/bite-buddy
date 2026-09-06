@@ -14,6 +14,7 @@ import { useAuthStore } from './store/useAuth'
 import { useSyncSession } from './store/useSync'
 import { useMealPlanStore } from './store/useMealPlanStore'
 import { useUserStore } from './store/useUserStore'
+import { followOtherTabs } from './store/registry'
 import { isConfigured } from './lib/supabase'
 import Zig from './components/brand/Mascot'
 import { lazyRoute } from './lib/lazyRoute'
@@ -53,6 +54,10 @@ function ScreenLoading() {
  * overnight is the ordinary case, and until this existed such a phone would
  * still be showing yesterday's week at breakfast.
  */
+function useOtherTabs() {
+  useEffect(followOtherTabs, [])
+}
+
 function useCurrentWeek() {
   const weekStartsOn = useUserStore((s) => s.profile.weekStartsOn)
   const ensureCurrentWeek = useMealPlanStore((s) => s.ensureCurrentWeek)
@@ -131,6 +136,7 @@ function useTheme() {
 function Shell() {
   useSyncSession()
   useCurrentWeek()
+  useOtherTabs()
   useRouteTitle()
 
   return (

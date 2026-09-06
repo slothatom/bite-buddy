@@ -15,6 +15,11 @@ import { weekEaten } from '../lib/nutrition'
 import { scoreWeek, scoreGaps, servingCount, IMPLAUSIBLE_RATIO } from '../lib/mediterranean'
 import { STATUS_STYLES, targetStatus } from '../lib/status'
 import { EmptyState, SectionHeading } from '../components/ui'
+import BodyChart from '../components/body/BodyChart'
+import {
+  BODY_SPANS, BODY_SPAN_LABELS, changeOver, spanStart, withinSpan,
+  type BodySpan, type Reading,
+} from '../lib/body'
 import { useMovementAcross } from '../store/useActivityStore'
 import TrendsTab from '../components/trends/TrendsTab'
 import type { DayMovement } from '../lib/movement'
@@ -411,17 +416,52 @@ function BodyTab() {
    * bare number with no unit of its own to remember.
    */
   const unit = profile.weightUnit
-  const shown = useMemo(() => weights.map((w) => inUnit(w, unit)), [weights, unit])
   const goalKg = profile.weightGoals?.[who]
   const goal = goalKg == null ? undefined : round1(fromKg(goalKg, unit))
 
   const [value, setValue] = useState('')
   const [sizes, setSizes] = useState<Partial<Record<MeasurementKey, string>>>({})
 
-  // Both ends in the same unit before subtracting: a first entry in pounds and
-  // a latest in kilograms differenced raw is not a change, it is a subtraction
-  // of two different things.
-  const change = shown.length > 1 ? round1(shown[shown.length - 1] - shown[0]) : 0
+  /*
+   * How far back the charts and the histories read.
+   *
+   * One control for both, because a body is one subject: nobody wants the
+   * weight over a year beside a waist over three months. Months rather than
+   * weeks, because a body moves slowly and gets measured rarely, and a
+   * fortnight of it is two dots.
+   */
+  const [span, setSpan] = useState<BodySpan>('halfYear')
+  /** The earliest date the span reaches, or nothing at all for "All". */
+  const spanFloor = spanStart(span, today())
+  const [measuring, setMeasuring] = useState<MeasurementKey>('waist')
+  const now = today()
+
+  /** Every weigh-in in the span, in the unit being read. */
+  const weightSeen = useMemo<Reading[]>(
+    () => withinSpan(weights.map((w) => ({ date: w.date, value: inUnit(w, unit) })), span, now),
+    [weights, unit, span, now],
+  )
+  const weightMoved = useMemo(() => changeOver(weightSeen), [weightSeen])
+
+  const measured = useMemo<Reading[]>(
+    () => withinSpan(
+      measurements
+        .filter((m) => m.measurements[measuring] != null)
+        .map((m) => ({ date: m.date, value: m.measurements[measuring]! })),
+      span, now,
+    ),
+    [measurements, measuring, span, now],
+  )
+  const measureMoved = useMemo(() => changeOver(measured), [measured])
+
+  /** Only the measures actually taken, so the chips are not five dead ends. */
+  const measuresTaken = useMemo(
+    () => MEASUREMENT_KEYS.filter((k) => measurements.some((m) => m.measurements[k] != null)),
+    [measurements],
+  )
+
+
+
   const anySize = MEASUREMENT_KEYS.some((k) => Number(sizes[k]))
 
   return (
@@ -437,6 +477,22 @@ function BodyTab() {
             className={who === p.id ? 'tab-on' : 'tab-off'}
           >
             {p.name}
+          </button>
+        ))}
+      </div>
+
+      {/* How far back everything below reads. One control, because a body is
+          one subject and nobody wants a year of weight beside three months of
+          waist. */}
+      <div className="flex flex-wrap gap-1.5">
+        {BODY_SPANS.map((s) => (
+          <button
+            key={s}
+            onClick={() => setSpan(s)}
+            aria-pressed={span === s}
+            className={span === s ? 'chip-on' : 'chip-off'}
+          >
+            {BODY_SPAN_LABELS[s]}
           </button>
         ))}
       </div>
@@ -490,22 +546,41 @@ function BodyTab() {
       ) : (
         <>
           <div className="card p-5">
-            <p className="text-xs font-bold uppercase tracking-wide text-ink-500">Since you started</p>
-            <p className={`text-3xl font-extrabold font-mono ${change <= 0 ? 'text-bite-700' : 'text-coral-600'}`}>
-              {change > 0 ? '+' : ''}{change.toFixed(1)}
+            <p className="text-xs font-bold uppercase tracking-wide text-ink-500">
+              Over {BODY_SPAN_LABELS[span].toLowerCase()}
+            </p>
+            {/* The change across what is on screen, and how long it took. Down
+                two kilos means two different things over a fortnight and over
+                a year, and one weigh-in is no change rather than a change of
+                nought. */}
+            <p className={`text-3xl font-extrabold font-mono ${
+              (weightMoved?.change ?? 0) <= 0 ? 'text-bite-700' : 'text-coral-600'}`}>
+              {weightMoved?.change == null ? '--' : (
+                <>{weightMoved.change > 0 ? '+' : ''}{weightMoved.change.toFixed(1)}</>
+              )}
               <span className="text-base text-ink-500 font-semibold ml-1">{unit}</span>
             </p>
-            {goal != null && weights.length > 0 && (
-              <p className="text-xs text-ink-500 mt-1">
-                {(() => {
-                  const togo = shown[shown.length - 1] - (goal ?? 0)
-                  return Math.abs(togo) < 0.05
-                    ? 'At your goal.'
-                    : `${Math.abs(togo).toFixed(1)} ${unit} ${togo > 0 ? 'to go' : 'below your goal'}.`
-                })()}
-              </p>
-            )}
-            <Sparkline values={shown} goal={goal} />
+            <p className="text-xs text-ink-500 mt-1">
+              {weightMoved?.change == null
+                ? 'One weigh-in so far, which is a reading rather than a change.'
+                : `across ${weightMoved.days} ${weightMoved.days === 1 ? 'day' : 'days'}, from ${
+                  weightMoved.first.value} to ${weightMoved.last.value} ${unit}.`}
+              {goal != null && weightMoved && (() => {
+                const togo = weightMoved.last.value - goal
+                return Math.abs(togo) < 0.05
+                  ? ' At your goal.'
+                  : ` ${Math.abs(togo).toFixed(1)} ${unit} ${togo > 0 ? 'to go' : 'below your goal'}.`
+              })()}
+            </p>
+
+            {weightSeen.length
+              ? <BodyChart readings={weightSeen} unit={unit} goal={goal} />
+              : (
+                <p className="text-sm text-ink-500 mt-3">
+                  Nothing weighed in this stretch. The entries are still there; widen the range
+                  above to see them.
+                </p>
+              )}
 
             <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border-100">
               <label className="label mb-0 shrink-0" htmlFor="goal">Aiming for</label>
@@ -524,8 +599,10 @@ function BodyTab() {
             </div>
           </div>
 
+          {/* The same stretch the chart above is drawn from, so the list and
+              the picture are about one thing. */}
           <div className="card divide-y divide-border-100">
-            {[...weights].reverse().map((w) => (
+            {[...weights].filter((w) => weightSeen.some((r) => r.date === w.date)).reverse().map((w) => (
               <div key={w.id} className="flex items-center justify-between px-4 py-2.5">
                 <span className="text-sm text-ink-700">{formatDay(w.date)}</span>
                 <span className="flex items-center gap-3">
@@ -598,9 +675,17 @@ function BodyTab() {
         </EmptyState>
       ) : (
         <>
+          {/* The five latest figures, each with what it has done. Five charts
+              at once would be five pictures nobody compares; the chart below
+              draws whichever one is being asked about. */}
           <div className="grid gap-3 sm:grid-cols-2">
             {MEASUREMENT_KEYS.map((key) => {
+              // The same stretch as the chart below. Read over all time while
+              // the chart read six months, the card said the waist was down 11
+              // and the chart said 7, and both were true, which is the worst
+              // way for two numbers about one thing to disagree.
               const series = measurements
+                .filter((m) => !spanFloor || m.date >= spanFloor)
                 .map((m) => m.measurements[key])
                 .filter((v): v is number => v != null)
               if (!series.length) return null
@@ -619,14 +704,58 @@ function BodyTab() {
                       </span>
                     )}
                   </p>
-                  {series.length > 1 && <Sparkline values={series} />}
                 </div>
               )
             })}
           </div>
 
+          {measuresTaken.length > 0 && (
+            <div className="card p-5">
+              {/* One at a time, and only the ones you have actually taken.
+                  Waist and thighs on one pair of axes is a chart about the
+                  difference between a waist and a thigh. */}
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {measuresTaken.map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setMeasuring(key)}
+                    aria-pressed={measuring === key}
+                    className={measuring === key ? 'chip-on' : 'chip-off'}
+                  >
+                    {MEASUREMENT_LABELS[key]}
+                  </button>
+                ))}
+              </div>
+
+              {measured.length ? (
+                <>
+                  <p className="text-sm text-ink-700">
+                    {measureMoved?.change == null
+                      ? `One reading of your ${MEASUREMENT_LABELS[measuring].toLowerCase()} in this
+                         stretch, which is a measurement rather than a change.`
+                      : (
+                        <>
+                          <strong className="font-mono text-ink-900">
+                            {measureMoved.change > 0 ? '+' : ''}{measureMoved.change.toFixed(1)} cm
+                          </strong>{' '}
+                          across {measureMoved.days} {measureMoved.days === 1 ? 'day' : 'days'},
+                          from {measureMoved.first.value} to {measureMoved.last.value} cm.
+                        </>
+                      )}
+                  </p>
+                  <BodyChart readings={measured} unit="cm" />
+                </>
+              ) : (
+                <p className="text-sm text-ink-500">
+                  No {MEASUREMENT_LABELS[measuring].toLowerCase()} taken in this stretch. Widen the
+                  range above to reach the earlier ones.
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="card divide-y divide-border-100">
-            {[...measurements].reverse().map((m) => (
+            {[...measurements].filter((m) => !spanFloor || m.date >= spanFloor).reverse().map((m) => (
               <div key={m.id} className="flex items-start justify-between gap-3 px-4 py-2.5">
                 <span className="min-w-0">
                   <span className="block text-sm text-ink-700">{formatDay(m.date)}</span>
@@ -655,28 +784,3 @@ function formatDay(date: string): string {
     .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function Sparkline({ values, goal }: { values: number[]; goal?: number }) {
-  if (values.length < 2) return null
-  // The goal is part of the range, or a line above the chart is a line you
-  // cannot see, which is worse than no line.
-  const all = goal ? [...values, goal] : values
-  const min = Math.min(...all)
-  const max = Math.max(...all)
-  const span = max - min || 1
-  const y = (v: number) => 30 - ((v - min) / span) * 26
-  const points = values.map((v, i) => `${(i / (values.length - 1)) * 100},${y(v)}`).join(' ')
-
-  return (
-    <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="w-full h-16 mt-3">
-      {goal != null && (
-        <line
-          x1="0" x2="100" y1={y(goal)} y2={y(goal)}
-          strokeWidth={1} vectorEffect="non-scaling-stroke" strokeDasharray="3 3"
-          className="stroke-ink-300"
-        />
-      )}
-      <polyline points={points} fill="none" strokeWidth={1.5} vectorEffect="non-scaling-stroke"
-        className="stroke-teal-500" strokeLinejoin="round" strokeLinecap="round" />
-    </svg>
-  )
-}

@@ -39,6 +39,8 @@ export interface PersistedStore {
    * restore for exactly the same reason an old device keeps its data.
    */
   upgrade: (state: unknown, fromVersion: number) => unknown
+  /** Re-reads what is in storage, discarding this tab's copy. */
+  rehydrate: () => void
 }
 
 function persisted<T extends object>(label: string, store: {
@@ -51,6 +53,7 @@ function persisted<T extends object>(label: string, store: {
       partialize?: (state: T) => unknown
       migrate?: (state: unknown, version: number) => unknown
     }
+    rehydrate: () => Promise<void> | void
   }
 }): PersistedStore {
   const { name, partialize, migrate } = store.persist.getOptions()
@@ -61,6 +64,7 @@ function persisted<T extends object>(label: string, store: {
     write: (state) => store.setState(state as Partial<T>),
     subscribe: (fn) => store.subscribe(() => fn()),
     upgrade: (state, fromVersion) => (migrate ? migrate(state, fromVersion) : state),
+    rehydrate: () => { void store.persist.rehydrate() },
   }
 }
 
@@ -77,3 +81,37 @@ export const STORES: PersistedStore[] = [
 ]
 
 export type StoreKey = string
+
+/**
+ * Keeps a second tab from overwriting the first.
+ *
+ * Every store writes its whole slice to localStorage on every change, and
+ * nothing was listening for another tab doing the same. So two tabs each held
+ * their own copy from whenever they loaded, and the next one to touch anything
+ * wrote its stale whole slice over the other's work. A tab left open since the
+ * morning would flatten an afternoon's shopping list, and it would look for
+ * all the world like the app losing data by itself.
+ *
+ * The `storage` event fires only in the tabs that did not make the change,
+ * which is exactly the set that needs to hear about it. A null key is the
+ * whole of storage being cleared, so everything re-reads.
+ *
+ * This does not make two tabs safe to edit the same store at the same instant,
+ * which would need a different shape of persistence entirely. It closes the
+ * window from hours to milliseconds, which is the difference between a bug you
+ * hit every week and one you have to try to cause.
+ */
+export function otherTabWrote(key: string | null): void {
+  // A null key is the whole of storage being cleared, so everything re-reads.
+  if (key === null) {
+    for (const store of STORES) store.rehydrate()
+    return
+  }
+  STORES.find((store) => store.name === key)?.rehydrate()
+}
+
+export function followOtherTabs(): () => void {
+  const onStorage = (event: StorageEvent) => otherTabWrote(event.key)
+  window.addEventListener('storage', onStorage)
+  return () => window.removeEventListener('storage', onStorage)
+}

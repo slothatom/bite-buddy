@@ -2762,3 +2762,45 @@ test.describe('a food is filed where you put it', () => {
     await expect(page.getByText('Test camembert').first()).toBeVisible()
   })
 })
+
+/**
+ * How a body has gone, rather than what it is today.
+ *
+ * The chart these replace spaced its points evenly along the box, one per
+ * reading, so four weigh-ins in a week and then nothing until March came out
+ * as four points marching steadily across the screen.
+ */
+test.describe('weight and measurements over time', () => {
+  test('reads a stretch you choose, and says how long the change took', async ({ page }) => {
+    await goto(page, '/analytics')
+    await page.getByRole('tab', { name: 'Body' }).click()
+
+    // Two weigh-ins, so there is a change to report.
+    await page.getByLabel('Weight').fill('80.5')
+    await page.getByRole('button', { name: 'Log', exact: true }).click()
+
+    await expect(page.getByRole('button', { name: '6 months' })).toHaveAttribute('aria-pressed', 'true')
+
+    // One reading is a reading, not a change of nought.
+    await expect(page.getByText(/a reading rather than a change/)).toBeVisible()
+
+    await page.getByRole('button', { name: 'All' }).click()
+    await expect(page.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  test('a measurement chart is drawn for one measure at a time', async ({ page }) => {
+    await goto(page, '/analytics')
+    await page.getByRole('tab', { name: 'Body' }).click()
+
+    await page.getByLabel('Waist').fill('93')
+    await page.getByLabel('Thighs').fill('59')
+    await page.getByRole('button', { name: 'Log measurements' }).click()
+
+    // Only the measures actually taken are offered, so the chips are not five
+    // dead ends. Waist and thighs on one pair of axes would be a chart about
+    // the difference between a waist and a thigh.
+    await expect(page.getByRole('button', { name: 'Waist' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Chest' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Thighs' })).toBeVisible()
+  })
+})
