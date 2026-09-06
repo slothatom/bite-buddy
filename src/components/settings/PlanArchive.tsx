@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react'
 import { CalendarPlus, Check } from 'lucide-react'
-import type { SourcePlan } from '../../types'
+import type { MealSlot, SourcePlan } from '../../types'
 import { SLOT_LABELS } from '../../types'
 import { SOURCE_PLANS } from '../../data'
-import { useMealPlanStore } from '../../store/useMealPlanStore'
+import { useMealPlanStore, today } from '../../store/useMealPlanStore'
+import { useDialog } from '../../lib/useDialog'
+import { offerUndo } from '../../store/useUndo'
+import WhenPicker from '../planner/WhenPicker'
 import { useUserStore } from '../../store/useUserStore'
 import { EMPTY_CONTEXT } from '../../lib/moments'
 import { SourceLine } from '../ui'
@@ -29,6 +32,7 @@ export function PlanArchive() {
    */
   const [openId, setOpenId] = useState<string | null>(null)
   const [loadedId, setLoadedId] = useState<string | null>(null)
+  const [taking, setTaking] = useState<Taken | null>(null)
   const { loadSourcePlan, weekDates } = useMealPlanStore()
   const notice = useUserStore((s) => s.notice)
 
@@ -57,22 +61,125 @@ export function PlanArchive() {
               setLoadedId(plan.id)
               notice({ ...EMPTY_CONTEXT, loadedFromArchive: true })
             }}
+            onTake={setTaking}
             weekLabel={weekDates[0]}
           />
         ))}
+      </div>
+
+      {taking && <PutItSomewhere taken={taking} onClose={() => setTaking(null)} />}
+    </div>
+  )
+}
+
+/**
+ * Where a day or a meal out of the archive should land.
+ *
+ * "Load" drops a whole week onto the current week, matching weekday to
+ * weekday, which is the right thing when you want the week and far too much
+ * when you wanted Tuesday's dinner. The archive is fourteen weeks of meals
+ * somebody wrote for this household, and the useful thing to do with it is
+ * take one, so a day and a meal can each be lifted out and put anywhere.
+ *
+ * Added rather than replacing what is already in that slot. A slot holds a
+ * list, and quietly overwriting a meal you had planned is not something a
+ * button called "Take" should do.
+ */
+function PutItSomewhere({ taken, onClose }: { taken: Taken; onClose: () => void }) {
+  const { plan, addEntry } = useMealPlanStore()
+  const panel = useDialog<HTMLDivElement>(onClose)
+  const [date, setDate] = useState(today)
+
+  // One meal picks its slot; a whole day keeps each meal in its own.
+  const single = taken.meals.length === 1 ? taken.meals[0] : undefined
+  const [slot, setSlot] = useState<MealSlot>(() => single?.slot ?? 'dinner')
+
+  const busy = useMemo(
+    () => new Set(plan.filter((d) => d.meals.length).map((d) => d.date)),
+    [plan],
+  )
+
+  function put() {
+    for (const meal of taken.meals) {
+      for (const entry of meal.entries) {
+        addEntry(date, single ? slot : meal.slot, entry)
+      }
+    }
+    const when = new Date(date + 'T12:00:00')
+      .toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+    offerUndo(`Put ${taken.what} on ${when}`, () => {
+      // Taken back out in reverse, so each index is still the one just added.
+      for (const meal of [...taken.meals].reverse()) {
+        const where = single ? slot : meal.slot
+        for (let i = meal.entries.length - 1; i >= 0; i--) {
+          const day = useMealPlanStore.getState().plan.find((d) => d.date === date)
+          const at = (day?.meals.find((m) => m.slot === where)?.entries.length ?? 1) - 1
+          useMealPlanStore.getState().removeEntry(date, where, at)
+        }
+      }
+    })
+    onClose()
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4"
+      onClick={onClose}
+    >
+      <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Put ${taken.what} in a day`}
+        className="bg-paper rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-sm shadow-xl max-h-[85vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="font-bold text-ink-900 mb-1">{taken.what}</h3>
+        <p className="text-sm text-ink-700 mb-4">
+          {single
+            ? 'One meal, on a day and a slot of your choosing.'
+            : `${taken.meals.length} meals, each keeping the slot it was written for.`}
+        </p>
+
+        <WhenPicker
+          date={date}
+          onDate={setDate}
+          slot={single ? slot : undefined}
+          onSlot={single ? setSlot : undefined}
+          busy={busy}
+        />
+
+        <p className="text-xs text-ink-500 mt-3">
+          Added to whatever is already there rather than replacing it.
+        </p>
+
+        <div className="flex gap-2 mt-5">
+          <button className="btn-primary flex-1" onClick={put}>
+            <Check size={15} /> Put it in
+          </button>
+          <button className="btn-secondary" onClick={onClose}>Cancel</button>
+        </div>
       </div>
     </div>
   )
 }
 
+/** One or more meals lifted out of an archived week, waiting for a home. */
+export interface Taken {
+  /** What is being moved, for the dialog's heading and the undo line. */
+  what: string
+  meals: SourcePlan['days'][number]['meals']
+}
+
 function PlanCard({
-  plan, open, loaded, onToggle, onLoad, weekLabel,
+  plan, open, loaded, onToggle, onLoad, onTake, weekLabel,
 }: {
   plan: SourcePlan
   open: boolean
   loaded: boolean
   onToggle: () => void
   onLoad: () => void
+  onTake: (taken: Taken) => void
   weekLabel: string
 }) {
   const ctx = useNutritionContext()
@@ -110,9 +217,17 @@ function PlanCard({
         <div className="border-t border-border-200 divide-y divide-border-100">
           {plan.days.map((day, i) => (
             <div key={i} className="px-4 py-3">
-              <div className="flex items-baseline justify-between mb-1.5">
+              <div className="flex items-baseline justify-between gap-2 mb-1.5">
                 <h3 className="text-sm font-bold text-ink-900">{day.dayName}</h3>
-                <span className="text-xs font-mono text-ink-500">{Math.round(dayTotals[i])} kcal</span>
+                <span className="flex items-baseline gap-2 shrink-0">
+                  <button
+                    className="btn-ghost text-xs text-bite-700"
+                    onClick={() => onTake({ what: day.dayName, meals: day.meals })}
+                  >
+                    <CalendarPlus size={12} /> Take this day
+                  </button>
+                  <span className="text-xs font-mono text-ink-500">{Math.round(dayTotals[i])} kcal</span>
+                </span>
               </div>
               <dl className="space-y-1">
                 {day.meals.map((meal, j) => (
@@ -127,6 +242,16 @@ function PlanCard({
                     </dd>
                     <dd className="w-12 text-right font-mono text-ink-500 shrink-0">
                       {Math.round(componentsNutrients(meal.entries, ctx).calories)}
+                    </dd>
+                    <dd className="shrink-0">
+                      <button
+                        className="btn-ghost text-xs text-bite-700 px-1 -mx-1"
+                        aria-label={`Take ${SLOT_LABELS[meal.slot]} from ${day.dayName}`}
+                        onClick={() => onTake({ what: `${day.dayName} ${SLOT_LABELS[meal.slot].toLowerCase()}`, meals: [meal] })}
+                        disabled={!meal.entries.length}
+                      >
+                        Take
+                      </button>
                     </dd>
                   </div>
                 ))}
