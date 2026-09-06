@@ -58,12 +58,32 @@ export function useDialog<T extends HTMLElement>(onClose: () => void) {
 
     document.addEventListener('keydown', onKey)
 
+    /*
+     * And the page underneath stays where it was.
+     *
+     * Scrolling with a sheet open moved the page behind it, so closing the
+     * sheet left you somewhere you had not chosen to be. The filter sheet
+     * happened to avoid this and the others did not, which made it read as a
+     * bug in one screen rather than a thing none of them did.
+     *
+     * The width is given back as padding, because hiding a scrollbar that was
+     * taking up space shifts the whole layout sideways as the dialog opens.
+     */
+    const { overflow, paddingRight } = document.body.style
+    const gap = window.innerWidth - document.documentElement.clientWidth
+    document.body.style.overflow = 'hidden'
+    if (gap > 0) document.body.style.paddingRight = `${gap}px`
+
     // Held in the effect rather than read from the ref on the way out, where
     // React may already have detached it.
     const box = panel.current
 
     return () => {
       document.removeEventListener('keydown', onKey)
+      // Put back exactly what was there, rather than cleared: two dialogs open
+      // at once would otherwise have the inner one unlock the page on close.
+      document.body.style.overflow = overflow
+      document.body.style.paddingRight = paddingRight
       // Only if focus is still somewhere inside the dialog that is going away,
       // or nowhere at all. Stealing it back from wherever the user has since
       // moved to would be worse than not restoring it.

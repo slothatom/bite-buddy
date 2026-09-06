@@ -228,14 +228,14 @@ export function lensBlocker(lens: Lens): Blocker {
   if (lens === 'have') {
     return {
       why: 'Nothing in the cupboard yet, so there is nothing to match against.',
-      to: '/grocery',
+      to: '/grocery?tab=cupboard',
       label: 'Open the cupboard',
     }
   }
   if (lens === 'use-first') {
     return {
       why: 'Nothing in the cupboard has a use-by date on it yet.',
-      to: '/grocery',
+      to: '/grocery?tab=cupboard',
       label: 'Open the cupboard',
     }
   }

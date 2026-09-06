@@ -58,13 +58,21 @@ export default function WhenPicker({
           ))}
         </div>
 
+        {/* Which months these are.
+            The grid runs five weeks and regularly crosses a boundary, so
+            "24 25 26 27" at the top and "1 2 3" below it read as one month
+            unless something says otherwise. Named once per row that starts a
+            new month, which is the least ink that answers the question. */}
         <div className="grid grid-cols-7 gap-1">
-          {dates.map((d) => {
+          {dates.map((d, i) => {
             const on = d === date
             const past = d < now
             const isToday = d === now
             const off = disabled?.(d) ?? false
             const when = new Date(d + 'T12:00:00')
+
+            // The first cell of the grid, and the first of any month after it.
+            const opens = i === 0 || new Date(d + 'T12:00:00').getDate() === 1
 
             return (
               <button
@@ -88,7 +96,13 @@ export default function WhenPicker({
                         : 'bg-paper border-border-200 text-ink-900 hover:border-bite-300'
                 } ${isToday && !on ? 'ring-2 ring-bite-300' : ''}`}
               >
-                {when.getDate()}
+                {/* The month, on the day it turns over, above the number. */}
+                {opens && (
+                  <span className="absolute -top-0.5 inset-x-0 text-[9px] font-bold uppercase tracking-wide text-ink-500 leading-none">
+                    {when.toLocaleDateString('en-GB', { month: 'short' })}
+                  </span>
+                )}
+                <span className={opens ? 'block mt-1.5 leading-none' : ''}>{when.getDate()}</span>
                 {/* A day that already has food in it. Said with a dot rather
                     than a colour, which is carrying enough already. */}
                 {busy?.has(d) && (
