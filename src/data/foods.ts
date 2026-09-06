@@ -895,7 +895,7 @@ export const FOODS: Food[] = [
     names: { en: 'Guacamole', ro: 'guacamole' },
     aliases: ['guacamole', 'pasta de avocado'],
     category: 'spreads-sauces', medTier: 'daily', state: 'as-sold',
-    per100g: { calories: 150, protein: 2, carbs: 8, fat: 13, fiber: 6, sodium: 383 },
+    per100g: { calories: 150, protein: 2, carbs: 8, fat: 13, fiber: 6 },
     units: [], source: 'curated',
   },
   {
