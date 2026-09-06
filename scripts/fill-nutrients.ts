@@ -64,11 +64,42 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
  * manufacturer typed on a label, and its sodium figures in particular are all
  * over the place, so it is asked for last and only when nothing else answers.
  */
+/**
+ * The searches to try, best data first, and the last one unfiltered.
+ *
+ * `undefined` is the point of the third. The first two ask only for
+ * composition-table rows, which is right when they have the food, and wrong
+ * when nothing in them matches: a filter that excludes every row returns an
+ * empty answer rather than a worse one, and the script read that as USDA not
+ * knowing what an apple is.
+ */
+const ATTEMPTS: (string | undefined)[] = ['Foundation,SR Legacy', 'Survey (FNDDS)', undefined]
+
+/**
+ * The query string, with the commas left alone.
+ *
+ * `encodeURIComponent('Foundation,SR Legacy')` turns the comma into `%2C`, and
+ * USDA splits its dataType list on a literal comma before decoding, so the
+ * whole thing arrived as one dataType nobody has ever heard of. It answered
+ * 200 with an empty list, 119 times, and the report called that "nothing
+ * found". Each part is encoded on its own and the separators stay separators.
+ */
+function search(query: string, dataType: string | undefined): string {
+  const parts = [
+    `api_key=${encodeURIComponent(KEY)}`,
+    `query=${encodeURIComponent(query)}`,
+    'pageSize=1',
+  ]
+  if (dataType) {
+    parts.push(`dataType=${dataType.split(',').map(encodeURIComponent).join(',')}`)
+  }
+  return `${USDA}/foods/search?${parts.join('&')}`
+}
+
 async function lookup(food: Food): Promise<Found | null> {
   const query = food.names.en
-  for (const dataType of ['SR Legacy,Foundation', 'Survey (FNDDS)']) {
-    const url = `${USDA}/foods/search?api_key=${encodeURIComponent(KEY)}`
-      + `&query=${encodeURIComponent(query)}&dataType=${encodeURIComponent(dataType)}&pageSize=1`
+  for (const dataType of ATTEMPTS) {
+    const url = search(query, dataType)
 
     const res = await fetch(url)
     if (res.status === 429) {
@@ -107,6 +138,53 @@ async function lookup(food: Food): Promise<Found | null> {
   return null
 }
 
+/**
+ * The first request, reported rather than merely survived.
+ *
+ * Twice now this script has printed a tidy report of a run in which every
+ * single request came back useless, because a request that answers 200 with an
+ * empty list is indistinguishable from a food nobody has heard of once you
+ * have thrown the response away. So the first one is described out loud: the
+ * URL it asked, what came back, and what was in it. Nine lines of output, and
+ * the difference between diagnosing this in one run and in three.
+ */
+const PROBE = 'broccoli'
+
+async function preflight(): Promise<void> {
+  // A word USDA certainly holds, rather than the first food in the library.
+  // The first food is "Wholemeal flatbread", which may honestly have no match
+  // in a composition table, and a preflight that fails on a real absence would
+  // stop a perfectly healthy run.
+  console.log(`Asking USDA about "${PROBE}" first, to see what it says.\n`)
+
+  for (const dataType of ATTEMPTS) {
+    // The key is the one thing that must not be printed. It goes into a
+    // repository secret, and Actions redacts secrets from its logs, but a log
+    // is not the only place output ends up.
+    const url = search(PROBE, dataType)
+    console.log(`  ${dataType ?? 'no dataType filter'}`)
+    console.log(`    ${url.replace(/api_key=[^&]*/, 'api_key=REDACTED')}`)
+
+    const res = await fetch(url)
+    if (!res.ok) throw new Refused(res.status, (await res.text()).slice(0, 300))
+
+    const body = await res.json() as { foods?: { description: string }[] }
+    const hits = body.foods ?? []
+    console.log(`    ${res.status}, ${hits.length} result${hits.length === 1 ? '' : 's'}`
+      + (hits[0] ? `: "${hits[0].description}"` : ''))
+    if (hits.length) {
+      console.log('\nThat works. Fetching the rest.\n')
+      return
+    }
+  }
+
+  console.error(`\nUSDA answered every one of those about "${PROBE}" and had nothing in any.`)
+  console.error('That is not a key problem: it accepted the request. Either the search')
+  console.error('endpoint has changed shape, or the query is being sent wrong.')
+  console.error('Send the three lines above to whoever maintains this script.\n')
+  process.exit(1)
+}
+
 /** Rounded the way the rest of the file is: a decimal for grams, whole for mg. */
 const round = (n: number, places: number) => Math.round(n * 10 ** places) / 10 ** places
 
@@ -130,7 +208,7 @@ async function main() {
    * the end costs five minutes and a page of dots that reads like an answer.
    */
   try {
-    await lookup(wanted[0])
+    await preflight()
   } catch (e) {
     if (e instanceof Refused) {
       console.error(`\nUSDA turned the first request down: ${e.status}.\n`)
