@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { Food } from '../src/types/index.js'
-import { pick, type Candidate } from './fill-nutrients.js'
+import { pick, resembles, type Candidate } from './fill-nutrients.js'
 
 /**
  * Choosing between ten USDA rows.
@@ -67,5 +67,72 @@ describe('picking the row the dietician meant', () => {
 
   it('has nothing to say about an empty answer', () => {
     expect(pick([], food())).toBeUndefined()
+  })
+})
+
+/**
+ * The wrong matches from the run of 6 September, each with USDA's real figures.
+ *
+ * Every one of these was accepted on its description alone and would have put
+ * a number for a different food into the app. They are kept as a set because
+ * the failure was never one bad match, it was a search answering a different
+ * question from the one asked, over and over.
+ */
+describe('a row that is a different food entirely', () => {
+  const usda = (description: string, kcal: number, p: number, c: number, f: number): Candidate => ({
+    fdcId: 1,
+    description,
+    foodNutrients: [
+      { nutrientId: 1008, value: kcal }, { nutrientId: 1003, value: p },
+      { nutrientId: 1005, value: c }, { nutrientId: 1004, value: f },
+      { nutrientId: 1079, value: 1 }, { nutrientId: 1093, value: 1 },
+    ],
+  })
+
+  const ours = (kcal: number, p: number, c: number, f: number) =>
+    food({ per100g: { calories: kcal, protein: p, carbs: c, fat: f } })
+
+  const cases: [string, Candidate, Food][] = [
+    // Water is nought calories and water spinach is nineteen. No amount of
+    // string matching reaches that; one look at the macros does.
+    ['water vs water spinach', usda('Water convolvulus, raw', 19, 2.6, 3.1, 0.2), ours(0, 0, 0, 0)],
+    ['milk vs milk crackers', usda('Crackers, milk', 450, 8, 70, 14), ours(64, 3.3, 4.8, 3.6)],
+    ['apple vs rose-apple', usda('Rose-apples, raw', 25, 0.6, 5.7, 0.3), ours(52, 0.3, 13.8, 0.2)],
+    ['orange vs orange peel', usda('Orange peel, raw', 97, 1.5, 25, 0.2), ours(47, 0.9, 11.8, 0.1)],
+    ['grapes vs grape leaves', usda('Grape leaves, raw', 93, 5.6, 17.3, 2.1), ours(69, 0.7, 18.1, 0.2)],
+    ['beef vs corned beef', usda('Beef, cured, corned beef', 251, 18, 0.5, 19), ours(158, 21.2, 0, 8.1)],
+    ['goat cheese vs goat meat', usda('Game meat, goat, raw', 109, 20.6, 0, 2.3), ours(364, 21.6, 2.5, 29.8)],
+  ]
+
+  for (const [name, candidate, mine] of cases) {
+    it(`refuses ${name}`, () => {
+      expect(resembles(candidate, mine)).toBe(false)
+      expect(pick([candidate], mine)).toBeUndefined()
+    })
+  }
+
+  it('still takes the row that is the food', () => {
+    // The check has to let the right answer through, or it is just a way of
+    // importing nothing.
+    const broccoli = usda('Broccoli, raw', 34, 2.8, 6.6, 0.4)
+    expect(resembles(broccoli, ours(34, 2.8, 6.6, 0.4))).toBe(true)
+    expect(pick([broccoli], ours(34, 2.8, 6.6, 0.4))?.description).toBe('Broccoli, raw')
+  })
+
+  it('forgives a table disagreeing with a table', () => {
+    // The library's figures come from European composition tables and USDA's
+    // do not, so they differ in the first decimal place all the time. That is
+    // not evidence of a different food.
+    const salmon = usda('Fish, salmon, chinook, raw', 179, 19.9, 0, 10.4)
+    expect(resembles(salmon, ours(185, 20.5, 0, 11.0))).toBe(true)
+  })
+
+  it('says nothing either way about a figure USDA left out', () => {
+    const noEnergy: Candidate = {
+      fdcId: 1,
+      description: 'Cheese, feta',
+      foodNutrients: [{ nutrientId: 1003, value: 14.2 }, { nutrientId: 1093, value: 917 }],
+    }
+    expect(resembles(noEnergy, ours(264, 14.2, 4.1, 21.3))).toBe(true)
   })
 })
