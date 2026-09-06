@@ -2572,3 +2572,83 @@ test.describe('taking one meal out of the archive', () => {
     await expect(page.getByText('Which meal')).toHaveCount(0)
   })
 })
+
+/**
+ * How it is going, as opposed to how this week is going.
+ *
+ * A week is one shop, one weekend and whatever happened on Tuesday. These
+ * check the tab reads a longer stretch honestly: it reports the mix of record
+ * and intention rather than blending them, it draws a day with nothing in it
+ * as a gap rather than as a zero, and every figure the chart holds can be
+ * reached by tapping, because a `title` tooltip does not exist on a phone.
+ */
+test.describe('how it is going', () => {
+  /** A month of days, every fourth one left empty, all but today ticked. */
+  async function seedAMonth(page: Page) {
+    await page.goto('#/')
+    await page.evaluate(() => {
+      const iso = (d: Date) => d.toISOString().slice(0, 10)
+      const plan = []
+      for (let back = 0; back < 30; back++) {
+        const d = new Date()
+        d.setDate(d.getDate() - back)
+        if (back % 4 === 3) continue
+        const meals = [{
+          id: `t-${back}`,
+          slot: 'dinner',
+          entries: [{ kind: 'food', foodId: 'salmon', grams: 120 + back * 4 }],
+          ...(back > 0 ? { outcome: 'eaten', outcomeAt: new Date().toISOString() } : {}),
+        }]
+        plan.push({ date: iso(d), updatedAt: new Date().toISOString(), meals })
+      }
+      localStorage.setItem('bite-buddy-mealplan-v2', JSON.stringify({ version: 3, state: { plan } }))
+    })
+    // A reload, because moving between hashes never re-reads what is stored:
+    // the store hydrates once, and it hydrated before any of this was written.
+    await page.reload()
+    await goto(page, '/analytics')
+    await page.getByRole('tab', { name: 'Trends' }).click()
+  }
+
+  test('says how much of the stretch is a record and how much an intention', async ({ page }) => {
+    await seedAMonth(page)
+    // Never one number covering both. A trend built on what you meant to eat
+    // is a chart of your intentions.
+    await expect(page.getByText(/recorded and \d+ still planned/)).toBeVisible()
+  })
+
+  test('a day nobody wrote anything down for is a gap, not a zero', async ({ page }) => {
+    await seedAMonth(page)
+    // Twenty-eight days on the chart, seven of them empty, so twenty-one bars.
+    // A bar of height nought would say the day was a day of no food.
+    const bars = page.locator('button[aria-label*="kcal"]')
+    await expect(bars).toHaveCount(21)
+  })
+
+  test('every day on the chart can be read by tapping it', async ({ page }) => {
+    await seedAMonth(page)
+    // The trend line and the target sit over the bars. They must not take the
+    // taps: this shipped once with the whole chart unreachable behind an SVG.
+    const bar = page.locator('button[aria-label*="kcal"]').nth(10)
+    const name = await bar.getAttribute('aria-label')
+    await bar.click()
+    await expect(page.getByText(new RegExp(name!.split(',')[0]))).toBeVisible()
+  })
+
+  test('the stretch and the figure are both yours to choose', async ({ page }) => {
+    await seedAMonth(page)
+    await page.getByRole('button', { name: 'Protein' }).click()
+    await expect(page.getByText('Protein by day')).toBeVisible()
+    await page.getByRole('button', { name: '12 weeks' }).click()
+    await expect(page.getByRole('button', { name: '12 weeks' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  test('what you eat most is counted in days, and can be filtered', async ({ page }) => {
+    await seedAMonth(page)
+    await expect(page.getByText('What you eat most')).toBeVisible()
+    // Salmon is the only thing in it, so the fish filter keeps it and any
+    // other filter does not. One food means one category, so no filter row
+    // is drawn; the tally itself is the thing under test here.
+    await expect(page.getByText(/\d+ days/).first()).toBeVisible()
+  })
+})
