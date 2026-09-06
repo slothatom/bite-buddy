@@ -236,7 +236,9 @@ test.describe('the main flow', () => {
     await page.locator('[data-recipe-card]').first().click()
 
     const dialog = page.getByRole('dialog').first()
-    await expect(dialog.getByText(/one serving against .+s day/)).toBeVisible()
+    // Against a day's target, not a person's: food is one shared figure now,
+    // because the household cooks once.
+    await expect(dialog.getByText(/one serving against a day/)).toBeVisible()
 
     const filled = await dialog.locator('[data-macro-fill]').evaluateAll(
       (bars) => bars.filter((b) => parseFloat((b as HTMLElement).style.width) > 0).length)

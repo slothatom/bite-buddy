@@ -3,8 +3,7 @@ import type { MedCategory, Nutrients, Targets } from '../../types'
 import { CATEGORY_LABELS } from '../../lib/categories'
 import { useMealPlanStore, today } from '../../store/useMealPlanStore'
 import { useNutritionContext } from '../../store/useNutrition'
-import { useUserStore, targetsFor } from '../../store/useUserStore'
-import { useUiStore } from '../../store/useUiStore'
+import { useUserStore } from '../../store/useUserStore'
 import { EmptyState, SectionHeading } from '../ui'
 import {
   SPANS, SPAN_LABELS, direction, foodsEaten, pointsFrom, smooth, spanDates, trend, type Span,
@@ -47,8 +46,7 @@ export default function TrendsTab() {
   const plan = useMealPlanStore((s) => s.plan)
   const ctx = useNutritionContext()
   const { profile } = useUserStore()
-  const viewingAs = useUiStore((s) => s.viewingAs)
-  const targets = targetsFor(profile, viewingAs)
+  const targets = profile.targets
 
   const [span, setSpan] = useState<Span>('month')
   const [watching, setWatching] = useState<Watched>('calories')

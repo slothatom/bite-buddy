@@ -12,14 +12,12 @@ import {
 } from '../store/useMealPlanStore'
 import { useDeletedIds } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
-import { targetsFor } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import {
   componentsNutrients, dayEaten, dayProgress, dayLabel, weekEaten, emptyNutrients, addNutrients, reportDay,
 } from '../lib/nutrition'
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
 import { useUiStore } from '../store/useUiStore'
-import { PEOPLE } from '../lib/people'
 import AddEntryModal from '../components/planner/AddEntryModal'
 import { usePortionStore } from '../store/usePortionStore'
 import { portionEntries } from '../lib/portionsUse'
@@ -69,7 +67,7 @@ export default function Planner() {
   const [clearing, setClearing] = useState(false)
   const [moving, setMoving] = useState<{ date: string; mealId: string } | null>(null)
   const [filling, setFilling] = useState<string[] | null>(null)
-  const { quickAdd, clearQuickAdd, viewingAs, setViewingAs } = useUiStore()
+  const { quickAdd, clearQuickAdd } = useUiStore()
   const { takeFrom, returnTo } = usePortionStore()
 
   const byDate = useMemo(() => new Map(plan.map((d) => [d.date, d])), [plan])
@@ -172,7 +170,21 @@ export default function Planner() {
   const dayReport = reportDay(selectedDay, ctx)
   // Whose target the day is measured against. The plan is shared, the line
   // it is compared to is not.
-  const targets = targetsFor(profile, viewingAs)
+  /*
+   * One plan, one line across it.
+   *
+   * There is one plan because a household cooks once and eats the same food,
+   * which is the premise the whole app rests on, so a control here asking
+   * which person this week is for was asking you to pick a human being for a
+   * thing that has none. Home, Progress and Body still ask, because there the
+   * question really is about a person.
+   *
+   * The household's target, not whichever person some other screen was last
+   * looking at: inheriting that would leave the same week measured against a
+   * different line depending on where you had been, which is the visible
+   * toggle's fault without the visibility.
+   */
+  const targets = profile.targets
 
   // Totals are for what you are looking at, not for everything ever planned.
   //
@@ -312,24 +324,6 @@ export default function Planner() {
             <Bookmark size={15} /> Saved weeks
           </button>
 
-          {/* Whose target the totals are measured against. The plan is one
-              plan; the line across it is personal, and it lives here rather
-              than buried in Settings because this is where you notice it is
-              the wrong one. */}
-          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl ml-auto" role="tablist">
-            {PEOPLE.map((person) => (
-              <button
-                key={person.id}
-                role="tab"
-                aria-selected={viewingAs === person.id}
-                aria-label={`Show totals against ${person.name}'s target`}
-                onClick={() => setViewingAs(person.id)}
-                className={viewingAs === person.id ? 'tab-on' : 'tab-off'}
-              >
-                {person.name}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* The days themselves, seven to a row however many there are. The

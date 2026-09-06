@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import type { ActivityLevel, Goal, Sex, Targets, Theme, UserProfile, WeekStart } from '../types'
 import { THEMES, THEME_LABELS } from '../types'
-import { useUserStore, targetsFor } from '../store/useUserStore'
+import { useUserStore } from '../store/useUserStore'
 import { useUiStore } from '../store/useUiStore'
 import { PEOPLE } from '../lib/people'
 import { useDeletedRecipes, useRecipeStore, useResolvableRecipes } from '../store/useRecipeStore'
@@ -103,7 +103,7 @@ function SettingsPanels() {
   // target and then reading it back are about the same human being.
   const whose = useUiStore((s) => s.viewingAs)
   const setViewingAs = useUiStore((s) => s.setViewingAs)
-  const shown = targetsFor(profile, whose)
+  const shown = profile.targets
   // Signed out, the account section has nothing to show and no one to sign out;
   // everything else on this screen belongs to the device and still works.
   const session = useAuthStore((s) => s.session)
@@ -122,46 +122,18 @@ function SettingsPanels() {
         <section>
           <SectionHeading>Daily targets</SectionHeading>
 
-          {/* Whose. Body and Movement have known whose row is whose for months
-              while the one screen about how much to eat had a single figure
-              for two people. The plan stays shared, because a household cooks
-              once; only the line it is measured against moves. */}
-          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit mb-3" role="tablist">
-            {PEOPLE.map((person) => (
-              <button
-                key={person.id}
-                role="tab"
-                aria-selected={whose === person.id}
-                onClick={() => setViewingAs(person.id)}
-                className={whose === person.id ? 'tab-on' : 'tab-off'}
-              >
-                {person.name}
-              </button>
-            ))}
-          </div>
-
-          <p className="text-sm text-ink-700 mb-2">
-            {PEOPLE.find((p) => p.id === whose)?.name} is on{' '}
-            <strong className="font-mono">{shown.calories} kcal</strong>{' '}
+          {/* One figure, for a plan that has one. The household cooks once
+              and eats the same food, so the line across a day belongs to the
+              day and not to a person. Two people did each have their own for
+              a while and neither ever set one, so the switch changed nothing
+              on screen and read as decoration on all three screens it
+              appeared on. Body and Movement still ask whose, because there
+              the question really is about a person. */}
+          <p className="text-sm text-ink-700 mb-4">
+            You are both on <strong className="font-mono">{shown.calories} kcal</strong>{' '}
             (Protein {shown.protein} g · Carbs {shown.carbs} g · Fat {shown.fat} g), set{' '}
             {shown.source === 'from-plans' ? 'from your plans'
-              : shown.source === 'tdee' ? 'by the calculator' : 'by hand'}
-            {profile.targetsByPerson?.[whose] ? '' : ', which is the household figure'}.
-          </p>
-
-          {/* Two people have been able to have their own targets for a while,
-              and neither had set one, so switching between them on the planner
-              and Progress changed nothing on screen and read as decoration.
-              The machinery was not the missing part; saying it was there was. */}
-          <p className="text-sm text-ink-700 mb-4">
-            {profile.targetsByPerson?.[whose]
-              ? `This is ${PEOPLE.find((p) => p.id === whose)?.name}'s own figure. The plan and the
-                 shopping list stay shared, because a household cooks once. Only the line a day is
-                 measured against moves when you switch.`
-              : `Both of you are measured against the same figure until one of you is given their
-                 own. Set one below and the planner, Home and Progress will read ${
-                   PEOPLE.find((p) => p.id === whose)?.name}'s days against it. The plan itself
-                 stays shared either way.`}
+              : shown.source === 'tdee' ? 'by the calculator' : 'by hand'}.
           </p>
 
           <div className="space-y-3">
@@ -182,7 +154,7 @@ function SettingsPanels() {
                       <p className="text-xs text-ink-500 mt-1">
                         Individual days ranged from {planAverage.min} to {planAverage.max} kcal.
                       </p>
-                      <button className="btn-primary mt-3" onClick={() => planTargets && setTargets(planTargets, whose)}>
+                      <button className="btn-primary mt-3" onClick={() => planTargets && setTargets(planTargets)}>
                         Use these
                       </button>
                     </>
@@ -284,7 +256,7 @@ function SettingsPanels() {
                         </p>
                       </details>
 
-                      <button className="btn-primary" onClick={() => setTargets(tdeeTargets, whose)}>Use these</button>
+                      <button className="btn-primary" onClick={() => setTargets(tdeeTargets)}>Use these</button>
                     </>
                   ) : (
                     <p className="text-xs text-ink-500">Fill in sex, age, height and weight to see a number.</p>
@@ -293,13 +265,38 @@ function SettingsPanels() {
               </div>
             </div>
 
-            {/* Keyed on the person, so switching tabs shows their numbers
-                rather than whichever were loaded first. */}
             <ManualTargets
-              key={whose}
               initial={shown}
-              onSave={(targets) => setTargets(targets, whose)}
+              onSave={(targets) => setTargets(targets)}
             />
+          </div>
+        </section>
+
+        {/* ─── Whose exercise ──────────────────────────────────────────────── */}
+        <section>
+          <SectionHeading>Whose exercise</SectionHeading>
+          {/* All that is left of a switch that used to sit on three screens.
+              Food is one target now, because the household cooks once. What
+              somebody did in a gym is not shared, and Home and Progress have
+              to show one person's, so this says which. Movement itself, and
+              Body, are per person on their own screens and ignore this. */}
+          <p className="text-sm text-ink-700 mb-3">
+            Home and Progress show one person's sessions and steps. This is who.
+            The Movement and Body screens ask for themselves.
+          </p>
+          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
+            {PEOPLE.map((person) => (
+              <button
+                key={person.id}
+                role="tab"
+                aria-selected={whose === person.id}
+                aria-label={`Show ${person.name}'s exercise on Home and Progress`}
+                onClick={() => setViewingAs(person.id)}
+                className={whose === person.id ? 'tab-on' : 'tab-off'}
+              >
+                {person.name}
+              </button>
+            ))}
           </div>
         </section>
 
@@ -398,10 +395,9 @@ function SettingsPanels() {
 /**
  * Targets typed in by hand.
  *
- * Its own component so it can be keyed on whose targets these are: the fields
- * hold a draft, and a draft has to start again when the person changes. Held
- * in the parent, switching to Oli showed Arany's numbers in the boxes and
- * saved them to Oli.
+ * Its own component so the draft in the fields lives with the fields. Held in
+ * the parent it survived every re-render of the whole settings screen, which
+ * is how a half-typed figure used to reappear after saving.
  */
 function ManualTargets({
   initial, onSave,
