@@ -54,6 +54,15 @@ const SODIUM = 1093
  * disagree with its own protein, carbs and fat. That is a fingerprint, and a
  * USDA row describing the same food has to match it.
  */
+/*
+ * Energy under any of the three ids USDA uses for it.
+ *
+ * 1008 is kcal on most rows; the Foundation set states Atwater general (2047)
+ * and specific (2048) instead on some. Looking only for 1008 would have meant
+ * the energy check silently never running on exactly the rows it matters most
+ * for, which is a way of appearing to check something.
+ */
+const ENERGY_IDS = [1008, 2048, 2047]
 const ENERGY = 1008
 const PROTEIN = 1003
 const CARBS = 1005
@@ -173,9 +182,21 @@ const TOLERANCE: { id: number; of: (n: Nutrients) => number | undefined; floor: 
   { id: FAT, of: (n) => n.fat, floor: 2 },
 ]
 
+/** How many rows the macro check refused across the run, for the report. */
+let turnedDown = 0
+
+/** A figure off a USDA row, taking the first id it actually states. */
+function stated(candidate: Candidate, ids: number[]): number | undefined {
+  for (const id of ids) {
+    const found = candidate.foodNutrients?.find((n) => n.nutrientId === id)?.value
+    if (found != null) return found
+  }
+  return undefined
+}
+
 export function resembles(candidate: Candidate, food: Food): boolean {
   for (const { id, of, floor } of TOLERANCE) {
-    const theirs = candidate.foodNutrients?.find((n) => n.nutrientId === id)?.value
+    const theirs = stated(candidate, id === ENERGY ? ENERGY_IDS : [id])
     const ours = of(food.per100g)
     // A figure one of them does not state cannot disagree. Energy in
     // particular is absent from some rows, which is not evidence either way.
@@ -189,7 +210,12 @@ export function pick(candidates: Candidate[], food: Food): Candidate | undefined
   const usable = candidates.filter((c) => {
     // A row with neither figure answers neither question.
     const has = c.foodNutrients?.some((n) => n.nutrientId === FIBRE || n.nutrientId === SODIUM)
-    return has && !PROCESSED.test(c.description) && resembles(c, food)
+    if (!has || PROCESSED.test(c.description)) return false
+    if (!resembles(c, food)) {
+      turnedDown += 1
+      return false
+    }
+    return true
   })
 
   // A cooked food wants a cooked row, and a dry one a dry row, where USDA
@@ -288,11 +314,22 @@ async function lookup(food: Food): Promise<Found | null> {
  */
 const PROBE = 'broccoli'
 
+/** Named in the report, so a stale checkout is visible in its own output. */
+const MATCHING = 'name, then description, then calories and macros'
+
+const NAMES: Record<number, string> = {
+  [ENERGY]: 'kcal', [PROTEIN]: 'protein', [CARBS]: 'carbs', [FAT]: 'fat',
+}
+
 async function preflight(): Promise<void> {
   // A word USDA certainly holds, rather than the first food in the library.
   // The first food is "Wholemeal flatbread", which may honestly have no match
   // in a composition table, and a preflight that fails on a real absence would
   // stop a perfectly healthy run.
+  // A line that changes whenever the matching changes. Two runs in a row have
+  // come back byte-identical to the one before them, and there was no way to
+  // tell a fix that did not work from a fix that was not running.
+  console.log(`Matching on: ${MATCHING}`)
   console.log(`Asking USDA about "${PROBE}" first, to see what it says.\n`)
 
   for (const dataType of ATTEMPTS) {
@@ -306,11 +343,32 @@ async function preflight(): Promise<void> {
     const res = await fetch(url)
     if (!res.ok) throw new Refused(res.status, (await res.text()).slice(0, 300))
 
-    const body = await res.json() as { foods?: { description: string }[] }
+    // The full row shape, not just a description: the report below reads the
+    // nutrients off it to prove the macro check has figures to compare.
+    const body = await res.json() as { foods?: Candidate[] }
     const hits = body.foods ?? []
     console.log(`    ${res.status}, ${hits.length} result${hits.length === 1 ? '' : 's'}`
       + (hits[0] ? `: "${hits[0].description}"` : ''))
+
     if (hits.length) {
+      /*
+       * What the row actually carries, before anything is trusted.
+       *
+       * The macro check compares four figures USDA is assumed to state. If it
+       * states none of them the check passes everything and looks exactly like
+       * a check that is working, which is the failure this prints its way out
+       * of. Four numbers here means the comparison has something to compare.
+       */
+      const seen = TOLERANCE.map(({ id }) => {
+        const value = stated(hits[0], id === ENERGY ? ENERGY_IDS : [id])
+        return `${NAMES[id]} ${value ?? 'absent'}`
+      })
+      console.log(`    it states: ${seen.join(', ')}`)
+      if (seen.every((t) => t.endsWith('absent'))) {
+        console.error('\nUSDA is stating none of the four figures the match is checked against,')
+        console.error('so every row would pass unchecked. Refusing to import on that basis.\n')
+        process.exit(1)
+      }
       console.log('\nThat works. Fetching the rest.\n')
       return
     }
@@ -399,6 +457,10 @@ async function main() {
   }
 
   console.log('\n')
+  if (turnedDown) {
+    console.log(`${turnedDown} rows were offered and refused: they did not match the`)
+    console.log('calories and macros this library already holds for that food.\n')
+  }
   for (const e of edits) {
     const parts = [
       e.fiber != null ? `fibre ${e.fiber} g` : null,
