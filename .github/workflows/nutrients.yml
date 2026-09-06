@@ -158,8 +158,25 @@ jobs:
             echo '```'
           } > body.md
 
-          gh pr create \
-            --title "data: fibre and sodium from USDA" \
-            --body-file body.md \
-            --base main \
-            --head "$branch"
+          # A repository can forbid Actions from opening pull requests, and many
+          # do by default. That is a setting rather than a fault, and the work
+          # is already safe on a pushed branch by this point, so the run says
+          # where to click instead of failing over the last step of ten.
+          if gh pr create --title "data: fibre and sodium from USDA" \
+               --body-file body.md --base main --head "$branch"; then
+            echo "Opened a pull request." >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo
+              echo "### Open the pull request yourself"
+              echo
+              echo "Actions is not allowed to open one in this repository, which is a"
+              echo "setting under **Settings > Actions > General > Workflow permissions**."
+              echo "The branch is pushed and the checks passed, so nothing is lost:"
+              echo
+              echo "<https://github.com/${{ github.repository }}/compare/main...$branch?expand=1>"
+              echo
+              echo "The matched USDA rows are in the run summary above, and they are"
+              echo "the part worth reading before you merge."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi

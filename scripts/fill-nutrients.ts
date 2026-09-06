@@ -433,8 +433,33 @@ async function preflight(): Promise<void> {
 /** Rounded the way the rest of the file is: a decimal for grams, whole for mg. */
 const round = (n: number, places: number) => Math.round(n * 10 ** places) / 10 ** places
 
+/**
+ * Foods this household makes, which USDA has never heard of.
+ *
+ * Every one of these is an assembly: a tray of vegetables somebody roasted, a
+ * bowl of raw salad, the dietician's own cake. USDA will always find something
+ * with a similar name and similar macros, and it will be a jar or a packet.
+ * The first run that got this far gave the eggplant spread 379 mg of sodium
+ * off a commercial one and the roasted vegetables 235 mg off a congee. Neither
+ * figure is about food anybody here has eaten.
+ *
+ * A list rather than a rule, because there is no signal to read: they are
+ * `source: 'curated'` like everything else, and "is this a thing you buy or a
+ * thing you make" is a fact about a kitchen. Named here, reported at the end,
+ * and easy to disagree with: take one out and it goes back to being fetched.
+ */
+const COMPOSED = new Set([
+  'vegetables-roasted', 'salad-raw', 'vegetables-mixed', 'berries-mixed',
+  'lentil-pate', 'eggplant-salad', 'yogurt-garlic-sauce',
+  'cake-coconut-raspberry', 'banana-bread-chocolate', 'cheese-blueberry-loaf',
+  'milk-ice-bar',
+])
+
 async function main() {
-  const wanted = FOODS.filter((f) => f.per100g.fiber == null || f.per100g.sodium == null)
+  const composed = FOODS.filter((f) => COMPOSED.has(f.id)
+    && (f.per100g.fiber == null || f.per100g.sodium == null))
+  const wanted = FOODS.filter((f) => !COMPOSED.has(f.id)
+    && (f.per100g.fiber == null || f.per100g.sodium == null))
   console.log(`${wanted.length} of ${FOODS.length} foods are missing fibre, sodium or both.\n`)
   if (KEY === 'DEMO_KEY') {
     console.log('No USDA_API_KEY set, so this is using DEMO_KEY and will be rate limited.')
@@ -516,6 +541,12 @@ async function main() {
       e.sodium != null ? `sodium ${e.sodium} mg` : null,
     ].filter(Boolean).join(', ')
     console.log(`  ${e.id.padEnd(28)} ${parts.padEnd(34)} from "${e.matched}" (#${e.fdcId})`)
+  }
+
+  if (composed.length) {
+    console.log(`\n${composed.length} left alone on purpose: things you make rather than buy.`)
+    console.log('USDA would find a jar with a similar name, and its salt is a factory\'s.')
+    console.log(`  ${composed.map((f) => `${f.id} (${f.names.en})`).join('\n  ')}`)
   }
 
   if (missed.length) {
