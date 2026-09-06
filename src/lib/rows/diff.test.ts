@@ -181,3 +181,28 @@ describe('a row that has been round the database', () => {
     expect(send).toEqual([])
   })
 })
+
+describe('an id that comes back from the dead', () => {
+  it('says so, instead of leaving the server calling it deleted', () => {
+    // A grocery line's id is the food's id, so `tomatoes` is deleted and
+    // re-created every time a staple leaves a list and comes back. An upsert
+    // writes only the columns it is given, so a revived row that never
+    // mentions `deleted_at` left the old timestamp standing: this device
+    // called the row alive, the server went on calling it deleted, and the
+    // next pull that reached the tombstone removed it. That is a shopping list
+    // emptying itself a second after you add something to it.
+    const revived = { id: 'tomatoes', data: { id: 'tomatoes', name: 'Tomatoes' } }
+    const { send } = localChanges([revived], { rows: {} }, '2026-09-06T12:00:00.000Z')
+
+    expect(send).toHaveLength(1)
+    expect(send[0].deleted_at).toBeNull()
+  })
+
+  it('does not make the row look changed, so nothing is sent twice', () => {
+    // `fingerprint` drops null fields, so saying it costs no extra traffic.
+    const row = { id: 'tomatoes', data: { id: 'tomatoes', name: 'Tomatoes' } }
+    const agreed = { rows: { tomatoes: fingerprint(row) } }
+
+    expect(localChanges([row], agreed, '2026-09-06T12:00:00.000Z').send).toHaveLength(0)
+  })
+})
