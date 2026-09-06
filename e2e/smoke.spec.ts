@@ -62,8 +62,43 @@ async function putATubInTheFridge(page: Page, label: string) {
  * planner's own and nothing else follows it, so this only moves the screen the
  * test is working on.
  */
+/**
+ * The planner, showing one day rather than the week.
+ *
+ * The planner opens on the week now, and a week is a grid of every meal in it:
+ * day rows, slot columns, one cell a meal. That was the whole point of the
+ * change, so it is the right default and these tests move off it deliberately.
+ *
+ * Anything whose subject is a single day's meals, the tick, the portion, the
+ * bin, comes here first. The controls live in the day view, and in the week
+ * view they are one tap away inside a meal's own sheet.
+ */
+async function planDay(page: Page) {
+  await goto(page, '/plan')
+  await page.getByRole('tab', { name: 'Day' }).click()
+}
+
+/**
+ * The day view, opened on a day that actually has food on it.
+ *
+ * Several of these tests want a planned day and used to click whichever cell
+ * in the old strip showed a three-digit calorie number. The strip is gone: the
+ * week is a grid now, so this finds the first row carrying a meal and goes in
+ * through it, which is also the route a person takes.
+ */
+async function openADayWithFood(page: Page) {
+  await goto(page, '/plan')
+  const row = page.locator('[data-day-row]')
+    .filter({ has: page.locator('[data-planned]') })
+    .first()
+  await row.getByRole('button', { name: /the full names/ }).click()
+  await row.getByRole('button', { name: /^Open / }).click()
+}
+
 async function planAheadOfToday(page: Page) {
   await goto(page, '/plan')
+  // The window, not the view. The arrow means a week here and a day in the
+  // day view, so this steps before anything narrows.
   await page.getByRole('button', { name: 'Next week' }).click()
 }
 
@@ -169,7 +204,7 @@ test.describe('the main flow', () => {
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await expect(page.getByRole('button', { name: /Loaded/ })).toBeVisible()
 
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
 
     // 3. The day's calories are real numbers, not zero or NaN. Figures are
@@ -214,7 +249,7 @@ test.describe('the main flow', () => {
     await planAheadOfToday(page)
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/plan')
+    await planDay(page)
 
     const named = page.locator('a[data-entry-name]').first()
     await expect(named).toBeVisible()
@@ -424,36 +459,74 @@ test.describe('the shopping list', () => {
 })
 
 test.describe('the planner', () => {
-  test('shows a week or a fortnight, and keeps what you planned', async ({ page }) => {
+  test('shows every meal in the range, not one day at a time', async ({ page }) => {
+    // The week view used to be seven small cells holding a calorie number,
+    // with a single day's food underneath, so it never actually showed a week.
+    // It is a grid now: a row a day, a column a slot, a cell a meal.
     await goto(page, '/plan')
 
-    const days = page.locator('button[aria-pressed]')
-    await expect(days).toHaveCount(7)
+    const rows = page.getByRole('button', { name: /Show the full names/ })
+    await expect(rows).toHaveCount(7)
 
     await page.getByRole('tab', { name: '2 weeks' }).click()
-    await expect(days).toHaveCount(14)
+    await expect(rows).toHaveCount(14)
 
     // A month is not offered any more. 150 meal slots is a grid where a day is
     // a rectangle with nothing readable in it, so the view that showed the
     // most showed the least.
     await expect(page.getByRole('tab', { name: '1 month' })).toHaveCount(0)
+  })
 
-    // Plan something, step forward and back: it is still there. The plan used
-    // to hold only the seven days on screen, so moving the window threw the
-    // rest away.
-    await page.getByRole('tab', { name: '1 week' }).click()
+  test('a day opens to its full names, and lets you into itself', async ({ page }) => {
+    // The columns are sixty pixels on a phone, so a cell holds the front of a
+    // name. The whole thing is one tap away on the date rather than hidden.
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+    await page.getByRole('button', { name: /^Add these/ }).click()
+
+    // Matches both wordings: the label flips to "Hide" once it is open, so a
+    // locator naming only "Show" resolves to a different row after the click.
+    const row = page.getByRole('button', { name: /the full names/ }).first()
+    await row.click()
+    await expect(row).toHaveAttribute('aria-expanded', 'true')
+    await expect(page.getByRole('button', { name: /^Open / })).toBeVisible()
+  })
+
+  test('a meal opens over the week rather than instead of it', async ({ page }) => {
+    // Tapping a meal used to mean leaving the week to see it. The controls are
+    // the day view's own, in a panel, so there is one set rather than two.
+    await goto(page, '/plan')
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+    await page.getByRole('button', { name: /^Add these/ }).click()
+
+    await page.getByRole('button', { name: /^Breakfast on .+: /  }).first().click()
+    const sheet = page.getByRole('dialog')
+    await expect(sheet).toBeVisible()
+    await expect(sheet.locator('[data-entry-name]').first()).toBeVisible()
+
+    // And the week is still behind it when you close.
+    await sheet.getByRole('button', { name: 'Close' }).click()
+    await expect(page.getByRole('button', { name: /Show the full names/ })).toHaveCount(7)
+  })
+
+  test('keeps what you planned when the window moves', async ({ page }) => {
+    // The plan used to hold only the seven days on screen, so stepping the
+    // window threw the rest away.
+    await planDay(page)
     await page.getByRole('button', { name: /Pop something in/ }).first().click()
     await page.getByPlaceholder(/What are we having/).fill('Bruschetta')
     await page.getByText('Bruschetta', { exact: false }).nth(1).click()
     await expect(page.locator('[data-entry-name]').first()).toBeVisible()
 
-    const planned = page.locator('button[aria-pressed]').filter({ hasText: /\d\d\d/ })
-    await expect(planned).toHaveCount(1)
+    await page.getByRole('tab', { name: '1 week' }).click()
+    const planned = page.getByRole('button', { name: /^Breakfast on .+: / })
+    const before = await planned.count()
+    expect(before).toBeGreaterThan(0)
 
     await page.getByRole('button', { name: 'Next week' }).click()
     await expect(planned).toHaveCount(0)
     await page.getByRole('button', { name: 'Previous week' }).click()
-    await expect(planned).toHaveCount(1)
+    await expect(planned).toHaveCount(before)
   })
 })
 
@@ -573,7 +646,7 @@ test.describe('the recipe library', () => {
     // it, and any id it folded away resolves through the aliases it wrote.
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
     await expect(page.getByText('Unknown')).toHaveCount(0)
 
@@ -584,7 +657,7 @@ test.describe('the recipe library', () => {
     await page.getByRole('button', { name: /Merge these into one/ }).click()
     await page.getByRole('button', { name: 'Merge into this one' }).click()
 
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
     await expect(page.getByText('Unknown')).toHaveCount(0)
   })
@@ -747,7 +820,7 @@ test.describe('the recipe library', () => {
     await page.getByRole('button', { name: 'Add recipe' }).click()
 
     // Put it in a day, and remember what that day came to.
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: /Pop something in/ }).first().click()
     await page.getByPlaceholder(/What are we having/).fill('Doomed dinner')
     await page.getByText('Doomed dinner').first().click()
@@ -785,7 +858,7 @@ test.describe('the recipe library', () => {
 
     // Gone from the planner's picker. Scoped to the sheet, since the plan
     // behind it still shows the meal, that is the point of the next assertion.
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: /Pop something in/ }).first().click()
     await page.getByRole('button', { name: 'recipes' }).click()
     await page.getByPlaceholder(/What are we having/).fill('Doomed dinner')
@@ -1103,7 +1176,7 @@ test.describe('the food library', () => {
     // lines in a plan. Destroying it would blank them all at once.
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/plan')
+    await planDay(page)
     const before = await page.locator('text=/\\d+ of 7 days planned/').first().textContent()
 
     await goto(page, '/foods')
@@ -1119,7 +1192,7 @@ test.describe('the food library', () => {
     await expect(page.getByRole('button', { name: /^Edit Extra virgin olive oil/ })).toHaveCount(0)
 
     // …and the week is untouched.
-    await goto(page, '/plan')
+    await planDay(page)
     expect(await page.locator('text=/\\d+ of 7 days planned/').first().textContent()).toBe(before)
 
     // And it can be put back.
@@ -1181,7 +1254,7 @@ test.describe('your data survives the browser', () => {
     // week that outlives the browser storage it was written to.
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
 
     await goto(page, '/settings')
@@ -1192,7 +1265,7 @@ test.describe('your data survives the browser', () => {
     // Lose everything, the way clearing site data would.
     await page.evaluate(() => localStorage.clear())
     await page.reload()
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.getByText('0 of 7 days planned')).toBeVisible()
 
     await goto(page, '/settings')
@@ -1206,7 +1279,7 @@ test.describe('your data survives the browser', () => {
     await page.getByRole('button', { name: 'Replace it all' }).click()
     await expect(page.getByText(/Restored everything/)).toBeVisible()
 
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
   })
 
@@ -1223,7 +1296,7 @@ test.describe('your data survives the browser', () => {
     await expect(page.getByText(/left alone/)).toBeVisible()
     // Refused at the reading step, so there is nothing to agree to.
     await expect(page.getByRole('button', { name: 'Replace it all' })).toHaveCount(0)
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
   })
 })
@@ -1233,9 +1306,8 @@ test.describe('rearranging the week', () => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
-    await goto(page, '/plan')
     // A day with meals on it, rather than whichever day today happens to be.
-    await page.locator('button[aria-pressed]').filter({ hasText: /\d\d\d/ }).first().click()
+    await openADayWithFood(page)
 
     const lunch = page.locator('.card').filter({ hasText: 'Lunch' }).first()
     const moved = (await lunch.locator('[data-entry-name]').first().textContent())?.trim() ?? ''
@@ -1255,8 +1327,7 @@ test.describe('rearranging the week', () => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
-    await goto(page, '/plan')
-    await page.locator('button[aria-pressed]').filter({ hasText: /\d\d\d/ }).first().click()
+    await openADayWithFood(page)
 
     const breakfast = page.locator('.card').filter({ hasText: 'Breakfast' }).first()
     const name = (await breakfast.locator('[data-entry-name]').first().textContent())?.trim() ?? ''
@@ -1291,7 +1362,7 @@ test.describe('cooking once and eating twice', () => {
     await expect(page.getByText('In the fridge')).toBeVisible()
 
     // And it is offered first the next time a meal needs filling in.
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: /Pop something in/ }).first().click()
     await expect(page.getByRole('button', { name: /^fridge/ })).toBeVisible()
     await page.locator('button').filter({ hasText: /portions? left/ }).first().click()
@@ -1357,18 +1428,20 @@ test.describe('filling the gaps', () => {
     const offered = await rows.count()
     expect(offered, 'nothing was proposed').toBeGreaterThan(3)
 
-    // Nothing is written while you are still looking at it.
-    await expect(page.locator('[data-entry-name]')).toHaveCount(0)
+    // Nothing is written while you are still looking at it. A filled cell in
+    // the grid is the week's own record of a meal; the day view's slot rows,
+    // and their `data-entry-name`, are not drawn over a week.
+    await expect(page.locator('[data-planned]')).toHaveCount(0)
 
     await rows.first().click()
     await expect(page.getByRole('button', { name: `Add these ${offered - 1} meals` })).toBeVisible()
 
     await page.getByRole('button', { name: /^Add these/ }).click()
-    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+    await expect(page.locator('[data-planned]').first()).toBeVisible()
   })
 
   test('every proposal says why it is there', async ({ page }) => {
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
 
     // The whole argument for doing this without a model is that each suggestion
@@ -1392,7 +1465,7 @@ test.describe('what the kitchen has to say', () => {
     await goto(page, '/schedule')
     await putATubInTheFridge(page, 'Half a lasagne')
 
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: /Pop something in/ }).first().click()
     await page.locator('button').filter({ hasText: /portions? left/ }).first().click()
 
@@ -1491,7 +1564,7 @@ test.describe('a laptop is not a large phone', () => {
 
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/plan')
+    await planDay(page)
 
     // All five slots, in the viewport, at once. Stacked full width a laptop
     // showed two and put the rest below the fold, which is the one thing a big
@@ -1580,7 +1653,7 @@ test.describe('whether tonight can actually be cooked', () => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.getByText(/to buy:/i)).toHaveCount(0)
     await expect(page.getByText('Everything in')).toHaveCount(0)
   })
@@ -1594,8 +1667,7 @@ test.describe('whether tonight can actually be cooked', () => {
     await page.getByPlaceholder('Search your foods').fill('olive oil')
     await page.locator('button').filter({ hasText: /olive oil/i }).first().click()
 
-    await goto(page, '/plan')
-    await page.locator('button[aria-pressed]').filter({ hasText: /\d\d\d/ }).first().click()
+    await openADayWithFood(page)
 
     // Named rather than counted, and never a verdict on the kitchen.
     const line = page.getByText(/to buy:/i).first()
@@ -1646,7 +1718,7 @@ test.describe('what you enter is still there tomorrow', () => {
     await page.reload()
     await page.waitForLoadState('networkidle')
 
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
 
     await goto(page, '/analytics')
@@ -1708,7 +1780,7 @@ test.describe('resilience', () => {
 
 test.describe('a week worth having again', () => {
   test('says there is nothing to save before you have planned anything', async ({ page }) => {
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: 'Saved weeks' }).click()
 
     await expect(page.getByText('Nothing on this week to save yet.')).toBeVisible()
@@ -1721,7 +1793,9 @@ test.describe('a week worth having again', () => {
     // A week with something on it, courtesy of the assistant.
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
     await page.getByRole('button', { name: /^Add these/ }).click()
-    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+    // In the grid a written meal is a filled cell. `data-entry-name` belongs
+    // to the day view's slot rows, which a week does not draw.
+    await expect(page.locator('[data-planned]').first()).toBeVisible()
 
     await page.getByRole('button', { name: 'Saved weeks' }).click()
     await page.getByLabel('Name this week').fill('Our usual')
@@ -1741,12 +1815,12 @@ test.describe('a week worth having again', () => {
     // Asserted across the week rather than on the day that happens to be
     // selected. Fill the gaps only proposes days still ahead, so which days
     // carry food depends on what day of the week the suite is run.
-    const filled = page.locator('button[aria-pressed]').filter({ hasText: /\d{2,}/ })
+    const filled = page.locator('[data-planned]')
     await expect(filled.first()).toBeVisible()
   })
 
   test('counts what it would overwrite, and writes nothing until you agree', async ({ page }) => {
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
     await page.getByRole('button', { name: /^Add these/ }).click()
     await expect(page.locator('[data-entry-name]').first()).toBeVisible()
@@ -1768,7 +1842,7 @@ test.describe('a week worth having again', () => {
   })
 
   test('a week can be forgotten', async ({ page }) => {
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
     await page.getByRole('button', { name: /^Add these/ }).click()
     await expect(page.locator('[data-entry-name]').first()).toBeVisible()
@@ -1861,12 +1935,14 @@ test.describe('the week you are actually in', () => {
    */
   test('a window left in the past does not survive a reload', async ({ page }) => {
     await goto(page, '/plan')
-    await expect(page.getByRole('button', { name: longDate(todayIso()) })).toBeVisible()
+    // The grid names each row by its date. The old strip of cells this used to
+    // read is gone with the view that drew it.
+    await expect(page.locator(`[data-day-row="${todayIso()}"]`)).toBeVisible()
 
     for (let i = 0; i < 3; i += 1) {
       await page.getByRole('button', { name: 'Previous week' }).click()
     }
-    await expect(page.getByRole('button', { name: longDate(todayIso()) })).toHaveCount(0)
+    await expect(page.locator(`[data-day-row="${todayIso()}"]`)).toHaveCount(0)
 
     // A window is about right now, so it has no business in storage, in a
     // backup, or on its way to the other phone.
@@ -1879,7 +1955,7 @@ test.describe('the week you are actually in', () => {
     await page.reload()
     await page.waitForLoadState('networkidle')
 
-    await expect(page.getByRole('button', { name: longDate(todayIso()) })).toBeVisible()
+    await expect(page.locator(`[data-day-row="${todayIso()}"]`)).toBeVisible()
   })
 
   test('the shopping list offers the days you are about to live', async ({ page }) => {
@@ -1900,7 +1976,7 @@ test.describe('the week you are actually in', () => {
     for (let i = 0; i < 2; i += 1) {
       await page.getByRole('button', { name: 'Previous week' }).click()
     }
-    await expect(page.getByRole('button', { name: longDate(todayIso()) })).toHaveCount(0)
+    await expect(page.locator(`[data-day-row="${todayIso()}"]`)).toHaveCount(0)
 
     // The planner's window used to be the app's only idea of "this week", so
     // looking back at what you ate a fortnight ago moved the shopping list
@@ -1914,8 +1990,7 @@ test.describe('the week you are actually in', () => {
     // gone, the current week, only days before today, and the next eight.
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/plan')
-    await page.locator('button[aria-pressed]').filter({ hasText: /\d\d\d/ }).first().click()
+    await openADayWithFood(page)
 
     const days = () => page.locator('[data-when-day]').count()
 
@@ -1937,6 +2012,8 @@ test.describe('the week you are actually in', () => {
     // The bar is the phone layout only; on a laptop there is no centre button.
     test.skip(testInfo.project.name !== 'mobile', 'the bottom bar is a phone thing')
 
+    // The week view, where the arrow means a week. It means a day in the day
+    // view, which is the right reading there and the wrong one here.
     await goto(page, '/plan')
     await page.getByRole('button', { name: 'Previous week' }).click()
 
@@ -1946,8 +2023,11 @@ test.describe('the week you are actually in', () => {
     await page.getByRole('button', { name: 'Add a meal' }).click()
 
     await expect(page.getByRole('heading', { name: /^Add to / })).toBeVisible()
-    await expect(page.getByRole('button', { name: longDate(todayIso()), exact: true }))
-      .toHaveAttribute('aria-pressed', 'true')
+    // The date the modal says it is writing to. It used to be read off the
+    // planner's day strip, which is gone, and the strip was never what the
+    // button meant anyway: this is the day the meal will land on.
+    await expect(page.getByRole('dialog').getByText(longDate(todayIso()), { exact: true }))
+      .toBeVisible()
   })
 })
 
@@ -1960,7 +2040,7 @@ test.describe('what actually happened', () => {
    * For somebody on a target, that is the point of the app.
    */
   async function aPlannedDay(page: Page) {
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
     await page.getByRole('button', { name: /^Add these/ }).click()
     await expect(page.locator('[data-entry-name]').first()).toBeVisible()
@@ -2069,7 +2149,7 @@ test.describe('what actually happened', () => {
     await page.getByRole('button', { name: 'Ate it' }).first().click()
 
     // It lands on the planner already a record. Nothing to tick afterwards.
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.getByText('eaten', { exact: true }).first()).toBeVisible()
     await expect(page.getByRole('button', { name: /^Eaten\./ }).first()).toBeVisible()
   })
@@ -2085,7 +2165,7 @@ test.describe('what actually happened', () => {
     await expect(dialog).toBeVisible()
     await dialog.getByRole('button', { name: 'Put it in', exact: true }).click()
 
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.locator('[data-entry-name]').first()).toBeVisible()
   })
 })
@@ -2166,9 +2246,10 @@ test.describe('a batch that lands in the week', () => {
     await page.getByRole('button', { name: 'Into the fridge' }).click()
 
     await goto(page, '/plan')
-    // Somewhere in the week ahead there is now a meal from the fridge.
-    const week = page.locator('button[aria-pressed]').filter({ hasText: /\d{2,}/ })
-    await expect(week.first()).toBeVisible()
+    // A fortnight, because a batch spreads into the days ahead and those run
+    // past the end of whichever week today happens to sit in.
+    await page.getByRole('tab', { name: '2 weeks' }).click()
+    await expect(page.locator('[data-planned]').first()).toBeVisible()
   })
 
   test('it can be turned off, and then nothing is planned', async ({ page }) => {
@@ -2184,7 +2265,7 @@ test.describe('a batch that lands in the week', () => {
 
     // The portions still exist, they are simply nobody's dinner yet.
     await expect(page.getByText('In the fridge')).toBeVisible()
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page.locator('[data-entry-name]')).toHaveCount(0)
   })
 })
@@ -2197,7 +2278,7 @@ test.describe('a batch that lands in the week', () => {
  */
 test.describe('taking it back', () => {
   async function aPlannedDay(page: Page) {
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
     await page.getByRole('button', { name: /^Add these/ }).click()
     await expect(page.locator('[data-entry-name]').first()).toBeVisible()
@@ -2336,7 +2417,7 @@ test.describe('the small sharp edges', () => {
   test('a dialog can be escaped, and gives focus back', async ({ page }) => {
     // Clicking the backdrop always worked, which hid the gap: on a phone that
     // is the only way most people would close one, so nothing looked broken.
-    await goto(page, '/plan')
+    await planDay(page)
 
     const opener = page.getByRole('button', { name: 'Saved weeks' })
     await opener.click()
@@ -2372,7 +2453,7 @@ test.describe('the small sharp edges', () => {
   })
 
   test('the tab is named after the screen', async ({ page }) => {
-    await goto(page, '/plan')
+    await planDay(page)
     await expect(page).toHaveTitle(/^Planner · Bite Buddy$/)
 
     await goto(page, '/grocery')
@@ -2385,7 +2466,7 @@ test.describe('the small sharp edges', () => {
   })
 
   test('clearing a day asks first, and says how much it would throw away', async ({ page }) => {
-    await goto(page, '/plan')
+    await planDay(page)
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
     await page.getByRole('button', { name: /^Add these/ }).click()
     await expect(page.locator('[data-entry-name]').first()).toBeVisible()

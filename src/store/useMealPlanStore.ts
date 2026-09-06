@@ -55,12 +55,15 @@ export function today(now: Date = new Date()): string {
  * least. A fortnight is the longest range where you can still read what is
  * planned, which is the only reason to look at a range at all.
  */
-export type PlanRange = 'week' | 'fortnight'
+export type PlanRange = 'day' | 'week' | 'fortnight'
 
 export const RANGE_LABELS: Record<PlanRange, string> = {
+  day: 'Day',
   week: '1 week',
   fortnight: '2 weeks',
 }
+
+const RANGE_DAYS: Record<PlanRange, number> = { day: 1, week: 7, fortnight: 14 }
 
 /** A date a number of days along, read at noon so a timezone cannot shift it. */
 export function addDays(date: string, days: number): string {
@@ -72,34 +75,13 @@ export function addDays(date: string, days: number): string {
 /**
  * The dates on screen, for a window that starts at `weekStart`.
  *
- * A week and a fortnight are simply seven and fourteen days from there. A
- * month is the calendar month the window sits in, padded out to whole weeks so
- * the grid has no ragged edges: the days either side belong to the neighbouring
- * months and are real days you can plan, they are just drawn quieter.
+ * A day, a week or a fortnight, counted forward from there. The month view
+ * this used to pad out to whole weeks is gone: a hundred and fifty meal slots
+ * drawn at that size made every day a rectangle with nothing readable in it,
+ * so the view that showed the most showed the least.
  */
-export function getRangeDates(
-  weekStart: string,
-  range: PlanRange,
-  weekStartsOn: WeekStart = DEFAULT_WEEK_START,
-): string[] {
-  if (range === 'week') return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
-  if (range === 'fortnight') return Array.from({ length: 14 }, (_, i) => addDays(weekStart, i))
-
-  const anchor = new Date(weekStart + 'T12:00:00')
-  const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1, 12)
-  const last = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0, 12)
-
-  const gridStart = getWeekDates(first, weekStartsOn)[0]
-  const gridEnd = getWeekDates(last, weekStartsOn)[6]
-
-  const out: string[] = []
-  for (let d = gridStart; d <= gridEnd; d = addDays(d, 1)) out.push(d)
-  return out
-}
-
-/** The month a window belongs to, for labelling and for greying the edges. */
-export function monthOf(weekStart: string): number {
-  return new Date(weekStart + 'T12:00:00').getMonth()
+export function getRangeDates(weekStart: string, range: PlanRange): string[] {
+  return Array.from({ length: RANGE_DAYS[range] }, (_, i) => addDays(weekStart, i))
 }
 
 function emptyWeek(dates: string[]): DayPlan[] {
