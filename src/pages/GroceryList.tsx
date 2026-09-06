@@ -29,7 +29,7 @@ export default function GroceryList() {
   const {
     groceryItems, generateGroceryList, toggleGroceryItem, addGroceryItem,
     updateGroceryItem, removeGroceryItem, clearCheckedItems, clearGroceryList,
-    restoreGroceryItems, plan,
+    restoreGroceryItems, plan, cupboardCovered,
   } = useMealPlanStore()
   const { profile } = useUserStore()
   const thisWeek = useThisWeek()
@@ -52,7 +52,7 @@ export default function GroceryList() {
   }
   const [emptying, setEmptying] = useState(false)
   const pantry = usePantry()
-  const { keep } = usePantryStore()
+  const { keep, drop: dropFromCupboard } = usePantryStore()
 
   /**
    * A fortnight of choices, starting today.
@@ -276,7 +276,14 @@ export default function GroceryList() {
                       // Into the cupboard rather than merely off the list, so
                       // the next list does not ask again. Removing it here would
                       // last until the next rebuild and no longer.
-                      keep({ foodId: item.foodId })
+                      //
+                      // With the amount that was on the line, which is the
+                      // claim you are actually making: "I have this much." A
+                      // cupboard entry carrying no quantity means enough, for
+                      // ever, so one tap about the tomatoes you happen to have
+                      // today deleted tomatoes from every future list. That is
+                      // how half a list went missing with nothing said.
+                      keep({ foodId: item.foodId, grams: item.grams || undefined })
                       removeGroceryItem(item.id)
                     } : undefined}
                   />
@@ -284,6 +291,37 @@ export default function GroceryList() {
               </div>
             </section>
           ))}
+          </div>
+        )}
+
+        {/* What the cupboard took off, said out loud.
+            A list that comes back half the length with no explanation is a
+            list you stop trusting, and that is exactly how this was reported:
+            "randomly the grocery list disappeared half of it". The cupboard is
+            a good reason for a line to be missing. It is not a good reason for
+            the disappearance to be silent, and each one can be put back. */}
+        {cupboardCovered.length > 0 && (
+          <div className="card p-4 space-y-2">
+            <p className="text-sm text-ink-900">
+              <strong className="font-semibold">
+                {cupboardCovered.length} {cupboardCovered.length === 1 ? 'thing is' : 'things are'}
+              </strong>{' '}
+              not on the list because your cupboard already covers{' '}
+              {cupboardCovered.length === 1 ? 'it' : 'them'}.
+            </p>
+            <ul className="flex flex-wrap gap-1.5">
+              {cupboardCovered.map((c) => (
+                <li key={c.foodId}>
+                  <button
+                    onClick={() => { dropFromCupboard(c.foodId); build() }}
+                    className="chip-off"
+                    aria-label={`Take ${c.name} out of the cupboard and put it back on the list`}
+                  >
+                    {c.name} <span className="text-ink-500">· put back</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

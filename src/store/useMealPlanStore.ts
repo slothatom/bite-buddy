@@ -174,6 +174,15 @@ interface MealPlanStore {
   weekDates: string[]
   plan: DayPlan[]
   groceryItems: GroceryItem[]
+  /**
+   * What the last rebuild left off because the cupboard already covers it.
+   *
+   * Not persisted and not synced: it describes one rebuild, and a stale copy of
+   * it read on the next visit would be a claim about a list that no longer
+   * exists. It is here rather than in the screen's own state because the screen
+   * is not the thing that decided.
+   */
+  cupboardCovered: { foodId: string; name: string; grams: number }[]
   /** Weeks worth having again. Shared, like everything else here. */
   templates: WeekTemplate[]
 
@@ -333,6 +342,7 @@ export const useMealPlanStore = create<MealPlanStore>()(
         plan: emptyWeek(weekDates),
         templates: [],
         groceryItems: [],
+        cupboardCovered: [],
 
         setMeal: (date, slot, entries, note) =>
           set((s) => ({
@@ -693,11 +703,21 @@ export const useMealPlanStore = create<MealPlanStore>()(
           // What the cupboard already covers comes off the list entirely rather
           // than appearing ticked: a line you have to read and dismiss is worse
           // than no line, and the cupboard is the reason it is not needed.
-          const needed = [...items.values()]
-            .map((i) => ({ ...i, grams: stillNeeded(i.grams, opts?.pantry?.get(i.foodId)) }))
-            .filter((i) => i.grams > 0)
+          const weighed = [...items.values()]
+            .map((i) => ({ ...i, needed: stillNeeded(i.grams, opts?.pantry?.get(i.foodId)) }))
+          const needed = weighed.filter((i) => i.needed > 0).map(({ needed: g, ...i }) => ({ ...i, grams: g }))
+
+          // What the cupboard took off, kept so the screen can say so. A list
+          // that quietly comes back half the length is a list you stop
+          // trusting, and "half of it disappeared" is exactly how it was
+          // reported. The cupboard is a good reason for a line to be missing;
+          // it is not a reason for the disappearance to be silent.
+          const covered = weighed
+            .filter((i) => i.needed <= 0)
+            .map((i) => ({ foodId: i.foodId, name: i.name, grams: Math.round(i.grams) }))
 
           set({
+            cupboardCovered: covered,
             groceryItems: [
               ...needed.map((i) => ({
                 ...i, grams: Math.round(i.grams), checked: ticked.has(i.id),
@@ -750,7 +770,7 @@ export const useMealPlanStore = create<MealPlanStore>()(
         clearCheckedItems: () =>
           set((s) => ({ groceryItems: s.groceryItems.filter((i) => !i.checked) })),
 
-        clearGroceryList: () => set({ groceryItems: [] }),
+        clearGroceryList: () => set({ groceryItems: [], cupboardCovered: [] }),
 
         restoreGroceryItems: (items) =>
           set((s) => {
@@ -783,7 +803,10 @@ export const useMealPlanStore = create<MealPlanStore>()(
        * computed from the clock.
        */
       partialize: (state) => {
-        const { weekDates: _window, ...rest } = state
+        // The window is the planner's own, and the cupboard note describes one
+        // rebuild: read back on the next visit it would be a claim about a list
+        // that no longer exists.
+        const { weekDates: _window, cupboardCovered: _note, ...rest } = state
         return rest as MealPlanStore
       },
       migrate: upgradeThrough<MealPlanStore>(SCHEMA_VERSION, {

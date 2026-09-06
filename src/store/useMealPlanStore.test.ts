@@ -552,3 +552,43 @@ describe('changing how much of it there was', () => {
     expect(mealId).toBeTruthy()
   })
 })
+
+describe('a list that comes back shorter says why', () => {
+  it('names what the cupboard covered rather than quietly dropping it', async () => {
+    // "Randomly the grocery list disappeared half of it." The cupboard was the
+    // reason, and the screen said nothing at all, so the list looked like it
+    // had lost things. A missing line now has a stated cause and a way back.
+    const { buildContext } = await import('../lib/nutrition')
+    const { FOODS } = await import('../data/foods')
+    const { ALL_RECIPES } = await import('../data')
+    const ctx = buildContext(FOODS, ALL_RECIPES)
+
+    useMealPlanStore.setState({ plan: [], groceryItems: [], cupboardCovered: [] })
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-24T12:00:00'), 1)
+    useMealPlanStore.getState().addEntry('2026-08-25', 'lunch', {
+      kind: 'food', foodId: 'tomatoes', grams: 400,
+    })
+
+    const cupboard = new Map([['tomatoes', { foodId: 'tomatoes', staple: true, updatedAt: '' }]])
+    useMealPlanStore.getState().generateGroceryList(ctx, { pantry: cupboard })
+
+    expect(useMealPlanStore.getState().groceryItems.some((i) => i.foodId === 'tomatoes')).toBe(false)
+    expect(useMealPlanStore.getState().cupboardCovered.map((c) => c.foodId)).toContain('tomatoes')
+  })
+
+  it('says nothing where the cupboard took nothing', async () => {
+    const { buildContext } = await import('../lib/nutrition')
+    const { FOODS } = await import('../data/foods')
+    const { ALL_RECIPES } = await import('../data')
+    const ctx = buildContext(FOODS, ALL_RECIPES)
+
+    useMealPlanStore.setState({ plan: [], groceryItems: [], cupboardCovered: [] })
+    useMealPlanStore.getState().goToWeek(new Date('2026-08-24T12:00:00'), 1)
+    useMealPlanStore.getState().addEntry('2026-08-25', 'lunch', {
+      kind: 'food', foodId: 'tomatoes', grams: 400,
+    })
+    useMealPlanStore.getState().generateGroceryList(ctx)
+
+    expect(useMealPlanStore.getState().cupboardCovered).toHaveLength(0)
+  })
+})

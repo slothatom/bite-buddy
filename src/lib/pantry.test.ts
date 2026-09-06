@@ -144,3 +144,17 @@ describe('whether a planned meal can be cooked tonight', () => {
     expect(state.missing).toEqual(['oil'])
   })
 })
+
+describe('a cupboard entry with no quantity', () => {
+  it('does not silently swallow any amount you ask for', () => {
+    // This is how half a shopping list went missing. "I have it" on a line
+    // stored a cupboard entry carrying no quantity, and no quantity meant
+    // enough, for ever. One tap about the tomatoes you happened to have that
+    // day deleted tomatoes from every list after it, with nothing said.
+    //
+    // A staple is different and stays: salt and oil are things you always
+    // have, which is a claim about your kitchen rather than about one shop.
+    expect(stillNeeded(2000, { foodId: 'tomatoes', grams: 300, updatedAt: '' })).toBe(1700)
+    expect(stillNeeded(2000, { foodId: 'salt', staple: true, updatedAt: '' })).toBe(0)
+  })
+})
