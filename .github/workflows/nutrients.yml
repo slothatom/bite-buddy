@@ -1,0 +1,165 @@
+# Fibre and sodium, fetched on GitHub's machines rather than yours.
+#
+# `scripts/fill-nutrients.ts` needs three things this repository's owner should
+# not have to arrange by hand: Node, a network that can reach USDA, and a key.
+# The first two a runner already has, and the third is a repository secret, so
+# the whole job becomes a button.
+#
+# It never pushes to main. The script finds a USDA row by searching on the
+# English name, and a search can match the wrong food: "pork shoulder" is
+# exactly the shape of query that goes astray. So the result arrives as a pull
+# request with the matched descriptions in its body, to be read before it is
+# merged. That reading is the point of the whole exercise.
+
+name: Fibre and sodium
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Preview the matches, or apply them and open a pull request'
+        type: choice
+        required: true
+        default: preview
+        options: [preview, apply]
+
+# Only what opening a pull request needs. The default token is otherwise
+# read-only on this repository.
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: nutrients
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check the key is set
+        env:
+          USDA_API_KEY: ${{ secrets.USDA_API_KEY }}
+        run: |
+          if [ -z "$USDA_API_KEY" ]; then
+            echo "::error::No USDA_API_KEY secret is set. Add one under"
+            echo "::error::Settings > Secrets and variables > Actions. A free key"
+            echo "::error::takes a minute: https://fdc.nal.usda.gov/api-key-signup.html"
+            exit 1
+          fi
+
+      # Captured as well as printed. The matched USDA descriptions are what a
+      # person has to read, and reading them in a pull request body beats
+      # digging them out of a folded log.
+      - name: Ask USDA
+        id: fetch
+        env:
+          USDA_API_KEY: ${{ secrets.USDA_API_KEY }}
+        run: |
+          # Actions runs this as `bash -e`, which does not include pipefail, so
+          # without this the exit code of the pipeline is tee's. The script
+          # exits 1 when USDA rate limits it, and that would have been reported
+          # as a clean run with a confusing log.
+          set -o pipefail
+          if [ "${{ inputs.mode }}" = "apply" ]; then
+            npm run data:nutrients -- --write | tee report.txt
+          else
+            npm run data:nutrients | tee report.txt
+          fi
+
+      - name: What it found
+        run: |
+          {
+            echo '### What USDA gave back'
+            echo
+            echo '```'
+            cat report.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Stop here on a preview
+        if: inputs.mode != 'apply'
+        run: |
+          echo "Preview only, nothing was changed."
+          echo "Run it again with mode: apply to open a pull request."
+
+      - name: Anything to propose?
+        if: inputs.mode == 'apply'
+        id: changed
+        run: |
+          if git diff --quiet -- src/data/foods.ts; then
+            echo "any=false" >> "$GITHUB_OUTPUT"
+            echo "USDA had nothing to add. Every food already carries both figures,"
+            echo "or nothing could be matched. No pull request opened."
+          else
+            echo "any=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Before the pull request, not after. A pull request opened by the
+      # default token does not start other workflows, so CI would not run on
+      # it by itself and a red branch would look green.
+      - name: The full gate
+        if: inputs.mode == 'apply' && steps.changed.outputs.any == 'true'
+        run: npm run verify
+
+      - name: Open a pull request
+        if: inputs.mode == 'apply' && steps.changed.outputs.any == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          branch="data/nutrients-${{ github.run_number }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add src/data/foods.ts
+
+          # Through a file rather than -m, so the message keeps its paragraphs.
+          # The block scalar above has already stripped this indentation, which
+          # is what lets the terminator sit at the start of its line.
+          cat > message.txt <<'MSG'
+          data: fibre and sodium from USDA FoodData Central
+
+          Fetched by .github/workflows/nutrients.yml. Every figure came from a
+          search on the food's English name, so the matched USDA descriptions
+          are in the pull request body and want reading: a search can return
+          the wrong food.
+
+          Nothing already present was overwritten and nothing was invented. A
+          food USDA could not answer for is left empty, which the app reports
+          as not known rather than as nought.
+          MSG
+          git commit -F message.txt
+          git push -u origin "$branch"
+
+          {
+            echo "Fetched by the **Fibre and sodium** workflow, run ${{ github.run_number }}."
+            echo
+            echo "\`npm run verify\` passed on this branch before the pull request was"
+            echo "opened, because a pull request raised by Actions does not start CI"
+            echo "on its own."
+            echo
+            echo "### Read the matches before merging"
+            echo
+            echo "Each line names the USDA row the figure came from. A search on"
+            echo "\"pork shoulder\" or \"telemea\" can land on something else entirely,"
+            echo "and a wrong number here reaches every day summary in the app."
+            echo
+            echo '```'
+            cat report.txt
+            echo '```'
+          } > body.md
+
+          gh pr create \
+            --title "data: fibre and sodium from USDA" \
+            --body-file body.md \
+            --base main \
+            --head "$branch"
