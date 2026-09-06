@@ -573,10 +573,14 @@ async function main() {
     const close = source.indexOf('}', open)
     if (open < 0 || close < 0) continue
 
-    let block = source.slice(open, close)
+    // Trimmed before appending and a single space put back after, because the
+    // slice ends at the brace and so carries the space the house style puts
+    // before it. Appending straight onto that wrote `fiber: 4 , sodium: 4`
+    // into a file people read.
+    let block = source.slice(open, close).replace(/\s+$/, '')
     if (edit.fiber != null && !/\bfiber:/.test(block)) block += `, fiber: ${edit.fiber}`
     if (edit.sodium != null && !/\bsodium:/.test(block)) block += `, sodium: ${edit.sodium}`
-    source = source.slice(0, open) + block + source.slice(close)
+    source = source.slice(0, open) + block + ' ' + source.slice(close)
     changed += 1
   }
 
