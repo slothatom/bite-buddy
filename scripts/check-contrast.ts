@@ -131,6 +131,38 @@ interface Pair { fg: string; bg: string; where: string; large: boolean }
  * the words sit on. Both were doing so here, and both were reported as
  * failures until the pairing was narrowed to one literal at a time.
  */
+/**
+ * Folds a continued string back onto the line it started on.
+ *
+ * A line holding an odd number of quotes is mid-literal, so the next one
+ * belongs to it. The joined text stays on the first line's index and the
+ * continuation becomes empty, which keeps every later line number correct.
+ */
+function joinWrapped(lines: string[]): string[] {
+  // Backticks and apostrophes inside prose would confuse this, so only the
+  // double quotes that carry a JSX attribute are counted.
+  const odd = (line: string) => (line.split('"').length - 1) % 2 === 1
+  const out = [...lines]
+
+  for (let i = 0; i < out.length; i++) {
+    /*
+     * Bounded, and stopping at a line with nothing left to give.
+     *
+     * Unbounded, this hangs. A line whose quotes are odd for a reason other
+     * than a wrapped attribute, a `"` inside a comment, say, never becomes
+     * even however much is folded into it, and the loop eats the file one
+     * blank line at a time for ever.
+     */
+    for (let taken = 0; taken < 8 && odd(out[i]) && i + 1 + taken < out.length; taken++) {
+      const next = out[i + 1 + taken]
+      if (!next.trim()) break
+      out[i] = `${out[i]} ${next.trim()}`
+      out[i + 1 + taken] = ''
+    }
+  }
+  return out
+}
+
 function literals(source: string): string[] {
   return [...source.matchAll(/'([^']*)'|"([^"]*)"|`([^`]*)`/g)]
     .map((m) => m[1] ?? m[2] ?? m[3])
@@ -146,7 +178,22 @@ function pairs(palette: Map<string, string>): Pair[] {
   for (const file of files(ROOT)) {
     const source = readFileSync(file, 'utf8')
 
-    const lines = source.split('\n')
+    /*
+     * Class attributes that wrap, joined back into one line first.
+     *
+     * The scan reads a literal at a time and literals were being taken line by
+     * line, so a `className` broken across two lines had no matching quote on
+     * either of them and was extracted as nothing at all. Not measured
+     * loosely: not measured. That is how the undo bar shipped as `bg-ink-900
+     * text-white`, which is white on a near-white ground once the dark palette
+     * inverts ink-900, at about 1.05:1, on a message whose whole job is to be
+     * read in eight seconds.
+     *
+     * Joined rather than scanned across the whole file at once, so every pair
+     * still reports the line it starts on and the surrounding window used to
+     * find a coloured parent still means something.
+     */
+    const lines = joinWrapped(source.split('\n'))
 
     lines.forEach((line, index) => {
       const where = `${file}:${index + 1}`

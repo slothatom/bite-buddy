@@ -31,8 +31,15 @@ export default function UndoBar() {
       className="fixed inset-x-0 z-40 px-4 pointer-events-none
                  bottom-[calc(4rem+env(safe-area-inset-bottom))] md:bottom-6 md:inset-x-auto md:right-6"
     >
+      {/* An inverted slab, which is what a transient message should be: it has
+          to read as not-the-page. `text-white` was wrong on a token that
+          inverts, though. In daylight ink-900 is nearly black and white sits on
+          it fine; after dark ink-900 is nearly white and so is white, which is
+          how this shipped at 1.11:1. Paired with cream-50 the two invert
+          together and the slab is dark-on-light or light-on-dark in either
+          theme, without either of them knowing a theme exists. */}
       <div className="pointer-events-auto mx-auto md:mx-0 max-w-md md:max-w-sm overflow-hidden
-                      rounded-xl bg-ink-900 text-white shadow-xl">
+                      rounded-xl bg-ink-900 text-cream-50 border border-ink-700 shadow-xl">
         <div className="flex items-center gap-3 px-4 py-3">
           <p className="flex-1 min-w-0 text-sm">{offer.what}</p>
           <button
@@ -45,7 +52,11 @@ export default function UndoBar() {
           <button
             onClick={() => clearUndo()}
             aria-label="Dismiss"
-            className="shrink-0 p-1 -m-1 text-white/70 hover:text-white"
+            // Inherits the slab's colour rather than naming one. A colour named
+            // here has no ground in its own literal, so nothing can tell what
+            // it sits on, and it is the same colour as the text beside it in
+            // any case.
+            className="shrink-0 p-1 -m-1 opacity-70 hover:opacity-100"
           >
             <X size={16} />
           </button>
