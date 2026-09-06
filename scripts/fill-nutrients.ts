@@ -25,8 +25,22 @@ import type { Food } from '../src/types/index.js'
  */
 
 const USDA = 'https://api.nal.usda.gov/fdc/v1'
-const KEY = process.env.USDA_API_KEY ?? 'DEMO_KEY'
+/*
+ * Trimmed, because a key gets here by being pasted.
+ *
+ * A trailing newline from a copy, or the space a phone keyboard adds after a
+ * paste, both survive into a repository secret, and USDA answers the resulting
+ * request with 403. Untrimmed, that is indistinguishable from a wrong key.
+ */
+const KEY = (process.env.USDA_API_KEY ?? 'DEMO_KEY').trim()
 const WRITE = process.argv.includes('--write')
+
+/** A request USDA turned down, as opposed to a food it does not know. */
+class Refused extends Error {
+  constructor(readonly status: number, readonly body: string) {
+    super(`USDA answered ${status}`)
+  }
+}
 
 /** USDA's own numbers for the two nutrients we are short of. */
 const FIBRE = 1079
@@ -63,7 +77,17 @@ async function lookup(food: Food): Promise<Found | null> {
       console.error('  USDA_API_KEY=your-key npm run data:nutrients -- --write\n')
       process.exit(1)
     }
-    if (!res.ok) continue
+    /*
+     * A refusal is not an absence.
+     *
+     * This line was `if (!res.ok) continue`, which threw the status away and
+     * carried on. The first real run of this script put a key with a trailing
+     * character into every request, USDA answered 403 to all 119 of them, and
+     * the report said "119 left alone, nothing found" as though the world's
+     * largest food composition database had never heard of broccoli. A wrong
+     * key and a missing food have to look different, so this says which.
+     */
+    if (!res.ok) throw new Refused(res.status, (await res.text()).slice(0, 300))
 
     const body = await res.json() as {
       foods?: { fdcId: number; description: string; foodNutrients?: { nutrientId: number; value: number }[] }[]
@@ -97,13 +121,47 @@ async function main() {
   const edits: { id: string; fiber?: number; sodium?: number; matched: string; fdcId: number }[] = []
   const missed: string[] = []
 
+  /*
+   * One request before the other 118.
+   *
+   * Everything that can be wrong with the setup, a bad key, a key with a
+   * newline in it, no network, USDA down, is wrong on the first request as
+   * surely as on the last. Finding out here costs two seconds; finding out at
+   * the end costs five minutes and a page of dots that reads like an answer.
+   */
+  try {
+    await lookup(wanted[0])
+  } catch (e) {
+    if (e instanceof Refused) {
+      console.error(`\nUSDA turned the first request down: ${e.status}.\n`)
+      if (e.status === 403 || e.status === 401) {
+        console.error('That is what it answers to a key it does not accept. Check the')
+        console.error('USDA_API_KEY secret for a stray space or newline from the paste,')
+        console.error('and that it is the key from https://fdc.nal.usda.gov/api-key-signup.html')
+      }
+      console.error(`\nWhat it said:\n${e.body}\n`)
+    } else {
+      console.error(`\nCould not reach USDA at all: ${(e as Error).message}\n`)
+    }
+    process.exit(1)
+  }
+
   for (const food of wanted) {
-    const found = await lookup(food).catch(() => null)
+    const found = await lookup(food).catch((e: Error) => {
+      // Past the preflight, one food failing is not worth abandoning the rest,
+      // but it is worth saying so rather than filing it under "not found".
+      missed.push(`${food.id} (${food.names.en}): ${e.message}`)
+      return null
+    })
     // Gentle on a public API that asks nicely.
     await sleep(250)
 
     if (!found) {
-      missed.push(`${food.id} (${food.names.en})`)
+      // A lookup that threw has already said why. This is the other case: USDA
+      // answered, and had nothing for this name.
+      if (!missed.some((m) => m.startsWith(`${food.id} (`))) {
+        missed.push(`${food.id} (${food.names.en})`)
+      }
       process.stdout.write('.')
       continue
     }
