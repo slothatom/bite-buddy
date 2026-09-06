@@ -34,9 +34,7 @@ import { usePantry } from '../store/usePantryStore'
 import { availability, availabilityLabel, missingFoods } from '../lib/pantry'
 import { throughLens, lensReady, lensBlocker, LENSES, LENS_ORDER, type Lens } from '../lib/discovery'
 import { timeIsEstimated } from '../lib/cookingTimes'
-import { useUserStore, targetsFor } from '../store/useUserStore'
-import { useUiStore } from '../store/useUiStore'
-import { PEOPLE } from '../lib/people'
+import { useUserStore } from '../store/useUserStore'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 
 /**
@@ -780,8 +778,7 @@ function RecipeDetail({
   const ctx = useNutritionContext()
   const { mergeRecipes, unmergeRecipe, favouriteIds, toggleFavourite } = useRecipeStore()
   const { profile } = useUserStore()
-  const viewingAs = useUiStore((s) => s.viewingAs)
-  const targets = targetsFor(profile, viewingAs)
+  const targets = profile.targets
   const [version, setVersion] = useState(() => {
     const at = card.variants.findIndex((r) => r.id === startId)
     return at >= 0 ? at : 0
@@ -1017,8 +1014,7 @@ function RecipeDetail({
               unresolved={report.unresolved}
             />
             <p className="text-xs text-ink-500 mt-2">
-              Bars are one serving against {PEOPLE.find((p) => p.id === viewingAs)?.name}
-              &rsquo;s day, not against the recipe.
+              Bars are one serving against a day&rsquo;s target, not against the recipe.
             </p>
           </div>
 

@@ -7,7 +7,6 @@ import {
 import { useMealPlanStore, today as todayDate } from '../store/useMealPlanStore'
 import { useThisWeek } from '../store/useThisWeek'
 import { useUserStore } from '../store/useUserStore'
-import { targetsFor } from '../store/useUserStore'
 import { useUiStore } from '../store/useUiStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { useAuthStore } from '../store/useAuth'
@@ -59,7 +58,7 @@ export default function Home() {
   const sessions = useCookStore((s) => s.sessions)
   const { profile } = useUserStore()
   const viewingAs = useUiStore((s) => s.viewingAs)
-  const targets = targetsFor(profile, viewingAs)
+  const targets = profile.targets
   const portions = useAvailablePortions()
   const groceryItems = useMealPlanStore((s) => s.groceryItems)
   const pantry = usePantry()

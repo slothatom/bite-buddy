@@ -3,7 +3,6 @@ import { Plus } from 'lucide-react'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { useThisWeek } from '../store/useThisWeek'
 import { useUserStore } from '../store/useUserStore'
-import { targetsFor } from '../store/useUserStore'
 import { useUiStore } from '../store/useUiStore'
 import {
   useBodyStore, useWeightFor, useMeasurementsFor, useUnassignedCount,
@@ -77,7 +76,7 @@ function WeekTab() {
   const weekDates = useThisWeek()
   const { profile } = useUserStore()
   const viewingAs = useUiStore((s) => s.viewingAs)
-  const targets = targetsFor(profile, viewingAs)
+  const targets = profile.targets
   const ctx = useNutritionContext()
 
   // The week on screen, not every day the app has ever held. Under a tab
