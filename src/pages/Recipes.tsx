@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useDialog } from '../lib/useDialog'
+import { readAmount, MOST } from '../lib/amounts'
 import { Link, useSearchParams } from 'react-router-dom'
 import WhenPicker from '../components/planner/WhenPicker'
 import { slotNow } from '../lib/whenDates'
@@ -796,6 +797,11 @@ function RecipeDetail({
    * so the per-serving figures above are left alone and the quantities below
    * follow the number you set. Scaling the per-serving numbers as well is the
    * mistake worth avoiding, it would say a double batch is twice as filling.
+   *
+   * And it stops here. This used to be handed to "Put it in a day" as the
+   * amount eaten, so cooking three portions booked all three against one lunch
+   * and the day read 790 kcal. Cooking three and eating one is the ordinary
+   * case; the dialog asks its own question now and starts at one.
    */
   const [wanted, setWanted] = useState(recipe.servings)
   const [planning, setPlanning] = useState(false)
@@ -1111,7 +1117,7 @@ function RecipeDetail({
           {planning && (
             <PlanIntoDay
               recipe={recipe}
-              servings={wanted}
+              cooking={wanted}
               onClose={() => setPlanning(false)}
             />
           )}
@@ -1136,17 +1142,30 @@ function RecipeDetail({
  * planner, find the day, search for the same dish again. Five steps to act on
  * a decision you had already made.
  *
- * The days offered are the week on screen in the planner, and the servings are
- * whatever the sheet was scaled to, so scaling a recipe to feed four and then
- * planning it keeps the four rather than silently going back to one.
+ * How much you cook and how much you eat are two different numbers.
+ *
+ * The sheet's scaler was handed straight to the planner, so scaling a recipe
+ * to three and planning it booked three servings against that day: 790 kcal
+ * for a lunch, flagged "slightly over", exactly three times the per-serving
+ * figures. But the sheet says "the whole lot comes to 789 kcal, and a serving
+ * is unchanged", which is the scaler describing a pot rather than a plate.
+ * Both cannot be right, and the pot is the one that matches what people do:
+ * you cook three portions on Sunday and eat one of them.
+ *
+ * So `cooking` is what the sheet was scaled to and only ever informs the copy,
+ * and `eating` is what goes in the day, starting at one. Planning two portions
+ * of something small is still a real thing to want, so it is a control rather
+ * than a constant, but it starts where the honest default is.
  */
 function PlanIntoDay({
-  recipe, servings, onClose,
+  recipe, cooking, onClose,
 }: {
   recipe: Recipe
-  servings: number
+  /** What the sheet was scaled to: how many portions this makes. */
+  cooking: number
   onClose: () => void
 }) {
+  const [eating, setEating] = useState(1)
   const { plan, addEntry } = useMealPlanStore()
   const panel = useDialog<HTMLDivElement>(onClose)
   const [date, setDate] = useState(todayDate)
@@ -1187,18 +1206,46 @@ function PlanIntoDay({
               heading, which is the line this dialog had to wrap over three
               of. */}
           {recipe.variant ? `${recipe.variant}. ` : ''}
-          {servings === 1 ? 'One serving' : `${servings} servings`}, on a day of your choosing.
+          On a day of your choosing.
         </p>
 
         <WhenPicker date={date} onDate={setDate} slot={slot} onSlot={setSlot} busy={busy} />
 
-        <div className="mt-5" />
+        <div className="mt-5">
+          <label className="label" htmlFor="eating">How much are you eating</label>
+          <div className="flex items-center gap-2">
+            <input
+              id="eating"
+              type="number"
+              min={0.25}
+              max={MOST.servings}
+              step={0.25}
+              className="input w-24"
+              value={eating}
+              onChange={(e) => setEating(readAmount(e.target.value, {
+                min: 0.25, max: MOST.servings, places: 2,
+              }))}
+            />
+            <span className="text-sm text-ink-700">
+              {eating === 1 ? 'serving' : 'servings'}
+            </span>
+          </div>
+          <p className="text-xs text-ink-500 mt-1">
+            {/* The other half of the answer, where the two numbers differ. The
+                app has somewhere for leftovers to live, and saying so here is
+                what stops "I scaled it to three" reading as "I ate three". */}
+            {cooking > eating
+              ? `You scaled this to ${cooking}. Only what you eat goes in the day; `
+                + `the rest is leftovers, and the cook schedule can hold them.`
+              : 'What goes in the day, not how much you cook.'}
+          </p>
+        </div>
 
         <div className="flex gap-2">
           <button
             className="btn-primary flex-1"
             onClick={() => {
-              addEntry(date, slot, { kind: 'recipe', recipeId: recipe.id, servings })
+              addEntry(date, slot, { kind: 'recipe', recipeId: recipe.id, servings: eating })
               onClose()
             }}
           >

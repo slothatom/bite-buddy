@@ -2481,3 +2481,26 @@ test.describe('after dark', () => {
       .toHaveAttribute('content', '#17130f')
   })
 })
+
+test.describe('cooking three and eating one', () => {
+  test('scaling a recipe does not book the whole pot against a day', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: /^Dinner/ }).click()
+    await page.locator('[data-recipe-card]').first().click()
+
+    // Cook three. The sheet has always called this "how many you are cooking",
+    // and it used to be handed to the planner as how many you were eating, so
+    // one lunch was booked at three times its per-serving figures.
+    const more = page.getByRole('button', { name: 'One serving more' })
+    await more.click()
+    await more.click()
+    await expect(page.getByText(/3 servings/)).toBeVisible()
+
+    await page.getByRole('button', { name: /Put it in a day/i }).first().click()
+
+    // The dialog asks its own question, and starts where the honest answer is.
+    const eating = page.getByLabel('How much are you eating')
+    await expect(eating).toHaveValue('1')
+    await expect(page.getByText(/You scaled this to 3/)).toBeVisible()
+  })
+})
