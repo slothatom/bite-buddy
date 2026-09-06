@@ -1082,6 +1082,9 @@ test.describe('the food library', () => {
     for (const _ of [1, 2]) {
       await page.getByRole('button', { name: 'Add food' }).click()
       await page.getByLabel('Name (English)').fill('Test kefir')
+      // A category has to be chosen. The form used to default to Vegetables,
+      // which is how a camembert ended up filed under it on a shopping list.
+      await page.getByLabel('Category').selectOption('dairy')
       await page.getByRole('button', { name: 'Save food' }).click()
     }
 
@@ -2652,5 +2655,29 @@ test.describe('how it is going', () => {
     // other filter does not. One food means one category, so no filter row
     // is drawn; the tally itself is the thing under test here.
     await expect(page.getByText(/\d+ days/).first()).toBeVisible()
+  })
+})
+
+test.describe('a food is filed where you put it', () => {
+  test('will not save until a category is chosen', async ({ page }) => {
+    // The draft used to start as Vegetables, and a lookup fills the name and
+    // the macros while knowing nothing about the category, so scanning a
+    // barcode was the fastest way to mis-file something. A camembert sat under
+    // Vegetables on the shopping list for as long as it existed.
+    await goto(page, '/foods')
+    await page.getByRole('button', { name: 'Add food' }).click()
+    await page.getByLabel('Name (English)').fill('Test camembert')
+
+    const save = page.getByRole('button', { name: 'Save food' })
+    await expect(save).toBeDisabled()
+    await expect(page.getByLabel('Category')).toHaveValue('')
+
+    await page.getByLabel('Category').selectOption('dairy')
+    await expect(save).toBeEnabled()
+    await save.click()
+
+    // Under Dairy, where it was put, and nowhere near the vegetables.
+    await page.getByPlaceholder(/Search/).first().fill('Test camembert')
+    await expect(page.getByText('Test camembert').first()).toBeVisible()
   })
 })

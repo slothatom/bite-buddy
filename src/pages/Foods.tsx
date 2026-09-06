@@ -266,7 +266,12 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
 
   const [draft, setDraft] = useState({
     en: '', ro: '', hu: '',
-    category: 'vegetables' as MedCategory,
+    // No default. A guess here is filed under a heading nobody chose, and it
+    // sticks: a camembert added without touching this select sat under
+    // Vegetables on the shopping list for as long as it existed. A lookup
+    // fills the name and the macros and knows nothing about the category, so
+    // scanning a barcode used to be the fastest way to mis-file something.
+    category: null as MedCategory | null,
     medTier: 'daily' as MedTier,
     calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0,
   })
@@ -308,7 +313,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
   }
 
   function save() {
-    if (!draft.en.trim()) return
+    if (!draft.en.trim() || !draft.category) return
 
     // Whatever the source knew is kept, not just the fields on the form: a
     // micronutrient it reported is worth storing even though nothing here shows
@@ -449,9 +454,12 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="label">Category</label>
-                  <select className="input" value={draft.category}
-                    onChange={(e) => setDraft({ ...draft, category: e.target.value as MedCategory })}>
+                  <label className="label" htmlFor="food-category">Category</label>
+                  <select id="food-category" className="input" value={draft.category ?? ''}
+                    onChange={(e) => setDraft({
+                      ...draft, category: (e.target.value || null) as MedCategory | null,
+                    })}>
+                    <option value="">Choose one</option>
                     {CATEGORY_ORDER.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
                   </select>
                 </div>
@@ -524,7 +532,7 @@ function AddFoodModal({ onClose }: { onClose: () => void }) {
                 </div>
               )}
 
-              <button className="btn-primary w-full" onClick={save} disabled={!draft.en.trim()}>
+              <button className="btn-primary w-full" onClick={save} disabled={!draft.en.trim() || !draft.category}>
                 Save food
               </button>
             </div>

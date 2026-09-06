@@ -17,7 +17,19 @@ export interface Amount {
   text?: string
 }
 
-const WEIGHT = /^\s*([\d.,]+)\s*(kg|g|kilos?|kilograms?|grams?)?\s*$/i
+/*
+ * A weight has to say it is one.
+ *
+ * The unit used to be optional and defaulted to grams, so typing `1` into the
+ * amount box next to "Vanilla Milk" produced one gram of vanilla milk. Nobody
+ * shopping has ever meant that. A bare number is a count of the thing, and a
+ * count is what the placeholder has always suggested.
+ *
+ * Guessing from the size of the number was the other option and it is worse:
+ * a threshold that reads 500 as grams and 2 as packs is a rule nobody can see,
+ * and it would be wrong about 200 eggs and 2 kg of flour in the same list.
+ */
+const WEIGHT = /^\s*([\d.,]+)\s*(kg|g|kilos?|kilograms?|grams?)\s*$/i
 
 export function parseAmount(input: string): Amount {
   const trimmed = input.trim()
@@ -29,7 +41,7 @@ export function parseAmount(input: string): Amount {
   const value = Number(match[1].replace(',', '.'))
   if (!Number.isFinite(value) || value < 0) return { text: trimmed }
 
-  const unit = (match[2] ?? 'g').toLowerCase()
+  const unit = match[2].toLowerCase()
   const grams = unit.startsWith('k') ? value * 1000 : value
   return { grams: Math.round(grams) }
 }
