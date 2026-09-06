@@ -17,10 +17,11 @@ import { scoreWeek, scoreGaps, servingCount, IMPLAUSIBLE_RATIO } from '../lib/me
 import { STATUS_STYLES, targetStatus } from '../lib/status'
 import { EmptyState, SectionHeading } from '../components/ui'
 import { useMovementAcross } from '../store/useActivityStore'
+import TrendsTab from '../components/trends/TrendsTab'
 import type { DayMovement } from '../lib/movement'
 import { fromKg, inUnit, round1, toKg } from '../lib/weight'
 
-type Tab = 'week' | 'mediterranean' | 'body'
+type Tab = 'week' | 'trends' | 'mediterranean' | 'body'
 
 export default function Analytics() {
   const [tab, setTab] = useState<Tab>('week')
@@ -30,18 +31,25 @@ export default function Analytics() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header>
           <h1 className="display text-xl sm:text-2xl text-ink-900">Progress</h1>
-          <p className="text-sm text-ink-700">How your week is shaping up.</p>
+          <p className="text-sm text-ink-700">How your week is shaping up, and how it is going.</p>
         </header>
 
         {/* Announced as tabs, like every other strip in the app. These were
             plain buttons, so nothing told a screen reader they were a set or
             which one was current. */}
-        <div
-          className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit"
-          role="tablist"
-          aria-label="What to show"
-        >
-          {([['week', 'This week'], ['mediterranean', 'Mediterranean'], ['body', 'Body']] as const).map(([k, label]) => (
+        {/* Scrolls rather than squashing: four tabs at 331 px is narrower than
+            the words on them, and a tab strip that truncates its own labels is
+            a strip you have to guess at. */}
+        <div className="-mx-4 px-4 overflow-x-auto">
+          <div
+            className="flex gap-1 p-1 bg-cream-50 rounded-xl w-max"
+            role="tablist"
+            aria-label="What to show"
+          >
+          {([
+            ['week', 'This week'], ['trends', 'Trends'],
+            ['mediterranean', 'Mediterranean'], ['body', 'Body'],
+          ] as const).map(([k, label]) => (
             <button
               key={k}
               role="tab"
@@ -52,9 +60,11 @@ export default function Analytics() {
               {label}
             </button>
           ))}
+          </div>
         </div>
 
         {tab === 'week' && <WeekTab />}
+        {tab === 'trends' && <TrendsTab />}
         {tab === 'mediterranean' && <MediterraneanTab />}
         {tab === 'body' && <BodyTab />}
       </div>
