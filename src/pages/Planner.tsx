@@ -387,6 +387,7 @@ export default function Planner() {
             onExpand={setExpandedDay}
             onOpenDay={(date) => { setChosen(date); setRange('day') }}
             onOpenSlot={(date, slot) => setSheet({ date, slot })}
+            onAddTo={(date, slot) => setAdding({ date, slot })}
           />
         )}
 
@@ -580,7 +581,7 @@ export default function Planner() {
  * their full names, on one line each, for as long as you are reading it.
  */
 function WeekGrid({
-  dates, byDate, kcalByDate, selected, expanded, onExpand, onOpenDay, onOpenSlot,
+  dates, byDate, kcalByDate, selected, expanded, onExpand, onOpenDay, onOpenSlot, onAddTo,
 }: {
   dates: string[]
   byDate: Map<string, DayPlan>
@@ -591,6 +592,8 @@ function WeekGrid({
   onExpand: (date: string | null) => void
   onOpenDay: (date: string) => void
   onOpenSlot: (date: string, slot: MealSlot) => void
+  /** An empty slot goes straight to the picker, rather than to an empty panel. */
+  onAddTo: (date: string, slot: MealSlot) => void
 }) {
   const ctx = useNutritionContext()
   const now = today()
@@ -660,7 +663,9 @@ function WeekGrid({
                   <MealCell
                     key={slot}
                     date={date} slot={slot} day={day} ctx={ctx}
-                    full onOpen={() => onOpenSlot(date, slot)}
+                    full
+                    onOpen={() => onOpenSlot(date, slot)}
+                    onAdd={() => onAddTo(date, slot)}
                   />
                 ))}
                 <button
@@ -677,6 +682,7 @@ function WeekGrid({
                   key={slot}
                   date={date} slot={slot} day={day} ctx={ctx}
                   onOpen={() => onOpenSlot(date, slot)}
+                  onAdd={() => onAddTo(date, slot)}
                 />
               ))
             )}
@@ -699,7 +705,7 @@ const DAY_COLUMNS = '2.5rem repeat(5, minmax(0, 1fr))'
  * you can fill rather than as a rendering fault.
  */
 function MealCell({
-  date, slot, day, ctx, full = false, onOpen,
+  date, slot, day, ctx, full = false, onOpen, onAdd,
 }: {
   date: string
   slot: MealSlot
@@ -707,14 +713,18 @@ function MealCell({
   ctx: NutritionContext
   full?: boolean
   onOpen: () => void
+  onAdd: () => void
 }) {
   const meals = day?.meals.filter((m) => m.slot === slot) ?? []
 
   if (!meals.length) {
     return (
+      // Straight to the picker. Opening an empty panel first, so you could
+      // press "Pop something in" inside it, was two taps to reach a thing the
+      // cell already says it does.
       <button
         type="button"
-        onClick={onOpen}
+        onClick={onAdd}
         aria-label={`Add something to ${SLOT_LABELS[slot]} on ${formatDate(date)}`}
         className={`rounded-lg border border-dashed border-border-200 text-ink-300
                     hover:border-bite-400 hover:text-bite-700 flex items-center justify-center
