@@ -44,7 +44,8 @@ describe('getWeekDates', () => {
 })
 
 describe('getRangeDates', () => {
-  it('gives seven days for a week and fourteen for a fortnight', () => {
+  it('gives one day, seven, or fourteen, counting from the start', () => {
+    expect(getRangeDates('2026-08-10', 'day')).toEqual(['2026-08-10'])
     expect(getRangeDates('2026-08-10', 'week')).toHaveLength(7)
 
     const fortnight = getRangeDates('2026-08-10', 'fortnight')
@@ -53,9 +54,10 @@ describe('getRangeDates', () => {
     expect(fortnight[13]).toBe('2026-08-23')
   })
 
-  it('follows the week start you chose', () => {
-    // Wednesday, the day every one of the dietician's plans begins on.
-    expect(getRangeDates('2026-08-12', 'fortnight', 3)[0]).toBe('2026-08-12')
+  it('starts wherever the window starts', () => {
+    // Wednesday, the day every one of the dietician's plans begins on. The
+    // window decides where a week starts; this only counts forward from it.
+    expect(getRangeDates('2026-08-12', 'fortnight')[0]).toBe('2026-08-12')
   })
 })
 

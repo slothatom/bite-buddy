@@ -7,7 +7,7 @@ import {
 import type { Component, DayPlan, MealOutcome, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import {
-  useMealPlanStore, getWeekDates, getRangeDates, today,
+  useMealPlanStore, getWeekDates, getRangeDates, addDays, today,
   RANGE_LABELS, type PlanRange,
 } from '../store/useMealPlanStore'
 import { useDeletedIds } from '../store/useRecipeStore'
@@ -15,6 +15,7 @@ import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import {
   componentsNutrients, dayEaten, dayProgress, dayLabel, weekEaten, emptyNutrients, addNutrients, reportDay,
+  type NutritionContext,
 } from '../lib/nutrition'
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
 import { useUiStore } from '../store/useUiStore'
@@ -63,8 +64,14 @@ export default function Planner() {
   const [adding, setAdding] = useState<{ date: string; slot: MealSlot } | null>(null)
   const [copyFrom, setCopyFrom] = useState<string | null>(null)
   const [templating, setTemplating] = useState(false)
-  const [amount, setAmount] = useState<{ mealId: string; index: number } | null>(null)
+  // Carries its date, because a meal can now be opened from any day in the
+  // grid rather than only from the one the day view had selected.
+  const [amount, setAmount] = useState<{ date: string; mealId: string; index: number } | null>(null)
   const [clearing, setClearing] = useState(false)
+  /** The one day showing full meal names in the grid, if any. */
+  const [expandedDay, setExpandedDay] = useState<string | null>(null)
+  /** The meal opened from the grid, edited over the week rather than in it. */
+  const [sheet, setSheet] = useState<{ date: string; slot: MealSlot } | null>(null)
   const [moving, setMoving] = useState<{ date: string; mealId: string } | null>(null)
   const [filling, setFilling] = useState<string[] | null>(null)
   const { quickAdd, clearQuickAdd } = useUiStore()
@@ -147,15 +154,29 @@ export default function Planner() {
    * The days on screen. A week, a fortnight, or the calendar month padded out
    * to whole weeks.
    */
-  const dates = useMemo(
-    () => getRangeDates(weekDates[0], range, profile.weekStartsOn),
-    [weekDates, range, profile.weekStartsOn],
+  /*
+   * The window you are stepping through, and the days actually drawn.
+   *
+   * They are the same thing for a week and a fortnight. A day view still moves
+   * through weeks underneath, because the arrows and "Today" have to land
+   * somewhere and a week is the thing the rest of the app is arranged around;
+   * only what is drawn narrows to one date.
+   */
+  const windowRange: PlanRange = range === 'day' ? 'week' : range
+  const windowDates = useMemo(
+    () => getRangeDates(weekDates[0], windowRange),
+    [weekDates, windowRange],
   )
 
   // The button first, then whatever you tapped, then today if it is on screen.
   const selected = quickAdd
-    ?? (chosen && dates.includes(chosen) ? chosen : null)
-    ?? todayOrFirst(dates)
+    ?? (chosen && windowDates.includes(chosen) ? chosen : null)
+    ?? todayOrFirst(windowDates)
+
+  const dates = useMemo(
+    () => (range === 'day' ? [selected] : windowDates),
+    [range, selected, windowDates],
+  )
   const selectedDay = byDate.get(selected) ?? { date: selected, meals: [] }
   // Once anything on the day has been ticked this is a record rather than an
   // intention, and the ring says which. A ring built on the plan looked like a
@@ -199,13 +220,21 @@ export default function Planner() {
    * before this one. But the count underneath "AUGUST 2026" read "1 of 42 days
    * planned", claiming five days of July and six of September as August's.
    */
-  const counted = dates
+  /*
+   * The window, not the view.
+   *
+   * "31 Aug to 6 Sept, 7 of 7 days planned" is a fact about the week you are
+   * standing in, and it stays true and useful while you look at one day of it.
+   * Narrowing it to "1 of 1" would be arithmetic about the thing you are
+   * already looking at.
+   */
+  const counted = windowDates
 
   const shownDays = useMemo(
     () => counted.map((date) => byDate.get(date)).filter((d): d is DayPlan => Boolean(d)),
     [counted, byDate],
   )
-  const reading = useMemo(() => weekEaten(dates, plan, ctx), [dates, plan, ctx])
+  const reading = useMemo(() => weekEaten(windowDates, plan, ctx), [windowDates, plan, ctx])
   const kcalByDate = useMemo(
     () => new Map(reading.days.map((d) => [d.date, d.nutrients.calories])),
     [reading],
@@ -249,25 +278,37 @@ export default function Planner() {
    * this component, so it belongs in an effect and the selection does not.
    */
   useEffect(() => {
-    if (quickAdd && !dates.includes(quickAdd)) {
+    if (quickAdd && !windowDates.includes(quickAdd)) {
       goToWeek(new Date(quickAdd + 'T12:00:00'), profile.weekStartsOn)
     }
-  }, [quickAdd, dates, goToWeek, profile.weekStartsOn])
+  }, [quickAdd, windowDates, goToWeek, profile.weekStartsOn])
 
   function closeAdd() {
     setAdding(null)
     clearQuickAdd()
   }
 
-  /** Steps by whatever you are looking at: a week or a fortnight. */
+  /**
+   * Steps by whatever you are looking at.
+   *
+   * A day at a time in the day view, which is the only reading of an arrow
+   * there: stepping a whole week from a screen showing Tuesday would land you
+   * on a Tuesday you did not ask for. The week comes along when the new day
+   * falls outside it.
+   */
   function shift(direction: -1 | 1) {
+    if (range === 'day') {
+      const next = addDays(selected, direction)
+      setChosen(next)
+      if (!windowDates.includes(next)) goToWeek(new Date(next + 'T12:00:00'), profile.weekStartsOn)
+      return
+    }
+
     const ref = new Date(weekDates[0] + 'T12:00:00')
     ref.setDate(ref.getDate() + direction * (range === 'fortnight' ? 14 : 7))
 
     goToWeek(ref, profile.weekStartsOn)
-    setChosen(getRangeDates(
-      getWeekDates(ref, profile.weekStartsOn)[0], range, profile.weekStartsOn,
-    )[0])
+    setChosen(getRangeDates(getWeekDates(ref, profile.weekStartsOn)[0], range)[0])
   }
 
   return (
@@ -281,7 +322,7 @@ export default function Planner() {
               Your week
             </h1>
             <p className="text-sm text-ink-700">
-              {formatRange(dates)} · {plannedDays} of {counted.length} days planned
+              {formatRange(windowDates)} · {plannedDays} of {counted.length} days planned
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -324,36 +365,35 @@ export default function Planner() {
             <Bookmark size={15} /> Saved weeks
           </button>
 
-        </div>
-
-        {/* The days themselves, seven to a row however many there are. The
-            weekday letters only appear once a grid is more than one row, where
-            reading down a column is the point. */}
-        <div className="space-y-1.5 sm:space-y-2">
-          {dates.length > 7 && (
-            <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
-              {dates.slice(0, 7).map((date) => (
-                <div key={date} className="text-center text-[11px] font-bold uppercase tracking-wide text-ink-500">
-                  {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })}
-                </div>
-              ))}
-            </div>
+          {/* Range scoped, so it sits with the range. In the day view it is on
+              the day's own toolbar below, acting on that day alone. */}
+          {range !== 'day' && (
+            <button className="btn-secondary" onClick={() => setFilling(dates)}>
+              <Sparkles size={15} /> Fill the gaps
+            </button>
           )}
-          <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
-            {dates.map((date) => (
-              <DayCell
-                key={date}
-                date={date}
-                kcal={kcalByDate.get(date) ?? 0}
-                selected={date === selected}
-                showWeekday={dates.length <= 7}
-                onSelect={() => setChosen(date)}
-              />
-            ))}
-          </div>
         </div>
 
-        {/* Day totals */}
+        {/* Every meal in the range, or the one day in detail. The week view
+            used to be seven cells holding a calorie number, with a single
+            day's food underneath, so it never actually showed a week. */}
+        {range !== 'day' && (
+          <WeekGrid
+            dates={dates}
+            byDate={byDate}
+            kcalByDate={kcalByDate}
+            selected={selected}
+            expanded={expandedDay}
+            onExpand={setExpandedDay}
+            onOpenDay={(date) => { setChosen(date); setRange('day') }}
+            onOpenSlot={(date, slot) => setSheet({ date, slot })}
+          />
+        )}
+
+        {/* The day in detail, only in the day view. In a week view it was the
+            whole content of the screen and the reason a week was never on it. */}
+        {range === 'day' && (
+        <>
         <section className="card p-5">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <CalorieRing value={selectedTotals.calories} target={targets.calories} />
@@ -425,11 +465,13 @@ export default function Planner() {
                 onRemove={(mealId) => removeMealReturningPortions(selected, mealId)}
                 onMove={(mealId) => setMoving({ date: selected, mealId })}
                 onOutcome={(mealId, outcome) => setMealOutcome(selected, mealId, outcome)}
-                onAmount={(mealId, index) => setAmount({ mealId, index })}
+                onAmount={(mealId, index) => setAmount({ date: selected, mealId, index })}
               />
             ))}
           </div>
         </section>
+        </>
+        )}
 
         {/* Week summary */}
         <section className="card-soft p-4 flex items-center gap-3 text-sm text-ink-700">
@@ -488,14 +530,28 @@ export default function Planner() {
 
       {amount && (
         <AmountDialog
-          day={selectedDay}
+          day={byDate.get(amount.date) ?? { date: amount.date, meals: [] }}
           mealId={amount.mealId}
           index={amount.index}
           onClose={() => setAmount(null)}
           onSet={(value) => {
-            changeAmountKeepingPortions(selected, amount.mealId, amount.index, value)
+            changeAmountKeepingPortions(amount.date, amount.mealId, amount.index, value)
             setAmount(null)
           }}
+        />
+      )}
+
+      {sheet && (
+        <MealSheet
+          date={sheet.date}
+          slot={sheet.slot}
+          day={byDate.get(sheet.date) ?? { date: sheet.date, meals: [] }}
+          onClose={() => setSheet(null)}
+          onAdd={() => { setAdding({ date: sheet.date, slot: sheet.slot }); setSheet(null) }}
+          onRemove={(mealId) => removeMealReturningPortions(sheet.date, mealId)}
+          onMove={(mealId) => { setMoving({ date: sheet.date, mealId }); setSheet(null) }}
+          onOutcome={(mealId, outcome) => setMealOutcome(sheet.date, mealId, outcome)}
+          onAmount={(mealId, index) => { setAmount({ date: sheet.date, mealId, index }); setSheet(null) }}
         />
       )}
 
@@ -506,6 +562,275 @@ export default function Planner() {
           onPick={(to) => { copyDay(copyFrom, to); setCopyFrom(null) }}
         />
       )}
+    </div>
+  )
+}
+
+/**
+ * A fortnight of food, as day rows and slot columns.
+ *
+ * The planner used to draw a strip of seven cells holding a calorie number and
+ * nothing else, with one day's meals underneath it, so the week view never
+ * actually showed a week. This shows every meal in the range at once.
+ *
+ * Days run down and slots run across, which is the one arrangement that fits a
+ * phone without scrolling sideways: six columns at 390px rather than eight.
+ * The cost is width, about 60px a cell, and most of the dietician's recipes are
+ * named in six words. So a row opens: tap the date and that day gives its meals
+ * their full names, on one line each, for as long as you are reading it.
+ */
+function WeekGrid({
+  dates, byDate, kcalByDate, selected, expanded, onExpand, onOpenDay, onOpenSlot,
+}: {
+  dates: string[]
+  byDate: Map<string, DayPlan>
+  kcalByDate: Map<string, number>
+  selected: string
+  /** The one day showing full names, if any. */
+  expanded: string | null
+  onExpand: (date: string | null) => void
+  onOpenDay: (date: string) => void
+  onOpenSlot: (date: string, slot: MealSlot) => void
+}) {
+  const ctx = useNutritionContext()
+  const now = today()
+
+  return (
+    <div className="space-y-1.5">
+      {/* The slot names once, at the top. Hidden from a screen reader because
+          every cell below already says which slot it is in its own label; a
+          visual header row is for eyes following a column. */}
+      <div className="grid gap-1 sm:gap-1.5 px-0.5" style={{ gridTemplateColumns: DAY_COLUMNS }} aria-hidden="true">
+        <span />
+        {MEAL_SLOTS.map((slot) => (
+          <span key={slot} className="text-center text-[9px] sm:text-[10px] font-bold uppercase tracking-wide text-ink-500 truncate">
+            {SLOT_LABELS[slot]}
+          </span>
+        ))}
+      </div>
+
+      {dates.map((date) => {
+        const day = byDate.get(date)
+        const open = expanded === date
+        const past = date < now
+
+        return (
+          <div
+            key={date}
+            data-day-row={date}
+            className={`grid gap-1 sm:gap-1.5 items-stretch rounded-xl p-0.5
+                        ${date === selected ? 'bg-bite-50' : ''}`}
+            style={{ gridTemplateColumns: open ? '1fr' : DAY_COLUMNS }}
+          >
+            {/* The date, and the handle that opens the row. */}
+            <button
+              type="button"
+              onClick={() => onExpand(open ? null : date)}
+              aria-expanded={open}
+              aria-label={`${formatDate(date)}, ${Math.round(kcalByDate.get(date) ?? 0)} kcal. ${
+                open ? 'Hide the full names' : 'Show the full names'}`}
+              className={`flex rounded-lg px-1 py-1.5 text-left
+                          ${open ? 'items-baseline gap-2' : 'flex-col justify-center'}
+                          ${date === now ? 'bg-bite-500 text-white' : 'bg-cream-50 text-ink-900'}
+                          ${past && date !== now ? 'opacity-60' : ''}`}
+            >
+              {/* Today inherits the button's own colour rather than naming
+                  one. A colour named here has its ground on the parent, so
+                  nothing can tell what it sits on, and `bite-100` on the app's
+                  dark ground is 1.34:1 if anything ever reads it that way. */}
+              <span className={`text-[9px] font-bold uppercase tracking-wide
+                                ${date === now ? 'opacity-80' : 'text-ink-500'}`}>
+                {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })}
+              </span>
+              <span className="text-sm font-extrabold leading-none">
+                {new Date(date + 'T12:00:00').getDate()}
+              </span>
+              {open && (
+                <span className={`ml-auto text-[10px] font-mono
+                                  ${date === now ? 'opacity-80' : 'text-ink-500'}`}>
+                  {Math.round(kcalByDate.get(date) ?? 0)} kcal
+                </span>
+              )}
+            </button>
+
+            {open ? (
+              // Opened: one slot a line, full names, and a way into the day.
+              <div className="space-y-1 pb-1">
+                {MEAL_SLOTS.map((slot) => (
+                  <MealCell
+                    key={slot}
+                    date={date} slot={slot} day={day} ctx={ctx}
+                    full onOpen={() => onOpenSlot(date, slot)}
+                  />
+                ))}
+                <button
+                  type="button"
+                  onClick={() => onOpenDay(date)}
+                  className="text-xs font-bold text-bite-700 hover:underline px-1 min-h-11"
+                >
+                  Open {formatDate(date)}
+                </button>
+              </div>
+            ) : (
+              MEAL_SLOTS.map((slot) => (
+                <MealCell
+                  key={slot}
+                  date={date} slot={slot} day={day} ctx={ctx}
+                  onOpen={() => onOpenSlot(date, slot)}
+                />
+              ))
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/** The day column, then the five slots. Narrow enough for a phone. */
+const DAY_COLUMNS = '2.5rem repeat(5, minmax(0, 1fr))'
+
+/**
+ * One day's one slot, as the grid draws it.
+ *
+ * A meal that was ticked carries the tick as well as its colour, because
+ * nothing in this app is allowed to say something in hue alone. An empty slot
+ * is a dashed outline rather than a blank, so a gap in a week reads as a gap
+ * you can fill rather than as a rendering fault.
+ */
+function MealCell({
+  date, slot, day, ctx, full = false, onOpen,
+}: {
+  date: string
+  slot: MealSlot
+  day: DayPlan | undefined
+  ctx: NutritionContext
+  full?: boolean
+  onOpen: () => void
+}) {
+  const meals = day?.meals.filter((m) => m.slot === slot) ?? []
+
+  if (!meals.length) {
+    return (
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`Add something to ${SLOT_LABELS[slot]} on ${formatDate(date)}`}
+        className={`rounded-lg border border-dashed border-border-200 text-ink-300
+                    hover:border-bite-400 hover:text-bite-700 flex items-center justify-center
+                    ${full ? 'w-full py-1.5 text-xs gap-1' : 'min-h-11 text-xs'}`}
+      >
+        <Plus size={13} />{full && <span className="text-ink-500">{SLOT_LABELS[slot]}</span>}
+      </button>
+    )
+  }
+
+  const eaten = meals.every((m) => m.outcome === 'eaten')
+  const skipped = meals.every((m) => m.outcome === 'skipped')
+  const name = entriesName(meals.flatMap((m) => m.entries), ctx)
+
+  return (
+    <button
+      type="button"
+      data-planned
+      onClick={onOpen}
+      aria-label={`${SLOT_LABELS[slot]} on ${formatDate(date)}: ${name}${
+        eaten ? ', eaten' : skipped ? ', skipped' : ', planned'}`}
+      className={`relative rounded-lg px-1 py-1 text-left leading-tight border
+                  ${eaten ? 'bg-teal-50 border-teal-200' : 'bg-cream-50 border-transparent'}
+                  ${skipped ? 'opacity-55' : ''}
+                  hover:border-bite-400
+                  ${full ? 'w-full flex items-center gap-1.5' : 'min-h-11 block'}`}
+    >
+      {/* Out of the text's way in the narrow view. A column is sixty pixels
+          and the tick was taking fifteen of them, which left "Chicken" too
+          little room to sit on a line and had it breaking mid-word. */}
+      {eaten && (
+        <Check
+          size={11}
+          aria-hidden="true"
+          className={`text-teal-700 ${full ? 'shrink-0' : 'absolute top-0.5 right-0.5'}`}
+        />
+      )}
+      <span
+        className={`block min-w-0 text-[10px] sm:text-[11px] text-ink-900
+                    ${skipped ? 'line-through' : ''}
+                    ${full ? 'flex-1 truncate' : 'line-clamp-3 break-words'}
+                    ${!full && eaten ? 'pr-2.5' : ''}`}
+      >
+        {full ? name : shortName(name)}
+      </span>
+    </button>
+  )
+}
+
+/**
+ * As much of a name as sixty pixels can hold.
+ *
+ * The dietician writes "Roasted vegetables with salmon & yogurt garlic sauce",
+ * and the part that identifies it is at the front. Cutting at the first "with"
+ * or "&" keeps the dish and drops the accompaniments, which is what somebody
+ * scanning a week is looking for. The whole thing is one tap away on the date.
+ */
+function shortName(name: string): string {
+  return name.split(/\s+(?:with|and|&)\s+/i)[0].split(',')[0]
+}
+
+/**
+ * One meal, opened over the week rather than instead of it.
+ *
+ * Tapping a meal in the grid used to be the moment you lost your place: the
+ * only editor was the day view, so seeing what Thursday's lunch was meant
+ * leaving the week you were reading. This is the same `SlotRow` the day view
+ * draws, in a panel, so there is one set of controls rather than two that
+ * drift apart.
+ */
+function MealSheet({
+  date, slot, day, onClose, onAdd, onRemove, onMove, onOutcome, onAmount,
+}: {
+  date: string
+  slot: MealSlot
+  day: DayPlan
+  onClose: () => void
+  onAdd: () => void
+  onRemove: (mealId: string) => void
+  onMove: (mealId: string) => void
+  onOutcome: (mealId: string, outcome: MealOutcome | undefined) => void
+  onAmount: (mealId: string, index: number) => void
+}) {
+  const panel = useDialog<HTMLDivElement>(onClose)
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs sm:p-4"
+      onClick={onClose}
+    >
+      <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${SLOT_LABELS[slot]} on ${formatDate(date)}`}
+        className="bg-paper w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-4 shadow-xl
+                   max-h-[85vh] overflow-y-auto pb-[calc(1rem+env(safe-area-inset-bottom))]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-baseline justify-between gap-3 mb-3">
+          <h3 className="font-bold text-ink-900">{formatDate(date)}</h3>
+          <button className="btn-ghost btn-icon text-ink-500" onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </button>
+        </div>
+
+        <SlotRow
+          slot={slot}
+          day={day}
+          onAdd={onAdd}
+          onRemove={onRemove}
+          onMove={onMove}
+          onOutcome={onOutcome}
+          onAmount={onAmount}
+        />
+      </div>
     </div>
   )
 }
@@ -1088,52 +1413,3 @@ function formatRange(dates: string[]): string {
 }
 
 
-/**
- * One day in the grid.
- *
- * The same cell serves all three ranges. In a month it is tighter and the days
- * belonging to the months either side are drawn quieter, since they are real
- * days you can plan but not the ones you came to look at.
- */
-function DayCell({
-  date, kcal, selected, showWeekday, onSelect,
-}: {
-  date: string
-  kcal: number
-  selected: boolean
-  showWeekday: boolean
-  onSelect: () => void
-}) {
-  const isToday = date === today()
-  const d = new Date(date + 'T12:00:00')
-
-  return (
-    <button
-      onClick={onSelect}
-      aria-label={formatDate(date)}
-      aria-pressed={selected}
-      className={`rounded-xl px-1 py-2.5 sm:p-3 min-h-14 text-center transition-all border ${
-        selected
-          ? 'bg-bite-500 text-white border-bite-500 shadow-xs'
-          : 'bg-paper border-border-200 hover:border-bite-300 text-ink-900'
-      }`}
-    >
-      {/* White rather than bite-100 on the selected chip. The tint is 4.19:1
-          against bite-500, under the 4.5 that small text needs, and the number
-          underneath the date is the one thing on this strip you most want to
-          read. The checker never saw it: light foregrounds were exempted
-          wholesale as "deliberately on a coloured parent". */}
-      {showWeekday && (
-        <div className={`text-[11px] sm:text-xs font-semibold uppercase tracking-wide ${selected ? 'text-white' : 'text-ink-500'}`}>
-          {d.toLocaleDateString('en-GB', { weekday: 'short' })}
-        </div>
-      )}
-      <div className={`text-base sm:text-lg font-bold leading-tight ${isToday && !selected ? 'text-bite-700' : ''}`}>
-        {d.getDate()}
-      </div>
-      <div className={`text-[11px] sm:text-xs font-mono tabular-nums ${selected ? 'text-white' : 'text-ink-500'}`}>
-        {kcal > 0 ? Math.round(kcal) : ''}
-      </div>
-    </button>
-  )
-}

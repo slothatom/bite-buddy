@@ -5,7 +5,6 @@ import type { GroceryItem, MedCategory, PantryItem } from '../types'
 import { useMealPlanStore, getRangeDates, today } from '../store/useMealPlanStore'
 import { useThisWeek } from '../store/useThisWeek'
 import { offerUndo } from '../store/useUndo'
-import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import { EmptyState, SectionHeading } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS } from '../lib/categories'
@@ -31,7 +30,6 @@ export default function GroceryList() {
     updateGroceryItem, removeGroceryItem, clearCheckedItems, clearGroceryList,
     restoreGroceryItems, plan, cupboardCovered,
   } = useMealPlanStore()
-  const { profile } = useUserStore()
   const thisWeek = useThisWeek()
   const ctx = useNutritionContext()
   const [justBuilt, setJustBuilt] = useState(false)
@@ -62,9 +60,9 @@ export default function GroceryList() {
    * found the list being built for a week that had ended. Nobody shops backwards.
    */
   const offered = useMemo(
-    () => getRangeDates(thisWeek[0], 'fortnight', profile.weekStartsOn)
+    () => getRangeDates(thisWeek[0], 'fortnight')
       .filter((d) => d >= today()),
-    [thisWeek, profile.weekStartsOn],
+    [thisWeek],
   )
 
   const mealsByDate = useMemo(() => {
