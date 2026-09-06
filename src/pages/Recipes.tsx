@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useDialog } from '../lib/useDialog'
 import { readAmount, MOST } from '../lib/amounts'
+import { offerUndo } from '../store/useUndo'
 import { Link, useSearchParams } from 'react-router-dom'
 import WhenPicker from '../components/planner/WhenPicker'
 import { slotNow } from '../lib/whenDates'
@@ -9,7 +10,7 @@ import {
   ChevronDown, SlidersHorizontal, Minus, ExternalLink, CalendarPlus, Check,
 } from 'lucide-react'
 import type { DishCategory, MealSlot, QuickFilter, Recipe } from '../types'
-import { DIFFICULTY_LABELS, MEAL_SLOTS } from '../types'
+import { DIFFICULTY_LABELS, MEAL_SLOTS, SLOT_LABELS } from '../types'
 import { safeUrl, linkLabel } from '../lib/links'
 import { useRecipes, useRecipeStore, useMergedInto } from '../store/useRecipeStore'
 import { useNutritionContext } from '../store/useNutrition'
@@ -56,7 +57,7 @@ type Tab = RecipeGroup | 'mine'
 
 export default function Recipes() {
   const recipes = useRecipes()
-  const { favouriteIds, toggleFavourite, custom, mergeRecipes } = useRecipeStore()
+  const { favouriteIds, toggleFavourite, custom, mergeRecipes, removeRecipe } = useRecipeStore()
   const ctx = useNutritionContext()
 
   const [tab, setTab] = useState<Tab>(() => groupForTime())
@@ -506,7 +507,22 @@ export default function Recipes() {
         <RecipeEditor
           recipe={editing}
           onClose={() => setEditing(undefined)}
-          onSaved={(saved) => { if (editing === null) setTab(groupsOf(saved)[0]) }}
+          onSaved={(saved) => {
+            /*
+             * Where a recipe you just wrote can actually be found.
+             *
+             * This used to open the shelf its tags put it on, and a new recipe
+             * has no meal tags, so `groupsOf` answered "dish" and the form
+             * closed on Dishes: a screen of the fourteen weeks' batch cooking,
+             * with the thing you had spent five minutes writing nowhere in
+             * sight. Yours holds it whatever it is tagged, which is the one
+             * answer that is always true.
+             */
+            if (editing === null) {
+              setTab('mine')
+              offerUndo(`Saved ${saved.name.en}`, () => removeRecipe(saved.id))
+            }
+          }}
         />
       )}
     </div>
@@ -1166,7 +1182,7 @@ function PlanIntoDay({
   onClose: () => void
 }) {
   const [eating, setEating] = useState(1)
-  const { plan, addEntry } = useMealPlanStore()
+  const { plan, addEntry, removeEntry } = useMealPlanStore()
   const panel = useDialog<HTMLDivElement>(onClose)
   const [date, setDate] = useState(todayDate)
   const busy = useMemo(
@@ -1246,6 +1262,27 @@ function PlanIntoDay({
             className="btn-primary flex-1"
             onClick={() => {
               addEntry(date, slot, { kind: 'recipe', recipeId: recipe.id, servings: eating })
+
+              /*
+               * And say so. This closed with nothing to show for it, so the
+               * only way to find out whether a meal had landed was to go to
+               * the planner and look, on the one screen whose whole purpose
+               * was saving you that trip. Removing a meal has said "Removed X,
+               * Undo" for a fortnight; adding one said nothing at all.
+               *
+               * The index is read back rather than assumed: `addEntry` appends
+               * to whatever is in the slot already, so the entry just added is
+               * the last one, whether the slot was empty or held a breakfast.
+               */
+              const landed = useMealPlanStore.getState().plan
+                .find((d) => d.date === date)?.meals.find((m) => m.slot === slot)
+              const at = (landed?.entries.length ?? 1) - 1
+              const when = new Date(date + 'T12:00:00')
+                .toLocaleDateString('en-GB', { weekday: 'long' })
+              offerUndo(
+                `Added ${recipe.name.en} to ${when} ${SLOT_LABELS[slot].toLowerCase()}`,
+                () => removeEntry(date, slot, at),
+              )
               onClose()
             }}
           >
