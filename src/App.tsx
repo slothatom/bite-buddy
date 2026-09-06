@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect } from 'react'
 import { HashRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import Sidebar from './components/layout/Sidebar'
-import BottomNav from './components/layout/BottomNav'
+import MobileNav from './components/layout/MobileNav'
 import ErrorBoundary from './components/layout/ErrorBoundary'
 import StorageBanner from './components/layout/StorageBanner'
 import UndoBar from './components/layout/UndoBar'
@@ -145,6 +145,7 @@ function Shell() {
       <div className="flex min-h-screen bg-cream-50">
         <Sidebar />
         <main className="flex-1 flex flex-col min-w-0">
+          <MobileNav />
           <Suspense fallback={<ScreenLoading />}>
             <Routes>
               <Route path="/"          element={<Home />} />
@@ -163,7 +164,6 @@ function Shell() {
             </Routes>
           </Suspense>
         </main>
-        <BottomNav />
       </div>
       <UndoBar />
     </>

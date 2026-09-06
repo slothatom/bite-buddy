@@ -2804,3 +2804,60 @@ test.describe('weight and measurements over time', () => {
     await expect(page.getByRole('button', { name: 'Thighs' })).toBeVisible()
   })
 })
+
+/**
+ * The phone's navigation.
+ *
+ * Five slots along the bottom, four destinations and a "More" button opening a
+ * grid of six icons, put nine screens in two places by nothing more principled
+ * than how many fitted on a bar. Grocery was two taps and three levels deep
+ * while Recipes was one, and the split had already drifted from the sidebar's
+ * own list.
+ */
+test.describe('the menu on a phone', () => {
+  test.beforeEach(({ }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', 'the menu is a phone thing')
+  })
+
+  test('holds every screen, with no second tier', async ({ page }) => {
+    await goto(page, '/')
+    await page.getByRole('button', { name: 'Menu' }).click()
+
+    const menu = page.getByRole('dialog', { name: 'Menu' })
+    // The same nine the sidebar lists, from the same array, so they cannot
+    // drift apart again.
+    await expect(menu.getByRole('link')).toHaveCount(9)
+    for (const label of ['Home', 'Planner', 'Recipes', 'Foods', 'Grocery',
+      'Schedule', 'Movement', 'Progress', 'Settings']) {
+      await expect(menu.getByRole('link', { name: label })).toBeVisible()
+    }
+  })
+
+  test('takes you somewhere and gets out of the way', async ({ page }) => {
+    await goto(page, '/')
+    await page.getByRole('button', { name: 'Menu' }).click()
+    await page.getByRole('dialog', { name: 'Menu' }).getByRole('link', { name: 'Grocery' }).click()
+
+    await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: 'Shopping list' })).toBeVisible()
+  })
+
+  test('adding a meal stays on the bar, because it is not a screen', async ({ page }) => {
+    // An action rather than a destination, and the thing this app is most
+    // often opened to do. It has no business inside a list of screens.
+    await goto(page, '/analytics')
+    await page.getByRole('button', { name: 'Add a meal' }).click()
+    await expect(page.getByRole('heading', { name: /^Add to / })).toBeVisible()
+  })
+
+  test('can be escaped, and gives focus back to the button that opened it', async ({ page }) => {
+    await goto(page, '/')
+    const button = page.getByRole('button', { name: 'Menu' })
+    await button.click()
+    await expect(page.getByRole('dialog', { name: 'Menu' })).toBeVisible()
+
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
+    await expect(button).toBeFocused()
+  })
+})
