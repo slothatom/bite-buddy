@@ -2537,3 +2537,38 @@ test.describe('cooking three and eating one', () => {
     await expect(page.getByText(/You scaled this to 3/)).toBeVisible()
   })
 })
+
+test.describe('taking one meal out of the archive', () => {
+  test('a single meal can be put on any day and any slot', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /week/i }).first().click()
+
+    // "Load" drops a whole week onto the current one, matching weekday to
+    // weekday. That is right when you want the week and far too much when you
+    // wanted Tuesday's dinner.
+    // A meal's own button, not "Take this day", which comes first in the DOM
+    // and opens the same dialog without a slot picker.
+    await page.getByRole('button', { name: /^Take \w+ from/ }).first().click()
+    await expect(page.getByRole('dialog')).toBeVisible()
+
+    // Scoped to the dialog: every meal row behind it has a "Take Lunch from
+    // Tuesday" button whose accessible name contains the same word.
+    const sheet = page.getByRole('dialog')
+    await sheet.getByRole('button', { name: 'Lunch' }).click()
+    await sheet.locator('[data-when-day]:not([disabled])').last().click()
+    await sheet.getByRole('button', { name: 'Put it in' }).click()
+
+    // It says where it went, and offers the way back.
+    await expect(page.getByText(/^Put /)).toBeVisible()
+  })
+
+  test('a whole day keeps each meal in the slot it was written for', async ({ page }) => {
+    await goto(page, '/settings/history')
+    await page.getByRole('button', { name: /week/i }).first().click()
+    await page.getByRole('button', { name: 'Take this day' }).first().click()
+
+    // No slot picker: every meal already knows which one it is.
+    await expect(page.getByText(/each keeping the slot it was written for/)).toBeVisible()
+    await expect(page.getByText('Which meal')).toHaveCount(0)
+  })
+})
