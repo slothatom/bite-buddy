@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { FOODS } from '../src/data/foods.js'
-import type { Food } from '../src/types/index.js'
+import type { Food, Nutrients } from '../src/types/index.js'
 
 /**
  * Fills in the salt and fibre figures the food database is missing.
@@ -45,6 +45,19 @@ class Refused extends Error {
 /** USDA's own numbers for the two nutrients we are short of. */
 const FIBRE = 1079
 const SODIUM = 1093
+
+/**
+ * And the four we already have, which is what makes this checkable.
+ *
+ * Every food in the library carries curated calories and macros, verified by
+ * `npm run data:check`, which fails the build if a food's stated calories
+ * disagree with its own protein, carbs and fat. That is a fingerprint, and a
+ * USDA row describing the same food has to match it.
+ */
+const ENERGY = 1008
+const PROTEIN = 1003
+const CARBS = 1005
+const FAT = 1004
 
 interface Found {
   fiber?: number
@@ -127,11 +140,56 @@ const PROCESSED = /\b(canned|salted|with salt|in brine|pickled|instant|fortified
 /** What a plain, unmessed-with row tends to say about itself. */
 const PLAIN = /\b(raw|without salt|unsalted|boiled, drained|drained solids|uncooked|dry|whole)\b/i
 
+export /**
+ * Whether a USDA row is plausibly the same food we already hold.
+ *
+ * Reading the description was not enough, and the run that proved it is worth
+ * recording. Searching by name gave "Chicken, roasting" for roasted
+ * vegetables, smoked salmon for telemea, water spinach for water, milk
+ * crackers for milk, goat meat for goat cheese, corned beef for beef, grape
+ * leaves for grapes, orange peel for oranges and rose-apples for apples. Two
+ * dozen more like it. Every one of those descriptions is honest; the search
+ * simply answered a different question from the one being asked.
+ *
+ * The library already knows what each of these foods is: calories, protein,
+ * carbs and fat, curated by hand and checked against each other on every
+ * build. USDA states the same four. A row that agrees on all of them is very
+ * likely the same food, and a row that does not is not, whatever its name
+ * says. Water is nought calories and water spinach is nineteen; that is the
+ * end of the argument, and no amount of string matching gets there.
+ *
+ * It also disposes of the house dishes without a special case. Eggplant
+ * spread, yogurt garlic sauce, the coconut and raspberry cake: USDA has never
+ * heard of any of them, will hand back an ingredient or a brand, and the
+ * macros will say so.
+ */
+const TOLERANCE: { id: number; of: (n: Nutrients) => number | undefined; floor: number }[] = [
+  // A quarter out, or the floor, whichever is more forgiving. The floors are
+  // there so a food with almost no fat is not failed by a rounding difference
+  // in the first decimal place.
+  { id: ENERGY, of: (n) => n.calories, floor: 15 },
+  { id: PROTEIN, of: (n) => n.protein, floor: 2 },
+  { id: CARBS, of: (n) => n.carbs, floor: 2.5 },
+  { id: FAT, of: (n) => n.fat, floor: 2 },
+]
+
+export function resembles(candidate: Candidate, food: Food): boolean {
+  for (const { id, of, floor } of TOLERANCE) {
+    const theirs = candidate.foodNutrients?.find((n) => n.nutrientId === id)?.value
+    const ours = of(food.per100g)
+    // A figure one of them does not state cannot disagree. Energy in
+    // particular is absent from some rows, which is not evidence either way.
+    if (theirs == null || ours == null) continue
+    if (Math.abs(theirs - ours) > Math.max(floor, ours * 0.25)) return false
+  }
+  return true
+}
+
 export function pick(candidates: Candidate[], food: Food): Candidate | undefined {
   const usable = candidates.filter((c) => {
     // A row with neither figure answers neither question.
     const has = c.foodNutrients?.some((n) => n.nutrientId === FIBRE || n.nutrientId === SODIUM)
-    return has && !PROCESSED.test(c.description)
+    return has && !PROCESSED.test(c.description) && resembles(c, food)
   })
 
   // A cooked food wants a cooked row, and a dry one a dry row, where USDA
@@ -151,6 +209,8 @@ async function lookup(food: Food): Promise<Found | null> {
   const query = food.names.en
   /** Every status USDA gave, so a food that fails everywhere says how. */
   const refusals: number[] = []
+  /** Whether anything was offered and turned down, as opposed to nothing found. */
+  let rejected = false
 
   for (const dataType of ATTEMPTS) {
     const url = search(query, dataType)
@@ -188,8 +248,16 @@ async function lookup(food: Food): Promise<Found | null> {
     }
 
     const body = await res.json() as { foods?: Candidate[] }
-    const hit = pick(body.foods ?? [], food)
-    if (!hit) continue
+    const offered = body.foods ?? []
+    const hit = pick(offered, food)
+    if (!hit) {
+      // Worth telling apart in the report. "USDA has nothing for pomelo" and
+      // "USDA offered ten rows and none of them was pomelo" are different
+      // facts, and after the macro check the second is the common one and is
+      // the check working rather than a gap in the data.
+      if (offered.length) rejected = true
+      continue
+    }
 
     const value = (id: number) =>
       hit.foodNutrients?.find((n) => n.nutrientId === id)?.value
@@ -204,6 +272,7 @@ async function lookup(food: Food): Promise<Found | null> {
   if (refusals.length === ATTEMPTS.length) {
     throw new Refused(refusals[0], `every attempt refused: ${refusals.join(', ')}`)
   }
+  if (rejected) throw new Error('USDA offered rows, none of them this food')
   return null
 }
 
