@@ -3,10 +3,23 @@ import type { GroceryItem } from '../types'
 import { formatGrams, parseAmount, householdAmount, listAsText } from './grocery'
 
 describe('reading an amount someone typed', () => {
-  it('takes grams with or without the unit', () => {
-    expect(parseAmount('250')).toEqual({ grams: 250 })
+  it('takes grams when the unit says grams', () => {
     expect(parseAmount('250 g')).toEqual({ grams: 250 })
     expect(parseAmount(' 250g ')).toEqual({ grams: 250 })
+    expect(parseAmount('250 grams')).toEqual({ grams: 250 })
+  })
+
+  it('reads a bare number as a count, not as grams', () => {
+    // The unit used to be optional and defaulted to grams, so typing 1 next to
+    // "Vanilla Milk" bought one gram of vanilla milk. Nobody shopping has ever
+    // meant that, and the box has always suggested "2 packs".
+    //
+    // Guessing from the size of the number is the other option and it is
+    // worse: a threshold reading 500 as grams and 2 as packs is a rule nobody
+    // can see, and it would be wrong about 200 eggs and 2 kg of flour in the
+    // same list.
+    expect(parseAmount('1')).toEqual({ text: '1' })
+    expect(parseAmount('250')).toEqual({ text: '250' })
   })
 
   it('takes kilograms, including the comma most of Europe writes', () => {
