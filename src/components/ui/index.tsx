@@ -228,8 +228,8 @@ export function NutrientSummary({
  * 122 rows at once, so they have to stay quiet.
  */
 const TIERS: Record<MedTier, { label: string; symbol: string; className: string }> = {
-  daily:    { label: 'Daily',      symbol: '●', className: 'bg-teal-50 text-teal-700' },
-  weekly:   { label: 'Weekly',     symbol: '◐', className: 'bg-teal-50 text-teal-700' },
+  daily:    { label: 'Daily',      symbol: '●', className: 'bg-leaf-50 text-leaf-700' },
+  weekly:   { label: 'Weekly',     symbol: '◐', className: 'bg-leaf-50 text-leaf-700' },
   moderate: { label: 'Moderation', symbol: '○', className: 'bg-cream-50 text-ink-700' },
   rare:     { label: 'Rarely',     symbol: '◇', className: 'bg-mustard-100 text-mustard-800' },
 }

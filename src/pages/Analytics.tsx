@@ -138,7 +138,7 @@ function WeekTab() {
             target {targets.calories.toLocaleString()} kcal
             {recorded > 0 && (
               <span className="ml-1">
-                · <span className="text-teal-700 font-bold">{'\u2713'}</span> recorded, the rest planned
+                · <span className="text-leaf-700 font-bold">{'\u2713'}</span> recorded, the rest planned
               </span>
             )}
           </p>
@@ -181,7 +181,7 @@ function WeekTab() {
                     title={d.any ? (d.recorded ? 'recorded' : 'planned') : undefined}
                   >
                     {new Date(d.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'narrow' })}
-                    {d.recorded ? <span className="text-teal-700 font-bold">{'\u2009\u2713'}</span> : null}
+                    {d.recorded ? <span className="text-leaf-700 font-bold">{'\u2009\u2713'}</span> : null}
                   </span>
                 </div>
               )
@@ -240,7 +240,7 @@ function MovementWeek({ moved }: { moved: { date: string; movement: DayMovement 
             return (
               <div key={date} className="flex-1 flex flex-col justify-end h-full">
                 <div
-                  className={movement.minutes > 0 ? 'bg-teal-500 rounded-t-sm' : 'bg-border-200 rounded-t-sm'}
+                  className={movement.minutes > 0 ? 'bg-leaf-500 rounded-t-sm' : 'bg-border-200 rounded-t-sm'}
                   style={{ height: `${Math.max(2, (movement.minutes / tallest) * 100)}%` }}
                 />
               </div>
@@ -343,8 +343,8 @@ function MediterraneanTab() {
               <div className="h-2 rounded-full bg-border-100 overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    g.isLimit ? (g.ratio > 1 ? 'bg-coral-500' : 'bg-teal-400')
-                              : (met ? 'bg-teal-500' : 'bg-ink-300')}`}
+                    g.isLimit ? (g.ratio > 1 ? 'bg-coral-500' : 'bg-leaf-400')
+                              : (met ? 'bg-leaf-500' : 'bg-ink-300')}`}
                   style={{ width: `${pct * 100}%` }}
                 />
               </div>

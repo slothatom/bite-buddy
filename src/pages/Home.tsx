@@ -514,7 +514,7 @@ function MovedToday({ movement }: { movement: DayMovement }) {
 
   return (
     <div className="card-soft p-3 flex items-start gap-3">
-      <Activity size={16} className="text-teal-700 shrink-0 mt-0.5" aria-hidden="true" />
+      <Activity size={16} className="text-leaf-700 shrink-0 mt-0.5" aria-hidden="true" />
       <div className="min-w-0">
         <p className="text-sm text-ink-900">
           <span className="font-semibold">Moved today</span>
@@ -624,7 +624,7 @@ function SyncLine() {
          `${unsaved} ${unsaved === 1 ? 'change' : 'changes'} not saved yet, kept on this device and retried automatically.`,
          'text-mustard-700']
     : state === 'live'
-      ? [Cloud, at ? `Everything shared · last synced ${timeOf(at)}` : 'Everything shared', 'text-teal-600']
+      ? [Cloud, at ? `Everything shared · last synced ${timeOf(at)}` : 'Everything shared', 'text-leaf-600']
     : state === 'connecting'
       ? [RefreshCw, 'Connecting…', 'text-ink-500']
     : state === 'error'

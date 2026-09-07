@@ -86,7 +86,7 @@ export default function WhenPicker({
                   weekday: 'long', day: 'numeric', month: 'long',
                 })}${isToday ? ', today' : past ? ', already gone' : ''}`}
                 className={`relative rounded-lg py-2 min-h-11 text-center text-sm font-semibold border transition-colors ${
-                  on ? 'bg-bite-500 border-bite-500 text-white'
+                  on ? 'bg-bite-500 border-bite-500 text-on-brand'
                     // A day you cannot choose is still a day you have to be
                     // able to read: ink-300 on cream is 3.01:1, and a date is
                     // text rather than an icon. Struck through rather than
@@ -136,7 +136,7 @@ export default function WhenPicker({
                 aria-pressed={s === slot}
                 className={`text-xs px-2.5 py-2 rounded-lg border transition-colors ${
                   s === slot
-                    ? 'bg-bite-500 border-bite-500 text-white font-semibold'
+                    ? 'bg-bite-500 border-bite-500 text-on-brand font-semibold'
                     : 'bg-paper border-border-200 text-ink-700 hover:border-bite-300'
                 }`}
               >
