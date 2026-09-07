@@ -2596,7 +2596,7 @@ test.describe('after dark', () => {
     await page.getByLabel('Appearance').selectOption('dark')
 
     // The one piece of a phone screen a stylesheet cannot reach. Left alone it
-    // stayed brand purple around a dark app.
+    // stayed the brand colour around a dark app.
     await expect(page.locator('meta[name="theme-color"]'))
       .toHaveAttribute('content', '#17130f')
   })

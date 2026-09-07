@@ -11,19 +11,35 @@
 
 @theme {
   /* ─── Brand ───────────────────────────────────────────────────────────────
-     Purple is the single brand primary. The 500/600/700 steps are the values
-     named in the design system; the rest of the ramp is derived from them for
-     soft surfaces and hover states. */
-  --color-bite-50: #f5f2ff;
-  --color-bite-100: #e9e4ff;
-  --color-bite-200: #c9c0f1;
-  --color-bite-300: #aa9ce8;
-  --color-bite-400: #8b7add;
-  --color-bite-500: #6d5bd0;
-  --color-bite-600: #5947be;
-  --color-bite-700: #4938a7;
-  --color-bite-800: #3b2d85;
-  --color-bite-900: #2c2166;
+     Lagoon: a bright turquoise, and the single brand primary.
+
+     The ramp is still called `bite`, because that names the brand rather than
+     the colour. Renaming it to `lagoon` would rewrite a hundred and twenty
+     class names to say the same thing, and would have to be done again the
+     next time the colour moves.
+
+     The 500 step is the face of the app and carries INK, not white: at
+     2.49:1 white on it is nowhere near the 4.5:1 the contrast check demands,
+     while the app's own ink reads at 6.15:1. That is the deliberate part of
+     this palette, not an accident of it. 700 is the step for brand-coloured
+     text on cream, at 5.12:1. */
+  --color-bite-50: #effcf9;
+  --color-bite-100: #d5f5ef;
+  --color-bite-200: #a7e9df;
+  --color-bite-300: #5eead4;
+  --color-bite-400: #2dd4bf;
+  --color-bite-500: #14b8a6;
+  --color-bite-600: #0d9488;
+  --color-bite-700: #0f766e;
+  --color-bite-800: #115e59;
+  --color-bite-900: #134e4a;
+
+  /* What sits on the brand, in both themes.
+     The brand is a mid turquoise and does not invert, so neither can the thing
+     written on it. `ink-900` looked right until dark, where it becomes nearly
+     white and every primary button dropped to 2.23:1. This is a literal, and
+     it stays a literal in the dark block below by not appearing there. */
+  --color-on-brand: #12312c;
 
   /* Warm accent. */
   --color-coral-50: #fff3f3;
@@ -37,17 +53,27 @@
   --color-coral-800: #a93030;
   --color-coral-900: #8a2a2a;
 
-  /* Data and positive progress. */
-  --color-teal-50: #ebfaf8;
-  --color-teal-100: #d3f5f1;
-  --color-teal-200: #a6ebe4;
-  --color-teal-300: #6adcd1;
-  --color-teal-400: #2ecbbd;
-  --color-teal-500: #00b8a9;
-  --color-teal-600: #008077;
-  --color-teal-700: #007e75;
-  --color-teal-800: #066259;
-  --color-teal-900: #08504a;
+  /* ─── Data and positive progress ────────────────────────────────────────
+     Green, and it moved here from teal when the brand became turquoise.
+
+     A ticked meal, a filled bar and a trend line all mean "this happened",
+     and that has to be legible as a different thing from "this is Bite
+     Buddy". Two shades of the same green-blue could not do that: the eaten
+     tick would have been the brand colour. Green still reads as done, and it
+     is far enough round the wheel that nothing is ambiguous.
+
+     Named `leaf` rather than `teal`, because a token called teal holding a
+     green is a lie the next person has to discover. */
+  --color-leaf-50: #edfaf3;
+  --color-leaf-100: #d3f2e1;
+  --color-leaf-200: #a8e5c6;
+  --color-leaf-300: #6fd3a4;
+  --color-leaf-400: #34b97f;
+  --color-leaf-500: #0a9d63;
+  --color-leaf-600: #0a7d55;
+  --color-leaf-700: #096847;
+  --color-leaf-800: #0a533a;
+  --color-leaf-900: #08402e;
 
   /* Highlights and attention. */
   --color-mustard-50: #fffcf2;
@@ -129,7 +155,7 @@
    with the same layout, and the warmth is most of what the brand is.
 
    The mid brand shades change because of what they are used for. In daylight
-   bite-700, teal-700, coral-600 and mustard-700 are the shades dark enough to
+   bite-700, leaf-700, coral-600 and mustard-700 are the shades dark enough to
    read as text on paper; after dark they are the shades too dark to read on
    anything. So they lighten, which does invert the ramp's ordering inside this
    block: what a token names here is its job, not its position between 600 and
@@ -147,9 +173,9 @@
   --color-border-200: #3d352b;
 
   /* The shades that carry words. */
-  --color-bite-700: #b7aaf0;
-  --color-teal-600: #4fd0c0;
-  --color-teal-700: #5fd8c9;
+  --color-bite-700: #5eead4;
+  --color-leaf-600: #56d295;
+  --color-leaf-700: #6fdca5;
   --color-coral-600: #ff9a9a;
   --color-coral-700: #ffaeae;
   --color-mustard-700: #e8c26a;
@@ -157,12 +183,12 @@
 
   /* Soft grounds. In daylight these are tints of white; here they have to be
      shades of the surface, or a "soft" card is the brightest thing on screen. */
-  --color-bite-50: #241f38;
-  --color-bite-100: #2f2849;
+  --color-bite-50: #12332f;
+  --color-bite-100: #17423d;
   --color-coral-50: #331e1e;
   --color-coral-100: #422626;
-  --color-teal-50: #102e2b;
-  --color-teal-100: #163b37;
+  --color-leaf-50: #122c20;
+  --color-leaf-100: #17392a;
   --color-mustard-50: #2c2415;
   --color-mustard-100: #382d19;
 
@@ -187,20 +213,20 @@
     --color-border-100: #2e2820;
     --color-border-200: #3d352b;
 
-    --color-bite-700: #b7aaf0;
-    --color-teal-600: #4fd0c0;
-    --color-teal-700: #5fd8c9;
+    --color-bite-700: #5eead4;
+    --color-leaf-600: #56d295;
+    --color-leaf-700: #6fdca5;
     --color-coral-600: #ff9a9a;
     --color-coral-700: #ffaeae;
     --color-mustard-700: #e8c26a;
     --color-mustard-800: #dfb659;
 
-    --color-bite-50: #241f38;
-    --color-bite-100: #2f2849;
+    --color-bite-50: #12332f;
+    --color-bite-100: #17423d;
     --color-coral-50: #331e1e;
     --color-coral-100: #422626;
-    --color-teal-50: #102e2b;
-    --color-teal-100: #163b37;
+    --color-leaf-50: #122c20;
+    --color-leaf-100: #17392a;
     --color-mustard-50: #2c2415;
     --color-mustard-100: #382d19;
 
@@ -254,8 +280,8 @@
 }
 
 @utility btn-primary {
-  @apply btn bg-bite-500 text-white hover:bg-bite-600 hover:-translate-y-px
-         active:translate-y-0 active:bg-bite-800 shadow-e1;
+  @apply btn bg-bite-500 text-on-brand hover:bg-bite-400 hover:-translate-y-px
+         active:translate-y-0 active:bg-bite-300 shadow-e1;
 }
 
 @utility btn-secondary {
@@ -291,7 +317,7 @@
 }
 
 @utility chip-on {
-  @apply chip bg-bite-500 text-white border-2 border-bite-500 font-extrabold;
+  @apply chip bg-bite-500 text-on-brand border-2 border-bite-500 font-extrabold;
 }
 
 /* ─── Segmented control ────────────────────────────────────────────────────── */
@@ -348,7 +374,7 @@
 }
 
 @utility nav-item-active {
-  @apply nav-item bg-bite-500 text-white hover:bg-bite-600 hover:text-white shadow-e1;
+  @apply nav-item bg-bite-500 text-on-brand hover:bg-bite-400 hover:text-on-brand shadow-e1;
 }
 
 /* ─── Planner ──────────────────────────────────────────────────────────────── */

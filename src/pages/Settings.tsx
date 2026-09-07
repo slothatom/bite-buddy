@@ -983,7 +983,7 @@ function SavingCheck() {
           {steps.map((step) => (
             <li key={step.what} className="flex items-start gap-2 text-xs">
               {step.ok
-                ? <Check size={13} className="shrink-0 mt-0.5 text-teal-600" />
+                ? <Check size={13} className="shrink-0 mt-0.5 text-leaf-600" />
                 : <X size={13} className="shrink-0 mt-0.5 text-coral-600" />}
               <span className="flex-1 min-w-0">
                 <span className={step.ok ? 'text-ink-700' : 'text-coral-700 font-semibold'}>{step.what}</span>
@@ -997,7 +997,7 @@ function SavingCheck() {
       )}
 
       {steps?.every((s) => s.ok) && (
-        <p className="text-xs text-teal-700">
+        <p className="text-xs text-leaf-700">
           Saving works. What you enter here reaches the other phone.
         </p>
       )}

@@ -74,7 +74,7 @@ export default function BarcodeScanner({ onDetected, onClose }: Props) {
               <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-bite-400 rounded-tr" />
               <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-bite-400 rounded-bl" />
               <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-bite-400 rounded-br" />
-              {!loading && <div className="absolute left-1 right-1 h-0.5 top-1/2 bg-teal-400 opacity-75 animate-pulse" />}
+              {!loading && <div className="absolute left-1 right-1 h-0.5 top-1/2 bg-leaf-400 opacity-75 animate-pulse" />}
             </div>
           </div>
         </div>

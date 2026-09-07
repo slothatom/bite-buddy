@@ -321,7 +321,7 @@ export default function Recipes() {
                     aria-pressed={on}
                     title={ready ? LENSES[l].rule : lensBlocker(l).why}
                     className={`shrink-0 whitespace-nowrap ${
-                      on ? 'chip bg-teal-800 text-white border border-teal-800'
+                      on ? 'chip bg-leaf-800 text-white border border-leaf-800'
                         : ready ? 'chip-off' : 'chip-off text-ink-500'
                     }`}
                   >
@@ -748,7 +748,7 @@ function ShoppingNote({ recipe }: { recipe: Recipe }) {
   const missing = missingFoods(state, ctx.foods)
 
   return (
-    <div className={`card-soft p-3 ${state.missing.length ? '' : 'bg-teal-50'}`}>
+    <div className={`card-soft p-3 ${state.missing.length ? '' : 'bg-leaf-50'}`}>
       <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-1">
         {availabilityLabel(state)}
       </p>

@@ -79,7 +79,7 @@ export default function Schedule() {
                   <button
                     onClick={() => complete(s)}
                     className={`shrink-0 w-6 h-6 rounded-full border-2 grid place-items-center transition-colors ${
-                      s.completed ? 'bg-bite-500 border-bite-500 text-white' : 'border-border-200 text-transparent'}`}
+                      s.completed ? 'bg-bite-500 border-bite-500 text-on-brand' : 'border-border-200 text-transparent'}`}
                     aria-label={s.completed ? 'Mark as not done' : 'Mark as done'}
                   >
                     <Check size={13} />
@@ -581,7 +581,7 @@ function CookedDialog({ session, onClose }: { session: CookSession; onClose: () 
                         weekday: 'long', day: 'numeric', month: 'long',
                       })}
                       className={`text-xs px-2.5 py-2 rounded-lg border transition-colors ${
-                        on ? 'bg-bite-500 border-bite-500 text-white font-semibold'
+                        on ? 'bg-bite-500 border-bite-500 text-on-brand font-semibold'
                           : 'bg-paper border-border-200 text-ink-700 hover:border-bite-300'
                       }`}
                     >

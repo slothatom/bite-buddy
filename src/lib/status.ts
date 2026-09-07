@@ -54,7 +54,7 @@ export function targetStatus(value: number, target: number | undefined, unit = '
  */
 export const STATUS_STYLES: Record<StatusLevel, { fill: string; text: string; surface: string; ring: string }> = {
   'none':          { fill: 'bg-border-200', text: 'text-ink-500',     surface: 'bg-cream-50',     ring: 'stroke-border-200' },
-  'on-track':      { fill: 'bg-teal-500',   text: 'text-teal-700',    surface: 'bg-teal-50',      ring: 'stroke-teal-500' },
+  'on-track':      { fill: 'bg-leaf-500',   text: 'text-leaf-700',    surface: 'bg-leaf-50',      ring: 'stroke-leaf-500' },
   'slightly-over': { fill: 'bg-mustard-500', text: 'text-mustard-800', surface: 'bg-mustard-100', ring: 'stroke-mustard-500' },
   'over':          { fill: 'bg-coral-500',  text: 'text-coral-700',   surface: 'bg-coral-50',     ring: 'stroke-coral-500' },
 }

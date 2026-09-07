@@ -634,7 +634,7 @@ function WeekGrid({
                 open ? 'Hide the full names' : 'Show the full names'}`}
               className={`flex rounded-lg px-1 py-1.5 text-left
                           ${open ? 'items-baseline gap-2' : 'flex-col justify-center'}
-                          ${date === now ? 'bg-bite-500 text-white' : 'bg-cream-50 text-ink-900'}
+                          ${date === now ? 'bg-bite-500 text-on-brand' : 'bg-cream-50 text-ink-900'}
                           ${past && date !== now ? 'opacity-60' : ''}`}
             >
               {/* Today inherits the button's own colour rather than naming
@@ -748,7 +748,7 @@ function MealCell({
         meals.length > 1 ? `, ${meals.length} meals` : ''}${
         eaten ? ', eaten' : skipped ? ', skipped' : ', planned'}`}
       className={`relative rounded-lg px-1 py-1 text-left leading-tight border
-                  ${eaten ? 'bg-teal-50 border-teal-200' : 'bg-cream-50 border-transparent'}
+                  ${eaten ? 'bg-leaf-50 border-leaf-200' : 'bg-cream-50 border-transparent'}
                   ${skipped ? 'opacity-55' : ''}
                   hover:border-bite-400
                   ${full ? 'w-full flex items-center gap-1.5' : 'min-h-11 block'}`}
@@ -760,7 +760,7 @@ function MealCell({
         <Check
           size={11}
           aria-hidden="true"
-          className={`text-teal-700 ${full ? 'shrink-0' : 'absolute top-0.5 right-0.5'}`}
+          className={`text-leaf-700 ${full ? 'shrink-0' : 'absolute top-0.5 right-0.5'}`}
         />
       )}
       <span
@@ -955,7 +955,7 @@ function ShoppingState({ entries }: { entries: Component[] }) {
   const { ready, missing } = mealAvailability(entries, ctx, pantry)
 
   return (
-    <p className={`flex items-start gap-1.5 pt-1 text-xs ${ready ? 'text-teal-700' : 'text-ink-500'}`}>
+    <p className={`flex items-start gap-1.5 pt-1 text-xs ${ready ? 'text-leaf-700' : 'text-ink-500'}`}>
       {ready
         ? <><Check size={13} className="shrink-0 mt-px" /> Everything in</>
         : <>
@@ -997,8 +997,8 @@ function OutcomeTick({
   return (
     <button
       className={`btn-ghost btn-icon shrink-0 ${
-        outcome === 'eaten' ? 'text-teal-700'
-          : outcome === 'skipped' ? 'text-ink-500' : 'text-ink-300 hover:text-teal-700'
+        outcome === 'eaten' ? 'text-leaf-700'
+          : outcome === 'skipped' ? 'text-ink-500' : 'text-ink-300 hover:text-leaf-700'
       }`}
       onClick={() => onChange(next)}
       aria-label={label}
@@ -1244,7 +1244,7 @@ function EntryLine({
       >
         {label}
         {entry.kind === 'portion' && (
-          <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-teal-700">
+          <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-leaf-700">
             {portion?.storage === 'freezer' ? 'freezer' : 'fridge'}
           </span>
         )}

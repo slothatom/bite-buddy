@@ -29,7 +29,7 @@ export default defineConfig({
         name: 'Bite Buddy',
         short_name: 'Bite Buddy',
         description: 'Plan your week. Eat well. Feel good. A bold, friendly offline meal planner.',
-        theme_color: '#6D5BD0',
+        theme_color: '#14B8A6',
         background_color: '#FAF7F0',
         display: 'standalone',
         orientation: 'portrait',

@@ -67,7 +67,7 @@ export default function MobileNav() {
         <button
           onClick={quickAdd}
           aria-label="Add a meal"
-          className="shrink-0 flex items-center gap-1.5 rounded-full bg-bite-500 text-white
+          className="shrink-0 flex items-center gap-1.5 rounded-full bg-bite-500 text-on-brand
                      font-bold text-sm px-3.5 h-10 active:scale-95 transition-transform"
         >
           <Plus size={18} strokeWidth={2.6} /> Meal

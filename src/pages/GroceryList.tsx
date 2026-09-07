@@ -180,7 +180,7 @@ export default function GroceryList() {
         {groceryItems.length > 0 && (
           <div className="card p-4">
             <div className="h-2 rounded-full bg-border-100 overflow-hidden">
-              <div className="h-full bg-teal-500 rounded-full transition-all duration-500"
+              <div className="h-full bg-leaf-500 rounded-full transition-all duration-500"
                 style={{ width: `${(checked / groceryItems.length) * 100}%` }} />
             </div>
             <div className="flex flex-wrap gap-2 mt-3">
@@ -554,7 +554,7 @@ function DayPicker({
               aria-pressed={on}
               aria-label={d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
               className={`rounded-lg py-2 min-h-14 text-center border transition-colors ${
-                on ? 'bg-bite-500 text-white border-bite-500'
+                on ? 'bg-bite-500 text-on-brand border-bite-500'
                   : meals ? 'bg-paper border-border-200 text-ink-900 hover:border-bite-300'
                     : 'bg-cream-50 border-transparent text-ink-500'
               }`}

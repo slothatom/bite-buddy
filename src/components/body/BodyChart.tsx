@@ -75,7 +75,7 @@ export default function BodyChart({
           {readings.length > 1 && (
             <polyline
               points={line} fill="none" strokeWidth={2} vectorEffect="non-scaling-stroke"
-              className="stroke-teal-500" strokeLinejoin="round" strokeLinecap="round"
+              className="stroke-leaf-500" strokeLinejoin="round" strokeLinecap="round"
             />
           )}
         </svg>
@@ -93,7 +93,7 @@ export default function BodyChart({
             style={{ left: `${x(i)}%`, top: `${y(r.value)}%` }}
           >
             <span
-              className={`block rounded-full border-2 border-paper bg-teal-500
+              className={`block rounded-full border-2 border-paper bg-leaf-500
                           ${reading === r.date ? 'w-3.5 h-3.5 ring-2 ring-ink-900' : 'w-2.5 h-2.5'}`}
             />
           </button>

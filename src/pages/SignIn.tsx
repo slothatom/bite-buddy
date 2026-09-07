@@ -39,7 +39,7 @@ export default function SignIn() {
         {linkSentTo ? (
           <div className="card p-5 text-center space-y-3">
             <p className="flex items-center justify-center gap-2 font-semibold text-ink-900">
-              <Check size={18} className="text-teal-600" /> Check your email
+              <Check size={18} className="text-leaf-600" /> Check your email
             </p>
             <p className="text-sm text-ink-700">
               If <strong className="break-all">{linkSentTo}</strong> is on the guest list, a sign-in

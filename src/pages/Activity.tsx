@@ -525,7 +525,7 @@ function SleepTab({ who }: { who: PersonId }) {
               aria-label={`${n} out of 5`}
               onClick={() => setQuality(quality === n ? 0 : n)}
               className={`w-8 h-8 rounded-lg text-sm font-bold ${
-                quality >= n ? 'bg-bite-500 text-white' : 'bg-cream-50 text-ink-500'}`}
+                quality >= n ? 'bg-bite-500 text-on-brand' : 'bg-cream-50 text-ink-500'}`}
             >
               {n}
             </button>

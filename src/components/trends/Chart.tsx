@@ -113,7 +113,7 @@ export default function DayChart({
                   type="button"
                   onClick={() => setReading((was) => (was?.date === p.date ? null : p))}
                   aria-label={`${dayLabel(p.date)}, ${Math.round(p.value)} ${unit}, ${p.recorded ? 'recorded' : 'still planned'}`}
-                  className={`w-full rounded-t-sm ${p.recorded ? 'bg-teal-500' : 'bg-bite-200'}
+                  className={`w-full rounded-t-sm ${p.recorded ? 'bg-leaf-500' : 'bg-bite-200'}
                               ${reading?.date === p.date ? 'ring-2 ring-ink-900 ring-offset-1' : ''}`}
                   style={{ height: `${Math.max(1, pct(p.value))}%` }}
                 />
@@ -145,7 +145,7 @@ export function Legend({ target, unit }: { target?: number; unit: string }) {
   return (
     <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-500 mt-2">
       <span className="flex items-center gap-1.5">
-        <span className="w-3 h-2 rounded-sm bg-teal-500" aria-hidden="true" />
+        <span className="w-3 h-2 rounded-sm bg-leaf-500" aria-hidden="true" />
         recorded
       </span>
       <span className="flex items-center gap-1.5">
