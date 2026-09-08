@@ -15,11 +15,19 @@ import { useEffect, useRef } from 'react'
  *
  * Returns a ref to put on the dialog's own panel, which is what the focus trap
  * is a trap for.
+ *
+ * `active` is for a dialog that opens another one. Two of these at once both
+ * listen on the document, so Escape closes both, and the inner one's focus
+ * trap fights the outer one for every Tab. `stopPropagation` does not help:
+ * these are two listeners on the same node, and only
+ * `stopImmediatePropagation` would silence a sibling. So the outer dialog
+ * stands down while the inner one is up, and takes over again when it closes.
  */
-export function useDialog<T extends HTMLElement>(onClose: () => void) {
+export function useDialog<T extends HTMLElement>(onClose: () => void, active = true) {
   const panel = useRef<T>(null)
 
   useEffect(() => {
+    if (!active) return
     // Whatever had focus when this opened. Captured before anything inside is
     // focused, so it is genuinely the trigger rather than the first field.
     const opener = document.activeElement as HTMLElement | null
@@ -92,7 +100,7 @@ export function useDialog<T extends HTMLElement>(onClose: () => void) {
         opener.focus?.()
       }
     }
-  }, [onClose])
+  }, [onClose, active])
 
   return panel
 }
