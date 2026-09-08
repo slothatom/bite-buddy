@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useDialog } from '../../lib/useDialog'
-import { Search, X, CalendarDays } from 'lucide-react'
+import { Search, X, CalendarDays, Plus } from 'lucide-react'
 import type { Component, MealSlot, Recipe } from '../../types'
 import { SLOT_LABELS } from '../../types'
 import { useRecipes } from '../../store/useRecipeStore'
@@ -20,6 +20,7 @@ import { usePantry } from '../../store/usePantryStore'
 import { availability, availabilityLabel } from '../../lib/pantry'
 import { usePortionStore } from '../../store/usePortionStore'
 import { surplusLine, surplusOf } from '../../lib/cookExtra'
+import AddFoodModal from '../foods/AddFoodModal'
 
 /**
  * Adds a recipe, a weighed food, or something already cooked, to a meal slot.
@@ -66,7 +67,18 @@ export default function AddEntryModal({
 }) {
   const ate = mode === 'ate'
   const [when, setWhen] = useState(false)
-  const panel = useDialog<HTMLDivElement>(onClose)
+  /*
+   * Writing down a food the app has never met, without leaving the day.
+   *
+   * The foods tab searched a library and, on a miss, offered to search the
+   * other library. Neither holds a yoghurt nobody has typed in yet, so the
+   * real answer was: go to Foods, add it, come back, find the day again, find
+   * the slot again. Four screens to record one yoghurt, which is the number at
+   * which people stop recording yoghurts. It opens the same sheet the Foods
+   * screen opens, and puts what you wrote straight into the meal.
+   */
+  const [writing, setWriting] = useState(false)
+  const panel = useDialog<HTMLDivElement>(onClose, !writing)
   const [query, setQuery] = useState('')
   // Snacks open on foods. The plans write them as lines rather than dishes
   // ("150 g mere, 10 g caju"), so the recipe tab for a snack slot was reliably
@@ -115,252 +127,294 @@ export default function AddEntryModal({
   const matchedFoods = useMemo(() => searchFoods(query, foodIndex, 40), [query, foodIndex])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs p-0 sm:p-4"
-      onClick={onClose}>
-      <div
-        ref={panel}
-        role="dialog"
-        aria-modal="true"
-        className="bg-paper w-full sm:max-w-2xl sm:rounded-2xl rounded-t-2xl max-h-[88vh] flex flex-col shadow-xl"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <header className="flex items-center justify-between px-5 py-4 border-b border-border-200">
-          <div>
-            <h2 className="text-base font-extrabold text-ink-900">
-              {ate ? `Ate this for ${SLOT_LABELS[slot].toLowerCase()}` : `Add to ${SLOT_LABELS[slot]}`}
-            </h2>
-            <p className="text-xs text-ink-500">{new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-          </div>
-          <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
-        </header>
-
-        <div className="px-5 pt-4 space-y-3">
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
-            <input
-              className="input pl-9"
-              autoFocus
-              placeholder={ate ? 'What did you have?' : 'What are we having?'}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </div>
-          {(onSlotChange || onDateChange) && (
-            <div className="card-soft p-3 space-y-3">
-              <div className="flex items-center gap-2">
-                <CalendarDays size={15} className="shrink-0 text-ink-500" />
-                <p className="flex-1 min-w-0 text-sm text-ink-900">
-                  <span className="font-semibold">{SLOT_LABELS[slot]}</span>
-                  {', '}
-                  {date === today()
-                    ? 'today'
-                    : new Date(date + 'T12:00:00').toLocaleDateString('en-GB', {
-                      weekday: 'long', day: 'numeric', month: 'long',
-                    })}
-                </p>
-                <button
-                  className="btn-ghost text-xs shrink-0"
-                  aria-expanded={when}
-                  onClick={() => setWhen((v) => !v)}
-                >
-                  {when ? 'Done' : 'Change'}
-                </button>
-              </div>
-
-              {when && (
-                <WhenPicker
-                  date={date}
-                  onDate={(d) => onDateChange?.(d)}
-                  slot={onSlotChange ? slot : undefined}
-                  onSlot={onSlotChange}
-                />
-              )}
+    <>
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs p-0 sm:p-4"
+        onClick={onClose}>
+        <div
+          ref={panel}
+          role="dialog"
+          aria-modal="true"
+          className="bg-paper w-full sm:max-w-2xl sm:rounded-2xl rounded-t-2xl max-h-[88vh] flex flex-col shadow-xl"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <header className="flex items-center justify-between px-5 py-4 border-b border-border-200">
+            <div>
+              <h2 className="text-base font-extrabold text-ink-900">
+                {ate ? `Ate this for ${SLOT_LABELS[slot].toLowerCase()}` : `Add to ${SLOT_LABELS[slot]}`}
+              </h2>
+              <p className="text-xs text-ink-500">{new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
             </div>
-          )}
+            <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
+          </header>
 
-          <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
-            {([...(available.length ? ['fridge' as const] : []), 'recipes' as const, 'foods' as const]).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`capitalize ${tab === t ? 'tab-on' : 'tab-off'}`}
-              >
-                {t}
-                {t === 'fridge' && (
-                  <span className="ml-1.5 text-xs opacity-60 font-mono">{available.length}</span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1.5">
-          {tab === 'fridge' && offerOrder(available).map((p) => {
-            const n = componentsNutrients([{ kind: 'portion', portionId: p.id, servings: 1 }], ctx)
-            return (
-              <button
-                key={p.id}
-                onClick={() => { onAdd({ kind: 'portion', portionId: p.id, servings: 1 }); onClose() }}
-                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left transition-colors"
-              >
-                <span className="text-xl">{p.storage === 'freezer' ? '🧊' : '🥡'}</span>
-                <span className="flex-1 min-w-0">
-                  <span className="block text-sm font-semibold text-ink-900 truncate">
-                    {portionLabel(p, ctx.recipes)}
-                  </span>
-                  <span className="block text-xs text-ink-500 truncate">
-                    {p.servings === 1 ? '1 portion left' : `${p.servings} portions left`} · {madeWhen(p)}
-                  </span>
-                </span>
-                {n.calories > 0 && (
-                  <span className="text-sm font-mono text-ink-700 shrink-0">
-                    {Math.round(n.calories)} kcal
-                  </span>
-                )}
-              </button>
-            )
-          })}
-
-          {/* How big the pot is. Only when planning: "I already ate this" is
-              not a moment to be asked how much you cooked. */}
-          {tab === 'recipes' && !ate && (
-            <div className="flex flex-wrap items-center gap-2 pb-1">
-              <span className="text-xs font-bold text-ink-500">Cooking</span>
-              {[1, 2, 3, 4, 6].map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => setCooking(n)}
-                  aria-pressed={cooking === n}
-                  aria-label={n === 1 ? 'Cooking one serving' : `Cooking ${n} servings`}
-                  className={cooking === n ? 'chip-on' : 'chip-off'}
-                >
-                  {n}
-                </button>
-              ))}
-              <span className="basis-full text-xs text-ink-500">
-                {surplusLine(cooking, 1)
-                  ? `One serving goes in the day, ${surplusLine(cooking, 1)}.`
-                  : 'One serving, eaten on the day.'}
-              </span>
+          <div className="px-5 pt-4 space-y-3">
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
+              <input
+                className="input pl-9"
+                autoFocus
+                placeholder={ate ? 'What did you have?' : 'What are we having?'}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
             </div>
-          )}
-
-          {tab === 'recipes' && matchedRecipes.map((r) => {
-            const n = recipePerServing(r, ctx)
-            return (
-              <button
-                key={r.id}
-                onClick={() => {
-                  onAdd({ kind: 'recipe', recipeId: r.id, servings: 1 })
-                  /*
-                   * The rest of the pot, straight into the fridge.
-                   *
-                   * Written here rather than handed to `onAdd`, because it is
-                   * a fact about the cooking rather than about the day: the
-                   * day gets one serving whatever size the pot was, and every
-                   * caller of this picker would otherwise have to learn about
-                   * portions to pass it on.
-                   */
-                  const spare = surplusOf({
-                    recipeId: r.id, cooking, eating: 1, madeOn: date,
-                    id: `cook-${Date.now().toString(36)}`,
-                  })
-                  if (spare) addPortion(spare)
-                  onClose()
-                }}
-                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left transition-colors"
-              >
-                <span className="text-xl">{r.emoji}</span>
-                <span className="flex-1 min-w-0">
-                  <span className="block text-sm font-semibold text-ink-900 truncate">{r.name.en}</span>
-                  {/* What you have matters more at this moment than what the
-                      dietician wrote, so it takes the line when there is
-                      anything in the cupboard to say. */}
-                  {pantry.size > 0 ? (
-                    <span className="block text-xs text-ink-500 truncate">
-                      {availabilityLabel(availability(r, ctx, pantry)) || r.sourceLine}
-                    </span>
-                  ) : r.sourceLine ? (
-                    <span className="block text-xs text-ink-500 truncate">{r.sourceLine}</span>
-                  ) : null}
-                </span>
-                <span className="text-sm font-mono text-ink-700 shrink-0">{Math.round(n.calories)} kcal</span>
-              </button>
-            )
-          })}
-
-          {tab === 'recipes' && !matchedRecipes.length && (
-            <div className="text-center py-8 space-y-2">
-              <p className="text-sm text-ink-500">No recipes match “{query}”.</p>
-              {/* The two libraries do not search each other, and used not to
-                  say so: a miss on one tab gave no hint that the other might
-                  have it. */}
-              <button className="btn-secondary" onClick={() => setTab('foods')}>
-                Look in foods instead
-              </button>
-            </div>
-          )}
-
-          {tab === 'foods' && matchedFoods.map((f) => {
-            const g = grams[f.id] ?? f.units[0]?.grams ?? 100
-            const n = componentsNutrients([{ kind: 'food', foodId: f.id, grams: g }], ctx)
-            return (
-              // Name on its own row, then controls beneath: on a phone the
-              // one-line version squeezed the food name down to a few characters.
-              <div key={f.id} className="p-3 rounded-xl hover:bg-cream-50 transition-colors">
-                <div className="min-w-0 mb-2">
-                  <p className="text-sm font-semibold text-ink-900 truncate">{f.names.en}</p>
-                  {/* Marked as what it is. The document is English and these
-                      two words are not, so a screen reader that is not told
-                      will pronounce "paine integrala" as English. */}
-                  {f.names.ro || f.names.hu ? (
-                    <p className="text-xs text-ink-500 truncate">
-                      {f.names.ro && <span lang="ro">{f.names.ro}</span>}
-                      {f.names.ro && f.names.hu ? ' · ' : ''}
-                      {f.names.hu && <span lang="hu">{f.names.hu}</span>}
-                    </p>
-                  ) : null}
-                </div>
+            {(onSlotChange || onDateChange) && (
+              <div className="card-soft p-3 space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min={0}
-                      max={MOST.grams}
-                      value={g}
-                      onChange={(e) => setGrams((s) => ({
-                        ...s, [f.id]: readAmount(e.target.value, { max: MOST.grams }),
-                      }))}
-                      className="input w-24 pr-7 text-right"
-                      aria-label={`Grams of ${f.names.en}`}
-                    />
-                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-ink-500 pointer-events-none">g</span>
-                  </div>
-                  <span className="flex-1 text-xs text-ink-500 font-mono">{Math.round(n.calories)} kcal</span>
+                  <CalendarDays size={15} className="shrink-0 text-ink-500" />
+                  <p className="flex-1 min-w-0 text-sm text-ink-900">
+                    <span className="font-semibold">{SLOT_LABELS[slot]}</span>
+                    {', '}
+                    {date === today()
+                      ? 'today'
+                      : new Date(date + 'T12:00:00').toLocaleDateString('en-GB', {
+                        weekday: 'long', day: 'numeric', month: 'long',
+                      })}
+                  </p>
                   <button
-                    className="btn-primary shrink-0"
-                    onClick={() => { onAdd({ kind: 'food', foodId: f.id, grams: g }); onClose() }}
+                    className="btn-ghost text-xs shrink-0"
+                    aria-expanded={when}
+                    onClick={() => setWhen((v) => !v)}
                   >
-                    {ate ? 'Ate it' : 'Add'}
+                    {when ? 'Done' : 'Change'}
                   </button>
                 </div>
-              </div>
-            )
-          })}
 
-          {tab === 'foods' && !matchedFoods.length && (
-            <div className="text-center py-8 space-y-2">
-              <p className="text-sm text-ink-500">No foods match “{query}”.</p>
-              <button className="btn-secondary" onClick={() => setTab('recipes')}>
-                Look in recipes instead
-              </button>
+                {when && (
+                  <WhenPicker
+                    date={date}
+                    onDate={(d) => onDateChange?.(d)}
+                    slot={onSlotChange ? slot : undefined}
+                    onSlot={onSlotChange}
+                  />
+                )}
+              </div>
+            )}
+
+            <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
+              {([...(available.length ? ['fridge' as const] : []), 'recipes' as const, 'foods' as const]).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`capitalize ${tab === t ? 'tab-on' : 'tab-off'}`}
+                >
+                  {t}
+                  {t === 'fridge' && (
+                    <span className="ml-1.5 text-xs opacity-60 font-mono">{available.length}</span>
+                  )}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1.5">
+            {tab === 'fridge' && offerOrder(available).map((p) => {
+              const n = componentsNutrients([{ kind: 'portion', portionId: p.id, servings: 1 }], ctx)
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => { onAdd({ kind: 'portion', portionId: p.id, servings: 1 }); onClose() }}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left transition-colors"
+                >
+                  <span className="text-xl">{p.storage === 'freezer' ? '🧊' : '🥡'}</span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-sm font-semibold text-ink-900 truncate">
+                      {portionLabel(p, ctx.recipes)}
+                    </span>
+                    <span className="block text-xs text-ink-500 truncate">
+                      {p.servings === 1 ? '1 portion left' : `${p.servings} portions left`} · {madeWhen(p)}
+                    </span>
+                  </span>
+                  {n.calories > 0 && (
+                    <span className="text-sm font-mono text-ink-700 shrink-0">
+                      {Math.round(n.calories)} kcal
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+
+            {/* How big the pot is. Only when planning: "I already ate this" is
+                not a moment to be asked how much you cooked. */}
+            {tab === 'recipes' && !ate && (
+              <div className="flex flex-wrap items-center gap-2 pb-1">
+                <span className="text-xs font-bold text-ink-500">Cooking</span>
+                {[1, 2, 3, 4, 6].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setCooking(n)}
+                    aria-pressed={cooking === n}
+                    aria-label={n === 1 ? 'Cooking one serving' : `Cooking ${n} servings`}
+                    className={cooking === n ? 'chip-on' : 'chip-off'}
+                  >
+                    {n}
+                  </button>
+                ))}
+                <span className="basis-full text-xs text-ink-500">
+                  {surplusLine(cooking, 1)
+                    ? `One serving goes in the day, ${surplusLine(cooking, 1)}.`
+                    : 'One serving, eaten on the day.'}
+                </span>
+              </div>
+            )}
+
+            {tab === 'recipes' && matchedRecipes.map((r) => {
+              const n = recipePerServing(r, ctx)
+              return (
+                <button
+                  key={r.id}
+                  onClick={() => {
+                    onAdd({ kind: 'recipe', recipeId: r.id, servings: 1 })
+                    /*
+                     * The rest of the pot, straight into the fridge.
+                     *
+                     * Written here rather than handed to `onAdd`, because it is
+                     * a fact about the cooking rather than about the day: the
+                     * day gets one serving whatever size the pot was, and every
+                     * caller of this picker would otherwise have to learn about
+                     * portions to pass it on.
+                     */
+                    const spare = surplusOf({
+                      recipeId: r.id, cooking, eating: 1, madeOn: date,
+                      id: `cook-${Date.now().toString(36)}`,
+                    })
+                    if (spare) addPortion(spare)
+                    onClose()
+                  }}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left transition-colors"
+                >
+                  <span className="text-xl">{r.emoji}</span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-sm font-semibold text-ink-900 truncate">{r.name.en}</span>
+                    {/* What you have matters more at this moment than what the
+                        dietician wrote, so it takes the line when there is
+                        anything in the cupboard to say. */}
+                    {pantry.size > 0 ? (
+                      <span className="block text-xs text-ink-500 truncate">
+                        {availabilityLabel(availability(r, ctx, pantry)) || r.sourceLine}
+                      </span>
+                    ) : r.sourceLine ? (
+                      <span className="block text-xs text-ink-500 truncate">{r.sourceLine}</span>
+                    ) : null}
+                  </span>
+                  <span className="text-sm font-mono text-ink-700 shrink-0">{Math.round(n.calories)} kcal</span>
+                </button>
+              )
+            })}
+
+            {tab === 'recipes' && !matchedRecipes.length && (
+              <div className="text-center py-8 space-y-2">
+                <p className="text-sm text-ink-500">No recipes match “{query}”.</p>
+                {/* The two libraries do not search each other, and used not to
+                    say so: a miss on one tab gave no hint that the other might
+                    have it. */}
+                <button className="btn-secondary" onClick={() => setTab('foods')}>
+                  Look in foods instead
+                </button>
+              </div>
+            )}
+
+            {tab === 'foods' && matchedFoods.map((f) => {
+              const g = grams[f.id] ?? f.units[0]?.grams ?? 100
+              const n = componentsNutrients([{ kind: 'food', foodId: f.id, grams: g }], ctx)
+              return (
+                // Name on its own row, then controls beneath: on a phone the
+                // one-line version squeezed the food name down to a few characters.
+                <div key={f.id} className="p-3 rounded-xl hover:bg-cream-50 transition-colors">
+                  <div className="min-w-0 mb-2">
+                    <p className="text-sm font-semibold text-ink-900 truncate">{f.names.en}</p>
+                    {/* Marked as what it is. The document is English and these
+                        two words are not, so a screen reader that is not told
+                        will pronounce "paine integrala" as English. */}
+                    {f.names.ro || f.names.hu ? (
+                      <p className="text-xs text-ink-500 truncate">
+                        {f.names.ro && <span lang="ro">{f.names.ro}</span>}
+                        {f.names.ro && f.names.hu ? ' · ' : ''}
+                        {f.names.hu && <span lang="hu">{f.names.hu}</span>}
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={0}
+                        max={MOST.grams}
+                        value={g}
+                        onChange={(e) => setGrams((s) => ({
+                          ...s, [f.id]: readAmount(e.target.value, { max: MOST.grams }),
+                        }))}
+                        className="input w-24 pr-7 text-right"
+                        aria-label={`Grams of ${f.names.en}`}
+                      />
+                      <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-ink-500 pointer-events-none">g</span>
+                    </div>
+                    <span className="flex-1 text-xs text-ink-500 font-mono">{Math.round(n.calories)} kcal</span>
+                    <button
+                      className="btn-primary shrink-0"
+                      onClick={() => { onAdd({ kind: 'food', foodId: f.id, grams: g }); onClose() }}
+                    >
+                      {ate ? 'Ate it' : 'Add'}
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* The way out of a library that does not have it. Offered whether
+                or not there were matches: a near-match is not the thing you ate,
+                and the old sheet's only answer to either case was to go and
+                search the other library. */}
+            {tab === 'foods' && (
+              <div className={matchedFoods.length ? 'pt-2' : 'text-center py-8 space-y-2'}>
+                {!matchedFoods.length && (
+                  <p className="text-sm text-ink-500">
+                    {query ? `No foods match “${query}”.` : 'Search above, or write one down.'}
+                  </p>
+                )}
+                <div className="flex flex-wrap justify-center gap-2">
+                  <button
+                    className={matchedFoods.length ? 'btn-ghost text-sm w-full justify-center' : 'btn-primary'}
+                    onClick={() => setWriting(true)}
+                  >
+                    <Plus size={15} />
+                    {query.trim() ? `Add “${query.trim()}” as a new food` : 'Add a new food'}
+                  </button>
+                  {!matchedFoods.length && (
+                    <button className="btn-secondary" onClick={() => setTab('recipes')}>
+                      Look in recipes instead
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/*
+        A sibling of the picker rather than a child of it. The picker's backdrop
+        closes the picker on any click that reaches it, and a click inside a
+        sheet nested within it would.
+
+        What you write goes straight into the meal at 100 g, which is the
+        figure everything in this app is stated per, and is one number to
+        correct rather than a second sheet to answer before the food is
+        recorded at all.
+      */}
+      {writing && (
+        <AddFoodModal
+          initialName={query.trim()}
+          onClose={() => setWriting(false)}
+          onSaved={(food) => {
+            onAdd({ kind: 'food', foodId: food.id, grams: food.units[0]?.grams ?? 100 })
+            onClose()
+          }}
+        />
+      )}
+    </>
   )
 }
