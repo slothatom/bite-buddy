@@ -9,15 +9,26 @@
  * So the face lives here once, as text, and the PNGs are rendered from it.
  * Run `npm run icons` after changing the mascot or the brand colour.
  *
+ * Every file it writes carries a hash of its own contents in its name, and
+ * `src/generated/icons.ts` records what those names are. That is the fix for
+ * a specific failure: `icon-192.png` has been three different pictures over
+ * this app's life, all at one address, and a home screen has no way to learn
+ * that an address it already has means something new. iOS reads the icon once
+ * when you add the app and keeps it; Android keeps its own copy; and a
+ * service worker precaches by URL. A new brand shipped and phones went on
+ * drawing the old blob. A name that changes with the picture cannot do that.
+ *
  * Rendering is done by taking a screenshot of the SVG in the browser that is
  * already a dev dependency for the end-to-end tests, rather than adding an
  * image library to the project for three files.
  */
 import { chromium } from '@playwright/test'
-import { writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { readdirSync, unlinkSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const OUT = resolve(import.meta.dirname, '../public')
+const GENERATED = resolve(import.meta.dirname, '../src/generated/icons.ts')
 
 /** The brand, as literals. These files are read outside the document, where
  *  a CSS variable means nothing. */
@@ -81,6 +92,27 @@ function face(scale: number): string {
 </svg>`
 }
 
+/** Eight characters of the contents, which is what makes the name honest. */
+function stamp(bytes: Buffer | string): string {
+  return createHash('sha256').update(bytes).digest('hex').slice(0, 8)
+}
+
+/**
+ * Everything this script has ever written, gone before it writes again.
+ *
+ * Without this, hashed names accumulate: every brand change would leave its
+ * predecessor in `public/`, shipped to every device forever because no build
+ * step knows which of nine PNGs is the current one. The generated module
+ * below is the only record of what is current, so anything not about to be
+ * named in it has no business being deployed.
+ */
+function clearOldArtwork(): void {
+  const mine = /^(icon-|splash-|favicon)/
+  for (const name of readdirSync(OUT)) {
+    if (mine.test(name)) unlinkSync(resolve(OUT, name))
+  }
+}
+
 /**
  * Full bleed for the ordinary icon, and pulled in for the maskable one.
  *
@@ -90,9 +122,9 @@ function face(scale: number): string {
  * ears. 0.72 keeps them inside the circle with room to spare.
  */
 const ICONS = [
-  { file: 'icon-192.png', size: 192, scale: 1 },
-  { file: 'icon-512.png', size: 512, scale: 1 },
-  { file: 'icon-maskable-512.png', size: 512, scale: 0.72 },
+  { stem: 'icon-192', size: 192, scale: 1 },
+  { stem: 'icon-512', size: 512, scale: 1 },
+  { stem: 'icon-maskable-512', size: 512, scale: 0.72, purpose: 'maskable' },
 ]
 
 /*
@@ -109,20 +141,32 @@ const browser = await chromium.launch(
 )
 const page = await browser.newPage()
 
-for (const { file, size, scale } of ICONS) {
+clearOldArtwork()
+
+const iconLines: string[] = []
+let appleTouch = ''
+for (const { stem, size, scale, purpose } of ICONS) {
   await page.setViewportSize({ width: size, height: size })
   await page.setContent(
     `<body style="margin:0">${face(scale).replace('<svg ', `<svg width="${size}" height="${size}" `)}</body>`,
   )
   const shot = await page.locator('svg').screenshot({ omitBackground: false })
+  const file = `${stem}.${stamp(shot)}.png`
   writeFileSync(resolve(OUT, file), shot)
-  console.log(`${file.padEnd(24)} ${size}x${size}${scale < 1 ? `, inset to ${scale * 100}%` : ''}`)
+  if (stem === 'icon-192') appleTouch = file
+  iconLines.push(
+    `  { src: '${file}', sizes: '${size}x${size}', type: 'image/png'`
+    + `${purpose ? `, purpose: '${purpose}'` : ''} },`,
+  )
+  console.log(`${file.padEnd(34)} ${size}x${size}${scale < 1 ? `, inset to ${scale * 100}%` : ''}`)
 }
 
 // The tab icon is the same face, as vector, so it stays sharp wherever a
 // browser decides to draw it.
-writeFileSync(resolve(OUT, 'favicon.svg'), `${face(1)}\n`)
-console.log('favicon.svg'.padEnd(24) + 'vector')
+const svg = `${face(1)}\n`
+const favicon = `favicon.${stamp(svg)}.svg`
+writeFileSync(resolve(OUT, favicon), svg)
+console.log(`${favicon.padEnd(34)} vector`)
 
 /*
  * The launch screens iOS will not work out for itself.
@@ -155,20 +199,70 @@ function splash(w: number, h: number): string {
   </div>`
 }
 
-const links: string[] = []
+const splashLines: string[] = []
 for (const { w, h, dw, dh, dpr } of SPLASHES) {
   await page.setViewportSize({ width: w, height: h })
   await page.setContent(`<body style="margin:0">${splash(w, h)}</body>`)
-  writeFileSync(resolve(OUT, `splash-${w}x${h}.png`), await page.screenshot())
-  links.push(
-    `    <link rel="apple-touch-startup-image" href="splash-${w}x${h}.png"`
-    + ` media="(device-width: ${dw}px) and (device-height: ${dh}px)`
-    + ` and (-webkit-device-pixel-ratio: ${dpr}) and (orientation: portrait)" />`,
+  const shot = await page.screenshot()
+  const file = `splash-${w}x${h}.${stamp(shot)}.png`
+  writeFileSync(resolve(OUT, file), shot)
+  splashLines.push(
+    `  { src: '${file}', media: '(device-width: ${dw}px) and (device-height: ${dh}px)`
+    + ` and (-webkit-device-pixel-ratio: ${dpr}) and (orientation: portrait)' },`,
   )
-  console.log(`splash-${w}x${h}.png`.padEnd(24) + `${dw}x${dh} at ${dpr}x`)
+  console.log(`${file.padEnd(34)} ${dw}x${dh} at ${dpr}x`)
 }
 
-console.log('\nPaste into index.html if the device list changes:\n')
-console.log(links.join('\n'))
+/*
+ * The names, written where the app can read them.
+ *
+ * A module rather than JSON, so the build config, the service worker and the
+ * check that guards all this can import it without anybody enabling JSON
+ * imports for one file. The links in index.html are injected from here by a
+ * plugin in vite.config.ts, which is why there is no longer a block of markup
+ * for somebody to paste in and get wrong.
+ */
+writeFileSync(GENERATED, `/**
+ * The artwork's real filenames, written by \`npm run icons\`.
+ *
+ * Do not edit. Every name carries a hash of the file's own contents, so a
+ * changed picture is a changed address and nothing that caches by URL, from a
+ * home screen to a service worker, can go on drawing the previous one.
+ *
+ * \`npm run icons:check\` fails the build if these names and \`public/\` have
+ * drifted apart in either direction.
+ */
+export interface AppIcon {
+  src: string
+  sizes: string
+  type: string
+  purpose?: string
+}
+
+export interface LaunchScreen {
+  src: string
+  media: string
+}
+
+/** The tab icon, as vector. */
+export const FAVICON = '${favicon}'
+
+/** What iOS puts on the home screen, read once when the app is added. */
+export const APPLE_TOUCH_ICON = '${appleTouch}'
+
+/** What a notification is drawn with, which the service worker asks for. */
+export const NOTIFICATION_ICON = '${appleTouch}'
+
+/** The manifest's icon list. */
+export const ICONS: AppIcon[] = [
+${iconLines.join('\n')}
+]
+
+/** iOS launch screens, one per device it knows about. */
+export const SPLASHES: LaunchScreen[] = [
+${splashLines.join('\n')}
+]
+`)
+console.log(`\nsrc/generated/icons.ts written`)
 
 await browser.close()
