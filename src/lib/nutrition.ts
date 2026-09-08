@@ -1,5 +1,6 @@
 import type {
-  Component, DayPlan, Food, Macros, MicroKey, Micros, Nutrients, PlannedMeal, Portion, Recipe,
+  Component, DayPlan, Food, Macros, MealOutcome, MicroKey, Micros, Nutrients, PlannedMeal,
+  Portion, Recipe,
 } from '../types'
 import { MICRO_KEYS } from '../types'
 import { flattenWithLosses } from './ingredients'
@@ -203,11 +204,8 @@ export function dayEaten(day: DayPlan, ctx: NutritionContext): {
   /** True once at least one meal has been marked one way or the other. */
   recorded: boolean
 } {
-  const { meals, recorded } = mealsThatCount(day)
-  return {
-    nutrients: meals.reduce((acc, m) => addNutrients(acc, mealNutrients(m, ctx)), emptyNutrients()),
-    recorded,
-  }
+  const { entries, recorded } = entriesThatCount(day)
+  return { nutrients: componentsNutrients(entries, ctx), recorded }
 }
 
 /**
@@ -230,9 +228,94 @@ export function dayEaten(day: DayPlan, ctx: NutritionContext): {
  * Lunch sitting there in front of you. The app was treating "not yet" as "no".
  */
 export function mealsThatCount(day: DayPlan): { meals: PlannedMeal[]; recorded: boolean } {
+  const { entries, recorded } = entriesThatCount(day)
+  const kept = new Set(entries)
   return {
-    meals: day.meals.filter((m) => m.outcome !== 'skipped'),
-    recorded: day.meals.some((m) => m.outcome),
+    // Each meal carrying only the items that count, so a caller reading meals
+    // still sees the right food in them. A meal whose every item was skipped
+    // drops out entirely, which is what it used to do when the tick was the
+    // meal's.
+    meals: day.meals
+      .map((m) => ({ ...m, entries: m.entries.filter((e) => kept.has(e)) }))
+      .filter((m) => m.entries.length > 0),
+    recorded,
+  }
+}
+
+/**
+ * What an item's tick says, falling back to its meal's.
+ *
+ * Exported because the screens need it to draw a tick, and a second copy of
+ * this rule would be a second answer to "did I eat that". Every day recorded
+ * before items had their own outcome has the answer on the meal alone, and
+ * `recordEaten` still writes it there, so the fallback is not a migration
+ * shim, it is where the answer legitimately lives for a meal ticked whole.
+ */
+export function entryOutcome(
+  entry: Component, meal: Pick<PlannedMeal, 'outcome'>,
+): MealOutcome | undefined {
+  return entry.outcome ?? meal.outcome
+}
+
+/**
+ * The items a day's figures should be built from.
+ *
+ * The item rather than the meal, because that is the unit a day is eaten in.
+ * Breakfast being bread, cheese and a coffee, leaving the coffee used to mean
+ * either counting a coffee nobody drank or throwing away a breakfast that
+ * happened.
+ */
+export function entriesThatCount(day: DayPlan): { entries: Component[]; recorded: boolean } {
+  const entries: Component[] = []
+  let recorded = false
+
+  for (const meal of day.meals) {
+    if (meal.outcome) recorded = true
+    for (const entry of meal.entries) {
+      if (entry.outcome) recorded = true
+      if (entryOutcome(entry, meal) !== 'skipped') entries.push(entry)
+    }
+  }
+
+  return { entries, recorded }
+}
+
+/**
+ * Where a day stands right now: what has been had, and what is still ahead.
+ *
+ * `dayEaten` answers "what does this day amount to", counting anything not
+ * skipped, which is the right total for a day you are planning and the wrong
+ * one for a day you are living. At four in the afternoon the useful sentence
+ * is not "this day is 1,600 kcal", it is "you have had 1,180 and dinner is
+ * still to come". Both halves are facts; presenting only their sum is what
+ * makes a planner unusable as a tracker.
+ *
+ * They add up to `dayEaten`'s figure exactly, so nothing here is a second
+ * opinion about the same day.
+ */
+export function dayStanding(day: DayPlan, ctx: NutritionContext): {
+  /** Ticked as eaten. */
+  had: Nutrients
+  /** Nothing said about it yet, so still to come. */
+  ahead: Nutrients
+  /** How many items are in each, for a screen deciding whether to say so. */
+  count: { had: number; ahead: number }
+} {
+  const had: Component[] = []
+  const ahead: Component[] = []
+
+  for (const meal of day.meals) {
+    for (const entry of meal.entries) {
+      const outcome = entryOutcome(entry, meal)
+      if (outcome === 'eaten') had.push(entry)
+      else if (!outcome) ahead.push(entry)
+    }
+  }
+
+  return {
+    had: componentsNutrients(had, ctx),
+    ahead: componentsNutrients(ahead, ctx),
+    count: { had: had.length, ahead: ahead.length },
   }
 }
 
@@ -253,17 +336,25 @@ export interface DayProgress {
 }
 
 export function dayProgress(day: DayPlan | undefined): DayProgress {
-  const meals = day?.meals ?? []
-  const eaten = meals.filter((m) => m.outcome === 'eaten').length
-  const skipped = meals.filter((m) => m.outcome === 'skipped').length
-  const undecided = meals.length - eaten - skipped
+  /*
+   * Items, not meals.
+   *
+   * "3 of 5 eaten" counting meals answered a question nobody asks. A day is
+   * eaten in items, and a meal of four things with one thing ticked was
+   * rounded, by the count, to nothing having happened at all.
+   */
+  const items = (day?.meals ?? []).flatMap(
+    (meal) => meal.entries.map((entry) => entryOutcome(entry, meal)))
+  const eaten = items.filter((o) => o === 'eaten').length
+  const skipped = items.filter((o) => o === 'skipped').length
+  const undecided = items.length - eaten - skipped
 
-  const state = !meals.length ? 'empty'
-    : undecided === meals.length ? 'planned'
+  const state = !items.length ? 'empty'
+    : undecided === items.length ? 'planned'
       : undecided === 0 ? 'done'
         : 'part'
 
-  return { total: meals.length, eaten, skipped, undecided, state }
+  return { total: items.length, eaten, skipped, undecided, state }
 }
 
 /**

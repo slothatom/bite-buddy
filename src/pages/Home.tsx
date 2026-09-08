@@ -13,7 +13,9 @@ import { useAuthStore } from '../store/useAuth'
 import { useSyncStatus } from '../store/useSync'
 import { useAvailablePortions } from '../store/usePortionStore'
 import { acknowledgeConflicts } from '../lib/sync'
-import { dayNutrients, dayEaten, weekEaten, componentsNutrients } from '../lib/nutrition'
+import {
+  dayNutrients, dayEaten, dayStanding, entryOutcome, weekEaten, componentsNutrients,
+} from '../lib/nutrition'
 import { targetStatus, STATUS_STYLES } from '../lib/status'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import type { MealSlot } from '../types'
@@ -70,6 +72,9 @@ export default function Home() {
   const todayPlan = plan.find((d) => d.date === today)
   const todayRecord = todayPlan ? dayEaten(todayPlan, ctx) : null
   const todayTotals = todayRecord?.nutrients ?? null
+  // Where today has got to, for the line under the ring. The ring is the whole
+  // day against the target; this is how much of it has actually happened.
+  const standing = todayPlan ? dayStanding(todayPlan, ctx) : null
   // What you did today, which every screen about today had never heard of.
   const movedToday = useDayMovement(viewingAs, today)
 
@@ -260,14 +265,20 @@ export default function Home() {
                   {MEAL_SLOTS.map((slot) => {
                     const meals = todayPlan?.meals.filter((m) => m.slot === slot) ?? []
                     if (!meals.length) return null
-                    const kcal = componentsNutrients(meals.flatMap((m) => m.entries), ctx).calories
+                    // Only what still counts. This summed every line in the
+                    // slot, so a breakfast whose coffee you had said you left
+                    // went on charging you for the coffee.
+                    const kept = meals.flatMap(
+                      (m) => m.entries.filter((e) => entryOutcome(e, m) !== 'skipped'))
+                    if (!kept.length) return null
+                    const kcal = componentsNutrients(kept, ctx).calories
                     return (
                       <div key={slot} className="flex items-baseline gap-2 text-sm">
                         <span className="w-20 shrink-0 text-xs font-bold uppercase tracking-wide text-ink-500">
                           {SLOT_LABELS[slot]}
                         </span>
                         <span className="flex-1 min-w-0 text-ink-900">
-                          {meals.flatMap((m) => m.entries).map((e) => entryName(e, ctx)).join(', ')}
+                          {kept.map((e) => entryName(e, ctx)).join(', ')}
                         </span>
                         <span className="shrink-0 text-xs font-mono text-ink-700 tabular-nums">
                           {Math.round(kcal)}
@@ -277,6 +288,19 @@ export default function Home() {
                   })}
                 </div>
               </div>
+              {/* The two facts a tracker exists to give you, once any of the
+                  day has happened. Before that there is nothing to report:
+                  a day you have not started is a plan, not nought eaten. */}
+              {standing && standing.count.had > 0 && (
+                <p className="text-sm text-ink-700 pt-1 border-t border-border-200">
+                  <strong className="font-mono">{Math.round(standing.had.calories)}</strong> kcal
+                  {' '}had
+                  {standing.count.ahead > 0
+                    ? <>, <strong className="font-mono">{Math.round(standing.ahead.calories)}</strong>
+                      {' '}still to come.</>
+                    : '. Nothing else on the day.'}
+                </p>
+              )}
               <MovedToday movement={movedToday} />
               <div className="flex flex-wrap gap-2">
                 <Link to="/plan" className="btn-secondary">

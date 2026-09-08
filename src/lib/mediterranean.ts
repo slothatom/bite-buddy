@@ -138,6 +138,17 @@ export function scoreGaps(days: DayPlan[], ctx: NutritionContext): ScoreGaps {
 
   const noGoal = new Map<string, string>()
   for (const ingredient of ingredients) {
+    /*
+     * A drink is not a serving of anything, and saying so is not a disclosure.
+     *
+     * This list exists to name food the guide could have counted and did not,
+     * so that a low score is never quietly a short list. A coffee is not that:
+     * there is no serving of coffee the guide is looking for and there never
+     * will be. Leaving them in would put a line about tea under every week's
+     * score, which teaches people to stop reading the one sentence here that
+     * matters.
+     */
+    if (ingredient.food.category === 'beverages') continue
     if (!goals.has(ingredient.food.category)) noGoal.set(ingredient.foodId, ingredient.food.names.en)
   }
 

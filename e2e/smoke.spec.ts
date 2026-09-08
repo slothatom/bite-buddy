@@ -2050,21 +2050,21 @@ test.describe('what actually happened', () => {
   test('a meal can be ticked off, and untidied again', async ({ page }) => {
     await aPlannedDay(page)
 
-    const tick = page.getByRole('button', { name: 'Mark as eaten' }).first()
+    const tick = page.getByRole('button', { name: /^Had / }).first()
     await tick.click()
 
-    // Eaten. The same button now offers the other thing you might mean, and
+    // Had. The same button now offers the other thing you might mean, and
     // the day counts how far through it is rather than picking one of two
     // words for four different situations.
-    await expect(page.getByRole('button', { name: /^Eaten\./ }).first()).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Had .*Say it was left/ }).first()).toBeVisible()
     await expect(page.getByText(/\d+ of \d+ eaten/)).toBeVisible()
 
-    await page.getByRole('button', { name: /^Eaten\./ }).first().click()
-    await expect(page.getByRole('button', { name: /^Skipped\./ }).first()).toBeVisible()
+    await page.getByRole('button', { name: /^Had .*Say it was left/ }).first().click()
+    await expect(page.getByRole('button', { name: /^Left .*Clear it/ }).first()).toBeVisible()
 
     // And round to nothing said, because people change their minds.
-    await page.getByRole('button', { name: /^Skipped\./ }).first().click()
-    await expect(page.getByRole('button', { name: 'Mark as eaten' }).first()).toBeVisible()
+    await page.getByRole('button', { name: /^Left .*Clear it/ }).first().click()
+    await expect(page.getByRole('button', { name: /^Had [^.]+$/ }).first()).toBeVisible()
   })
 
   test('a meal nobody has spoken about stays in the day', async ({ page }) => {
@@ -2074,7 +2074,7 @@ test.describe('what actually happened', () => {
     await expect(page.getByText('planned', { exact: true })).toBeVisible()
     const before = await page.locator('[data-day-kcal]').innerText()
 
-    await page.getByRole('button', { name: 'Mark as eaten' }).first().click()
+    await page.getByRole('button', { name: /^Had [^.]+$/ }).first().click()
 
     // The badge moves on, and the total does not. Ticking breakfast used to
     // drop dinner, still hours away and untouched, out of the day.
@@ -2087,8 +2087,8 @@ test.describe('what actually happened', () => {
     await aPlannedDay(page)
     const before = Number((await page.locator('[data-day-kcal]').innerText()).replace(/\D/g, ''))
 
-    await page.getByRole('button', { name: 'Mark as eaten' }).first().click()
-    await page.getByRole('button', { name: /^Eaten\./ }).first().click()
+    await page.getByRole('button', { name: /^Had [^.]+$/ }).first().click()
+    await page.getByRole('button', { name: /^Had .*Say it was left/ }).first().click()
 
     const after = Number((await page.locator('[data-day-kcal]').innerText()).replace(/\D/g, ''))
     expect(after, 'skipping took nothing off').toBeLessThan(before)
@@ -2098,13 +2098,99 @@ test.describe('what actually happened', () => {
   test('a skipped meal is dimmed rather than told off', async ({ page }) => {
     await aPlannedDay(page)
 
-    await page.getByRole('button', { name: 'Mark as eaten' }).first().click()
-    await page.getByRole('button', { name: /^Eaten\./ }).first().click()
+    await page.getByRole('button', { name: /^Had [^.]+$/ }).first().click()
+    await page.getByRole('button', { name: /^Had .*Say it was left/ }).first().click()
 
     // Struck through and quieter. Nothing red, nothing scolding: not eating
     // what you planned is a Tuesday, not a failure.
     const struck = page.locator('[data-entry-name].line-through')
     await expect(struck.first()).toBeVisible()
+  })
+
+  test('one item can be left without leaving the whole meal', async ({ page }) => {
+    await aPlannedDay(page)
+
+    // A slot with more than one line in it, which is the case the meal-level
+    // tick had no honest answer for.
+    await page.getByRole('button', { name: /^Add another$|^\+ Add another$/ }).first().click()
+    // Scoped to the sheet: the phone's bar carries an "Add a meal" of its own,
+    // sitting over the top of this one.
+    const sheet = page.getByRole('dialog').first()
+    await sheet.getByRole('button', { name: 'foods', exact: true }).click()
+    await sheet.getByPlaceholder(/What are we having|What did you have/).fill('coffee')
+    await sheet.getByRole('button', { name: 'Add', exact: true }).first().click()
+
+    const before = Number((await page.locator('[data-day-kcal]').innerText()).replace(/\D/g, ''))
+
+    // Say you left the coffee. The rest of that slot is untouched.
+    await page.getByRole('button', { name: /^Had Coffee$/ }).click()
+    await page.getByRole('button', { name: /^Had Coffee. Say it was left/ }).click()
+
+    const after = Number((await page.locator('[data-day-kcal]').innerText()).replace(/\D/g, ''))
+    expect(after, 'leaving one line took nothing off').toBeLessThan(before)
+    expect(after, 'leaving one line emptied the slot').toBeGreaterThan(0)
+
+    // And the food beside it is still there, unstruck.
+    await expect(page.locator('[data-entry-name]').first()).not.toHaveClass(/line-through/)
+  })
+
+  test('a whole slot can still be ticked in one tap', async ({ page }) => {
+    await aPlannedDay(page)
+
+    await page.getByRole('button', { name: 'Had it all' }).first().click()
+
+    // Every line in that slot, not just the first, and the offer withdraws
+    // itself once there is nothing left to say about it.
+    await expect(page.getByRole('button', { name: /Say it was left/ }).first()).toBeVisible()
+    await expect(page.getByText(/\d+ of \d+ eaten/)).toBeVisible()
+  })
+
+  test('the day says what has been had and what is still to come', async ({ page }) => {
+    await aPlannedDay(page)
+
+    // Nothing ticked, nothing to say: a day you have not started is not a day
+    // with nought eaten, it is a plan.
+    await expect(page.getByText(/kcal had,/)).toHaveCount(0)
+
+    await page.getByRole('button', { name: /^Had [^.]+$/ }).first().click()
+    await expect(page.getByText(/kcal had,.*still to come across/)).toBeVisible()
+  })
+
+  test('the same sheet can plan a thing or record it', async ({ page }) => {
+    await planDay(page)
+    await page.getByRole('button', { name: /Pop something in/ }).first().click()
+    const sheet = page.getByRole('dialog').first()
+
+    // It opens planning, which is what the planner has always meant.
+    await expect(sheet.getByRole('heading', { name: /^Add to / })).toBeVisible()
+
+    // And says so the other way in one tap, rather than adding to the plan and
+    // sending you off to tick it.
+    await sheet.getByRole('button', { name: 'Already had it' }).click()
+    await expect(sheet.getByRole('heading', { name: /^Had this for / })).toBeVisible()
+
+    await sheet.getByRole('button', { name: 'foods', exact: true }).click()
+    await sheet.getByPlaceholder('What did you have?').fill('apple')
+    await sheet.getByRole('button', { name: 'Had it', exact: true }).first().click()
+
+    // It lands already ticked. Nothing to go back and confirm.
+    await planDay(page)
+    await expect(page.getByRole('button', { name: /Say it was left/ }).first()).toBeVisible()
+  })
+
+  test('a drink is one tap and a named glass, not a number of grams', async ({ page }) => {
+    await planDay(page)
+    await page.getByRole('button', { name: /Pop something in/ }).first().click()
+    await page.getByRole('button', { name: 'foods', exact: true }).click()
+    await page.getByPlaceholder(/What are we having|What did you have/).fill('beer')
+
+    // The library had water and nothing else drinkable, so a beer could not be
+    // recorded at all, and the amount is the bottle rather than a figure you
+    // are expected to know about a bottle.
+    await page.getByRole('button', { name: /^One bottle of Beer$/ }).click()
+    await page.getByRole('button', { name: /^(Add|Ate it)$/ }).first().click()
+
+    await expect(page.locator('[data-entry-name]').filter({ hasText: 'Beer' }).first()).toBeVisible()
   })
 
   test('how much of it there was can be changed after the fact', async ({ page }) => {
@@ -2134,7 +2220,7 @@ test.describe('what actually happened', () => {
     await goto(page, '/')
     await page.getByRole('button', { name: /^I ate something/ }).click()
 
-    const sheet = page.getByRole('heading', { name: /^Ate this for / })
+    const sheet = page.getByRole('heading', { name: /^Had this for / })
     await expect(sheet).toBeVisible()
 
     // The sheet says where this is going before you have chosen what, and the
@@ -2142,17 +2228,17 @@ test.describe('what actually happened', () => {
     await expect(page.getByText(/, today$/)).toBeVisible()
     await page.getByRole('button', { name: 'Change' }).click()
     await page.getByRole('button', { name: 'Snacks', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Ate this for snacks' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Had this for snacks' })).toBeVisible()
     await page.getByRole('button', { name: 'Done' }).click()
 
     await page.getByRole('button', { name: 'foods', exact: true }).click()
     await page.getByPlaceholder('What did you have?').fill('apple')
-    await page.getByRole('button', { name: 'Ate it' }).first().click()
+    await page.getByRole('button', { name: 'Had it', exact: true }).first().click()
 
     // It lands on the planner already a record. Nothing to tick afterwards.
     await planDay(page)
     await expect(page.getByText('eaten', { exact: true }).first()).toBeVisible()
-    await expect(page.getByRole('button', { name: /^Eaten\./ }).first()).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Had .*Say it was left/ }).first()).toBeVisible()
   })
 
   test('a recipe can go into a day without leaving the recipe', async ({ page }) => {

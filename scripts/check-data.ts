@@ -65,7 +65,14 @@ for (const recipe of recipes) {
 //
 // Foods whose energy is genuinely not all in the macros. Vanilla extract is
 // mostly ethanol, which carries 7 kcal/g and is not a tracked macro.
-const ENERGY_NOT_IN_MACROS = new Set(['vanilla-extract'])
+const ENERGY_NOT_IN_MACROS = new Set([
+  'vanilla-extract',
+  // Alcohol carries 7 kcal a gram and is not a macro, so a glass of wine reads
+  // 87% "off" against its own protein, carbs and fat. Listing them keeps the
+  // check sharp for the foods where a disagreement really is a mis-keyed
+  // number, which is the only reason it exists.
+  'beer-lager', 'wine-red', 'wine-white',
+])
 
 for (const food of FOODS) {
   if (ENERGY_NOT_IN_MACROS.has(food.id)) continue

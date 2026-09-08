@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { DayPlan, Food, PlannedMeal, Recipe } from '../types'
+import type { DayPlan, Food, MealOutcome, PlannedMeal, Recipe } from '../types'
 import {
-  atwaterCalories, buildContext, calorieDrift, componentsNutrients, dayEaten, dayProgress, dayLabel, reportDay,
+  atwaterCalories, buildContext, calorieDrift, componentsNutrients, dayEaten, dayProgress, dayLabel,
+  dayStanding, entryOutcome, reportDay,
   recipePerServing, recipeTotal, scaleNutrients, addNutrients,
   reportNutrients, saltFromSodium, sodiumFromSalt, weekEaten,
 } from './nutrition'
@@ -222,6 +223,102 @@ describe('what a day amounted to', () => {
 
     // Eaten plus still to come, without the one that was skipped.
     expect(mixed.nutrients.calories).toBeCloseTo(one.calories * 2, 5)
+  })
+})
+
+/**
+ * A meal is a list, and a day is eaten one line at a time.
+ *
+ * One tick per meal could say all of it or none of it, so a breakfast of
+ * bread, cheese and a coffee you left had no honest answer available.
+ */
+describe('ticking one item rather than a whole meal', () => {
+  const day = (meals: PlannedMeal[]): DayPlan => ({ date: '2026-08-29', meals })
+
+  /** Three lines of 100 g, each able to say its own thing. */
+  const spread = (outcomes: (MealOutcome | undefined)[]): DayPlan => day([{
+    id: 'a', slot: 'breakfast',
+    entries: outcomes.map((outcome) => ({
+      kind: 'food' as const, foodId: 'oats', grams: 100, outcome,
+    })),
+  }])
+
+  it('drops the one item that was left, and keeps the other two', () => {
+    const all = dayEaten(spread([undefined, undefined, undefined]), ctx).nutrients
+    const left = dayEaten(spread(['eaten', 'eaten', 'skipped']), ctx)
+
+    expect(left.recorded).toBe(true)
+    expect(left.nutrients.calories).toBeCloseTo(all.calories * 2 / 3, 5)
+  })
+
+  it("takes the meal's word for an item that has not said anything", () => {
+    // Every day recorded before items could be ticked has its answer on the
+    // meal alone, and `recordEaten` still writes it there.
+    const legacy = day([{
+      id: 'a', slot: 'breakfast', outcome: 'skipped',
+      entries: [{ kind: 'food', foodId: 'oats', grams: 100 }],
+    }])
+
+    expect(entryOutcome(legacy.meals[0].entries[0], legacy.meals[0])).toBe('skipped')
+    expect(dayEaten(legacy, ctx).nutrients.calories).toBe(0)
+  })
+
+  it("lets an item overrule the meal it is in", () => {
+    const meal: PlannedMeal = {
+      id: 'a', slot: 'breakfast', outcome: 'eaten',
+      entries: [
+        { kind: 'food', foodId: 'oats', grams: 100 },
+        { kind: 'food', foodId: 'oats', grams: 100, outcome: 'skipped' },
+      ],
+    }
+
+    expect(dayEaten(day([meal]), ctx).nutrients.calories)
+      .toBeCloseTo(dayEaten(spread(['eaten']), ctx).nutrients.calories, 5)
+  })
+
+  it('counts the day in items, not in meals', () => {
+    // Four lines with one ticked used to round to "nothing has happened",
+    // because the meal holding them was still undecided.
+    const p = dayProgress(spread(['eaten', undefined, undefined]))
+
+    expect(p.total).toBe(3)
+    expect(p.eaten).toBe(1)
+    expect(dayLabel(p)).toBe('1 of 3 eaten')
+  })
+})
+
+/**
+ * At four in the afternoon "this day is 1,600 kcal" is not the useful
+ * sentence. What has happened and what is still ahead are two facts, and
+ * summing them is what makes a planner unusable as a tracker.
+ */
+describe('where a day has got to', () => {
+  const day: DayPlan = {
+    date: '2026-08-29',
+    meals: [{
+      id: 'a', slot: 'breakfast',
+      entries: [
+        { kind: 'food', foodId: 'oats', grams: 100, outcome: 'eaten' },
+        { kind: 'food', foodId: 'oats', grams: 100, outcome: 'skipped' },
+        { kind: 'food', foodId: 'oats', grams: 100 },
+      ],
+    }],
+  }
+
+  it('separates what was had from what is still to come', () => {
+    const { had, ahead, count } = dayStanding(day, ctx)
+
+    expect(count).toEqual({ had: 1, ahead: 1 })
+    expect(had.calories).toBeCloseTo(ahead.calories, 5)
+  })
+
+  it('adds up to the same day the totals show', () => {
+    const { had, ahead } = dayStanding(day, ctx)
+
+    // The one that was skipped is in neither, which is the whole point of
+    // having said so.
+    expect(had.calories + ahead.calories)
+      .toBeCloseTo(dayEaten(day, ctx).nutrients.calories, 5)
   })
 })
 

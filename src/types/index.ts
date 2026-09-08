@@ -147,9 +147,30 @@ export interface Food {
  * models the dietician's batch cooking: "pasta de ton (pt 2 portii: 135 g ton,
  * 50 g branza cremoasa...)" is one dish cooked once and eaten across two meals.
  */
+/**
+ * What every entry on a day carries, whatever kind of thing it is.
+ *
+ * `outcome` is per item rather than per meal, which is the difference between
+ * a plan you confirm and a day you record. Breakfast is bread and cheese and a
+ * coffee; you had the bread and the cheese and left the coffee, and the meal
+ * tick could only say all of it or none of it. Every honest answer to that
+ * morning was unavailable, so the tick got used loosely and the totals it fed
+ * meant less each time it did.
+ *
+ * Undecided is not undecided forever: an entry that says nothing falls back to
+ * whatever its meal says, which is what keeps every day recorded before this
+ * existed reading exactly as it did.
+ */
+export interface EntryOutcome {
+  note?: string
+  outcome?: MealOutcome
+  /** When it was marked, so a tick is a record rather than a decoration. */
+  outcomeAt?: string
+}
+
 export type Component =
-  | { kind: 'food';   foodId: string;   grams: number;   note?: string }
-  | { kind: 'recipe'; recipeId: string; servings: number; note?: string }
+  | ({ kind: 'food';   foodId: string;   grams: number } & EntryOutcome)
+  | ({ kind: 'recipe'; recipeId: string; servings: number } & EntryOutcome)
   /**
    * Something already cooked, sitting in the fridge or the freezer.
    *
@@ -160,7 +181,7 @@ export type Component =
    * you plan to eat one, or the app cheerfully offers you the same tub of
    * chilli four times.
    */
-  | { kind: 'portion'; portionId: string; servings: number; note?: string }
+  | ({ kind: 'portion'; portionId: string; servings: number } & EntryOutcome)
 
 /**
  * What a recipe can be made of.
