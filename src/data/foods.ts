@@ -995,13 +995,126 @@ export const FOODS: Food[] = [
     units: [{ label: 'tsp', grams: 7 }],
     source: 'curated',
   },
+  // ─── Drinks ────────────────────────────────────────────────────────────────
+  // A day has drinks in it and this list had water, so everything anybody
+  // actually drinks was unrecordable: a tracker that cannot hold a coffee is a
+  // tracker somebody stops opening in the morning.
+  //
+  // Figures are per 100 ml, and every one of these carries the glass, mug or
+  // bottle it is drunk from as its first unit, because that is the amount a
+  // person knows. Nobody has had 100 ml of beer.
   {
     id: 'water',
     names: { en: 'Water', ro: 'apă', hu: 'víz' },
     aliases: ['apa', 'viz'],
     category: 'beverages', medTier: 'daily', state: 'as-sold',
     per100g: { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sodium: 2 },
-    units: [], source: 'curated',
+    units: [{ label: 'glass', grams: 250 }, { label: 'bottle', grams: 500 }],
+    source: 'curated',
+  },
+  {
+    id: 'water-sparkling',
+    names: { en: 'Sparkling water', ro: 'apă minerală', hu: 'szénsavas víz' },
+    aliases: ['apa minerala', 'szensavas viz'],
+    category: 'beverages', medTier: 'daily', state: 'as-sold',
+    per100g: { calories: 0, protein: 0, carbs: 0, fat: 0, sodium: 4 },
+    units: [{ label: 'glass', grams: 250 }, { label: 'bottle', grams: 500 }],
+    source: 'curated',
+  },
+  {
+    id: 'coffee-black',
+    names: { en: 'Coffee', ro: 'cafea', hu: 'kávé' },
+    aliases: ['cafea', 'kave', 'filter coffee', 'americano'],
+    category: 'beverages', medTier: 'daily', state: 'as-sold',
+    per100g: { calories: 1, protein: 0.1, carbs: 0, fat: 0, sodium: 2 },
+    units: [{ label: 'mug', grams: 240 }, { label: 'cup', grams: 150 }],
+    source: 'curated',
+  },
+  {
+    id: 'coffee-espresso',
+    names: { en: 'Espresso', ro: 'espresso', hu: 'eszpresszó' },
+    aliases: ['espresso', 'eszpresszo'],
+    category: 'beverages', medTier: 'daily', state: 'as-sold',
+    per100g: { calories: 9, protein: 0.1, carbs: 1.7, fat: 0.2, sodium: 14 },
+    units: [{ label: 'shot', grams: 30 }, { label: 'double', grams: 60 }],
+    source: 'curated',
+  },
+  {
+    id: 'tea-black',
+    names: { en: 'Tea', ro: 'ceai', hu: 'tea' },
+    aliases: ['ceai', 'tea', 'ceai negru', 'herbal tea'],
+    category: 'beverages', medTier: 'daily', state: 'as-sold',
+    per100g: { calories: 1, protein: 0, carbs: 0.3, fat: 0, sodium: 3 },
+    units: [{ label: 'mug', grams: 240 }],
+    source: 'curated',
+  },
+  {
+    id: 'juice-orange',
+    names: { en: 'Orange juice', ro: 'suc de portocale', hu: 'narancslé' },
+    aliases: ['suc de portocale', 'narancsle'],
+    category: 'beverages', medTier: 'moderate', state: 'as-sold',
+    per100g: { calories: 45, protein: 0.7, carbs: 10.4, fat: 0.2, sugar: 8.4, sodium: 1 },
+    units: [{ label: 'glass', grams: 200 }],
+    source: 'curated',
+  },
+  {
+    id: 'juice-apple',
+    names: { en: 'Apple juice', ro: 'suc de mere', hu: 'almalé' },
+    aliases: ['suc de mere', 'almale'],
+    category: 'beverages', medTier: 'moderate', state: 'as-sold',
+    per100g: { calories: 46, protein: 0.1, carbs: 11.3, fat: 0.1, sugar: 9.6, sodium: 4 },
+    units: [{ label: 'glass', grams: 200 }],
+    source: 'curated',
+  },
+  {
+    id: 'cola',
+    names: { en: 'Cola', ro: 'cola', hu: 'kóla' },
+    aliases: ['cola', 'kola', 'coca cola', 'pepsi'],
+    category: 'beverages', medTier: 'rare', state: 'as-sold',
+    per100g: { calories: 37, protein: 0, carbs: 9.6, fat: 0, sugar: 9.6, sodium: 4 },
+    units: [{ label: 'can', grams: 330 }, { label: 'glass', grams: 250 }],
+    source: 'curated',
+  },
+  {
+    id: 'cola-zero',
+    names: { en: 'Cola, no sugar', ro: 'cola fără zahăr', hu: 'cukormentes kóla' },
+    aliases: ['cola zero', 'cola fara zahar', 'diet cola', 'cukormentes kola'],
+    category: 'beverages', medTier: 'moderate', state: 'as-sold',
+    per100g: { calories: 0, protein: 0, carbs: 0, fat: 0, sugar: 0, sodium: 5 },
+    units: [{ label: 'can', grams: 330 }, { label: 'glass', grams: 250 }],
+    source: 'curated',
+  },
+  // The three below carry energy their macros cannot account for, because most
+  // of it is the alcohol. `scripts/check-data.ts` knows: the check that a
+  // food's calories agree with its own macros would otherwise call every one
+  // of these a typo, and it is a check worth keeping sharp for the foods where
+  // a disagreement really does mean somebody mis-keyed a number.
+  {
+    id: 'beer-lager',
+    names: { en: 'Beer', ro: 'bere', hu: 'sör' },
+    aliases: ['bere', 'sor', 'lager', 'pils'],
+    category: 'beverages', medTier: 'rare', state: 'as-sold',
+    per100g: { calories: 43, protein: 0.5, carbs: 3.6, fat: 0, sodium: 4 },
+    units: [{ label: 'bottle', grams: 500 }, { label: 'can', grams: 330 }],
+    source: 'curated',
+  },
+  {
+    id: 'wine-red',
+    names: { en: 'Red wine', ro: 'vin roșu', hu: 'vörösbor' },
+    aliases: ['vin rosu', 'vorosbor'],
+    category: 'beverages', medTier: 'rare', state: 'as-sold',
+    per100g: { calories: 85, protein: 0.1, carbs: 2.6, fat: 0, sodium: 4 },
+    units: [{ label: 'glass', grams: 150 }],
+    source: 'curated',
+  },
+  {
+    id: 'wine-white',
+    names: { en: 'White wine', ro: 'vin alb', hu: 'fehérbor' },
+    aliases: ['vin alb', 'feherbor'],
+    category: 'beverages', medTier: 'rare', state: 'as-sold',
+    per100g: { calories: 82, protein: 0.1, carbs: 2.6, fat: 0, sodium: 5 },
+    units: [{ label: 'glass', grams: 150 }],
+    source: 'curated',
   },
 
   // ─── Baked treats the plans reference as whole portions ────────────────────

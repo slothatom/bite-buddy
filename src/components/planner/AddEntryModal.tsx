@@ -66,6 +66,24 @@ export default function AddEntryModal({
   onDateChange?: (date: string) => void
 }) {
   const ate = mode === 'ate'
+  /*
+   * Whether this is going down as a plan or as a record.
+   *
+   * The caller sets the starting point and this is where it can be changed,
+   * because the answer belongs to the moment rather than to the screen you
+   * came from. The phone's "+ Meal" plans, which is right when you open it on
+   * Sunday to write the week and wrong every other time you press it: at four
+   * on a Tuesday you have already had the thing you are typing in, and the
+   * app made you add it to the plan and then go and tick it, which is two
+   * actions and, in between them, a day claiming you are about to eat
+   * something you have eaten.
+   *
+   * Offered for today and for days gone, not for days ahead. "I already ate
+   * Friday's dinner" is not a thing.
+   */
+  const [recording, setRecording] = useState(ate)
+  const past = date <= today()
+  const isRecord = recording && past
   const [when, setWhen] = useState(false)
   /*
    * Writing down a food the app has never met, without leaving the day.
@@ -100,6 +118,18 @@ export default function AddEntryModal({
    */
   const [cooking, setCooking] = useState(1)
   const { addPortion } = usePortionStore()
+
+  /**
+   * An entry, already ticked when this is a record.
+   *
+   * Recording used to need its own path through the store, so that ticking a
+   * planned meal could not claim the rest of it had been eaten too. An item
+   * carries its own answer now, so a record is simply an item that arrives
+   * with one, and it can sit in the same meal as the food you are still
+   * planning to have.
+   */
+  const stamped = (entry: Component): Component => (
+    isRecord ? { ...entry, outcome: 'eaten', outcomeAt: new Date().toISOString() } : entry)
 
   const recipes = useRecipes()
   const foods = useFoods()
@@ -141,7 +171,7 @@ export default function AddEntryModal({
           <header className="flex items-center justify-between px-5 py-4 border-b border-border-200">
             <div>
               <h2 className="text-base font-extrabold text-ink-900">
-                {ate ? `Ate this for ${SLOT_LABELS[slot].toLowerCase()}` : `Add to ${SLOT_LABELS[slot]}`}
+                {isRecord ? `Had this for ${SLOT_LABELS[slot].toLowerCase()}` : `Add to ${SLOT_LABELS[slot]}`}
               </h2>
               <p className="text-xs text-ink-500">{new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
             </div>
@@ -154,7 +184,7 @@ export default function AddEntryModal({
               <input
                 className="input pl-9"
                 autoFocus
-                placeholder={ate ? 'What did you have?' : 'What are we having?'}
+                placeholder={isRecord ? 'What did you have?' : 'What are we having?'}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
@@ -189,6 +219,24 @@ export default function AddEntryModal({
                     onSlot={onSlotChange}
                   />
                 )}
+
+                {/* Plan or record, said here rather than decided by whichever
+                    button you happened to press to get here. Not offered for a
+                    day ahead: "I already ate Friday's dinner" is not a thing. */}
+                {past && (
+                  <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
+                    {([false, true] as const).map((r) => (
+                      <button
+                        key={String(r)}
+                        onClick={() => setRecording(r)}
+                        aria-pressed={recording === r}
+                        className={recording === r ? 'tab-on' : 'tab-off'}
+                      >
+                        {r ? 'Already had it' : 'Planning it'}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -214,7 +262,7 @@ export default function AddEntryModal({
               return (
                 <button
                   key={p.id}
-                  onClick={() => { onAdd({ kind: 'portion', portionId: p.id, servings: 1 }); onClose() }}
+                  onClick={() => { onAdd(stamped({ kind: 'portion', portionId: p.id, servings: 1 })); onClose() }}
                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left transition-colors"
                 >
                   <span className="text-xl">{p.storage === 'freezer' ? '🧊' : '🥡'}</span>
@@ -237,7 +285,7 @@ export default function AddEntryModal({
 
             {/* How big the pot is. Only when planning: "I already ate this" is
                 not a moment to be asked how much you cooked. */}
-            {tab === 'recipes' && !ate && (
+            {tab === 'recipes' && !isRecord && (
               <div className="flex flex-wrap items-center gap-2 pb-1">
                 <span className="text-xs font-bold text-ink-500">Cooking</span>
                 {[1, 2, 3, 4, 6].map((n) => (
@@ -266,7 +314,7 @@ export default function AddEntryModal({
                 <button
                   key={r.id}
                   onClick={() => {
-                    onAdd({ kind: 'recipe', recipeId: r.id, servings: 1 })
+                    onAdd(stamped({ kind: 'recipe', recipeId: r.id, servings: 1 }))
                     /*
                      * The rest of the pot, straight into the fridge.
                      *
@@ -336,6 +384,29 @@ export default function AddEntryModal({
                       </p>
                     ) : null}
                   </div>
+                  {/* The amounts this food actually comes in.
+                      A mug, a glass, a slice. Typing 240 into a grams box is
+                      the step between "I had a coffee" and a recorded coffee,
+                      and it is the step at which people give up: it asks you
+                      to know a number about a mug. The box stays for
+                      everything else, and for when the answer is half a
+                      glass. */}
+                  {f.units.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {f.units.map((u) => (
+                        <button
+                          key={u.label}
+                          type="button"
+                          onClick={() => setGrams((s) => ({ ...s, [f.id]: u.grams }))}
+                          aria-pressed={g === u.grams}
+                          aria-label={`One ${u.label} of ${f.names.en}`}
+                          className={g === u.grams ? 'chip-on' : 'chip-off'}
+                        >
+                          1 {u.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   <div className="flex items-center gap-2">
                     <div className="relative">
                       <input
@@ -355,9 +426,9 @@ export default function AddEntryModal({
                     <span className="flex-1 text-xs text-ink-500 font-mono">{Math.round(n.calories)} kcal</span>
                     <button
                       className="btn-primary shrink-0"
-                      onClick={() => { onAdd({ kind: 'food', foodId: f.id, grams: g }); onClose() }}
+                      onClick={() => { onAdd(stamped({ kind: 'food', foodId: f.id, grams: g })); onClose() }}
                     >
-                      {ate ? 'Ate it' : 'Add'}
+                      {isRecord ? 'Had it' : 'Add'}
                     </button>
                   </div>
                 </div>
@@ -410,7 +481,7 @@ export default function AddEntryModal({
           initialName={query.trim()}
           onClose={() => setWriting(false)}
           onSaved={(food) => {
-            onAdd({ kind: 'food', foodId: food.id, grams: food.units[0]?.grams ?? 100 })
+            onAdd(stamped({ kind: 'food', foodId: food.id, grams: food.units[0]?.grams ?? 100 }))
             onClose()
           }}
         />

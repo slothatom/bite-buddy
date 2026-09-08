@@ -19,7 +19,7 @@
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { APPLE_TOUCH_ICON, FAVICON, ICONS, SPLASHES } from '../src/generated/icons'
+import { APPLE_TOUCH_ICON, FAVICON, ICONS, SPLASHES } from '../src/generated/icons.js'
 
 const PUBLIC = resolve(import.meta.dirname, '../public')
 

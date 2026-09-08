@@ -227,7 +227,25 @@ interface MealPlanStore {
    * it in the first place, and a tick you cannot take back is one people stop
    * pressing.
    */
+  /**
+   * Says what happened to a whole meal, and to everything in it.
+   *
+   * One tap still means "all of it", which is the common case and has to stay
+   * one tap. It writes the answer onto each entry as well as onto the meal, so
+   * that a meal ticked whole and a meal whose items were ticked one by one are
+   * the same record afterwards rather than two shapes every reader has to
+   * handle.
+   */
   setMealOutcome: (date: string, mealId: string, outcome: MealOutcome | undefined) => void
+  /**
+   * Says what happened to one item.
+   *
+   * The unit a day is actually lived in. A meal is a list, and until this
+   * existed the only sayable things about that list were all and nothing.
+   */
+  setEntryOutcome: (
+    date: string, mealId: string, index: number, outcome: MealOutcome | undefined,
+  ) => void
   /**
    * Changes how much of something is in a meal, after it is already there.
    *
@@ -469,16 +487,63 @@ export const useMealPlanStore = create<MealPlanStore>()(
           }),
 
         setMealOutcome: (date, mealId, outcome) =>
-          set((s) => ({
-            plan: s.plan.map((day) => (day.date === date
-              ? touch({
-                ...day,
-                meals: day.meals.map((m) => (m.id === mealId
-                  ? { ...m, outcome, outcomeAt: outcome ? new Date().toISOString() : undefined }
-                  : m)),
-              })
-              : day)),
-          })),
+          set((s) => {
+            const at = outcome ? new Date().toISOString() : undefined
+            return {
+              plan: s.plan.map((day) => (day.date === date
+                ? touch({
+                  ...day,
+                  meals: day.meals.map((m) => (m.id === mealId
+                    ? {
+                      ...m,
+                      outcome,
+                      outcomeAt: at,
+                      // Down onto the items too, so the meal and its contents
+                      // never disagree about the same morning.
+                      entries: m.entries.map((e) => ({ ...e, outcome, outcomeAt: at })),
+                    }
+                    : m)),
+                })
+                : day)),
+            }
+          }),
+
+        setEntryOutcome: (date, mealId, index, outcome) =>
+          set((s) => {
+            const at = outcome ? new Date().toISOString() : undefined
+            return {
+              plan: s.plan.map((day) => (day.date === date
+                ? touch({
+                  ...day,
+                  meals: day.meals.map((m) => {
+                    if (m.id !== mealId) return m
+                    const entries = m.entries.map((e, i) => (
+                      i === index ? { ...e, outcome, outcomeAt: at } : e))
+                    /*
+                     * The meal's own answer, worked out from its items.
+                     *
+                     * It is kept because everything written before entries had
+                     * outcomes relies on it, and because a reader that only
+                     * wants "did this meal happen" should not have to fold the
+                     * list itself. Unanimity or nothing: a meal half eaten is
+                     * not an eaten meal and not a skipped one, and saying
+                     * either would be the exact claim this change exists to
+                     * stop the app making.
+                     */
+                    const agreed = (want: MealOutcome) => entries.every((e) => e.outcome === want)
+                    const meal: MealOutcome | undefined =
+                      agreed('eaten') ? 'eaten' : agreed('skipped') ? 'skipped' : undefined
+                    return {
+                      ...m,
+                      entries,
+                      outcome: meal,
+                      outcomeAt: meal ? at ?? m.outcomeAt : undefined,
+                    }
+                  }),
+                })
+                : day)),
+            }
+          }),
 
         updateEntry: (date, mealId, index, amount) =>
           set((s) => ({

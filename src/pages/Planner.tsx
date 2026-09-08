@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ChevronLeft, ChevronRight, Copy, Plus, Trash2, X, CalendarDays, MoveRight, Sparkles,
-  Check, ShoppingBasket, Bookmark, Circle, CircleSlash, Minus,
+  Check, ShoppingBasket, Bookmark, Circle, CircleDot, CircleSlash, Minus,
 } from 'lucide-react'
 import type { Component, DayPlan, MealOutcome, MealSlot } from '../types'
 import { MEAL_SLOTS, SLOT_LABELS } from '../types'
@@ -14,7 +14,8 @@ import { useDeletedIds } from '../store/useRecipeStore'
 import { useUserStore } from '../store/useUserStore'
 import { useNutritionContext } from '../store/useNutrition'
 import {
-  componentsNutrients, dayEaten, dayProgress, dayLabel, weekEaten, emptyNutrients, addNutrients, reportDay,
+  componentsNutrients, dayEaten, dayProgress, dayLabel, dayStanding, entryOutcome, weekEaten,
+  emptyNutrients, addNutrients, reportDay,
   type NutritionContext,
 } from '../lib/nutrition'
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
@@ -46,7 +47,7 @@ export default function Planner() {
   const { profile } = useUserStore()
   const {
     weekDates, plan, goToWeek, addEntry, removeMeal, clearDay, copyDay,
-    moveMeal, duplicateMeal, setMealOutcome, updateEntry, restoreMeals,
+    moveMeal, duplicateMeal, setMealOutcome, setEntryOutcome, updateEntry, restoreMeals,
   } = useMealPlanStore()
   const ctx = useNutritionContext()
 
@@ -185,6 +186,10 @@ export default function Planner() {
   // Empty, all still ahead of you, part way through, or done. The badge used
   // to have two states for four situations and was wrong in two of them.
   const progress = dayProgress(selectedDay)
+  // Split rather than summed, for the hours when a day is half over. The ring
+  // and the bars still show the whole day, which is what a target is about;
+  // this is the sentence underneath that says where you have got to.
+  const standing = dayStanding(selectedDay, ctx)
   // What the day's figures do not know. The planner totalled with a function
   // that discards it, so a day of foods with no sodium figure between them
   // still showed a salt total as though it were one.
@@ -405,6 +410,23 @@ export default function Planner() {
                 partial={dayReport.partial}
                 unresolved={dayReport.unresolved}
               />
+              {/* Where the day has got to, once any of it has happened. Two
+                  facts rather than one sum: at four in the afternoon "this day
+                  is 1,600 kcal" is not the thing you want to know. */}
+              {standing.count.had > 0 && (
+                <p className="mt-3 pt-3 border-t border-border-200 text-sm text-ink-700">
+                  <strong className="font-mono">{Math.round(standing.had.calories)}</strong> kcal
+                  {' '}had
+                  {standing.count.ahead > 0 ? (
+                    <>
+                      {', '}
+                      <strong className="font-mono">{Math.round(standing.ahead.calories)}</strong>
+                      {' '}still to come across {standing.count.ahead}{' '}
+                      {standing.count.ahead === 1 ? 'item' : 'items'}.
+                    </>
+                  ) : '. Nothing else on the day.'}
+                </p>
+              )}
             </div>
           </div>
           <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-border-200">
@@ -466,6 +488,8 @@ export default function Planner() {
                 onRemove={(mealId) => removeMealReturningPortions(selected, mealId)}
                 onMove={(mealId) => setMoving({ date: selected, mealId })}
                 onOutcome={(mealId, outcome) => setMealOutcome(selected, mealId, outcome)}
+                onEntryOutcome={(mealId, i, outcome) =>
+                  setEntryOutcome(selected, mealId, i, outcome)}
                 onAmount={(mealId, index) => setAmount({ date: selected, mealId, index })}
               />
             ))}
@@ -552,6 +576,7 @@ export default function Planner() {
           onRemove={(mealId) => removeMealReturningPortions(sheet.date, mealId)}
           onMove={(mealId) => { setMoving({ date: sheet.date, mealId }); setSheet(null) }}
           onOutcome={(mealId, outcome) => setMealOutcome(sheet.date, mealId, outcome)}
+          onEntryOutcome={(mealId, i, outcome) => setEntryOutcome(sheet.date, mealId, i, outcome)}
           onAmount={(mealId, index) => { setAmount({ date: sheet.date, mealId, index }); setSheet(null) }}
         />
       )}
@@ -735,8 +760,19 @@ function MealCell({
     )
   }
 
-  const eaten = meals.every((m) => m.outcome === 'eaten')
-  const skipped = meals.every((m) => m.outcome === 'skipped')
+  /*
+   * The cell's state, worked out from the items rather than from the meals.
+   *
+   * Reading `m.outcome` was right while a meal was ticked whole. It stopped
+   * being right the moment items could be ticked one at a time: a breakfast
+   * where you had the bread and left the coffee leaves the meal undecided, and
+   * the week grid would have shown it as untouched, which is the week quietly
+   * disagreeing with the day.
+   */
+  const outcomes = meals.flatMap((m) => m.entries.map((e) => entryOutcome(e, m)))
+  const eaten = outcomes.every((o) => o === 'eaten')
+  const skipped = outcomes.every((o) => o === 'skipped')
+  const part = !eaten && !skipped && outcomes.some((o) => o === 'eaten')
   const name = entriesName(meals.flatMap((m) => m.entries), ctx)
 
   return (
@@ -746,7 +782,10 @@ function MealCell({
       onClick={onOpen}
       aria-label={`${SLOT_LABELS[slot]} on ${formatDate(date)}: ${name}${
         meals.length > 1 ? `, ${meals.length} meals` : ''}${
-        eaten ? ', eaten' : skipped ? ', skipped' : ', planned'}`}
+        eaten ? ', eaten'
+          : skipped ? ', skipped'
+            : part ? `, ${outcomes.filter((o) => o === 'eaten').length} of ${outcomes.length} eaten`
+              : ', planned'}`}
       className={`relative rounded-lg px-1 py-1 text-left leading-tight border
                   ${eaten ? 'bg-leaf-50 border-leaf-200' : 'bg-cream-50 border-transparent'}
                   ${skipped ? 'opacity-55' : ''}
@@ -756,12 +795,23 @@ function MealCell({
       {/* Out of the text's way in the narrow view. A column is sixty pixels
           and the tick was taking fifteen of them, which left "Chicken" too
           little room to sit on a line and had it breaking mid-word. */}
-      {eaten && (
-        <Check
-          size={11}
-          aria-hidden="true"
-          className={`text-leaf-700 ${full ? 'shrink-0' : 'absolute top-0.5 right-0.5'}`}
-        />
+      {(eaten || part) && (
+        // Part way through is its own mark rather than a paler tick. Colour is
+        // never the only thing carrying a meaning in this app, and "some of
+        // it" and "all of it" are two different facts about a morning.
+        part ? (
+          <CircleDot
+            size={11}
+            aria-hidden="true"
+            className={`text-leaf-700 ${full ? 'shrink-0' : 'absolute top-0.5 right-0.5'}`}
+          />
+        ) : (
+          <Check
+            size={11}
+            aria-hidden="true"
+            className={`text-leaf-700 ${full ? 'shrink-0' : 'absolute top-0.5 right-0.5'}`}
+          />
+        )
       )}
       <span
         className={`block min-w-0 text-[10px] sm:text-[11px] text-ink-900
@@ -803,7 +853,7 @@ function shortName(name: string): string {
  * drift apart.
  */
 function MealSheet({
-  date, slot, day, onClose, onAdd, onRemove, onMove, onOutcome, onAmount,
+  date, slot, day, onClose, onAdd, onRemove, onMove, onOutcome, onEntryOutcome, onAmount,
 }: {
   date: string
   slot: MealSlot
@@ -813,6 +863,7 @@ function MealSheet({
   onRemove: (mealId: string) => void
   onMove: (mealId: string) => void
   onOutcome: (mealId: string, outcome: MealOutcome | undefined) => void
+  onEntryOutcome: (mealId: string, index: number, outcome: MealOutcome | undefined) => void
   onAmount: (mealId: string, index: number) => void
 }) {
   const panel = useDialog<HTMLDivElement>(onClose)
@@ -845,6 +896,7 @@ function MealSheet({
           onRemove={onRemove}
           onMove={onMove}
           onOutcome={onOutcome}
+          onEntryOutcome={onEntryOutcome}
           onAmount={onAmount}
         />
       </div>
@@ -853,7 +905,7 @@ function MealSheet({
 }
 
 function SlotRow({
-  slot, day, onAdd, onRemove, onMove, onOutcome, onAmount,
+  slot, day, onAdd, onRemove, onMove, onOutcome, onEntryOutcome, onAmount,
 }: {
   slot: MealSlot
   day: DayPlan
@@ -861,19 +913,46 @@ function SlotRow({
   onRemove: (mealId: string) => void
   onMove: (mealId: string) => void
   onOutcome: (mealId: string, outcome: MealOutcome | undefined) => void
+  onEntryOutcome: (mealId: string, index: number, outcome: MealOutcome | undefined) => void
   onAmount: (mealId: string, index: number) => void
 }) {
   const ctx = useNutritionContext()
   const meals = day.meals.filter((m) => m.slot === slot)
-  const kcal = componentsNutrients(meals.flatMap((m) => m.entries), ctx).calories
+
+  /*
+   * What the slot amounted to, counting only what still counts.
+   *
+   * It used to total every entry in the slot regardless, so a breakfast whose
+   * coffee had been marked as not drunk went on charging you for the coffee,
+   * in the one place on the screen that exists to say how much you have had.
+   */
+  const counted = meals.flatMap(
+    (meal) => meal.entries.filter((e) => entryOutcome(e, meal) !== 'skipped'))
+  const kcal = componentsNutrients(counted, ctx).calories
+  const undecided = meals.some(
+    (meal) => meal.entries.some((e) => !entryOutcome(e, meal)))
 
   return (
     <div className="card p-4">
-      {/* Tight, because a tick and an amount now live on every meal and a day
+      {/* Tight, because a tick and an amount now live on every line and a day
           still has to fit on a laptop without scrolling. */}
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between gap-2 mb-1">
         <span className="text-xs font-bold uppercase tracking-wide text-ink-500">{SLOT_LABELS[slot]}</span>
-        <span className="text-xs font-mono text-ink-700">{kcal > 0 ? `${Math.round(kcal)} kcal` : ''}</span>
+        <span className="flex items-center gap-2">
+          {/* One tap for the ordinary case, which is that you ate the meal you
+              planned. The ticks below are for the case this app kept getting
+              wrong, where you ate most of it. Offered only while there is
+              something left to say, so a finished slot is quiet. */}
+          {undecided && (
+            <button
+              className="text-xs font-semibold text-bite-700 hover:underline min-h-11 px-1 -mx-1"
+              onClick={() => { for (const meal of meals) onOutcome(meal.id, 'eaten') }}
+            >
+              Had it all
+            </button>
+          )}
+          <span className="text-xs font-mono text-ink-700">{kcal > 0 ? `${Math.round(kcal)} kcal` : ''}</span>
+        </span>
       </div>
 
       {meals.length === 0 ? (
@@ -884,19 +963,30 @@ function SlotRow({
         <div className="space-y-1">
           {meals.map((meal) => (
             <div key={meal.id} className="flex items-start gap-2">
-              <OutcomeTick
-                outcome={meal.outcome}
-                onChange={(next) => onOutcome(meal.id, next)}
-              />
-              <div className={`flex-1 min-w-0 space-y-1 ${meal.outcome === 'skipped' ? 'opacity-55' : ''}`}>
-                {meal.entries.map((entry, i) => (
-                  <EntryLine
-                    key={i}
-                    entry={entry}
-                    struck={meal.outcome === 'skipped'}
-                    onAmount={() => onAmount(meal.id, i)}
-                  />
-                ))}
+              <div className="flex-1 min-w-0 space-y-1">
+                {/* A tick a line, because that is how a day is actually eaten.
+                    One tick for the meal could say all of it or none of it,
+                    and a breakfast of bread, cheese and a coffee you left has
+                    neither of those as an honest answer. */}
+                {meal.entries.map((entry, i) => {
+                  const outcome = entryOutcome(entry, meal)
+                  return (
+                    <div key={i} className="flex items-start gap-1.5">
+                      <OutcomeTick
+                        outcome={outcome}
+                        what={entryName(entry, ctx)}
+                        onChange={(next) => onEntryOutcome(meal.id, i, next)}
+                      />
+                      <div className={`flex-1 min-w-0 ${outcome === 'skipped' ? 'opacity-55' : ''}`}>
+                        <EntryLine
+                          entry={entry}
+                          struck={outcome === 'skipped'}
+                          onAmount={() => onAmount(meal.id, i)}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
                 {meal.note ? (
                   <div className="pt-0.5" title={meal.note}>
                     <SourceLine text={meal.note} clamp={2} translate />
@@ -982,17 +1072,28 @@ function ShoppingState({ entries }: { entries: Component[] }) {
  * that treats it as one is an app people stop ticking honestly.
  */
 function OutcomeTick({
-  outcome, onChange,
+  outcome, what, onChange,
 }: {
   outcome: MealOutcome | undefined
+  /**
+   * What this tick is about.
+   *
+   * A line of ticks down a slot needs it. "Mark as eaten" was a fine name
+   * while there was one of these per meal and the meal's name sat beside it;
+   * five of them in a column all called the same thing is a screen reader
+   * reading out the same button five times with no way to tell which is the
+   * bread.
+   */
+  what?: string
   onChange: (next: MealOutcome | undefined) => void
 }) {
   const next: MealOutcome | undefined =
     outcome === undefined ? 'eaten' : outcome === 'eaten' ? 'skipped' : undefined
 
-  const label = outcome === undefined ? 'Mark as eaten'
-    : outcome === 'eaten' ? 'Eaten. Mark as skipped instead'
-      : 'Skipped. Clear it'
+  const of = what ? ` ${what}` : ''
+  const label = outcome === undefined ? `Had${of}`
+    : outcome === 'eaten' ? `Had${of}. Say it was left instead`
+      : `Left${of}. Clear it`
 
   return (
     <button

@@ -1,7 +1,7 @@
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
-import { APPLE_TOUCH_ICON, FAVICON, ICONS, SPLASHES } from './src/generated/icons'
+import { APPLE_TOUCH_ICON, FAVICON, ICONS, SPLASHES } from './src/generated/icons.ts'
 
 /**
  * Puts the artwork's links into the page, from the one place that knows their
