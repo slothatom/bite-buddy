@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "serve": "vite preview --host",
     "data:build": "tsx scripts/build-data.ts",
+    "icons": "tsx scripts/make-icons.ts",
     "data:check": "tsx scripts/check-data.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

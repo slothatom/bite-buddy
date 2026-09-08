@@ -38,7 +38,10 @@ export default defineConfig({
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          // Its own file, inset to the safe zone. This used to offer the
+          // full-bleed icon for both, and a phone that draws round icons cut
+          // the mascot's ears off.
+          { src: 'icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       // What to precache. The runtime caching that used to live beside this
@@ -49,7 +52,13 @@ export default defineConfig({
         // The barcode library is 477 kB and useless offline anyway. Scanning a
         // product means looking it up over the network. Precaching it would put
         // it on every device that never opens the scanner.
-        globIgnores: ['**/esm-*.js'],
+        //
+        // The launch screens are the same argument: six of them, 244 kB, and a
+        // phone matches exactly one. iOS reads it from the ordinary HTTP cache
+        // when the app is opened from the home screen, so precaching all six
+        // put a quarter of a megabyte of pictures of other people's phones on
+        // every device.
+        globIgnores: ['**/esm-*.js', '**/splash-*.png'],
       },
     }),
   ],

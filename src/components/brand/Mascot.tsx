@@ -72,13 +72,20 @@ export default function Zig({
       <ellipse cx="32" cy="48" rx="15" ry="10" fill="var(--color-ink-900)" />
       <ellipse cx="32" cy="48" rx="13.4" ry="8.4" fill="var(--color-bite-500)" />
 
-      <path d="M13.4 20.6 L10.6 5.4 L24.4 12.6 Z" fill="var(--color-ink-900)" />
-      <path d="M15 19 L12.8 8 L22.4 13 Z" fill="var(--color-bite-500)" />
-      <path d="M16.9 17.4 L15.8 10.8 L20.8 13.6 Z" fill="var(--color-ink-900)" />
-
-      <path d="M50.6 20.6 L53.4 5.4 L39.6 12.6 Z" fill="var(--color-ink-900)" />
-      <path d="M49 19 L51.2 8 L41.6 13 Z" fill="var(--color-bite-500)" />
-      <path d="M47.1 17.4 L48.2 10.8 L43.2 13.6 Z" fill="var(--color-ink-900)" />
+      {/* One ear, drawn on the left and mirrored. Short and round rather than
+          pointed: drawn as triangles first, the face read as a cat, because a
+          pointed ear is the strongest cat signal there is and a raccoon's are
+          stubby. Mirroring keeps the pair identical as the numbers move. */}
+      <g>
+        <path d="M12.6 20.4 C9.6 13.6 11.2 6.2 16.4 5.2 C21.4 4.2 25.4 8.4 26.4 12 Z" fill="var(--color-ink-900)" />
+        <path d="M14.8 18.4 C12.6 13 13.8 8 17.2 7.4 C20.6 6.8 23.6 9.9 24.4 12.6 Z" fill="var(--color-bite-500)" />
+        <path d="M17 16.2 C15.7 12.8 16.4 10 18.4 9.6 C20.4 9.2 22.1 11 22.6 12.8 Z" fill="var(--color-ink-900)" />
+      </g>
+      <g transform="translate(64 0) scale(-1 1)">
+        <path d="M12.6 20.4 C9.6 13.6 11.2 6.2 16.4 5.2 C21.4 4.2 25.4 8.4 26.4 12 Z" fill="var(--color-ink-900)" />
+        <path d="M14.8 18.4 C12.6 13 13.8 8 17.2 7.4 C20.6 6.8 23.6 9.9 24.4 12.6 Z" fill="var(--color-bite-500)" />
+        <path d="M17 16.2 C15.7 12.8 16.4 10 18.4 9.6 C20.4 9.2 22.1 11 22.6 12.8 Z" fill="var(--color-ink-900)" />
+      </g>
 
       <ellipse cx="32" cy="27" rx="20" ry="17" fill="var(--color-ink-900)" />
       <ellipse cx="32" cy="27" rx="18.4" ry="15.4" fill="var(--color-bite-500)" />
