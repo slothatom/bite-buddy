@@ -1,6 +1,32 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { APPLE_TOUCH_ICON, FAVICON, ICONS, SPLASHES } from './src/generated/icons'
+
+/**
+ * Puts the artwork's links into the page, from the one place that knows their
+ * names.
+ *
+ * These used to be typed into index.html by hand, from a block this repo's
+ * icon script printed for somebody to paste. That was survivable while the
+ * files were called `icon-192.png` forever; it is not survivable now that the
+ * name carries a hash, because a stale paste is a page pointing at artwork
+ * that no longer exists. So nobody pastes anything.
+ */
+function artworkLinks(): Plugin {
+  return {
+    name: 'bite-buddy-artwork-links',
+    transformIndexHtml: () => [
+      { tag: 'link', attrs: { rel: 'icon', type: 'image/svg+xml', href: FAVICON }, injectTo: 'head' },
+      { tag: 'link', attrs: { rel: 'apple-touch-icon', href: APPLE_TOUCH_ICON }, injectTo: 'head' },
+      ...SPLASHES.map(({ src, media }) => ({
+        tag: 'link',
+        attrs: { rel: 'apple-touch-startup-image', href: src, media },
+        injectTo: 'head' as const,
+      })),
+    ],
+  }
+}
 
 export default defineConfig({
   // Relative, so the built app runs from wherever it is put (a local server,
@@ -15,6 +41,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    artworkLinks(),
     VitePWA({
       // Hand written rather than generated, because a push arrives at the
       // worker and a generated file has nowhere to put the handler. The
@@ -24,7 +51,7 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.ts',
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: [FAVICON],
       manifest: {
         name: 'Bite Buddy',
         short_name: 'Bite Buddy',
@@ -35,14 +62,12 @@ export default defineConfig({
         orientation: 'portrait',
         start_url: './',
         scope: './',
-        icons: [
-          { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
-          // Its own file, inset to the safe zone. This used to offer the
-          // full-bleed icon for both, and a phone that draws round icons cut
-          // the mascot's ears off.
-          { src: 'icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
-        ],
+        // Named by `npm run icons`, each with a hash of its own contents, so a
+        // redrawn mascot arrives at an address no phone has seen before. The
+        // maskable one is its own file, inset to the safe zone: this used to
+        // offer the full-bleed icon for both, and a phone that draws round
+        // icons cut the mascot's ears off.
+        icons: ICONS,
       },
       // What to precache. The runtime caching that used to live beside this
       // now lives in src/sw.ts, because injectManifest builds the worker from

@@ -19,6 +19,7 @@ import { registerRoute } from 'workbox-routing'
 import { NetworkFirst } from 'workbox-strategies'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { CacheableResponsePlugin } from 'workbox-cacheable-response'
+import { NOTIFICATION_ICON } from './generated/icons'
 
 declare const self: ServiceWorkerGlobalScope
 
@@ -78,8 +79,10 @@ self.addEventListener('push', (event) => {
       // your phone was in your pocket is one line on the lock screen.
       tag: note.tag,
       data: { path: note.path },
-      icon: 'icon-192.png',
-      badge: 'icon-192.png',
+      // Named rather than spelled, because the artwork's filename carries a
+      // hash of its contents and changes whenever the picture does.
+      icon: NOTIFICATION_ICON,
+      badge: NOTIFICATION_ICON,
       // Nothing here is urgent enough to buzz twice for.
       renotify: false,
     } as NotificationOptions),
