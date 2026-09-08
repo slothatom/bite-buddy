@@ -18,6 +18,8 @@ import WhenPicker from './WhenPicker'
 import { offerOrder, madeWhen, portionLabel } from '../../lib/portionsUse'
 import { usePantry } from '../../store/usePantryStore'
 import { availability, availabilityLabel } from '../../lib/pantry'
+import { usePortionStore } from '../../store/usePortionStore'
+import { surplusLine, surplusOf } from '../../lib/cookExtra'
 
 /**
  * Adds a recipe, a weighed food, or something already cooked, to a meal slot.
@@ -75,6 +77,17 @@ export default function AddEntryModal({
   const [tab, setTab] = useState<'fridge' | 'recipes' | 'foods'>(
     available.length ? 'fridge' : isSnack ? 'foods' : 'recipes')
   const [grams, setGrams] = useState<Record<string, number>>({})
+  /*
+   * How many portions the pot makes.
+   *
+   * The planner never asked. A recipe went into a day at one serving and the
+   * fact that you had made three of them existed only in your fridge, which
+   * meant the one thing this kitchen does most often was the one thing the
+   * app could not record. Recording a meal you have already eaten is not the
+   * moment to ask, so it is offered when planning only.
+   */
+  const [cooking, setCooking] = useState(1)
+  const { addPortion } = usePortionStore()
 
   const recipes = useRecipes()
   const foods = useFoods()
@@ -209,12 +222,54 @@ export default function AddEntryModal({
             )
           })}
 
+          {/* How big the pot is. Only when planning: "I already ate this" is
+              not a moment to be asked how much you cooked. */}
+          {tab === 'recipes' && !ate && (
+            <div className="flex flex-wrap items-center gap-2 pb-1">
+              <span className="text-xs font-bold text-ink-500">Cooking</span>
+              {[1, 2, 3, 4, 6].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setCooking(n)}
+                  aria-pressed={cooking === n}
+                  aria-label={n === 1 ? 'Cooking one serving' : `Cooking ${n} servings`}
+                  className={cooking === n ? 'chip-on' : 'chip-off'}
+                >
+                  {n}
+                </button>
+              ))}
+              <span className="basis-full text-xs text-ink-500">
+                {surplusLine(cooking, 1)
+                  ? `One serving goes in the day, ${surplusLine(cooking, 1)}.`
+                  : 'One serving, eaten on the day.'}
+              </span>
+            </div>
+          )}
+
           {tab === 'recipes' && matchedRecipes.map((r) => {
             const n = recipePerServing(r, ctx)
             return (
               <button
                 key={r.id}
-                onClick={() => { onAdd({ kind: 'recipe', recipeId: r.id, servings: 1 }); onClose() }}
+                onClick={() => {
+                  onAdd({ kind: 'recipe', recipeId: r.id, servings: 1 })
+                  /*
+                   * The rest of the pot, straight into the fridge.
+                   *
+                   * Written here rather than handed to `onAdd`, because it is
+                   * a fact about the cooking rather than about the day: the
+                   * day gets one serving whatever size the pot was, and every
+                   * caller of this picker would otherwise have to learn about
+                   * portions to pass it on.
+                   */
+                  const spare = surplusOf({
+                    recipeId: r.id, cooking, eating: 1, madeOn: date,
+                    id: `cook-${Date.now().toString(36)}`,
+                  })
+                  if (spare) addPortion(spare)
+                  onClose()
+                }}
                 className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left transition-colors"
               >
                 <span className="text-xl">{r.emoji}</span>
