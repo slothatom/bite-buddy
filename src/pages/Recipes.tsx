@@ -2,6 +2,8 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { useDialog } from '../lib/useDialog'
 import { readAmount, MOST } from '../lib/amounts'
 import { offerUndo } from '../store/useUndo'
+import { usePortionStore } from '../store/usePortionStore'
+import { surplusLine, surplusOf } from '../lib/cookExtra'
 import { Link, useSearchParams } from 'react-router-dom'
 import WhenPicker from '../components/planner/WhenPicker'
 import { slotNow } from '../lib/whenDates'
@@ -1179,6 +1181,7 @@ function PlanIntoDay({
 }) {
   const [eating, setEating] = useState(1)
   const { plan, addEntry, removeEntry } = useMealPlanStore()
+  const { addPortion, removePortion } = usePortionStore()
   const panel = useDialog<HTMLDivElement>(onClose)
   const [date, setDate] = useState(todayDate)
   const busy = useMemo(
@@ -1243,12 +1246,13 @@ function PlanIntoDay({
             </span>
           </div>
           <p className="text-xs text-ink-500 mt-1">
-            {/* The other half of the answer, where the two numbers differ. The
-                app has somewhere for leftovers to live, and saying so here is
-                what stops "I scaled it to three" reading as "I ate three". */}
-            {cooking > eating
-              ? `You scaled this to ${cooking}. Only what you eat goes in the day; `
-                + `the rest is leftovers, and the cook schedule can hold them.`
+            {/* The other half of the answer, where the two numbers differ.
+                This used to end "the cook schedule can hold them", which
+                described a second screen you then had to go and use, and in
+                the meantime the surplus went nowhere at all. */}
+            {surplusLine(cooking, eating)
+              ? `You scaled this to ${cooking}. What you eat goes in the day and `
+                + `the rest goes in the fridge: ${surplusLine(cooking, eating)}.`
               : 'What goes in the day, not how much you cook.'}
           </p>
         </div>
@@ -1258,6 +1262,17 @@ function PlanIntoDay({
             className="btn-primary flex-1"
             onClick={() => {
               addEntry(date, slot, { kind: 'recipe', recipeId: recipe.id, servings: eating })
+
+              /*
+               * And the rest goes in the fridge, rather than being described
+               * and then dropped. Dated to the day the meal is planned for,
+               * because that is the day the pot gets made.
+               */
+              const spare = surplusOf({
+                recipeId: recipe.id, cooking, eating, madeOn: date,
+                id: `cook-${Date.now().toString(36)}`,
+              })
+              if (spare) addPortion(spare)
 
               /*
                * And say so. This closed with nothing to show for it, so the
@@ -1275,9 +1290,17 @@ function PlanIntoDay({
               const at = (landed?.entries.length ?? 1) - 1
               const when = new Date(date + 'T12:00:00')
                 .toLocaleDateString('en-GB', { weekday: 'long' })
+              // The offer takes back both halves. Putting the meal back and
+              // leaving a tub in the fridge would be an undo that left the
+              // kitchen believing in food nobody cooked.
               offerUndo(
-                `Added ${recipe.name.en} to ${when} ${SLOT_LABELS[slot].toLowerCase()}`,
-                () => removeEntry(date, slot, at),
+                spare
+                  ? `Added ${recipe.name.en}, ${surplusLine(cooking, eating)}`
+                  : `Added ${recipe.name.en} to ${when} ${SLOT_LABELS[slot].toLowerCase()}`,
+                () => {
+                  removeEntry(date, slot, at)
+                  if (spare) removePortion(spare.id)
+                },
               )
               onClose()
             }}

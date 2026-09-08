@@ -2622,6 +2622,48 @@ test.describe('cooking three and eating one', () => {
     const eating = page.getByLabel('How much are you eating')
     await expect(eating).toHaveValue('1')
     await expect(page.getByText(/You scaled this to 3/)).toBeVisible()
+
+    // And says where the other two are going, rather than naming a second
+    // screen you then have to go and use.
+    await expect(page.getByText(/2 servings into the fridge/)).toBeVisible()
+
+    // Exact, because the card behind the dialog still offers "Put it in a day".
+    await page.getByRole('button', { name: 'Put it in', exact: true }).click()
+
+    // They are actually there. The surplus used to be described and then
+    // dropped: you cooked three, the app recorded one, and the other two
+    // existed only in your fridge and your memory.
+    await goto(page, '/schedule')
+    await expect(page.getByText('In the fridge')).toBeVisible()
+    await expect(page.locator('text=/^2$/').first()).toBeVisible()
+  })
+
+  test('the planner asks how big the pot is', async ({ page }) => {
+    // It never did. A recipe went into a day at one serving and the fact that
+    // you had made three of them existed nowhere, which made the thing this
+    // kitchen does most often the thing the app could not record.
+    await planDay(page)
+    await page.getByRole('button', { name: /Pop something in/ }).first().click()
+    await page.getByRole('button', { name: 'Cooking 3 servings' }).click()
+    await expect(page.getByText(/2 servings into the fridge/)).toBeVisible()
+
+    await page.getByRole('dialog').locator('button').filter({ hasText: /kcal/ }).first().click()
+
+    // One serving on the day, whatever the size of the pot.
+    await expect(page.locator('[data-entry-name]').first()).toBeVisible()
+
+    await goto(page, '/schedule')
+    await expect(page.getByText('In the fridge')).toBeVisible()
+  })
+
+  test('does not put a tub away when you eat what you cooked', async ({ page }) => {
+    await planDay(page)
+    await page.getByRole('button', { name: /Pop something in/ }).first().click()
+    await expect(page.getByText(/One serving, eaten on the day/)).toBeVisible()
+
+    await page.getByRole('dialog').locator('button').filter({ hasText: /kcal/ }).first().click()
+    await goto(page, '/schedule')
+    await expect(page.getByText('In the fridge')).toHaveCount(0)
   })
 })
 
