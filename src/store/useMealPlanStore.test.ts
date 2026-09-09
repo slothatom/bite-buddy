@@ -87,6 +87,54 @@ describe('planning beyond the week on screen', () => {
   })
 })
 
+describe('loading one of the dietician\'s own weeks', () => {
+  /** A source day naming one food, so each day is telling apart from the next. */
+  const day = (dayName: string, weekday: number, foodId: string) => ({
+    dayName, weekday,
+    meals: [{ slot: 'lunch' as const, text: dayName, entries: [{ kind: 'food' as const, foodId, grams: 100 }] }],
+  })
+
+  const plan = (days: ReturnType<typeof day>[]) => ({
+    id: 'p', file: 'p.docx', label: 'A week', language: 'ro' as const,
+    issuedOn: '2022-06-06', subject: 'self' as const, days,
+  })
+
+  it('lines a week up by weekday when the weekdays are distinct', () => {
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-10T12:00:00'), 1)
+    // Her weeks run Wednesday to Tuesday; the app's runs Monday to Sunday.
+    store.loadSourcePlan(plan([
+      day('Miercuri', 3, 'a'), day('Joi', 4, 'b'), day('Marti', 2, 'c'),
+    ]))
+
+    const byDate = new Map(useMealPlanStore.getState().plan.map((d) => [d.date, d]))
+    // 2026-08-12 is the Wednesday of that week, the 11th its Tuesday.
+    expect(byDate.get('2026-08-12')?.meals[0]?.entries[0]).toMatchObject({ foodId: 'a' })
+    expect(byDate.get('2026-08-13')?.meals[0]?.entries[0]).toMatchObject({ foodId: 'b' })
+    expect(byDate.get('2026-08-11')?.meals[0]?.entries[0]).toMatchObject({ foodId: 'c' })
+  })
+
+  it('keeps every day when a plan names the same weekday twice', () => {
+    // 06.06.2022 reads Miercuri, Joi, Vineri, Marti, Miercuri, Joi, Vineri,
+    // with different food on each. Keyed by weekday the second of each pair
+    // overwrote the first, so loading it gave four days of the seven she
+    // wrote and said nothing about the three that had gone.
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-10T12:00:00'), 1)
+    store.loadSourcePlan(plan([
+      day('Miercuri', 3, 'a'), day('Joi', 4, 'b'), day('Vineri', 5, 'c'), day('Marti', 2, 'd'),
+      day('Miercuri', 3, 'e'), day('Joi', 4, 'f'), day('Vineri', 5, 'g'),
+    ]))
+
+    const loaded = useMealPlanStore.getState().plan
+      .flatMap((d) => d.meals.flatMap((m) => m.entries))
+      .map((e) => (e as { foodId: string }).foodId)
+      .sort()
+
+    expect(loaded).toEqual(['a', 'b', 'c', 'd', 'e', 'f', 'g'])
+  })
+})
+
 describe('rearranging a week', () => {
   /** A clean plan with one meal, so each test starts from the same place. */
   function planWith(): { date: string; mealId: string } {
