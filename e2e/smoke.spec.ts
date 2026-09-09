@@ -193,10 +193,11 @@ test.describe('the main flow', () => {
   test('load a dietician week, then build a grocery list from it', async ({ page }) => {
     const errors = trackErrors(page)
 
-    // 1. The archive offers every plan she has written. Twenty-five of them
-    //    now: fourteen were imported first, and eleven more arrived later.
+    // 1. The archive offers every plan she has written. Thirty-six of them:
+    //    fourteen were imported first, eleven more arrived as documents, and
+    //    eleven again once the importer could read a PDF.
     await goto(page, '/settings/history')
-    await expect(page.getByRole('button', { name: /^Load$/ })).toHaveCount(25)
+    await expect(page.getByRole('button', { name: /^Load$/ })).toHaveCount(36)
 
     // 2. Loading one fills the planner. Into next week, so all seven days are
     // still ahead and the shopping list further down will offer all of them.
@@ -537,6 +538,10 @@ test.describe('the recipe library', () => {
     // alphabetically, a wall you had to scroll past to reach anything.
     await goto(page, '/recipes')
 
+    // Counted after the first card is on screen. Reading the count the instant
+    // the route changes raced the render, and with the library three times the
+    // size it had, the race started going the other way.
+    await expect(page.locator('.card').first()).toBeVisible()
     const shown = await page.locator('.card').count()
     expect(shown, 'the whole library is on screen again').toBeLessThan(150)
     expect(shown, 'the opening shelf is empty').toBeGreaterThan(5)
@@ -892,6 +897,7 @@ test.describe('the recipe library', () => {
   test('deleting a recipe leaves its ingredients alone', async ({ page }) => {
     // Other recipes use them.
     await goto(page, '/foods')
+    await expect(page.locator('.card').first()).toBeVisible()
     const before = await page.locator('.card').count()
 
     await goto(page, '/recipes')
@@ -903,6 +909,7 @@ test.describe('the recipe library', () => {
     await page.getByRole('button', { name: 'Yes, delete' }).click()
 
     await goto(page, '/foods')
+    await expect(page.locator('.card').first()).toBeVisible()
     expect(await page.locator('.card').count()).toBe(before)
   })
 

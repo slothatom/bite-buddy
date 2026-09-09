@@ -63,18 +63,15 @@ describe('reading the dietician in English', () => {
 
     const { words, untranslated } = coverage(lines, dict)
 
-    expect(words).toBeGreaterThan(4000)
+    expect(words).toBeGreaterThan(6000)
     /*
-     * As a share, because a count is a fact about the corpus.
+     * Three words in thirty-six weeks.
      *
-     * It used to be four words in fourteen mostly Romanian weeks. Eleven more
-     * arrived, most of them Hungarian, and the dictionary is built from the
-     * food library, whose Hungarian names are thin: 191 distinct words now go
-     * through untouched. That is the behaviour this app wants, since a visible
-     * gap beats a plausible invention, but it is a gap, and the Hungarian
-     * weeks read noticeably less well than the Romanian ones until the
-     * dictionary catches up.
+     * Two of them are a brand name and the third is a typo in one of her
+     * documents, so leaving them is the right answer rather than a gap: the
+     * original is the record, and inventing a reading for a misspelling would
+     * be the app deciding what she meant.
      */
-    expect(untranslated.length / words).toBeLessThan(0.06)
+    expect(untranslated.length).toBeLessThanOrEqual(4)
   })
 })

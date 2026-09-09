@@ -170,7 +170,7 @@ export const FOODS: Food[] = [
   {
     id: 'beans-kidney-cooked',
     names: { en: 'Red kidney beans, cooked', ro: 'fasole roșie', hu: 'vörös paszuly' },
-    aliases: ['fasole rosie', 'voros paszuly', 'fott voros paszuly'],
+    aliases: ['fasole rosie', 'voros paszuly', 'fott voros paszuly', 'voros bab'],
     category: 'legumes', medTier: 'weekly', state: 'cooked',
     per100g: { calories: 127, protein: 8.7, carbs: 22.8, fat: 0.5, fiber: 6.4, iron: 2.2, sodium: 2 },
     units: [], source: 'curated',
@@ -186,7 +186,7 @@ export const FOODS: Food[] = [
   {
     id: 'green-beans',
     names: { en: 'Green beans', ro: 'fasole verde', hu: 'zöldbab' },
-    aliases: ['fasole verde'],
+    aliases: ['fasole verde', 'zoldbab', 'zoldpaszuly', 'zoldpaszuly parolva', 'paszuly'],
     category: 'vegetables', medTier: 'daily', state: 'raw',
     per100g: { calories: 31, protein: 1.8, carbs: 7, fat: 0.1, fiber: 3.4, sodium: 0 },
     units: [], source: 'curated',
@@ -387,7 +387,7 @@ export const FOODS: Food[] = [
   {
     id: 'potato',
     names: { en: 'Potato', ro: 'cartofi', hu: 'burgonya' },
-    aliases: ['cartofi', 'cartof', 'burgonya'],
+    aliases: ['cartofi', 'cartof', 'burgonya', 'krumpli', 'fott krumpli'],
     category: 'vegetables', medTier: 'moderate', state: 'raw',
     per100g: { calories: 77, protein: 2, carbs: 17.5, fat: 0.1, fiber: 2.2, potassium: 425 },
     units: [], source: 'curated',
@@ -605,7 +605,7 @@ export const FOODS: Food[] = [
   {
     id: 'avocado',
     names: { en: 'Avocado', ro: 'avocado' },
-    aliases: ['avocado'],
+    aliases: ['avocado', 'avokado', 'avokados', 'avokadobol'],
     category: 'fruits', medTier: 'daily', state: 'raw',
     per100g: { calories: 160, protein: 2, carbs: 8.5, fat: 14.7, fiber: 6.7, potassium: 485, sodium: 8 },
     units: [{ label: 'avocado', grams: 150 }],
@@ -842,7 +842,8 @@ export const FOODS: Food[] = [
   {
     id: 'pork-loin',
     names: { en: 'Pork loin', ro: 'cotlet de porc' },
-    aliases: ['cotlet', 'cotlet la gratar', 'cotlet sub capac', 'carne de porc'],
+    aliases: ['cotlet', 'cotlet la gratar', 'cotlet sub capac', 'carne de porc', 'karaj',
+      'karaj grillen'],
     category: 'red-meat', medTier: 'rare', state: 'raw',
     per100g: { calories: 143, protein: 21, carbs: 0, fat: 6, fiber: 0, sodium: 49 },
     units: [], source: 'curated',
@@ -878,7 +879,7 @@ export const FOODS: Food[] = [
   {
     id: 'olives',
     names: { en: 'Olives', ro: 'măsline', hu: 'olívabogyó' },
-    aliases: ['masline'],
+    aliases: ['masline', 'oliva bogyo', 'olivabogyo'],
     category: 'fats-vinegars', medTier: 'daily', state: 'as-sold',
     per100g: { calories: 145, protein: 1, carbs: 3.8, fat: 15.3, fiber: 3.3, sodium: 1556 },
     units: [], source: 'curated',
@@ -904,7 +905,7 @@ export const FOODS: Food[] = [
   {
     id: 'yogurt-garlic-sauce',
     names: { en: 'Yogurt garlic sauce', ro: 'sos de usturoi cu iaurt', hu: 'joghurtos fokhagymaszósz' },
-    aliases: ['sos de usturoi', 'sos de usrutoi', 'joghurtos fokhagyma szosz', 'tzatziki szosz', 'sos de usturoi pe baza de iaurt',
+    aliases: ['sos de usturoi', 'sos de usrutoi', 'joghurtos fokhagyma szosz', 'tzatziki szosz', 'tzatziki', 'sos de usturoi pe baza de iaurt',
       'sos de baza de iaurt si usturoi', 'iaurt cu sos de usturoi'],
     category: 'spreads-sauces', medTier: 'moderate', state: 'as-sold',
     per100g: { calories: 70, protein: 3.4, carbs: 5, fat: 4 },
@@ -1054,6 +1055,72 @@ export const FOODS: Food[] = [
     per100g: { calories: 265, protein: 9, carbs: 68.9, fat: 4.3, fiber: 42.5, sodium: 25 },
     units: [{ label: 'tsp', grams: 1 }],
     source: 'curated',
+  },
+
+  // Three more the 2020 weeks name, and nothing else in the library covers.
+  {
+    id: 'sesame-seeds',
+    names: { en: 'Sesame seeds', ro: 'semințe de susan', hu: 'szezámmag' },
+    aliases: ['seminte de susan', 'susan', 'szezammag'],
+    category: 'nuts-seeds', medTier: 'weekly', state: 'as-sold',
+    per100g: { calories: 573, protein: 17.7, carbs: 23.4, fat: 49.7, fiber: 11.8, sodium: 11 },
+    units: [{ label: 'tbsp', grams: 9 }],
+    source: 'curated',
+  },
+  {
+    id: 'oat-biscuits',
+    names: { en: 'Oat biscuits', ro: 'biscuiți de ovăz', hu: 'zabkeksz' },
+    aliases: ['zabkeksz', 'biscuiti de ovaz'],
+    category: 'grains', medTier: 'moderate', state: 'as-sold',
+    per100g: { calories: 450, protein: 7, carbs: 65, fat: 18, fiber: 5, sodium: 290 },
+    units: [{ label: 'biscuit', grams: 12 }],
+    source: 'curated',
+  },
+  {
+    id: 'brewers-yeast',
+    names: { en: "Brewer's yeast", ro: 'drojdie de bere', hu: 'sörélesztő' },
+    aliases: ['drojdie de bere', 'soreleszto', 'sorelesztő'],
+    category: 'pantry', medTier: 'moderate', state: 'as-sold',
+    per100g: { calories: 325, protein: 38.3, carbs: 38.4, fat: 1.8, fiber: 22, sodium: 51 },
+    units: [{ label: 'tsp', grams: 4 }],
+    source: 'curated',
+  },
+
+  {
+    id: 'salt',
+    names: { en: 'Salt', ro: 'sare', hu: 'só' },
+    aliases: ['sare', 'so', 'so es bors'],
+    category: 'herbs-spices', medTier: 'rare', state: 'as-sold',
+    per100g: { calories: 0, protein: 0, carbs: 0, fat: 0, sodium: 38758 },
+    units: [{ label: 'pinch', grams: 1 }],
+    source: 'curated',
+  },
+  {
+    id: 'black-pepper',
+    names: { en: 'Black pepper', ro: 'piper', hu: 'bors' },
+    aliases: ['piper', 'bors'],
+    category: 'herbs-spices', medTier: 'daily', state: 'as-sold',
+    per100g: { calories: 251, protein: 10.4, carbs: 63.9, fat: 3.3, fiber: 25.3, sodium: 20 },
+    units: [{ label: 'tsp', grams: 2 }],
+    source: 'curated',
+  },
+  {
+    id: 'persimmon',
+    names: { en: 'Persimmon', ro: 'kaki', hu: 'datolyaszilva' },
+    aliases: ['kaki', 'datolyaszilva'],
+    category: 'fruits', medTier: 'daily', state: 'as-sold',
+    per100g: { calories: 70, protein: 0.6, carbs: 18.6, fat: 0.2, fiber: 3.6, sodium: 1 },
+    units: [{ label: 'fruit', grams: 168 }],
+    source: 'curated',
+  },
+  {
+    id: 'millet',
+    names: { en: 'Millet', ro: 'mei', hu: 'köles' },
+    // Weighed dry, like every other grain in these plans.
+    aliases: ['mei', 'koles', 'fott koles'],
+    category: 'grains', medTier: 'daily', state: 'dry',
+    per100g: { calories: 378, protein: 11, carbs: 72.8, fat: 4.2, fiber: 8.5, sodium: 5 },
+    units: [], source: 'curated',
   },
 
   // ─── Drinks ────────────────────────────────────────────────────────────────
