@@ -65,17 +65,26 @@ async function putATubInTheFridge(page: Page, label: string) {
 /**
  * The planner, showing one day rather than the week.
  *
- * The planner opens on the week now, and a week is a grid of every meal in it:
- * day rows, slot columns, one cell a meal. That was the whole point of the
- * change, so it is the right default and these tests move off it deliberately.
- *
- * Anything whose subject is a single day's meals, the tick, the portion, the
- * bin, comes here first. The controls live in the day view, and in the week
- * view they are one tap away inside a meal's own sheet.
+ * Which is where it now opens, so this is a no-op beyond being explicit about
+ * what the test is looking at. Kept because it says so: anything whose subject
+ * is a single day's meals, the tick, the portion, the bin, comes here first.
  */
 async function planDay(page: Page) {
   await goto(page, '/plan')
   await page.getByRole('tab', { name: 'Day' }).click()
+}
+
+/**
+ * The planner, showing the week.
+ *
+ * The screen opens on the day: it is reached far more often to tick off a
+ * snack than to plan a week, and what you have had so far only exists in the
+ * day view. So a week is now the deliberate one, and anything whose subject is
+ * the grid, or an arrow that means seven days rather than one, comes here.
+ */
+async function planWeek(page: Page) {
+  await goto(page, '/plan')
+  await page.getByRole('tab', { name: '1 week' }).click()
 }
 
 /**
@@ -87,7 +96,7 @@ async function planDay(page: Page) {
  * through it, which is also the route a person takes.
  */
 async function openADayWithFood(page: Page) {
-  await goto(page, '/plan')
+  await planWeek(page)
   const row = page.locator('[data-day-row]')
     .filter({ has: page.locator('[data-planned]') })
     .first()
@@ -96,7 +105,7 @@ async function openADayWithFood(page: Page) {
 }
 
 async function planAheadOfToday(page: Page) {
-  await goto(page, '/plan')
+  await planWeek(page)
   // The window, not the view. The arrow means a week here and a day in the
   // day view, so this steps before anything narrows.
   await page.getByRole('button', { name: 'Next week' }).click()
@@ -461,11 +470,21 @@ test.describe('the shopping list', () => {
 })
 
 test.describe('the planner', () => {
+  test('opens on the day, because that is what it is opened for', async ({ page }) => {
+    // Planning a week is deliberate and can afford a tap. Ticking off a snack
+    // cannot, and what you have had so far only exists in the day view, which
+    // was two taps away every single time the screen was opened.
+    await goto(page, '/plan')
+
+    await expect(page.getByRole('tab', { name: 'Day' })).toHaveAttribute('aria-selected', 'true')
+    await expect(page.locator('[data-day-row]')).toHaveCount(0)
+  })
+
   test('shows every meal in the range, not one day at a time', async ({ page }) => {
     // The week view used to be seven small cells holding a calorie number,
     // with a single day's food underneath, so it never actually showed a week.
     // It is a grid now: a row a day, a column a slot, a cell a meal.
-    await goto(page, '/plan')
+    await planWeek(page)
 
     const rows = page.getByRole('button', { name: /Show the full names/ })
     await expect(rows).toHaveCount(7)
@@ -482,7 +501,7 @@ test.describe('the planner', () => {
   test('a day opens to its full names, and lets you into itself', async ({ page }) => {
     // The columns are sixty pixels on a phone, so a cell holds the front of a
     // name. The whole thing is one tap away on the date rather than hidden.
-    await goto(page, '/plan')
+    await planWeek(page)
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
     await page.getByRole('button', { name: /^Add these/ }).click()
 
@@ -497,7 +516,7 @@ test.describe('the planner', () => {
   test('a meal opens over the week rather than instead of it', async ({ page }) => {
     // Tapping a meal used to mean leaving the week to see it. The controls are
     // the day view's own, in a panel, so there is one set rather than two.
-    await goto(page, '/plan')
+    await planWeek(page)
     await page.getByRole('button', { name: 'Fill the gaps' }).click()
     await page.getByRole('button', { name: /^Add these/ }).click()
 
@@ -1945,7 +1964,7 @@ test.describe('the week you are actually in', () => {
    * reloads, which is what a person does every time they open the app.
    */
   test('a window left in the past does not survive a reload', async ({ page }) => {
-    await goto(page, '/plan')
+    await planWeek(page)
     // The grid names each row by its date. The old strip of cells this used to
     // read is gone with the view that drew it.
     await expect(page.locator(`[data-day-row="${todayIso()}"]`)).toBeVisible()
@@ -1965,6 +1984,8 @@ test.describe('the week you are actually in', () => {
 
     await page.reload()
     await page.waitForLoadState('networkidle')
+    // The view resets with the reload, and the grid is what carries the dates.
+    await page.getByRole('tab', { name: '1 week' }).click()
 
     await expect(page.locator(`[data-day-row="${todayIso()}"]`)).toBeVisible()
   })
@@ -1983,7 +2004,7 @@ test.describe('the week you are actually in', () => {
   })
 
   test('stepping the planner back leaves every other screen where it was', async ({ page }) => {
-    await goto(page, '/plan')
+    await planWeek(page)
     for (let i = 0; i < 2; i += 1) {
       await page.getByRole('button', { name: 'Previous week' }).click()
     }
@@ -2025,7 +2046,7 @@ test.describe('the week you are actually in', () => {
 
     // The week view, where the arrow means a week. It means a day in the day
     // view, which is the right reading there and the wrong one here.
-    await goto(page, '/plan')
+    await planWeek(page)
     await page.getByRole('button', { name: 'Previous week' }).click()
 
     // Leave the planner entirely, which is where this went wrong: the day came
