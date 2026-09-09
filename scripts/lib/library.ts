@@ -2,11 +2,13 @@ import { fragmentsOf, type RawFragment } from './plans.js'
 import { FOODS } from '../../src/data/foods.js'
 import { DISHES, DISH_ALIASES, DISH_BY_WEIGHT } from '../../src/data/dishes.js'
 import { buildFoodIndex, resolveFood } from '../../src/lib/foodSearch.js'
-import { normaliseTerm } from '../../src/lib/units.js'
+import { normaliseTerm, parseNumber } from '../../src/lib/units.js'
 import { buildContext, componentsNutrients } from '../../src/lib/nutrition.js'
 import { categorise } from '../../src/lib/classify.js'
 import { deriveTimes } from '../../src/lib/cookingTimes.js'
-import type { RecipeComponent, MealSlot, Recipe, RecipeTag, SourcePlan } from '../../src/types/index.js'
+import type {
+  Food, RecipeComponent, MealSlot, Recipe, RecipeTag, SourcePlan,
+} from '../../src/types/index.js'
 
 /**
  * Turns the dietician's meal lines into the recipe library.
@@ -43,6 +45,41 @@ function resolveDish(term: string): string | undefined {
     if (n === a.key || n.includes(a.key)) return a.recipeId
   }
   return undefined
+}
+
+/**
+ * How much a slice weighs, asked of the food rather than of a table.
+ *
+ * `felie` is a shape, not a food. A slice of pizza is 110 g, a slice of
+ * wholemeal bread is 30, a slice of the coconut and raspberry cake is 90, and
+ * the fragment parser had one number for all of them: 40 g, which is a slice
+ * of nothing in particular. So "o felie de pizza" came into the library as
+ * 106 kcal where the pizza's own definition makes it 293, and every line the
+ * dietician wrote that way was understated, always in the same direction,
+ * because 40 g is lighter than any real slice.
+ *
+ * Every sliceable food already carries what its own slice weighs, for the
+ * picker to offer. This asks it. The parser's 40 g stays as the answer for a
+ * food that has no slice of its own, where a rough number beats none.
+ *
+ * Only the count word is read here, not the whole fragment: "1,5 felie de
+ * brownie" is one and a half of the brownie's own slices, not one and a half
+ * of anybody's.
+ */
+function slicedGrams(raw: string, food: Food): number | undefined {
+  const slice = food.units.find((u) => u.label === 'slice')
+  if (!slice) return undefined
+
+  const m = raw.match(
+    /(\d+(?:[.,]\d+)?|o|un|una|egy|jum[aă]tate|f[eé]l|½)\s+(?:de\s+)?(?:felie|felii|szelet)\b/i)
+  if (!m) return undefined
+
+  const word = m[1].toLowerCase()
+  const count = /^(o|un|una|egy)$/.test(word) ? 1
+    : /^(jum[aă]tate|f[eé]l|½)$/.test(word) ? 0.5
+      : parseNumber(m[1]) ?? 1
+
+  return Math.round(count * slice.grams)
 }
 
 /** A fragment with no stated weight still needs a sensible portion. */
@@ -119,9 +156,11 @@ function toComponents(f: RawFragment, slot: MealSlot, file: string, unresolved: 
 
   const food = resolveFood(f.term, foodIndex)
   if (food) {
+    // A slice the food itself has measured beats the parser's flat 40 g.
+    const sliced = slicedGrams(f.raw, food)
     return [{
-      component: { kind: 'food', foodId: food.id, grams: f.grams ?? defaultGrams(food.id) },
-      stated: f.grams != null,
+      component: { kind: 'food', foodId: food.id, grams: sliced ?? f.grams ?? defaultGrams(food.id) },
+      stated: sliced != null || f.grams != null,
     }]
   }
 

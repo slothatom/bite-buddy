@@ -287,6 +287,36 @@ const categoriesUsed = new Set(Object.values(RECIPE_CLASSIFICATION).map((c) => c
 
 // ─── Report ───────────────────────────────────────────────────────────────────
 
+// 12. A slice weighs what its food says a slice weighs.
+//
+// `felie` is a shape rather than a food, so the fragment parser cannot know
+// what one weighs: a slice of pizza is 110 g, of wholemeal bread 30, of the
+// coconut cake 90. It had a single number, 40 g, and every line the dietician
+// wrote as "o felie" came in lighter than it was, always in that direction,
+// because 40 g is lighter than any real slice. The importer asks the food now.
+// This holds it to that, since the failure is silent: a pizza at 106 kcal
+// looks like a perfectly ordinary number sitting in a file.
+const SLICED = /(\d+(?:[.,]\d+)?|o|un|una|egy|jum[a\u0103]tate|f[e\u00e9]l|\u00bd)\s+(?:de\s+)?(?:felie|felii|szelet)\b/i
+for (const recipe of MEAL_RECIPES) {
+  if (!recipe.sourceLine || !SLICED.test(recipe.sourceLine)) continue
+  for (const c of recipe.components) {
+    if (c.kind !== 'food') continue
+    const slice = FOODS.find((f) => f.id === c.foodId)?.units.find((u) => u.label === 'slice')
+    if (!slice) continue
+    // Halves, because the plans do write "1,5 felie". Anything that is not a
+    // multiple of half a slice means the weight came from somewhere other than
+    // the food, which is the bug this exists to catch.
+    const halves = (c.grams / slice.grams) * 2
+    if (Math.abs(halves - Math.round(halves)) > 0.02) {
+      problems.push(
+        `${recipe.id}: "${recipe.sourceLine}" gives ${c.foodId} ${c.grams} g, `
+        + `which is ${(halves / 2).toFixed(2)} of the ${slice.grams} g slice it defines`,
+      )
+    }
+  }
+}
+
+
 const componentCount = recipes.reduce((a, r) => a + r.components.length, 0)
 console.log(`foods          ${FOODS.length}`)
 console.log(`dishes         ${DISHES.length}`)
