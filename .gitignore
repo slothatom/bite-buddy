@@ -10,3 +10,13 @@ dist-single/
 
 # Local Supabase credentials
 .env.local
+
+# The dietician's own documents.
+#
+# `npm run data:build` reads these to produce the archive in
+# src/data/generated, and the archive is what the app ships, so the originals
+# are only ever needed on the machine doing the import. They are somebody's
+# named medical correspondence and this repository is public, so they stay out
+# of it. Drop them in data/source and rebuild; nothing here will offer to
+# commit them.
+data/source/
