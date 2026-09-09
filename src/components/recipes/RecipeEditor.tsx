@@ -566,7 +566,7 @@ function IngredientPicker({
   const ctx = useNutritionContext()
   const addFood = useFoodStore((s) => s.addFood)
   const foods = useFoods()
-  const { foods: matchedFoods, recipes: matchedRecipes, online, searching, problems, searched } =
+  const { foods: matchedFoods, recipes: matchedRecipes, online, searching, problems, unrelated, searched } =
     useIngredientSearch(query, excludeRecipeId)
 
   /** Saves an online result as a food of yours, then adds it to the recipe. */
@@ -681,7 +681,7 @@ function IngredientPicker({
           {!searching && nothing && query.trim().length > 0 && (
             <div className="py-6 text-center space-y-2">
               <p className="text-sm text-ink-700">
-                {searched ? lookupMessage(problems, query) : `Nothing of yours matches “${query}”.`}
+                {searched ? lookupMessage(problems, query, unrelated) : `Nothing of yours matches “${query}”.`}
               </p>
               <p className="text-xs text-ink-500">
                 Add it on the Foods screen and it will be here next time.
@@ -714,9 +714,17 @@ function ResultHeading({ children }: { children: ReactNode }) {
  * Being rate-limited, being offline and genuinely finding nothing are three
  * different situations with three different next moves, and calling all of them
  * "no results" sends you off to type in numbers the database already had.
+ *
+ * "No signal" is the one claim that has to be earned. One source refusing a
+ * connection is that source's problem and says nothing about your phone, so it
+ * takes the browser saying it and both sources failing the same way.
  */
-function lookupMessage(problems: IngredientSearch['problems'], query: string): string {
-  if (problems.some((p) => p.reason === 'offline')) {
+function lookupMessage(
+  problems: IngredientSearch['problems'],
+  query: string,
+  unrelated = 0,
+): string {
+  if (problems.length > 1 && problems.every((p) => p.reason === 'offline')) {
     return 'No signal, so only your own foods were searched.'
   }
   if (problems.some((p) => p.reason === 'rate-limited')) {
@@ -724,6 +732,13 @@ function lookupMessage(problems: IngredientSearch['problems'], query: string): s
   }
   if (problems.length === 2) {
     return 'Both food databases are unreachable just now.'
+  }
+  if (problems.length === 1) {
+    const down = problems[0].source === 'usda' ? 'USDA' : 'Open Food Facts'
+    return `Nothing of yours matches “${query}”, and ${down} is not responding, so it was not searched.`
+  }
+  if (unrelated > 0) {
+    return `Nothing that came back looked like “${query}”. The databases are mostly English, so an English word may find it.`
   }
   return `Nothing anywhere matches “${query}”.`
 }

@@ -51,6 +51,8 @@ export default function AddFoodModal({
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<NutritionResult[]>([])
   const [problems, setProblems] = useState<LookupOutcome['problems']>([])
+  /** Rows the databases returned that had nothing to do with the question. */
+  const [unrelated, setUnrelated] = useState(0)
   const [searched, setSearched] = useState(false)
   const [searching, setSearching] = useState(false)
 
@@ -75,6 +77,7 @@ export default function AddFoodModal({
       const outcome = await lookupOnline(query)
       setResults(outcome.results)
       setProblems(outcome.problems)
+      setUnrelated(outcome.unrelated)
     } finally {
       setSearched(true)
       setSearching(false)
@@ -196,14 +199,14 @@ export default function AddFoodModal({
                   <p className="text-sm text-ink-500 text-center py-4">
                     {!searched
                       ? 'Nothing yet. Search above, or just type it in by hand.'
-                      : lookupMessage(problems)}
+                      : lookupMessage(problems, { unrelated, query })}
                   </p>
                 )}
                 {/* Partial failures matter too: results from one source while
                     the other is down looks like a complete answer otherwise. */}
                 {!searching && results.length > 0 && problems.length > 0 && (
                   <p className="text-xs text-mustard-700 text-center pt-1">
-                    {lookupMessage(problems)}
+                    {lookupMessage(problems, { hadResults: true })}
                   </p>
                 )}
               </div>
@@ -365,24 +368,65 @@ function ceiling(key: string): number {
   return MOST.gramsPer100g
 }
 
+const SOURCE_NAMES = { usda: 'USDA', openfoodfacts: 'Open Food Facts' } as const
+
 /**
  * What to say when a lookup did not simply find nothing.
  *
  * Being rate-limited is the common one: without a key of your own the USDA
  * allows about 30 requests an hour, and the old code reported that as "no
  * results", which sends you off to type in numbers it already had.
+ *
+ * The claim to be careful with is "you're offline". It used to be printed
+ * whenever every failure looked like a dead fetch, which is trivially true when
+ * only one of the two sources failed, so a phone with full signal was told it
+ * had none, in a line sitting directly under results the other source had just
+ * returned. Nothing here says your connection is gone unless the browser says
+ * so, both sources agree, and there is nothing on screen contradicting it.
  */
-function lookupMessage(problems: LookupOutcome['problems']): string {
-  if (!problems.length) return 'No matches. Try another spelling, or type it in by hand.'
+function lookupMessage(
+  problems: LookupOutcome['problems'],
+  { unrelated = 0, query = '', hadResults = false }: {
+    unrelated?: number; query?: string; hadResults?: boolean
+  } = {},
+): string {
+  if (!problems.length) {
+    if (unrelated > 0) {
+      return `The databases answered, but nothing they offered looked like “${query}”. They are mostly English, so an English word may find it. Typing it in by hand works the same.`
+    }
+    return 'No matches. Try another spelling, or type it in by hand.'
+  }
 
-  if (problems.every((p) => p.reason === 'offline')) {
+  /*
+   * A source failing and the other source not understanding the question are
+   * two separate things, and the screenshot that started this had both at once:
+   * three USDA rows for a Romanian soup, none of them a soup, under a line
+   * claiming the phone had no network.
+   */
+  const noise = unrelated > 0 && !hadResults
+    ? ` What did come back looked nothing like “${query}”, and the databases are mostly English.`
+    : ''
+
+  if (!hadResults && problems.length > 1 && problems.every((p) => p.reason === 'offline')) {
     return "You're offline, so the food databases can't be reached. Type it in by hand and it'll work the same."
   }
-  if (problems.some((p) => p.reason === 'rate-limited')) {
-    return 'The USDA database is rate-limiting this app. Wait a few minutes, add your own free API key, or type it in by hand.'
+
+  const limited = problems.filter((p) => p.reason === 'rate-limited')
+  if (limited.length) {
+    return limited.some((p) => p.source === 'usda')
+      ? 'The USDA database is rate-limiting this app. Wait a few minutes, add your own free API key, or type it in by hand.'
+      : 'Open Food Facts is rate-limiting this app. Wait a few minutes, or type it in by hand.'
   }
-  const down = problems.map((p) => (p.source === 'usda' ? 'USDA' : 'Open Food Facts')).join(' and ')
-  return `${down} ${problems.length > 1 ? 'are' : 'is'} not responding right now. Try again shortly, or type it in by hand.`
+
+  const down = problems.map((p) => SOURCE_NAMES[p.source]).join(' and ')
+  const verb = problems.length > 1 ? 'are' : 'is'
+  if (hadResults) {
+    const other = problems.length === 1
+      ? SOURCE_NAMES[problems[0].source === 'usda' ? 'openfoodfacts' : 'usda']
+      : 'the other database'
+    return `${down} ${verb} not responding, so these results come from ${other} alone.`
+  }
+  return `${down} ${verb} not responding right now.${noise} Try again shortly, or type it in by hand.`
 }
 
 function barcodeMessage(reason: 'unknown-product' | LookupProblem): string {

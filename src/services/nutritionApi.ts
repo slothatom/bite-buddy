@@ -136,6 +136,44 @@ export function worthOffering(result: NutritionResult): boolean {
   return result.per100g.calories > 0
 }
 
+/** Words too common to tell one food from another, in any of the three. */
+const NOISE_WORDS = new Set(['and', 'the', 'with', 'for', 'from', 'per', 'din', 'cel', 'cea'])
+
+/** Lower case, no accents, letters and digits only. */
+function words(text: string): string[] {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length >= 3 && !NOISE_WORDS.has(w))
+}
+
+/**
+ * Whether a row the databases returned has anything to do with what was asked.
+ *
+ * USDA's search is a loose full text match and it always answers something.
+ * Asked for "Ciorba de legume" it offered creme de menthe, pound cake and corn
+ * flour, with nothing on the row to say it had simply not understood the
+ * question, and tapping any of the three would have stored those numbers as a
+ * vegetable soup.
+ *
+ * The test is deliberately blunt: one word of the question and one word of the
+ * name have to share a beginning, so "tomatoes" still finds "Tomato, raw" and
+ * nothing in "Creme de menthe" answers "ciorba" or "legume". A food the
+ * databases hold only under an English name is lost this way. That is the
+ * trade taken knowingly, and the message says which happened, because a search
+ * you can repeat with another word is a better failure than a confident wrong
+ * number stored under the right one.
+ */
+export function relatedTo(query: string, name: string): boolean {
+  const asked = words(query)
+  if (!asked.length) return true
+  const has = words(name)
+  return asked.some((q) =>
+    has.some((n) => (q.length <= n.length ? n.startsWith(q) : q.startsWith(n))))
+}
+
 /**
  * Open Food Facts keys, with how many decimals each is worth keeping.
  *
@@ -228,6 +266,13 @@ export interface LookupOutcome {
    * numbers in by hand for a food the database knew perfectly well.
    */
   problems: Array<{ source: 'usda' | 'openfoodfacts'; reason: LookupProblem }>
+  /**
+   * How many rows were dropped for having nothing to do with the question.
+   *
+   * Not the same as finding nothing: it means the databases answered and the
+   * answer was noise, which is worth saying differently. See `relatedTo`.
+   */
+  unrelated: number
 }
 
 /** Requests that hang leave the UI saying "searching" forever. */
@@ -251,10 +296,17 @@ class LookupError extends Error {
 
 function reasonFor(error: unknown): LookupProblem {
   if (error instanceof LookupError) return error.reason
-  // A failed fetch with no response is the network being gone. Distinguishing
-  // it matters: one is worth retrying in a moment, the other is not.
+  /*
+   * Only the browser gets to say you are offline.
+   *
+   * A fetch that dies before it has a response throws a TypeError, and reading
+   * that as "the network is gone" put "You're offline" on the screen of a phone
+   * with a full bar of 5G, directly underneath results from the source that had
+   * just answered. A request can fail for its own reasons, refused, blocked,
+   * DNS gone, the host down, and none of those are your connection.
+   */
   if (typeof navigator !== 'undefined' && navigator.onLine === false) return 'offline'
-  return error instanceof TypeError ? 'offline' : 'unavailable'
+  return 'unavailable'
 }
 
 export async function searchFoods(query: string, signal?: AbortSignal): Promise<LookupOutcome> {
@@ -279,7 +331,9 @@ export async function searchFoods(query: string, signal?: AbortSignal): Promise<
 
   // A row with no energy figure is not an ingredient anybody can use. See
   // `worthOffering`: adding one zeroes whatever it is added to.
-  return { results: results.filter(worthOffering).slice(0, 14), problems }
+  const usable = results.filter(worthOffering)
+  const related = usable.filter((r) => relatedTo(query, r.name))
+  return { results: related.slice(0, 14), problems, unrelated: usable.length - related.length }
 }
 
 async function searchUSDA(query: string, signal?: AbortSignal): Promise<NutritionResult[]> {
