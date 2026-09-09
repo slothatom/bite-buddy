@@ -654,21 +654,46 @@ export const useMealPlanStore = create<MealPlanStore>()(
 
         loadSourcePlan: (source) =>
           set((s) => {
-            // Source days carry a weekday, not a date. Line them up with the
-            // matching weekday in the week currently on screen.
+            /*
+             * Source days carry a weekday, not a date, so they are lined up
+             * with the matching weekday in the week on screen: a Wednesday
+             * meal lands on Wednesday even though her weeks run Wednesday to
+             * Tuesday and this one runs Monday to Sunday.
+             *
+             * That only works while the weekdays are distinct, and in one of
+             * the fourteen plans they are not. 06.06.2022 reads Miercuri, Joi,
+             * Vineri, Marti, Miercuri, Joi, Vineri: two Wednesdays, two
+             * Thursdays and two Fridays, each with different food. Keyed by
+             * weekday, the second of each pair overwrote the first, so loading
+             * that plan gave you four days of the seven she wrote and no hint
+             * that three had gone.
+             *
+             * So the alignment is used when it can be, and when it cannot the
+             * days are laid out in the order she wrote them. Sequence is the
+             * next best thing to the weekday, and losing three days is worse
+             * than starting the week on the wrong one.
+             */
+            const weekdays = new Set(source.days.map((d) => d.weekday))
+            const aligned = weekdays.size === source.days.length
             const byWeekday = new Map(source.days.map((d) => [d.weekday, d]))
+
+            const asDay = (date: string, day: SourcePlan['days'][number] | undefined) => {
+              if (!day) return touch({ date, meals: [] })
+              return touch({
+                date,
+                meals: day.meals
+                  .filter((m) => m.entries.length)
+                  .map((m) => ({ id: newId(), slot: m.slot, entries: m.entries, note: m.text })),
+              })
+            }
+
             return {
-              plan: s.weekDates.map((date) => {
-                const weekday = new Date(date + 'T12:00:00').getDay()
-                const day = byWeekday.get(weekday)
-                if (!day) return touch({ date, meals: [] })
-                return touch({
-                  date,
-                  meals: day.meals
-                    .filter((m) => m.entries.length)
-                    .map((m) => ({ id: newId(), slot: m.slot, entries: m.entries, note: m.text })),
-                })
-              }),
+              plan: s.weekDates.map((date, i) => asDay(
+                date,
+                aligned
+                  ? byWeekday.get(new Date(date + 'T12:00:00').getDay())
+                  : source.days[i],
+              )),
               groceryItems: [],
             }
           }),
