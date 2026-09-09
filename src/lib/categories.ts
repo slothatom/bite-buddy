@@ -2,13 +2,17 @@ import type { MedCategory } from '../types'
 
 /**
  * Display names and icons for the Mediterranean guide's food groups, in the
- * order the guide itself presents them.
+ * order the guide itself presents them, followed by the app's own group for a
+ * dish you cannot break into ingredients. See `MedCategory`.
  */
 
 export const CATEGORY_ORDER: MedCategory[] = [
   'vegetables', 'legumes', 'fruits', 'grains', 'nuts-seeds', 'herbs-spices',
   'fats-vinegars', 'dairy', 'fish-seafood', 'poultry', 'eggs', 'red-meat',
   'pantry', 'spreads-sauces', 'treats', 'sweeteners', 'beverages',
+  // Last, and not the guide's: see `MedCategory`. A cooked dish is one item
+  // with no group of its own, and the shopping list has no aisle for it.
+  'dishes',
 ]
 
 export const CATEGORY_LABELS: Record<MedCategory, string> = {
@@ -17,11 +21,12 @@ export const CATEGORY_LABELS: Record<MedCategory, string> = {
   dairy: 'Dairy', 'fish-seafood': 'Fish & seafood', poultry: 'Poultry', eggs: 'Eggs',
   'red-meat': 'Red meat', pantry: 'Pantry', 'spreads-sauces': 'Spreads & sauces',
   treats: 'Treats', sweeteners: 'Sweeteners', beverages: 'Drinks',
+  dishes: 'Cooked dishes',
 }
 
 export const CATEGORY_EMOJI: Record<MedCategory, string> = {
   vegetables: '🥬', legumes: '🫘', fruits: '🍑', grains: '🌾', 'nuts-seeds': '🥜',
   'herbs-spices': '🌿', 'fats-vinegars': '🫒', dairy: '🧀', 'fish-seafood': '🐟',
   poultry: '🍗', eggs: '🥚', 'red-meat': '🥩', pantry: '🥣', 'spreads-sauces': '🧴',
-  treats: '🍫', sweeteners: '🍯', beverages: '💧',
+  treats: '🍫', sweeteners: '🍯', beverages: '💧', dishes: '🍲',
 }

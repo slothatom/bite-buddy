@@ -33,6 +33,9 @@ const FOODS: Food[] = [
   // A category the guide has no serving size for, which is the whole point of
   // scoreGaps: it is dropped mid-count either way.
   food('cinnamon', 'herbs-spices'),
+  // A bought soup. One item, no way to say what is in it, and no serving goal:
+  // counted for its calories everywhere else, and named here.
+  food('ciorba', 'dishes'),
 ]
 
 const stew: Recipe = {
@@ -190,6 +193,17 @@ describe('what the scoring had to leave out', () => {
 
     expect(gaps.noGoal).toEqual(['cinnamon'])
     expect(gaps.lost).toBe(0)
+  })
+
+  it('names a cooked dish rather than counting it towards a group', () => {
+    // The alternative was filing it under the nearest guide group, and a bowl
+    // of broth counted as three servings of vegetables is worse than a bowl of
+    // broth the screen admits it could not count.
+    const days = [day('2026-08-20', [{ kind: 'food', foodId: 'ciorba', grams: 350 }])]
+    const gaps = scoreGaps(days, ctx)
+
+    expect(gaps.noGoal).toEqual(['ciorba'])
+    expect(gramsByCategory(days, ctx).get('vegetables')).toBeUndefined()
   })
 
   it('counts a food the library has lost', () => {

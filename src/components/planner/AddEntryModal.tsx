@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useDialog } from '../../lib/useDialog'
-import { Search, X, CalendarDays, Plus } from 'lucide-react'
+import { Search, X, CalendarDays, Plus, Globe } from 'lucide-react'
 import type { Component, MealSlot, Recipe } from '../../types'
 import { SLOT_LABELS } from '../../types'
 import { useRecipes } from '../../store/useRecipeStore'
@@ -95,7 +95,8 @@ export default function AddEntryModal({
    * which people stop recording yoghurts. It opens the same sheet the Foods
    * screen opens, and puts what you wrote straight into the meal.
    */
-  const [writing, setWriting] = useState(false)
+  /** Which way in to the new-food sheet, or null while it is closed. */
+  const [writing, setWriting] = useState<'manual' | 'lookup' | null>(null)
   const panel = useDialog<HTMLDivElement>(onClose, !writing)
   const [query, setQuery] = useState('')
   // Snacks open on foods. The plans write them as lines rather than dishes
@@ -364,6 +365,35 @@ export default function AddEntryModal({
               </div>
             )}
 
+            {/*
+              Above the list, not below it.
+
+              Both ways out of a library that does not have it used to sit
+              under the results, and with nothing typed the results are forty
+              foods, so "search the databases" was a scroll past forty things
+              you did not want. The databases are the whole reason the Foods
+              tab can answer a yoghurt it has never heard of, and they were the
+              hardest thing on the screen to reach.
+            */}
+            {tab === 'foods' && (
+              <div className="flex gap-2 pb-1">
+                <button
+                  className="btn-secondary text-sm flex-1 justify-center"
+                  onClick={() => setWriting('manual')}
+                >
+                  <Plus size={15} />
+                  <span className="truncate">{query.trim() ? `Add “${query.trim()}”` : 'Write one down'}</span>
+                </button>
+                <button
+                  className="btn-secondary text-sm flex-1 justify-center"
+                  onClick={() => setWriting('lookup')}
+                >
+                  <Globe size={15} />
+                  <span className="truncate">Search the databases</span>
+                </button>
+              </div>
+            )}
+
             {tab === 'foods' && matchedFoods.map((f) => {
               const g = grams[f.id] ?? f.units[0]?.grams ?? 100
               const n = componentsNutrients([{ kind: 'food', foodId: f.id, grams: g }], ctx)
@@ -435,31 +465,18 @@ export default function AddEntryModal({
               )
             })}
 
-            {/* The way out of a library that does not have it. Offered whether
-                or not there were matches: a near-match is not the thing you ate,
-                and the old sheet's only answer to either case was to go and
-                search the other library. */}
-            {tab === 'foods' && (
-              <div className={matchedFoods.length ? 'pt-2' : 'text-center py-8 space-y-2'}>
-                {!matchedFoods.length && (
-                  <p className="text-sm text-ink-500">
-                    {query ? `No foods match “${query}”.` : 'Search above, or write one down.'}
-                  </p>
-                )}
-                <div className="flex flex-wrap justify-center gap-2">
-                  <button
-                    className={matchedFoods.length ? 'btn-ghost text-sm w-full justify-center' : 'btn-primary'}
-                    onClick={() => setWriting(true)}
-                  >
-                    <Plus size={15} />
-                    {query.trim() ? `Add “${query.trim()}” as a new food` : 'Add a new food'}
-                  </button>
-                  {!matchedFoods.length && (
-                    <button className="btn-secondary" onClick={() => setTab('recipes')}>
-                      Look in recipes instead
-                    </button>
-                  )}
-                </div>
+            {tab === 'foods' && !matchedFoods.length && (
+              <div className="text-center py-8 space-y-2">
+                <p className="text-sm text-ink-500">
+                  {query
+                    ? `None of your foods match “${query}”. The two buttons above will look it up or write it down.`
+                    : 'Search above, or write one down.'}
+                </p>
+                {/* A miss on one tab used to give no hint that the other might
+                    have it. */}
+                <button className="btn-secondary" onClick={() => setTab('recipes')}>
+                  Look in recipes instead
+                </button>
               </div>
             )}
           </div>
@@ -479,7 +496,8 @@ export default function AddEntryModal({
       {writing && (
         <AddFoodModal
           initialName={query.trim()}
-          onClose={() => setWriting(false)}
+          initialTab={writing}
+          onClose={() => setWriting(null)}
           onSaved={(food) => {
             onAdd(stamped({ kind: 'food', foodId: food.id, grams: food.units[0]?.grams ?? 100 }))
             onClose()
