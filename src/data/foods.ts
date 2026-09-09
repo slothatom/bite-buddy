@@ -229,7 +229,8 @@ export const FOODS: Food[] = [
   {
     id: 'salad-raw',
     names: { en: 'Raw vegetable salad', ro: 'salată de crudități', hu: 'vegyes saláta' },
-    aliases: ['raw vegetable salad', 'salata de cruditati', 'vegyes salata', 'salata'],
+    aliases: ['raw vegetable salad', 'salata de cruditati', 'vegyes salata', 'salata',
+      'vegyes sali', 'sali'],
     category: 'vegetables', medTier: 'daily', state: 'raw',
     per100g: { calories: 25, protein: 1.3, carbs: 4.5, fat: 0.2, fiber: 2, vitaminC: 22 },
     units: [{ label: 'bowl', grams: 200 }],
@@ -748,7 +749,7 @@ export const FOODS: Food[] = [
   {
     id: 'goat-cheese',
     names: { en: 'Goat cheese', ro: 'brânză de capră' },
-    aliases: ['branza de capra'],
+    aliases: ['branza de capra', 'kecskesajt'],
     category: 'dairy', medTier: 'moderate', state: 'as-sold',
     per100g: { calories: 364, protein: 21.6, carbs: 2.5, fat: 29.8, calcium: 298, fiber: 0, sodium: 415 },
     units: [], source: 'curated',
@@ -869,7 +870,7 @@ export const FOODS: Food[] = [
   {
     id: 'olive-oil',
     names: { en: 'Extra virgin olive oil', ro: 'ulei de măsline', hu: 'olívaolaj' },
-    aliases: ['ulei de masline', 'ulei', 'olivaolaj', 'olivaolajjal', 'oliva olajjal', 'oliva olaj',
+    aliases: ['ulei de masline', 'ulei', 'olivaolaj', 'olivaolajjal', 'oliva olajjal', 'olivoalaj', 'oliva olaj',
       'olivaolajban'],
     category: 'fats-vinegars', medTier: 'daily', state: 'as-sold',
     per100g: { calories: 884, protein: 0, carbs: 0, fat: 100, saturatedFat: 13.8, fiber: 0, sodium: 0 },
@@ -1121,6 +1122,28 @@ export const FOODS: Food[] = [
     category: 'grains', medTier: 'daily', state: 'dry',
     per100g: { calories: 378, protein: 11, carbs: 72.8, fat: 4.2, fiber: 8.5, sodium: 5 },
     units: [], source: 'curated',
+  },
+
+  {
+    id: 'seeds-mixed',
+    names: { en: 'Mixed seeds', ro: 'semințe', hu: 'magvak' },
+    // She writes "10 g pirított magvak", toasted seeds, without saying which.
+    aliases: ['magvak', 'piritott magvak', 'seminte', 'seminte prajite'],
+    category: 'nuts-seeds', medTier: 'weekly', state: 'as-sold',
+    per100g: { calories: 559, protein: 21.5, carbs: 20.6, fat: 46.5, fiber: 9.5, sodium: 8 },
+    units: [{ label: 'tbsp', grams: 10 }],
+    source: 'curated',
+  },
+
+  {
+    id: 'pasca-cheese',
+    names: { en: 'Pască with sweet cheese', ro: 'pască cu brânză' },
+    // The Romanian Easter cake, a soft dough with a sweet curd filling.
+    aliases: ['pasca cu branza', 'pasca'],
+    category: 'treats', medTier: 'rare', state: 'as-sold',
+    per100g: { calories: 252, protein: 8, carbs: 30, fat: 10.5, fiber: 1, sugar: 12, sodium: 180 },
+    units: [{ label: 'slice', grams: 100 }],
+    source: 'curated',
   },
 
   // ─── Drinks ────────────────────────────────────────────────────────────────

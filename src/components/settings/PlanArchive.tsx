@@ -233,12 +233,14 @@ function PlanCard({
                 {day.meals.map((meal, j) => (
                   <div key={j} className="flex gap-3 text-xs">
                     <dt className="w-20 shrink-0 font-semibold text-ink-500">{SLOT_LABELS[meal.slot]}</dt>
-                    {/* The archive is where these are actually read, so both
-                        go: what it says, and what was written. The original is
-                        the record and stays underneath rather than being
-                        replaced by a reading of it. */}
+                    {/* Her words lead here, and the reading sits under them.
+                        This is the one screen whose subject is her weeks
+                        rather than tonight's dinner, so it should read as
+                        hers; everywhere else the English goes first, because
+                        for one of the two people here the original is not
+                        readable at all. */}
                     <dd className="flex-1 min-w-0">
-                      <SourceLine text={meal.text} translate />
+                      <SourceLine text={meal.text} translate lead lang={plan.language} />
                     </dd>
                     <dd className="w-12 text-right font-mono text-ink-500 shrink-0">
                       {Math.round(componentsNutrients(meal.entries, ctx).calories)}
