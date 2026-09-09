@@ -58,13 +58,24 @@ export const EMPTY_MACROS: Macros = { calories: 0, protein: 0, carbs: 0, fat: 0 
 
 /**
  * The 17 food groups of the Mediterranean Diet guide, in the order the guide
- * presents them. Used for browsing the food library and for serving-goal scoring.
+ * presents them, and one group of the app's own.
+ *
+ * `dishes` is the app's, and it is there because a bowl of soup is not a food
+ * group. Something already cooked, bought ready made or eaten out is one item
+ * with one set of numbers and no way to say which of the guide's groups it
+ * belongs to, and filing it under the nearest one, a ciorba under Vegetables,
+ * would add a bowl of broth to a serving goal it never earned. It carries no
+ * serving goal, so the week's score leaves it out and says that it did.
+ *
+ * A dish you cook yourself belongs in Recipes, where its ingredients are known
+ * and each one counts towards its own group. This is for the ones you cannot
+ * break down.
  */
 export type MedCategory =
   | 'vegetables' | 'legumes' | 'fruits' | 'grains' | 'nuts-seeds'
   | 'herbs-spices' | 'fats-vinegars' | 'dairy' | 'fish-seafood'
   | 'poultry' | 'eggs' | 'red-meat' | 'pantry' | 'spreads-sauces'
-  | 'treats' | 'sweeteners' | 'beverages'
+  | 'treats' | 'sweeteners' | 'beverages' | 'dishes'
 
 /**
  * How often the guide says to eat this group:

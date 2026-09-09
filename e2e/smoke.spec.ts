@@ -2117,6 +2117,43 @@ test.describe('what actually happened', () => {
     await expect(struck.first()).toBeVisible()
   })
 
+  test('the food databases are reachable without scrolling past the library', async ({ page }) => {
+    // They were not. Both ways out of a library that does not have it sat
+    // under the results, and with nothing typed the results are forty foods,
+    // so the databases, the one thing that can answer a yoghurt the app has
+    // never heard of, were the hardest thing on the sheet to reach.
+    await aPlannedDay(page)
+    await page.getByRole('button', { name: /^Add another$|^\+ Add another$/ }).first().click()
+
+    const sheet = page.getByRole('dialog').first()
+    await sheet.getByRole('button', { name: 'foods', exact: true }).click()
+
+    const lookItUp = sheet.getByRole('button', { name: /Search the databases/ })
+    await expect(lookItUp).toBeInViewport()
+
+    // And what was typed goes with you, rather than being asked for twice.
+    await sheet.getByPlaceholder(/What are we having|What did you have/).fill('skyr')
+    await lookItUp.click()
+
+    const adding = page.getByRole('dialog').last()
+    await expect(adding.getByRole('heading', { name: 'Add a food' })).toBeVisible()
+    await expect(adding.getByPlaceholder(/Search USDA/)).toHaveValue('skyr')
+  })
+
+  test('a cooked dish has a group of its own to go in', async ({ page }) => {
+    // The categories are the guide's food groups, so every one of them is an
+    // ingredient, and there was nowhere at all to put a bowl of soup.
+    await aPlannedDay(page)
+    await page.getByRole('button', { name: /^Add another$|^\+ Add another$/ }).first().click()
+
+    const sheet = page.getByRole('dialog').first()
+    await sheet.getByRole('button', { name: 'foods', exact: true }).click()
+    await sheet.getByRole('button', { name: /Write one down|^Add “/ }).click()
+
+    const adding = page.getByRole('dialog').last()
+    await expect(adding.getByLabel('Category')).toContainText('Cooked dishes')
+  })
+
   test('one item can be left without leaving the whole meal', async ({ page }) => {
     await aPlannedDay(page)
 

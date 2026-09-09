@@ -19,6 +19,12 @@ import type { NutritionResult } from '../services/nutritionApi'
  * open, since "blueberries" really is a berry.
  */
 const CATEGORY_HINTS: [RegExp, MedCategory][] = [
+  // First, so a chicken soup is a dish rather than poultry: the group is about
+  // what the thing is, and a soup made of chicken is not a serving of chicken.
+  [/\b(soup|ciorba|ciorb\u0103|supa|sup\u0103|stew|tocana|tocan\u0103|goulash|gulyas|guly\u00e1s|casserole|curry|lasagne|lasagna|risotto|pilaf|pizza|sandwich)/i, 'dishes'],
+  // Hungarian builds the word up rather than out, so "leves" is a soup's
+  // ending, not its beginning: tyukhusleves, zoldsegleves, gulyasleves.
+  [/leves/i, 'dishes'],
   [/\b(yogurt|yoghurt|kefir|cheese|milk|cream|butter|telemea|skyr|ricotta)/i, 'dairy'],
   [/\b(chicken|turkey|poultry)/i, 'poultry'],
   [/\b(beef|pork|lamb|veal|bacon|ham|sausage|mince)\b/i, 'red-meat'],

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { X, Search, Loader2 } from 'lucide-react'
 import { readAmount, MOST } from '../../lib/amounts'
 import { useDialog } from '../../lib/useDialog'
@@ -30,7 +30,7 @@ const BarcodeScanner = lazy(() => import('../recipes/BarcodeScanner'))
  * only reason you were creating it.
  */
 export default function AddFoodModal({
-  onClose, onSaved, initialName = '',
+  onClose, onSaved, initialName = '', initialTab = 'manual',
 }: {
   onClose: () => void
   /**
@@ -43,12 +43,21 @@ export default function AddFoodModal({
   onSaved?: (food: Food) => void
   /** What was already typed into the search that found nothing. */
   initialName?: string
+  /**
+   * Which way in to open on.
+   *
+   * The planner opens straight on the databases when that is what was asked
+   * for. Landing on "Type it in" and leaving you to find the tab is how
+   * "search the databases" became four taps and a scroll, and the databases
+   * went unused.
+   */
+  initialTab?: 'manual' | 'lookup' | 'scan'
 }) {
   const panel = useDialog<HTMLDivElement>(onClose)
   const { addFood } = useFoodStore()
-  const [tab, setTab] = useState<'manual' | 'lookup' | 'scan'>('manual')
+  const [tab, setTab] = useState<'manual' | 'lookup' | 'scan'>(initialTab)
   const [scanError, setScanError] = useState<string | null>(null)
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(initialTab === 'lookup' ? initialName : '')
   const [results, setResults] = useState<NutritionResult[]>([])
   const [problems, setProblems] = useState<LookupOutcome['problems']>([])
   /** Rows the databases returned that had nothing to do with the question. */
@@ -83,6 +92,19 @@ export default function AddFoodModal({
       setSearching(false)
     }
   }
+
+  /*
+   * Opened to search, with something to search for: search. Anything else is
+   * asking you to type what you already typed, into a second box.
+   */
+  const asked = useRef(false)
+  useEffect(() => {
+    if (asked.current || initialTab !== 'lookup' || !initialName.trim()) return
+    asked.current = true
+    void runLookup()
+    // Once, on open. `runLookup` closes over state that changes as it runs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   /** Fills the form from a lookup or a scan and hands you back the fields. */
   function applyResult(r: NutritionResult) {
@@ -257,6 +279,16 @@ export default function AddFoodModal({
                     <option value="">Choose one</option>
                     {CATEGORY_ORDER.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
                   </select>
+                  {/* These are the guide's food groups, so they are all
+                      ingredients, and there was nowhere to put a bowl of soup.
+                      Cooked dishes is the app's own group, and it says what it
+                      costs: nothing in it counts towards a serving goal. */}
+                  {draft.category === 'dishes' && (
+                    <p className="text-xs text-ink-500 mt-1">
+                      Counted for its calories, not towards any serving goal. Cook it from a
+                      recipe instead and each ingredient counts towards its own group.
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="label" htmlFor="new-food-tier">How often</label>
