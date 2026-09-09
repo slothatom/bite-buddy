@@ -124,8 +124,11 @@ describe('a joining word between two foods', () => {
   it('leaves a dish name alone, however many joining words it has', () => {
     expect(splitComponents('spanac cu linte ( 40 g linte nefiarta )'))
       .toEqual(['spanac cu linte ( 40 g linte nefiarta )'])
+    // The colon does separate, deliberately: a name on the left and what it is
+    // made of on the right. What this asserts is that the joining word inside
+    // the name survives it, which is the thing the splitter used to get wrong.
     expect(splitComponents('terci de ovaz cu mere: 100 ml lapte'))
-      .toEqual(['terci de ovaz cu mere: 100 ml lapte'])
+      .toEqual(['terci de ovaz cu mere', '100 ml lapte'])
   })
 
   it('does not let a later ingredient vouch for an earlier dish name', () => {

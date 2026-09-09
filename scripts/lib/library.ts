@@ -3,6 +3,7 @@ import { FOODS } from '../../src/data/foods.js'
 import { DISHES, DISH_ALIASES, DISH_BY_WEIGHT } from '../../src/data/dishes.js'
 import { buildFoodIndex, resolveFood } from '../../src/lib/foodSearch.js'
 import { normaliseTerm, parseNumber } from '../../src/lib/units.js'
+import { COOKED_FROM_DRY } from '../../src/lib/mediterranean.js'
 import { buildContext, componentsNutrients } from '../../src/lib/nutrition.js'
 import { categorise } from '../../src/lib/classify.js'
 import { deriveTimes } from '../../src/lib/cookingTimes.js'
@@ -45,6 +46,26 @@ function resolveDish(term: string): string | undefined {
     if (n === a.key || n.includes(a.key)) return a.recipeId
   }
   return undefined
+}
+
+/**
+ * The weight to store, once the plan and the library disagree about state.
+ *
+ * She weighs grains and pulses both ways and says which: "40 g bulgur
+ * nefiert" is dry, "140 g főtt bulgur" is cooked. The library holds them dry,
+ * because that is how the Romanian plans weigh them, and the parser has always
+ * worked out which was meant. Nothing ever acted on the answer.
+ *
+ * So eleven lines in the Hungarian plans, every one of them cooked, were
+ * charged at dry weight: 150 g of cooked bulgur billed as 150 g of dry, which
+ * is 525 kcal for something nearer 210. Grains take up about two and a half
+ * times their dry weight in water, which is the same rule of thumb the guide's
+ * serving counts already use, so it is imported from there rather than written
+ * out a second time.
+ */
+function weighAs(state: string | undefined, grams: number, food: Food): number {
+  if (state !== 'cooked' || food.state !== 'dry') return grams
+  return Math.round(grams / COOKED_FROM_DRY)
 }
 
 /**
@@ -149,17 +170,60 @@ function toComponents(f: RawFragment, slot: MealSlot, file: string, unresolved: 
       const food = resolveFood(inner.term, foodIndex)
       if (!food || already.has(food.id)) continue
       already.add(food.id)
-      out.push({ component: { kind: 'food', foodId: food.id, grams: inner.grams }, stated: true })
+      out.push({
+        component: { kind: 'food', foodId: food.id, grams: weighAs(inner.state, inner.grams, food) },
+        stated: true,
+      })
     }
     return out
+  }
+
+  // A title that named no dish and stated no weight is a title, not a food.
+  // Left in, it invented a default portion of whatever its words happened to
+  // match: "quinoas gombas salata" put 100 g of quinoa in a salad that already
+  // stated 140 g of it.
+  if (f.heading && f.grams == null) return []
+
+  /*
+   * A meal the app has never heard of, spelled out in its own brackets.
+   *
+   * "360 g csirkés gombás cukkinis rizses étel (100 g csirkemell, 80 g főtt
+   * rizs, 180 g zöldség)" names no dish in the library, so the resolver fell
+   * back to matching words in the title and found "cukkini" in "cukkinis".
+   * The meal was stored as 360 g of courgette, 111 kcal, with the chicken and
+   * the rice she had written out in the brackets thrown away.
+   *
+   * The test is arithmetic rather than a guess: the bracketed weights have to
+   * add up to the weight in front of them. 100 plus 80 plus 180 is the 360 she
+   * wrote, so the brackets are that meal's composition and can replace it.
+   * Where they do not add up they are something else, a two-serving recipe
+   * ("pt 2 portii: 135 g ton…") or a per-portion note, and reading them as the
+   * whole meal doubled a lunch to 2,749 kcal. Those keep the behaviour they
+   * had, which is to be added to a dish as extras.
+   */
+  const spelled = f.innerFragments.filter((i) => i.grams && i.normalised)
+  const listed = spelled.reduce((n, i) => n + (i.grams ?? 0), 0)
+  if (spelled.length > 1 && f.grams && Math.abs(listed - f.grams) <= f.grams * 0.1) {
+    const out: Stated[] = []
+    for (const inner of spelled) {
+      const part = resolveFood(inner.term, foodIndex)
+      if (part) {
+        out.push({
+          component: { kind: 'food', foodId: part.id, grams: weighAs(inner.state, inner.grams!, part) },
+          stated: true,
+        })
+      }
+    }
+    if (out.length) return out
   }
 
   const food = resolveFood(f.term, foodIndex)
   if (food) {
     // A slice the food itself has measured beats the parser's flat 40 g.
     const sliced = slicedGrams(f.raw, food)
+    const grams = sliced ?? f.grams ?? defaultGrams(food.id)
     return [{
-      component: { kind: 'food', foodId: food.id, grams: sliced ?? f.grams ?? defaultGrams(food.id) },
+      component: { kind: 'food', foodId: food.id, grams: weighAs(f.state, grams, food) },
       stated: sliced != null || f.grams != null,
     }]
   }

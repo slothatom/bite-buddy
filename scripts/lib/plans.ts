@@ -41,6 +41,21 @@ export interface RawFragment {
    * sos: 100 g iaurt, 50 g telemea)" adds a sauce worth 200 kcal.
    */
   innerFragments: Omit<RawFragment, 'inner' | 'innerFragments'>[]
+  /**
+   * The part of the line before a colon, which names the meal rather than
+   * listing an ingredient of it.
+   *
+   * "quinoas gombas salata : 150 g gomba + 140 g fott quinoa" is a title and
+   * then its contents. Splitting on the colon is what lets the 150 g reach the
+   * mushrooms, but it also hands "quinoas gombas salata" to the food resolver,
+   * which found quinoa in the name and invented a default 100 g of it on top
+   * of the 140 g she actually wrote.
+   *
+   * A heading that names a dish the app knows is still worth keeping, since
+   * that is where the rest of the recipe comes from. One that resolves to a
+   * bare food with no weight of its own is just the title, and is dropped.
+   */
+  heading?: boolean
 }
 
 export interface RawMeal {
@@ -155,7 +170,11 @@ function bare(text: string): Omit<RawFragment, 'inner' | 'innerFragments'> {
  * there is one function and `parseDocument` uses it too.
  */
 export function fragmentsOf(text: string): RawFragment[] {
-  return splitComponents(text).map(toFragment)
+  const parts = splitComponents(text)
+  // Only when a colon actually did the splitting: it is the one separator that
+  // puts a name on the left rather than another ingredient.
+  const titled = /^[^(,+]*:/.test(text)
+  return parts.map((part, i) => ({ ...toFragment(part), heading: titled && i === 0 }))
 }
 
 function toFragment(fragment: string): RawFragment {

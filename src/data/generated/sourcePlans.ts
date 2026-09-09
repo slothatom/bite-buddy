@@ -785,7 +785,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-034",
+                "recipeId": "meal-lunch-038",
                 "servings": 1
               }
             ]
@@ -1415,7 +1415,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "dish-spicy-pan-chicken",
+                "recipeId": "meal-lunch-058",
                 "servings": 1
               }
             ]
@@ -1891,7 +1891,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "dish-porridge-apple",
+                "recipeId": "meal-breakfast-077",
                 "servings": 1
               }
             ]
@@ -5087,7 +5087,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-199",
+                "recipeId": "meal-breakfast-077",
                 "servings": 1
               }
             ]
@@ -5142,6 +5142,4641 @@ export const SOURCE_PLANS: SourcePlan[] = [
   },
   {
     "id": "plan-13",
+    "file": "Arany-Mak-dieta-01.10.2022.docx",
+    "label": "Week of 1 Oct 2022",
+    "language": "ro",
+    "issuedOn": "2022-10-01",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Miercuri    :",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, omleta din 2 oua, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-135",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g grapefruit",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapefruit",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g peste alb, 250 g legume la cuptor (morcovi, ciuperci, dovlecel, ardei, ceapa), 50 g sos de usturoi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-204",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g dovleac la cuptor, 330 ml iaurt de baut",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-205",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Joi     :",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g telemea, salata de morcovi, 30 g masline, ceapa sau usturoi, o lingurita de ulei de masline, 50 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-206",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g peste alb, 250 g legume la cuptor, 50 g sos de usturoi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-204",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g dovleac la cuptor, 200 g iaurt grecesc 2%",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-208",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vineri    :",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 200 g cottage, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-209",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "50 g paste int, 150 g broccoli fiert, rosii, 100 g fasole rosie fiarta, ceapa, o lingurita de ulei de masline, 25 g masline, 20 g parmezan",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-210",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g supa crema de dovleac (5 g unt / portie), 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-211",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Sambata      :",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 2 oua fierte, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-212",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g pere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "50 g paste int, 150 g broccoli fiert, rosii, 100 g fasole rosie, ceapa, o lingurita de ulei de masline, 25 g masline, 20 g parmezan",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-210",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g supa crema de dovleac (5 g unt / portie), 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-211",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Duminica     :",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "3 briose cu dovleac, 150 g iaurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-214",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g grapefruit",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapefruit",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "120 g pulpa de pui la cuptor, 200 g varza calita (o lingurita de ulei de masline / portie), o lg de iaurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-215",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g pere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata de cruditati, 75 g branza de capra, o lingurita de ulei de masline, 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-216",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Luni     :",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "3 briose cu dovleac, 150 g iaurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-214",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g afine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "blueberries",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "120 g pulpa de pui la cuptor, 200 g varza calita (o lingurita de ulei de masline / portie)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-217",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune, 15 g caju",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-218",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata greceasca: 50 g paine int, 50 g feta, o lingurita de ulei, 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-219",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Marti  :",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine, pasta de branza (100 g branza de vaci, 2 lg de iaurt, ceapa), jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-042",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g kiwi",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "kiwi",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "naut cu orez (160 g naut fiert, 50 g orez brun nefiert, o lingurita de ulei), muraturi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-221",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere, 10 g migdale",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-088",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g ciorba de perisoare (o lingurita de ulei / portie), 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-222",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-14",
+    "file": "Arany-Mak-dieta-03.10.2022.docx",
+    "label": "Week of 3 Oct 2022",
+    "language": "ro",
+    "issuedOn": "2022-10-03",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Miercuri    :",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, pasta de avocado (100 g avocado), 25 g mozzarella, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-223",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "110 g piept de curcan la cuptor, 200 g dovleac placintar la cuptor, salata de varza, o lingurita de ulei",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-224",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g supa crema de broccoli (o lingurita de ulei / portie), 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-225",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Joi     :",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "2 briose cu dovleac, 150 g iaurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-214",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "50 g halloumi la gratar, 250 g legume la tigaie (o lingurita de ulei de masline / portie), 50 g sos de usturoi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-227",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata de cruditati, 75 g ton in suc propriu, o lingurita de ulei, 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-228",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vineri    :",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "2 briose cu dovleac, 150 g iaurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-214",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "50 g halloumi la gratar, 250 g legume la tigaie (o lingurita de ulei / portie), 50 g sos de usturoi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-227",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata de cruditati, 160 g fasole rosie, o lingurita de ulei de masline, 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-089",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Sambata      :",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, omleta cu legume din 2 oua, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-135",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g pere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "125 g somon, 200 g piure de conopida (70% conopida, 30% cartofi), salata de cruditati, o lg de iaurt cu usturoi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-232",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g nectarine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata de cruditati, 50 g branza de capra, o lingurita de ulei de masline, 25 g paine",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-233",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Duminica     :",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "1 portie de terci la cuptor",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-porridge",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "125 g somon, 200 g piure de conopida (70% conopida, 30% cartofi), salata de cruditati, o lg de iaurt cu usturoi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-232",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere, 10 g caju",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "50 g paine int, 150 g salata de vinete, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-096",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Luni     :",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "1 portie de terci la cuptor",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-porridge",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g pulpa de pui la cuptor, 50 g bulgur, castraveti murati",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-237",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune, 10 g caju",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-238",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "50 g paine int, 150 g salata de vinete, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-096",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Marti  :",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine, 200 g branza cottage, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-209",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g nectarine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g pulpa de pui la cuptor, 40 g bulgur, castraveti murati",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-240",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere, 20 g migdale",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-241",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g supa varza (o lingurita de ulei / portie), 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-242",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-15",
+    "file": "Arany-Mak-dieta-07.11.2022.docx",
+    "label": "Week of 7 Nov 2022",
+    "language": "ro",
+    "issuedOn": "2022-11-07",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Miercuri    :",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 2 ochiuri, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-100",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g banana",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "banana",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Joi     :",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine, 10 g unt, 65 g mozzarella, legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-244",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g banana",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "banana",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vineri    :",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, pasta de avocado din 100 g avocado, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-079",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "o portie de piept de pui umplut cu spanac, 200 g fasole verde cu patrunjel si o lingurita de ulei de masline",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-245",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere, 10 g nuci",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-022",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g dovleac copt, 150 g iaurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-246",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Sambata      :",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, omleta din 2 oua, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-135",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g portocale / clementine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "clementine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "o portie de piept de pui umplut cu spanac, 200 g fasole verde cu patrunjel si o lingurita de ulei de masline",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-245",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g supa crema de dovleac (o lingurita de ulei / portie), 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-247",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Duminica     :",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine, 200 g branza cottage, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-209",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g grapefruit, 15 g caju",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-248",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g salau la cuptor, 250 g legume la cuptor",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-249",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g supa crema de dovleac, 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-211",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Luni     :",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 150 g salata de vinete, legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-096",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g portocale",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g salau la cuptor, 250 g legume la cuptor, 50 g iaurt cu usturoi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-252",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune, 15 g caju",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-218",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "mamaliga din 50 g faina de malai, 100 g branza de vaci, 50 g iaurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-253",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Marti  :",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 150 g salata de vinete, legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-096",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g pere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "salata cezar : 120 g piept de curcan, 1 ou fiert, salata de cruditati, 75 g sos de usturoi, 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-254",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere, 15 g migdale",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-255",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "mamaliga din 50 g faina de malai, 100 g branza de vaci, 50 g iaurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-253",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-16",
+    "file": "Arany-Mak-dieta-12.09.2022.docx",
+    "label": "Week of 12 Sept 2022",
+    "language": "ro",
+    "issuedOn": "2022-09-12",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Miercuri    :",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 100 g humus, jumatate de farfurie de legume, o lingurita de ulei de masline",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-256",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "paste cu legume (50 g paste integrale nefierte, 200 g legume calite intr-o lingurita de ulei de masline)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-257",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata de cruditati, 75 g ton in suc propriu, o lingurita de ulei de masline, 15 g orez expandat",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-258",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Joi     :",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "omleta cu branza de vaci (2 oua, 50 g branza de vaci), jumatate de farfurie de legume, o lingurita de ulei de masline, 50 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-259",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "110 g piept de curcan, salata tabbouleh (45 g quinoa nefiarta, legume, o lingurita de ulei de masline)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-173",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g nectarine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g ciorba de legume (o lingurita de ulei / portie), 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-261",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vineri    :",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, pasta de branza (100 g branza de vaci, 2 lg de iaurt, ceapa), jumatate de farfurie de legume, o lingurita de ulei de masline",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-262",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "110 g piept de curcan, salata tabbouleh (45 g quinoa nefiarta, legume, o lingurita de ulei de masline)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-173",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere, 10 g caju",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g ciorba de legume (o lingurita de ulei / portie), 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-261",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Sambata      :",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, pasta de branza (100 g branza de vaci, 2 lg de iaurt, ceapa), jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-042",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g somon, 300 g legume la gratar,",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-263",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g nectarine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "bruschetta cu avocado: 50 g paine int, 100 g avocado, rosii, usturoi, o lingurita de ulei de masline",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-264",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Duminica     :",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "terci de ovaz: 100 ml lapte, 100 ml apa, 1 mar razuit, 40 g fulgi de ovaz, scortisoara, esenta de vanilie",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-265",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g pere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "50 g branza halloumi, 200 g ciuperci calite cu mult patrunjel",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-266",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g afine, 15 g caju",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-267",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata de cruditati, 160 g fasole rosie, o lingurita de ulei de masline",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-268",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Luni     :",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 2 oua fierte, salata de morcovi, o lingurita de ulei de masline",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-269",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "75 g branza halloumi, 200 g ciuperci calite cu mult patrunjel",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-270",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g prune",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g supa crema de ardei copti (o lingurita de ulei de masline), 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-271",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Marti  :",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "330 g iaurt de baut, 40 g fulgi de porumb",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-272",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g nectarine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g pulpa de pui la cuptor, 200 g piure de conopida, 2 ardei copti",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-273",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata de cruditati, 50 g telemea, o lingurita de ulei de masline, 15 g orez expandat",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-051",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-17",
+    "file": "Arany-Mak-dieta-26.09.2022.docx",
+    "label": "Week of 26 Sept 2022",
+    "language": "ro",
+    "issuedOn": "2022-09-26",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Miercuri    :",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 100 g mozzarella in apa, salata de morcovi, o lingurita de ulei de masline",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-274",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g pulpe de pui, 200 g piure de telina (70% telina, 30% cartofi), sfecla rosie / muraturi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-275",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g supa de fasole verde (o lingurita de ulei / portie), o lg de iaurt, 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-065",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Joi     :",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 150 g salata de vinete, jumatate de farfurie de legume, o lingurita de ulei de masline, 25 g telemea",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-277",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapes",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g pulpe de pui, 200 g piure de telina (70% telina, 30% cartofi), sfecla rosie / muraturi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-275",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g nectarine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g supa de fasole verde (o lingurita de ulei / portie), o lg de iaurt, 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-065",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vineri    :",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 150 g salata de vinete, jumatate de farfurie de legume, o lingurita de ulei de masline, 25 g telemea",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-277",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g pere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "paste cu varza calita (50 g paste nefierte, 200 g varza calita (o lingurita de ulei / portie))",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-278",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere, 10 g caju",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata de cruditati, 75 g ton in suc propriu, o lingurita de ulei de masline, 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-228",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Sambata      :",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine int, 2 ochiuri, jumatate de farfurie de legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-100",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g pere",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g pastrav la cuptor, 250 g legume la cuptor",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-280",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g nectarine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata de cruditati, 50 g feta, o lingurita de ulei de masline, 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-018",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Duminica     :",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "1 portie de terci de ovaz cu afine",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-porridge",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri, 10 g caju",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-282",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g tofu intr-o lingurita de ulei, 250 g mancare de spanac",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-283",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere, 10 g migdale",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-088",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "salata de cruditati, 160 g fasole rosie, o lingurita de ulei de masline, 15 g orez expandat",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-154",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Luni     :",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "1 portie de terci de ovaz cu afine",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-porridge",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g struguri, 20 g caju",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-168",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g tofu intr-o lingurita de ulei, 200 g mancare de spanac",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-285",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g nectarine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "50 g paine int, 50 g somon afumat, 100 g branza cottage, legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-286",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Marti  :",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g paine, pasta de ou (2 oua fierte, mustar, o lg de iaurt, ceapa, sare, piper), legume",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-161",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g nectarine",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "110 g piept de curcan la cuptor, 200 g dovleac placintar la cuptor, salata de varza, o lingurita de ulei",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-224",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mere, 10 g migdale",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-088",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350 g supa crema de broccoli (o lingurita de ulei / portie), 25 g paine int",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-225",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-18",
+    "file": "Arany-Mák-05.10.2020.docx",
+    "label": "Week of 5 Oct 2020",
+    "language": "ro",
+    "issuedOn": "2020-10-05",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "gombás rántotta (2 tojásból és 3-4 gombából) + 1/2 tányér zöldség, 1 tk. Olivaolaj + 40 g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-288",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "gyümölcssaláta: 1 grépfrút + 1 nektarin",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkés zöldséges fasírt (50% hús, 50% zöldség, 1 tojás) + 250 g tökfőzelék (1 ek. olíva olaj és 1 tk. liszt/2 adag)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-290",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "120 g banán kenyér + 150 ml 1,5-2 % joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-291",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 nektarin + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-292",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkés fasírt (50% hús, 50% zöldség, 1 tojás) + 250 g tökfőzelék",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-293",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 reszelt alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "140 g banán kenyér + 150 ml 1,5-2% joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-294",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapefruit",
+                "grams": 250
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "rizses csicseriborsós étel (100 g főtt csicseriborsó, 150 g főtt barna rizs) + savanyú uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-295",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 15 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-083",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "2 főtt tojás + muroksaláta (1 nagy reszelt murok, 1 tk. Olivaolaj, bazsalikom) + 40 g pirítós + 60 g mozzarella",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-297",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 20 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-200",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "rizses csicseriborsos étel (100 g főtt csicseriborsó, 150 g főtt barna rizs) + savanyú uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-295",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 nektarin",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "120 g banán kenyér + 150 ml joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-291",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapefruit",
+                "grams": 250
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "pikáns csirkemell: 100 g csirkemell + 250 g zöldség köret",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-300",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 reszelt alma + fahéj + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-301",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + vinetta joghurttal + fel tányér zöldség + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-302",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "200 g cottage túró + 1 alma",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-303",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "pikáns csirkemell: 100 g csirkemell + 250 g zöldség köret",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-300",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 nektarin + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-012",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + guacamole 1 avokadóból + fel tányér zöldség + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-305",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 nektarin",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "120 g lazac roston vagy a lerben elkészítve + 250 g zöldségek 1 tk. Olivaolajban megdinsztelve",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-306",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-19",
+    "file": "Arany-Mák-12.10.2020.docx",
+    "label": "Week of 12 Oct 2020",
+    "language": "ro",
+    "issuedOn": "2020-10-12",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "chiamagos puding (150 ml tej, 2 ek. chiamag, 3 ek. zabpehely) + 1 nektarin",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-307",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g szilva",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g tehéntúrós vinettás tekercs + 140 g főtt bulgur + vegyes saláta + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-308",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-022",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + tojás krém (1 tojásból, joghurt, mustár, só, bors) + 40 g feta + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-309",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g szilva",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g tehéntúrós vinettás tekercs + 140 g főtt bulgur + vegyes saláta + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-308",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 reszelt alma + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-022",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + 80 g humusz + fel tányér zöldség + 1 tk. Olivaolaj + 10 g tokmag",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-311",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 nektarin",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g marhahús lesütve (1 tk/ adag) + 200 g zeller püré (70% zeller, 30% krumpli) + vegyes saláta / cékla / savanyúság + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-312",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 15 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-083",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + 80 g humusz + fel tányér zöldség + 1 tk. Olivaolaj + 10 g tokmag",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-311",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 15 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-313",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g marhahús lesütve + 200 g zeller püré (70% zeller, 30% krumpli) + vegyes saláta + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-312",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 nektarin",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "zabkasa 1 reszelt almával: 100 ml tej, 100 ml víz, 30 g zabpehely, 1 reszelt alma, fahéj, vanília eszenc",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-265",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-316",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g pisztráng a lerben vagy roston elkészítve + quinoás saláta (40 g nyers quinoával, 1 tk. olíva olaj) + 2 ek. fokhagymás joghurtos szósz",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-317",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 nektarin + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-012",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "bruschetta fetával (50 g kenyér meg pirítva, 60 g feta, paradicsom, fokhagyma, esetleg retek apróra vágva, petrezselyemzöld, bazsalikom, 1 tk. olíva olaj) + 10 g tokmag pirítva",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-318",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g szilva",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "plum",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "2 tükörtojás 1 tk. Olivaolaj + 240 g spenót 1 tk. Olivaolajjal /adag + 40 g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-319",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + körözött (80 g túró, 1 ek. Joghurt, hagyma/ kapor) + fel tányér zöldség + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-321",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 körte",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 170
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkemell roston 1 tk. olíva olajjal + 240 g spenót 1 tk. Olivaolajjal /adag",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-322",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-20",
+    "file": "Arany-Mák-19.10.2020.docx",
+    "label": "Week of 19 Oct 2020",
+    "language": "ro",
+    "issuedOn": "2020-10-19",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + körözött (80 g túró, 1 ek. Joghurt, hagyma/ kapor) + fel tányér zöldség + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-321",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 körte",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 170
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "360 g csirkés gombás cukkinis rizses étel (100 g csirkemell, 80 g főtt rizs, 180 g zöldség) + cékla saláta (1,5 tk. olíva olaj)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-323",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-022",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "120 g szilvas suti + 150 g joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-324",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapefruit",
+                "grams": 250
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "360 g csirkés gombás cukkinis rizses étel + cékla saláta (1,5 tk. olíva olaj)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-325",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-022",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "120 g szilvas suti + 150 g joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-324",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "grapefruit",
+                "grams": 250
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g lazac + 200 g zeller hasáb 1 tk. Olivaolajjal + joghurtos fokhagymás szósz + rukkolás paradicsomos Sali + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-326",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "100 g szilvas suti + 150 g joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-327",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 körte",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 170
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "vegyes saláta + 130 g lencse saláta + 50 g feta + 1 tk. Olivaolaj + 25 g pirítós",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-328",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 nektarin",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "nectarine",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "1 tojás + 40 g feta + murok saláta + 1 tk. Olivaolaj + 40 g teljes kiőrlésű kenyér pirítva",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-329",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-316",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "200 g lencsefőzelék + 150 g tofu 1 tk. Olivaolaj + 100 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-330",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + tonhal krém (2 adaghoz: 130 g tonhal, 50 g feta) + fel tányér zöldség + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-331",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g szilva + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-238",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "200 g lencsefőzelék + 150 g tofu 1 tk. Olivaolaj + 100 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-330",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + tonhal krém (2 adaghoz:) + fel tányér zöldség + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-333",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkemell roston 1 tk. olíva olajjal + 250 g zöldség köret 1 tk. Olivaolaj + joghurtos öntet",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-334",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs / 1 grépfrút + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-020",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-21",
+    "file": "Arany-Mák-reg-al-1.docx",
+    "label": "Undated week",
+    "language": "ro",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Csutortok  :",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "150 g joghurt 2% gorog joghurt + 30 g zabpehely + 100 g erdei gyumolcs",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-019",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 gref + 20 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-337",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "pikans csirkemell : 100 g csirkemell + 250 g zoldsegek",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-300",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 20 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-339",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "vegyes salata (alap: zold levelu zoldseg: zold salata, baby spenot, rukkola, zsalya + 2-3-4 zoldseg) + 80 g mozzarella + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-340",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Pentek :",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "1 fott tojas + muroksalata (1 reszelt murok, oregano, bazsalikom, 2 tk. Olivaolaj) + 45 g mozzarella + 40 g teljes kiorlesu kenyer",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-341",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g kiwi + 20 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-342",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g brokkoli fasirt + 150 g fott bulgur + vegyes salata + 2 ek. tzatziki szosz",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-343",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 20 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-344",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g zoldsegleves + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-345",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat :",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiorlesu kenyer + turokorozott (70 g tehenturo, 1 ek. joghurt + hagyma/ kapor/ paprika es komenymag) + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-346",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "200 g pomelo + 15 g mandula",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-347",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g brokkoli fasirt + 140 g fott bulgur + 2 db sult paprika",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-348",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 20 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-339",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g zoldsegleves + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-345",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasarnap  :",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiorlesu kenyer + turokorozott (70 g tehenturo, 1 ek. joghurt + hagyma/ kapor/ paprika es komenymag) + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-321",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "200 g pomelo + 20 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-350",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g lazac + 170 g borsopure (borso, hagyma, fokhagyma) + fokhagyma szosz + vegyes salata + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-351",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 korte + 20 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-352",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g zoldsegleves + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-345",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hetfo   :",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "chiamagos puding : ejjelre beaztatunk : 130 ml tejbe + 20 g chiamagot + 20 g zabpehely + reggel hozzaadunk fel granatalma",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-353",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "fel granatalma + 20 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-200",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkemell roston + 200 g borsopure + 2 sult paprika",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-355",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "250 g pomelo",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pomelo",
+                "grams": 250
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "vegyes salata + 50 g telemea + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-023",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd   :",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "spenotos rantotta (egy kis marek spenot + 2 tojas) + fel tanyer zoldseg + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-356",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 15 g mandula",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-357",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g fott quinoa petrezselymesen + 200 g cukkinis lecso + 1 ek. joghurt + 60 g savanyu uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-358",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 20 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-200",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g kaposztaleves + 1 ek joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-359",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szerda    :",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiorlesu kenyer + 2 ek. vinetta (majonez helyett gorog joghurt 2%) + fel tanyer zoldseg + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-360",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "200 g pomelo + 20 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-361",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkecomb + 200 g cukkinis lecso + 1 ek. joghurt + 60 g savanyu uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-362",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mango + 20 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-363",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g kaposztaleves + 1 ek joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-359",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csutortok  :",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "1 sana + 3 ek. zabpehely + 100 g erdei gyumolcs",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-364",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 banan + 20 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-365",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkecomb + 200 g zellerpure (70 % zeller + 30% krumpli) + 70 g uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-366",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 20 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-200",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "vegyes salata + 70 g voros paszuly fove + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-367",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-22",
+    "file": "Arany-Mák-reg-al-2.docx",
+    "label": "Undated week",
+    "language": "ro",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Pentek :",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "snack",
+            "text": "1 gref + 10 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-025",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "quinoas gombas salata : 150 g gomba megparolva 1 ek. olivaolajban + 140 g fott quinoa + egy marek friss spenot/ rukkola + 40 g telemea",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-369",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "paprikara + turókrém (70 g tehenturó osszekavarva + 1 ek joghurtal + hagyma/ kapor)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-370",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat :",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiorlesu kenyer + turokorozott (70 g tehenturo, 1 ek. joghurt + hagyma/ kapor/ paprika es komenymag) + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-346",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g kiwi",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "kiwi",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "1 pisztrang + 150 g edeskrumpli a lerben + 50 g brokkoli + 1-2 ek. fokhagymasz joghurtos szosz",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-371",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g zoldpaszuly leves + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-372",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasarnap  :",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "cukkinis rantotta : 2 tojasbol es 50 g cukkinivel + fel tanyer zoldseg + 1 tk. Olivaolaj + 40 g teljes kiorlesu kenyer",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-373",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "200 g edeskrumpli a lerben + 80 g reszelt telemea + vegyes salata + 1 tk. Olivaolaj + 50 g voros paszuly",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-374",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g zoldpaszuly leves + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-372",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hetfo   :",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "150 g joghurt + 3 ek zabpehely + 100 g erdei gyumolcs + 15 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-375",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 banan + 120 g kiwi",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-376",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "mozzarellas csirke: 100 g csirkehus + 60 g mozzarella + 140 g fott hajdina + 50 g savanyu uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-377",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g zoldpaszuly leves + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-372",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd   :",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiorlesu kenyer + 60 g humusz + fel tanyer zoldseg + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-378",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mango",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "mango",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "mozzarellas csirke: 100 g csirkehus + 60 g mozzarella + 140 g fott hajdina + 1 sult paprika + 30 g savanyu uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-379",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g cukkinikremleves + 1 ek. joghurt + 10 g piritott tokmag",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-380",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szerda    :",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiorlesu kenyer + 60 g humusz + fel tanyer zoldseg + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-378",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "200 g pomelo",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pomelo",
+                "grams": 200
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkehusos zoldsegfasirt (50% hus, 50 g murok, krumpli, + 1 tojas, petrezselyemzold) + 180 g zellerpure + 70 g cekla",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-381",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g cukkinikremleves + 1 ek. joghurt + 10 g piritott tokmag",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-380",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csutortok  :",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "zabkasa : mindent osszefozunk 5-6 percig : 100 ml tej, 100 ml viz + 1 reszelt alma + 30 g zabpehely, fahej, vanilia eszenc",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-265",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "200 g pomelo + 20 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-350",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkehusos zoldsegfasirt (50% hus, 50 g murok, krumpli, + 1 tojas, petrezselyemzold) + 180 g zellerpure + 70 g cekla",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-381",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "vegyes salata + 70 g voros paszuly fove + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-367",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Pentek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiorlesu kenyer + tojaskrem (1 fott tojas, joghurt, reszelt hagyma, so, bors, mustar) + fel tanyer zoldseg + 5 g piritott tokmag + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-383",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 gref + 10 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-316",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-23",
+    "file": "Arany-Mák-reg-al-3.docx",
+    "label": "Undated week",
+    "language": "ro",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szombat :",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "lunch",
+            "text": "quinoa Sali : 140 g fott quinoa + 50 g csicseriborso + zoldsegek + 2 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-385",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g salataleves + 1 ek joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-386",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasarnap  :",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "zabkasa",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-porridge",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 gref + 10 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-316",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "1 pisztrang + 200 g parolt zoldsegek + joghurt alapu fokhagyma szosz",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-388",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "vegyes salata + 60 g mozzarella + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-035",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hetfo   :",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiorlesu kenyer + 60 g humusz + fel tanyer zoldseg + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-378",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkehusos zoldsegfasirt (50% hus, 50 g murok, krumpli, + 1 tojas, petrezselyemzold) + 200 g tokfozelek + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-389",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g salata leves + 1 ek joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-386",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd   :",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiorlesu kenyer + 60 g humusz + fel tanyer zoldseg + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-378",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "200 g pomelo",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pomelo",
+                "grams": 200
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkehusos zoldsegfasirt (50% hus, 50 g murok, krumpli, + 1 tojas, petrezselyemzold) + 200 g tokfozelek + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-389",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g kiwi",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "kiwi",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "vegyes salata + 65 g mozzarella + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-391",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szerda    :",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "150 g joghurt + 3 ek zabpehely + 100 g erdei gyumolcs",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-392",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 20 g mandula",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-393",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "200 g spenot (1 tk. Lisztel /adag) + tojasos muffin (3 tojasbol, 60 g kukorica, 2-3 gomba, zoldhagyma / 2 nap) + 40 g teljes kiorlesu kenyer",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-394",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g csirkehusos zoldsegleves",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-395",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csutortok  :",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "200 g cottage turo + fel tanyer zoldseg + 40 g teljes kiorlesu kenyer piritva",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-396",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g kiwi",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "kiwi",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "200 g spenot (1 tk. Lisztel /adag) + tojasos muffin (3 tojasbol, 60 g kukorica, 2-3 gomba, zoldhagyma / 2 nap) + 40 g teljes kiorlesu kenyer",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-394",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g csirkehusos zoldsegleves",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-395",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Pentek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "bruschetta : 40 g teljes kiorlesu kenyer piritva + paradicsom, 40 g telemea, oregano, bazsalikom + 2 tk. Olivaolaj, fokhagyma",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-397",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 gref + 10 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-316",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkecomb + 200 g parolt kaposzta + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-398",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300 g csirkehusos zoldsegleves",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-395",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat :",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiorlesu kenyer + tonhalkrem (1 nagy tonhal konzerv sajat leveben + 60 g kukorica, 60 g tehenturo, 1 ek. joghurt + a tobbi ami a receptben van / 2 adag) + fel tanyer zoldseg + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-399",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkecomb + 200 g parolt kaposzta + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-398",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "vegyes salata + 50 g telemea + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-023",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-24",
     "file": "a7a0f138-AranyM_k18.01.2021_trend.docx",
     "label": "Week of 18 Jan 2021",
     "language": "hu",
@@ -5158,7 +9793,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-203",
+                "recipeId": "meal-breakfast-392",
                 "servings": 1
               }
             ]
@@ -5202,7 +9837,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-205",
+                "recipeId": "meal-dinner-402",
                 "servings": 1
               }
             ]
@@ -5219,7 +9854,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-206",
+                "recipeId": "meal-breakfast-403",
                 "servings": 1
               }
             ]
@@ -5263,7 +9898,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-209",
+                "recipeId": "meal-dinner-405",
                 "servings": 1
               }
             ]
@@ -5280,7 +9915,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-210",
+                "recipeId": "meal-breakfast-406",
                 "servings": 1
               }
             ]
@@ -5302,7 +9937,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-211",
+                "recipeId": "meal-lunch-407",
                 "servings": 1
               }
             ]
@@ -5313,7 +9948,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-212",
+                "recipeId": "meal-snack-408",
                 "servings": 1
               }
             ]
@@ -5324,7 +9959,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-209",
+                "recipeId": "meal-dinner-405",
                 "servings": 1
               }
             ]
@@ -5341,7 +9976,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-213",
+                "recipeId": "meal-breakfast-302",
                 "servings": 1
               }
             ]
@@ -5352,7 +9987,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-214",
+                "recipeId": "meal-snack-410",
                 "servings": 1
               }
             ]
@@ -5363,7 +9998,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-215",
+                "recipeId": "meal-lunch-411",
                 "servings": 1
               }
             ]
@@ -5374,7 +10009,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-216",
+                "recipeId": "meal-snack-412",
                 "servings": 1
               }
             ]
@@ -5385,7 +10020,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-217",
+                "recipeId": "meal-dinner-413",
                 "servings": 1
               }
             ]
@@ -5402,7 +10037,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-218",
+                "recipeId": "meal-breakfast-414",
                 "servings": 1
               }
             ]
@@ -5424,7 +10059,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-219",
+                "recipeId": "meal-lunch-415",
                 "servings": 1
               }
             ]
@@ -5446,7 +10081,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-220",
+                "recipeId": "meal-dinner-416",
                 "servings": 1
               }
             ]
@@ -5463,7 +10098,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-218",
+                "recipeId": "meal-breakfast-414",
                 "servings": 1
               }
             ]
@@ -5485,7 +10120,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-219",
+                "recipeId": "meal-lunch-415",
                 "servings": 1
               }
             ]
@@ -5507,7 +10142,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-221",
+                "recipeId": "meal-dinner-417",
                 "servings": 1
               }
             ]
@@ -5535,7 +10170,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-223",
+                "recipeId": "meal-snack-419",
                 "servings": 1
               }
             ]
@@ -5546,7 +10181,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-224",
+                "recipeId": "meal-lunch-420",
                 "servings": 1
               }
             ]
@@ -5557,7 +10192,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-225",
+                "recipeId": "meal-snack-421",
                 "servings": 1
               }
             ]
@@ -5568,7 +10203,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-226",
+                "recipeId": "meal-dinner-422",
                 "servings": 1
               }
             ]
@@ -5578,7 +10213,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
     ]
   },
   {
-    "id": "plan-14",
+    "id": "plan-25",
     "file": "e84da1db-AranyMakdieta09.05.2022.docx",
     "label": "Week of 9 May 2022",
     "language": "ro",
@@ -5617,7 +10252,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-228",
+                "recipeId": "meal-lunch-423",
                 "servings": 1
               }
             ]
@@ -5667,7 +10302,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-229",
+                "recipeId": "meal-snack-424",
                 "servings": 1
               }
             ]
@@ -5678,7 +10313,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-228",
+                "recipeId": "meal-lunch-423",
                 "servings": 1
               }
             ]
@@ -5728,7 +10363,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-230",
+                "recipeId": "meal-snack-425",
                 "servings": 1
               }
             ]
@@ -5739,7 +10374,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-231",
+                "recipeId": "meal-lunch-426",
                 "servings": 1
               }
             ]
@@ -5800,7 +10435,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-233",
+                "recipeId": "meal-lunch-428",
                 "servings": 1
               }
             ]
@@ -5822,7 +10457,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-234",
+                "recipeId": "meal-dinner-429",
                 "servings": 1
               }
             ]
@@ -5861,7 +10496,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-236",
+                "recipeId": "meal-lunch-431",
                 "servings": 1
               }
             ]
@@ -5883,7 +10518,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-237",
+                "recipeId": "meal-dinner-432",
                 "servings": 1
               }
             ]
@@ -5911,7 +10546,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-238",
+                "recipeId": "meal-snack-433",
                 "servings": 1
               }
             ]
@@ -5922,7 +10557,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-239",
+                "recipeId": "meal-lunch-434",
                 "servings": 1
               }
             ]
@@ -5944,7 +10579,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-240",
+                "recipeId": "meal-dinner-435",
                 "servings": 1
               }
             ]
@@ -5961,7 +10596,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-241",
+                "recipeId": "meal-breakfast-436",
                 "servings": 1
               }
             ]
@@ -5983,7 +10618,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-239",
+                "recipeId": "meal-lunch-434",
                 "servings": 1
               }
             ]
@@ -6005,7 +10640,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-240",
+                "recipeId": "meal-dinner-435",
                 "servings": 1
               }
             ]

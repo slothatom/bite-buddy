@@ -52,7 +52,7 @@ export const SERVING_GOALS: ServingGoal[] = [
  * decides how a serving is counted, never a calorie: the energy comes from the
  * food's own per-100 g figures, in the state that food is stored in.
  */
-const COOKED_FROM_DRY = 2.5
+export const COOKED_FROM_DRY = 2.5
 
 /** What one serving weighs, for a food in the state this one is stored in. */
 export function servingGrams(food: Food, goal: ServingGoal): number {

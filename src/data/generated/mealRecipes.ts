@@ -322,7 +322,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "salata de cruditati, 135 g ton in suc propriu, o lingurita de ulei de masline, 15 g orez expandat",
     "sourcePlanId": "plan-01",
-    "createdAt": "2022-06-06T00:00:00.000Z"
+    "createdAt": "2022-06-06T00:00:00.000Z",
+    "variant": "135 g tuna in brine"
   },
   {
     "id": "meal-breakfast-011",
@@ -492,8 +493,7 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "125 g somon, 250 g legume la cuptor, 50 g sos de usrutoi",
     "sourcePlanId": "plan-01",
-    "createdAt": "2022-06-06T00:00:00.000Z",
-    "variant": "125 g salmon"
+    "createdAt": "2022-06-06T00:00:00.000Z"
   },
   {
     "id": "meal-breakfast-016",
@@ -852,7 +852,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "1 narancs + 10 g mandula",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "10 g almonds"
   },
   {
     "id": "meal-breakfast-030",
@@ -949,17 +950,18 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "fel mango + 10 g kesudio",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "10 g cashews"
   },
   {
     "id": "meal-lunch-034",
     "name": {
-      "en": "Roasted vegetables with salmon & yogurt garlic sauce"
+      "en": "Salmon with roasted vegetables & yogurt garlic sauce"
     },
-    "emoji": "🍠",
+    "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 14,
-    "cookMinutes": 35,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
     "components": [
       {
         "kind": "food",
@@ -967,9 +969,14 @@ export const MEAL_RECIPES: Recipe[] = [
         "grams": 100
       },
       {
-        "kind": "recipe",
-        "recipeId": "dish-roasted-vegetables",
-        "servings": 0.98
+        "kind": "food",
+        "foodId": "vegetables-roasted",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
       },
       {
         "kind": "food",
@@ -983,8 +990,7 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "100 g lazac + 300 g lerben / parolva zoldsegek 1 tk. olivaolajjal + 75 g joghurtos fokhagyma szosz",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z",
-    "variant": "100 g salmon"
+    "createdAt": "2021-01-11T00:00:00.000Z"
   },
   {
     "id": "meal-dinner-035",
@@ -1096,6 +1102,45 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "5 g cashews, 250 g grapefruit"
   },
   {
+    "id": "meal-lunch-038",
+    "name": {
+      "en": "Salmon with mixed vegetables & yogurt garlic sauce"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 15,
+    "cookMinutes": 22,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salmon",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt-garlic-sauce",
+        "grams": 75
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g lazac + 300 g zoldsegek 1 tk. olivaolajjal + 75 g joghurtos fokhagyma szosz",
+    "sourcePlanId": "plan-02",
+    "createdAt": "2021-01-11T00:00:00.000Z"
+  },
+  {
     "id": "meal-snack-039",
     "name": {
       "en": "Apple with cashews"
@@ -1123,7 +1168,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "1 alma + 5 g kesudio",
     "sourcePlanId": "plan-02",
     "createdAt": "2021-01-11T00:00:00.000Z",
-    "variant": "5 g cashews"
+    "variant": "5 g cashews, no cinnamon"
   },
   {
     "id": "meal-dinner-040",
@@ -1515,7 +1560,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "50 g paine integrala, 100 g humus cu busuioc, jumatate de farfurie de legume",
     "sourcePlanId": "plan-03",
-    "createdAt": "2022-06-28T00:00:00.000Z"
+    "createdAt": "2022-06-28T00:00:00.000Z",
+    "variant": "100 g hummus, no extra virgin olive oil"
   },
   {
     "id": "meal-lunch-053",
@@ -1616,13 +1662,18 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🌶️",
     "servings": 1,
-    "prepMinutes": 11,
+    "prepMinutes": 12,
     "cookMinutes": 25,
     "components": [
       {
         "kind": "recipe",
         "recipeId": "dish-spicy-pan-chicken",
         "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 20
       },
       {
         "kind": "food",
@@ -1637,7 +1688,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "tigaie picanta: 120 g piept de pui, 300 g legume, o lingurita de ulei",
     "sourcePlanId": "plan-04",
     "createdAt": "2022-05-30T00:00:00.000Z",
-    "variant": "300 g mixed vegetables"
+    "variant": "120 g chicken breast, 300 g mixed vegetables"
   },
   {
     "id": "meal-dinner-057",
@@ -1677,6 +1728,36 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "salata de cruditati, 50 g feta, o lingurita de ulei, 15 g orez expandat",
     "sourcePlanId": "plan-04",
     "createdAt": "2022-05-30T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-058",
+    "name": {
+      "en": "Spicy chicken & vegetable pan"
+    },
+    "emoji": "🌶️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-spicy-pan-chicken",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "tigaie picanta: 120 g piept de pui, 200 g legume, o lingurita de ulei",
+    "sourcePlanId": "plan-04",
+    "createdAt": "2022-05-30T00:00:00.000Z",
+    "variant": "120 g chicken breast, 250 g mixed vegetables"
   },
   {
     "id": "meal-breakfast-059",
@@ -2086,13 +2167,18 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 16,
+    "prepMinutes": 17,
     "cookMinutes": 12,
     "components": [
       {
         "kind": "recipe",
         "recipeId": "dish-caesar-turkey",
         "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "turkey-breast",
+        "grams": 20
       },
       {
         "kind": "food",
@@ -2122,6 +2208,36 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "salata cezar : 120 g piept de curcan, 85 g porumb fiert, salata de cruditati, 75 g sos de usturoi, 25 g paine int",
     "sourcePlanId": "plan-05",
     "createdAt": "2022-11-14T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-077",
+    "name": {
+      "en": "Oat porridge with apple"
+    },
+    "emoji": "🥣",
+    "servings": 1,
+    "prepMinutes": 5,
+    "cookMinutes": 8,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-porridge",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "apple",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "terci de ovaz cu mere: 100 ml lapte, 100 ml apa, 100 g mere, 40 g fulgi de ovaz, scortisoara",
+    "sourcePlanId": "plan-05",
+    "createdAt": "2022-11-14T00:00:00.000Z",
+    "variant": "100 g apple"
   },
   {
     "id": "meal-snack-078",
@@ -2253,13 +2369,18 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 10,
+    "prepMinutes": 11,
     "cookMinutes": 0,
     "components": [
       {
         "kind": "recipe",
         "recipeId": "dish-tuna-salad",
         "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "tuna-canned",
+        "grams": 35
       },
       {
         "kind": "food",
@@ -2308,7 +2429,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "150 g mere, 15 g caju",
     "sourcePlanId": "plan-05",
     "createdAt": "2022-11-14T00:00:00.000Z",
-    "variant": "15 g cashews"
+    "variant": "15 g cashews, no cinnamon"
   },
   {
     "id": "meal-dinner-084",
@@ -2380,13 +2501,18 @@ export const MEAL_RECIPES: Recipe[] = [
     },
     "emoji": "🥗",
     "servings": 1,
-    "prepMinutes": 10,
+    "prepMinutes": 11,
     "cookMinutes": 0,
     "components": [
       {
         "kind": "recipe",
         "recipeId": "dish-mozzarella-salad",
         "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 25
       },
       {
         "kind": "food",
@@ -2434,7 +2560,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g mere, 10 g migdale",
     "sourcePlanId": "plan-05",
-    "createdAt": "2022-11-14T00:00:00.000Z"
+    "createdAt": "2022-11-14T00:00:00.000Z",
+    "variant": "10 g almonds"
   },
   {
     "id": "meal-dinner-089",
@@ -2610,7 +2737,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "steps": [],
     "tags": [
-      "breakfast"
+      "breakfast",
+      "dinner"
     ],
     "sourceLine": "50 g paine int, 150 g pasta de vinete cu ardei copti (o lingurita de ulei), jumatate de farfurie de legume",
     "sourcePlanId": "plan-06",
@@ -2991,7 +3119,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "50 g paine int + pasta de ou (1 ou), legume",
     "sourcePlanId": "plan-07",
-    "createdAt": "2022-01-01T00:00:00.000Z"
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "no yogurt"
   },
   {
     "id": "meal-dinner-109",
@@ -3506,7 +3635,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "150 g mar + 10 g caju",
     "sourcePlanId": "plan-08",
     "createdAt": "2022-01-01T00:00:00.000Z",
-    "variant": "10 g cashews"
+    "variant": "10 g cashews, no cinnamon"
   },
   {
     "id": "meal-dinner-134",
@@ -3575,7 +3704,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "omleta (din 2 oua + 25 g telemea) + jumatate de farfurie de legume, 50 g paine int",
     "sourcePlanId": "plan-09",
-    "createdAt": "2022-04-18T00:00:00.000Z"
+    "createdAt": "2022-04-18T00:00:00.000Z",
+    "variant": "50 g wholemeal bread, no zucchini"
   },
   {
     "id": "meal-lunch-136",
@@ -3638,7 +3768,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g pere, 10 g caju",
     "sourcePlanId": "plan-09",
-    "createdAt": "2022-04-18T00:00:00.000Z"
+    "createdAt": "2022-04-18T00:00:00.000Z",
+    "variant": "10 g cashews"
   },
   {
     "id": "meal-snack-140",
@@ -4119,7 +4250,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-161",
     "name": {
-      "en": "Egg spread with wholemeal bread, mixed vegetables & yogurt"
+      "en": "Egg spread with wholemeal bread & mixed vegetables"
     },
     "emoji": "🥚",
     "servings": 1,
@@ -4153,22 +4284,33 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "50 g paine int, pasta de ou (2 oua, 1 lg de iaurt, ceapa, sare, piper), jumatate de farfurie de legume",
     "sourcePlanId": "plan-10",
-    "createdAt": "2022-05-24T00:00:00.000Z"
+    "createdAt": "2022-05-24T00:00:00.000Z",
+    "variant": "15 g yogurt"
   },
   {
     "id": "meal-lunch-162",
     "name": {
-      "en": "Flatbread pizza with onion & bell pepper"
+      "en": "Wholemeal flatbread with mozzarella & onion"
     },
-    "emoji": "🍕",
+    "emoji": "🍽️",
     "servings": 1,
-    "prepMinutes": 12,
-    "cookMinutes": 20,
+    "prepMinutes": 13,
+    "cookMinutes": 18,
     "components": [
       {
-        "kind": "recipe",
-        "recipeId": "dish-flatbread-pizza",
-        "servings": 1
+        "kind": "food",
+        "foodId": "flatbread-wholemeal",
+        "grams": 64
+      },
+      {
+        "kind": "food",
+        "foodId": "tomato-sauce",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 50
       },
       {
         "kind": "food",
@@ -4231,7 +4373,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-breakfast-164",
     "name": {
-      "en": "Cottage cheese with wholemeal bread & mixed vegetables"
+      "en": "Cottage cheese with wholemeal bread, mixed vegetables & extra virgin olive oil"
     },
     "emoji": "🌅",
     "servings": 1,
@@ -4393,7 +4535,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "150 g strugurei, 20 g caju",
     "sourcePlanId": "plan-11",
-    "createdAt": "2022-07-04T00:00:00.000Z"
+    "createdAt": "2022-07-04T00:00:00.000Z",
+    "variant": "20 g cashews"
   },
   {
     "id": "meal-lunch-169",
@@ -5227,35 +5370,6 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "30 g yogurt"
   },
   {
-    "id": "meal-breakfast-199",
-    "name": {
-      "en": "Oat porridge with apple"
-    },
-    "emoji": "🥣",
-    "servings": 1,
-    "prepMinutes": 5,
-    "cookMinutes": 8,
-    "components": [
-      {
-        "kind": "recipe",
-        "recipeId": "dish-porridge",
-        "servings": 1
-      },
-      {
-        "kind": "food",
-        "foodId": "apple",
-        "grams": 100
-      }
-    ],
-    "steps": [],
-    "tags": [
-      "breakfast"
-    ],
-    "sourceLine": "terci de ovaz (100 ml lapte, 100 ml apa, 40 g fulgi de ovaz, 100 g mar razuit)",
-    "sourcePlanId": "plan-12",
-    "createdAt": "2022-07-11T00:00:00.000Z"
-  },
-  {
     "id": "meal-snack-200",
     "name": {
       "en": "Apple with cashews"
@@ -5283,7 +5397,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "150 g mere, 20 g caju",
     "sourcePlanId": "plan-12",
     "createdAt": "2022-07-11T00:00:00.000Z",
-    "variant": "20 g cashews"
+    "variant": "20 g cashews, no cinnamon"
   },
   {
     "id": "meal-lunch-201",
@@ -5320,7 +5434,5136 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-07-11T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-203",
+    "id": "meal-lunch-204",
+    "name": {
+      "en": "Roasted vegetables with cod & yogurt garlic sauce"
+    },
+    "emoji": "🍠",
+    "servings": 1,
+    "prepMinutes": 14,
+    "cookMinutes": 35,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "cod",
+        "grams": 150
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-roasted-vegetables",
+        "servings": 0.82
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt-garlic-sauce",
+        "grams": 50
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "150 g peste alb, 250 g legume la cuptor (morcovi, ciuperci, dovlecel, ardei, ceapa), 50 g sos de usturoi",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-205",
+    "name": {
+      "en": "Baked pumpkin with yogurt"
+    },
+    "emoji": "🎃",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 35,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-baked-pumpkin",
+        "servings": 0.99
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 330
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g dovleac la cuptor, 330 ml iaurt de baut",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z",
+    "variant": "330 g yogurt"
+  },
+  {
+    "id": "meal-breakfast-206",
+    "name": {
+      "en": "Carrot salad with Telemea, wholemeal bread & olives"
+    },
+    "emoji": "🥕",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "telemea",
+        "grams": 50
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-carrot-salad",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "olives",
+        "grams": 30
+      },
+      {
+        "kind": "food",
+        "foodId": "garlic",
+        "grams": 3
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g telemea, salata de morcovi, 30 g masline, ceapa sau usturoi, o lingurita de ulei de masline, 50 g paine int",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-208",
+    "name": {
+      "en": "Baked pumpkin with yogurt"
+    },
+    "emoji": "🎃",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 35,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-baked-pumpkin",
+        "servings": 0.99
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 200
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g dovleac la cuptor, 200 g iaurt grecesc 2%",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z",
+    "variant": "200 g yogurt"
+  },
+  {
+    "id": "meal-breakfast-209",
+    "name": {
+      "en": "Cottage cheese with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "cottage-cheese",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g paine int, 200 g cottage, jumatate de farfurie de legume",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z",
+    "variant": "50 g wholemeal bread"
+  },
+  {
+    "id": "meal-lunch-210",
+    "name": {
+      "en": "Wholemeal pasta with red kidney beans & parmesan"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 13,
+    "cookMinutes": 12,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "pasta-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "broccoli",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "tomatoes",
+        "grams": 120
+      },
+      {
+        "kind": "food",
+        "foodId": "beans-kidney-cooked",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "onion",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "olives",
+        "grams": 25
+      },
+      {
+        "kind": "food",
+        "foodId": "parmesan",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "50 g paste int, 150 g broccoli fiert, rosii, 100 g fasole rosie fiarta, ceapa, o lingurita de ulei de masline, 25 g masline, 20 g parmezan",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-211",
+    "name": {
+      "en": "Cream of pumpkin soup with wholemeal bread"
+    },
+    "emoji": "🎃",
+    "servings": 1,
+    "prepMinutes": 13,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-soup-pumpkin-cream",
+        "servings": 0.56
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g supa crema de dovleac (5 g unt / portie), 25 g paine int",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-212",
+    "name": {
+      "en": "Egg with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 10,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 110
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g paine int, 2 oua fierte, jumatate de farfurie de legume",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-214",
+    "name": {
+      "en": "Pumpkin muffins"
+    },
+    "emoji": "🧁",
+    "servings": 1,
+    "prepMinutes": 16,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-pumpkin-muffins",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 133
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "3 briose cu dovleac, 150 g iaurt",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z",
+    "variant": "150 g yogurt"
+  },
+  {
+    "id": "meal-lunch-215",
+    "name": {
+      "en": "Braised cabbage with chicken thigh & yogurt"
+    },
+    "emoji": "🥬",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-thigh",
+        "grams": 120
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-braised-cabbage",
+        "servings": 0.62
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "120 g pulpa de pui la cuptor, 200 g varza calita (o lingurita de ulei de masline / portie), o lg de iaurt",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-216",
+    "name": {
+      "en": "Goat cheese with wholemeal bread & raw vegetable salad"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "goat-cheese",
+        "grams": 75
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "salata de cruditati, 75 g branza de capra, o lingurita de ulei de masline, 25 g paine int",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z",
+    "variant": "75 g goat cheese"
+  },
+  {
+    "id": "meal-lunch-217",
+    "name": {
+      "en": "Braised cabbage with chicken thigh"
+    },
+    "emoji": "🥬",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-thigh",
+        "grams": 120
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-braised-cabbage",
+        "servings": 0.62
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "120 g pulpa de pui la cuptor, 200 g varza calita (o lingurita de ulei de masline / portie)",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-218",
+    "name": {
+      "en": "Plum with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "plum",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "150 g prune, 15 g caju",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z",
+    "variant": "15 g cashews"
+  },
+  {
+    "id": "meal-dinner-219",
+    "name": {
+      "en": "Feta with wholemeal bread & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "feta",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "salata greceasca: 50 g paine int, 50 g feta, o lingurita de ulei, 25 g paine int",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-221",
+    "name": {
+      "en": "White rice with pickles"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 6,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "rice-white",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "pickles",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "naut cu orez (160 g naut fiert, 50 g orez brun nefiert, o lingurita de ulei), muraturi",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-222",
+    "name": {
+      "en": "Meatball sour soup with wholemeal bread"
+    },
+    "emoji": "🥣",
+    "servings": 1,
+    "prepMinutes": 21,
+    "cookMinutes": 40,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-ciorba-meatball",
+        "servings": 0.78
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g ciorba de perisoare (o lingurita de ulei / portie), 25 g paine int",
+    "sourcePlanId": "plan-13",
+    "createdAt": "2022-10-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-223",
+    "name": {
+      "en": "Avocado spread with wholemeal bread & mozzarella"
+    },
+    "emoji": "🥑",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-avocado-spread",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 25
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g paine int, pasta de avocado (100 g avocado), 25 g mozzarella, jumatate de farfurie de legume",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-224",
+    "name": {
+      "en": "Cabbage salad with baked pumpkin & turkey breast"
+    },
+    "emoji": "🎃",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 35,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "turkey-breast",
+        "grams": 110
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-baked-pumpkin",
+        "servings": 0.57
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-cabbage-salad",
+        "servings": 1
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "110 g piept de curcan la cuptor, 200 g dovleac placintar la cuptor, salata de varza, o lingurita de ulei",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-225",
+    "name": {
+      "en": "Broccoli with wholemeal bread"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "broccoli",
+        "grams": 350
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g supa crema de broccoli (o lingurita de ulei / portie), 25 g paine int",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-227",
+    "name": {
+      "en": "Halloumi with mixed vegetables & yogurt garlic sauce"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "halloumi",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 250
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt-garlic-sauce",
+        "grams": 50
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "50 g halloumi la gratar, 250 g legume la tigaie (o lingurita de ulei de masline / portie), 50 g sos de usturoi",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-228",
+    "name": {
+      "en": "Tuna in brine with wholemeal bread & raw vegetable salad"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 15,
+    "cookMinutes": 22,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "tuna-canned",
+        "grams": 75
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "salata de cruditati, 75 g ton in suc propriu, o lingurita de ulei, 25 g paine int",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-232",
+    "name": {
+      "en": "Cauliflower purée with salmon, raw vegetable salad & garlic"
+    },
+    "emoji": "🥔",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salmon",
+        "grams": 125
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-cauliflower-puree",
+        "servings": 0.85
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "garlic",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "125 g somon, 200 g piure de conopida (70% conopida, 30% cartofi), salata de cruditati, o lg de iaurt cu usturoi",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-233",
+    "name": {
+      "en": "Goat cheese with wholemeal bread & raw vegetable salad"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "goat-cheese",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "salata de cruditati, 50 g branza de capra, o lingurita de ulei de masline, 25 g paine",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z",
+    "variant": "50 g goat cheese"
+  },
+  {
+    "id": "meal-lunch-237",
+    "name": {
+      "en": "Bulgur with chicken thigh & pickles"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-thigh",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "bulgur",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "pickles",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g pulpa de pui la cuptor, 50 g bulgur, castraveti murati",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z",
+    "variant": "50 g bulgur"
+  },
+  {
+    "id": "meal-snack-238",
+    "name": {
+      "en": "Plum with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "plum",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "150 g prune, 10 g caju",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z",
+    "variant": "10 g cashews"
+  },
+  {
+    "id": "meal-lunch-240",
+    "name": {
+      "en": "Bulgur with chicken thigh & pickles"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-thigh",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "bulgur",
+        "grams": 40
+      },
+      {
+        "kind": "food",
+        "foodId": "pickles",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g pulpa de pui la cuptor, 40 g bulgur, castraveti murati",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z",
+    "variant": "40 g bulgur"
+  },
+  {
+    "id": "meal-snack-241",
+    "name": {
+      "en": "Apple with almonds"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "apple",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "almonds",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "150 g mere, 20 g migdale",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z",
+    "variant": "20 g almonds"
+  },
+  {
+    "id": "meal-dinner-242",
+    "name": {
+      "en": "Cabbage with wholemeal bread"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "cabbage",
+        "grams": 350
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g supa varza (o lingurita de ulei / portie), 25 g paine int",
+    "sourcePlanId": "plan-14",
+    "createdAt": "2022-10-03T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-244",
+    "name": {
+      "en": "Mozzarella with wholemeal bread & butter"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "butter",
+        "grams": 10
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 65
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g paine, 10 g unt, 65 g mozzarella, legume",
+    "sourcePlanId": "plan-15",
+    "createdAt": "2022-11-07T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-245",
+    "name": {
+      "en": "Chicken breast with green beans & extra virgin olive oil"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "green-beans",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "o portie de piept de pui umplut cu spanac, 200 g fasole verde cu patrunjel si o lingurita de ulei de masline",
+    "sourcePlanId": "plan-15",
+    "createdAt": "2022-11-07T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-246",
+    "name": {
+      "en": "Yogurt with pumpkin"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "pumpkin",
+        "grams": 350
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g dovleac copt, 150 g iaurt",
+    "sourcePlanId": "plan-15",
+    "createdAt": "2022-11-07T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-247",
+    "name": {
+      "en": "Cream of pumpkin soup with wholemeal bread & extra virgin olive oil"
+    },
+    "emoji": "🎃",
+    "servings": 1,
+    "prepMinutes": 14,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-soup-pumpkin-cream",
+        "servings": 0.56
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g supa crema de dovleac (o lingurita de ulei / portie), 25 g paine int",
+    "sourcePlanId": "plan-15",
+    "createdAt": "2022-11-07T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-248",
+    "name": {
+      "en": "Grapefruit with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "grapefruit",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "150 g grapefruit, 15 g caju",
+    "sourcePlanId": "plan-15",
+    "createdAt": "2022-11-07T00:00:00.000Z",
+    "variant": "15 g cashews, 150 g grapefruit"
+  },
+  {
+    "id": "meal-lunch-249",
+    "name": {
+      "en": "Roasted vegetables with zander"
+    },
+    "emoji": "🍠",
+    "servings": 1,
+    "prepMinutes": 13,
+    "cookMinutes": 35,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "zander",
+        "grams": 150
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-roasted-vegetables",
+        "servings": 0.82
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "150 g salau la cuptor, 250 g legume la cuptor",
+    "sourcePlanId": "plan-15",
+    "createdAt": "2022-11-07T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-252",
+    "name": {
+      "en": "Roasted vegetables with zander & garlic"
+    },
+    "emoji": "🍠",
+    "servings": 1,
+    "prepMinutes": 14,
+    "cookMinutes": 35,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "zander",
+        "grams": 150
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-roasted-vegetables",
+        "servings": 0.82
+      },
+      {
+        "kind": "food",
+        "foodId": "garlic",
+        "grams": 50
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "150 g salau la cuptor, 250 g legume la cuptor, 50 g iaurt cu usturoi",
+    "sourcePlanId": "plan-15",
+    "createdAt": "2022-11-07T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-253",
+    "name": {
+      "en": "Polenta with cottage cheese & yogurt"
+    },
+    "emoji": "🌽",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-polenta",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "cottage-cheese",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 50
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "mamaliga din 50 g faina de malai, 100 g branza de vaci, 50 g iaurt",
+    "sourcePlanId": "plan-15",
+    "createdAt": "2022-11-07T00:00:00.000Z",
+    "variant": "50 g yogurt"
+  },
+  {
+    "id": "meal-lunch-254",
+    "name": {
+      "en": "Turkey caesar salad with egg & wholemeal bread"
+    },
+    "emoji": "🥗",
+    "servings": 1,
+    "prepMinutes": 17,
+    "cookMinutes": 12,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-caesar-turkey",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "turkey-breast",
+        "grams": 20
+      },
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 55
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt-garlic-sauce",
+        "grams": 75
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "salata cezar : 120 g piept de curcan, 1 ou fiert, salata de cruditati, 75 g sos de usturoi, 25 g paine int",
+    "sourcePlanId": "plan-15",
+    "createdAt": "2022-11-07T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-255",
+    "name": {
+      "en": "Apple with almonds"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "apple",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "almonds",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "150 g mere, 15 g migdale",
+    "sourcePlanId": "plan-15",
+    "createdAt": "2022-11-07T00:00:00.000Z",
+    "variant": "15 g almonds"
+  },
+  {
+    "id": "meal-breakfast-256",
+    "name": {
+      "en": "Hummus with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "hummus",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g paine int, 100 g humus, jumatate de farfurie de legume, o lingurita de ulei de masline",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z",
+    "variant": "100 g hummus, 5 g extra virgin olive oil"
+  },
+  {
+    "id": "meal-lunch-257",
+    "name": {
+      "en": "Mixed vegetables"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "paste cu legume (50 g paste integrale nefierte, 200 g legume calite intr-o lingurita de ulei de masline)",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-258",
+    "name": {
+      "en": "Tuna in brine with puffed rice cakes & raw vegetable salad"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 15,
+    "cookMinutes": 22,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "tuna-canned",
+        "grams": 75
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "rice-cakes",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "salata de cruditati, 75 g ton in suc propriu, o lingurita de ulei de masline, 15 g orez expandat",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z",
+    "variant": "75 g tuna in brine"
+  },
+  {
+    "id": "meal-breakfast-259",
+    "name": {
+      "en": "Omelette with wholemeal bread, mixed vegetables & cottage cheese"
+    },
+    "emoji": "🍳",
+    "servings": 1,
+    "prepMinutes": 6,
+    "cookMinutes": 8,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-omelette",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "cottage-cheese",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "omleta cu branza de vaci (2 oua, 50 g branza de vaci), jumatate de farfurie de legume, o lingurita de ulei de masline, 50 g paine int",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-261",
+    "name": {
+      "en": "Vegetable sour soup with wholemeal bread"
+    },
+    "emoji": "🍲",
+    "servings": 1,
+    "prepMinutes": 13,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-ciorba-vegetable",
+        "servings": 0.63
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g ciorba de legume (o lingurita de ulei / portie), 25 g paine int",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-262",
+    "name": {
+      "en": "Cheese spread with wholemeal bread, mixed vegetables & extra virgin olive oil"
+    },
+    "emoji": "🧀",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-cheese-spread",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g paine int, pasta de branza (100 g branza de vaci, 2 lg de iaurt, ceapa), jumatate de farfurie de legume, o lingurita de ulei de masline",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-263",
+    "name": {
+      "en": "Roasted vegetables with salmon"
+    },
+    "emoji": "🍠",
+    "servings": 1,
+    "prepMinutes": 13,
+    "cookMinutes": 35,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salmon",
+        "grams": 150
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-roasted-vegetables",
+        "servings": 0.98
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "150 g somon, 300 g legume la gratar,",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-264",
+    "name": {
+      "en": "Bruschetta with telemea, avocado"
+    },
+    "emoji": "🍞",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 4,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-bruschetta",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "avocado",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "bruschetta cu avocado: 50 g paine int, 100 g avocado, rosii, usturoi, o lingurita de ulei de masline",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-265",
+    "name": {
+      "en": "Oat porridge with apple"
+    },
+    "emoji": "🥣",
+    "servings": 1,
+    "prepMinutes": 6,
+    "cookMinutes": 8,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-porridge",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "apple",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "vanilla-extract",
+        "grams": 3
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "terci de ovaz: 100 ml lapte, 100 ml apa, 1 mar razuit, 40 g fulgi de ovaz, scortisoara, esenta de vanilie",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z",
+    "variant": "150 g apple"
+  },
+  {
+    "id": "meal-lunch-266",
+    "name": {
+      "en": "Sautéed mushrooms with halloumi"
+    },
+    "emoji": "🍄",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "halloumi",
+        "grams": 50
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-sauteed-mushrooms",
+        "servings": 1
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "50 g branza halloumi, 200 g ciuperci calite cu mult patrunjel",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z",
+    "variant": "50 g halloumi"
+  },
+  {
+    "id": "meal-snack-267",
+    "name": {
+      "en": "Blueberries with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "blueberries",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "150 g afine, 15 g caju",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-268",
+    "name": {
+      "en": "Red kidney beans with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "beans-kidney-cooked",
+        "grams": 160
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "salata de cruditati, 160 g fasole rosie, o lingurita de ulei de masline",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z",
+    "variant": "160 g red kidney beans"
+  },
+  {
+    "id": "meal-breakfast-269",
+    "name": {
+      "en": "Carrot salad with egg & wholemeal bread"
+    },
+    "emoji": "🥕",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 110
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-carrot-salad",
+        "servings": 1
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g paine int, 2 oua fierte, salata de morcovi, o lingurita de ulei de masline",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-270",
+    "name": {
+      "en": "Sautéed mushrooms with halloumi"
+    },
+    "emoji": "🍄",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "halloumi",
+        "grams": 75
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-sauteed-mushrooms",
+        "servings": 1
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "75 g branza halloumi, 200 g ciuperci calite cu mult patrunjel",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z",
+    "variant": "75 g halloumi"
+  },
+  {
+    "id": "meal-dinner-271",
+    "name": {
+      "en": "Bell pepper with wholemeal bread"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bell-pepper",
+        "grams": 350
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g supa crema de ardei copti (o lingurita de ulei de masline), 25 g paine int",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-272",
+    "name": {
+      "en": "Yogurt with sweetcorn"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 330
+      },
+      {
+        "kind": "food",
+        "foodId": "corn",
+        "grams": 40
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "330 g iaurt de baut, 40 g fulgi de porumb",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-273",
+    "name": {
+      "en": "Cauliflower purée with chicken thigh & bell pepper"
+    },
+    "emoji": "🥔",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-thigh",
+        "grams": 100
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-cauliflower-puree",
+        "servings": 0.85
+      },
+      {
+        "kind": "food",
+        "foodId": "bell-pepper",
+        "grams": 120
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g pulpa de pui la cuptor, 200 g piure de conopida, 2 ardei copti",
+    "sourcePlanId": "plan-16",
+    "createdAt": "2022-09-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-274",
+    "name": {
+      "en": "Carrot salad with mozzarella & wholemeal bread"
+    },
+    "emoji": "🥕",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 100
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-carrot-salad",
+        "servings": 1
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g paine int, 100 g mozzarella in apa, salata de morcovi, o lingurita de ulei de masline",
+    "sourcePlanId": "plan-17",
+    "createdAt": "2022-09-26T00:00:00.000Z",
+    "variant": "100 g mozzarella"
+  },
+  {
+    "id": "meal-lunch-275",
+    "name": {
+      "en": "Celeriac purée with chicken thigh & pickles"
+    },
+    "emoji": "🥔",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-thigh",
+        "grams": 100
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-celeriac-puree",
+        "servings": 0.85
+      },
+      {
+        "kind": "food",
+        "foodId": "pickles",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g pulpe de pui, 200 g piure de telina (70% telina, 30% cartofi), sfecla rosie / muraturi",
+    "sourcePlanId": "plan-17",
+    "createdAt": "2022-09-26T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-277",
+    "name": {
+      "en": "Eggplant spread with wholemeal bread & Telemea"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "eggplant-salad",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "telemea",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g paine int, 150 g salata de vinete, jumatate de farfurie de legume, o lingurita de ulei de masline, 25 g telemea",
+    "sourcePlanId": "plan-17",
+    "createdAt": "2022-09-26T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-278",
+    "name": {
+      "en": "Braised cabbage with wholemeal pasta"
+    },
+    "emoji": "🥬",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-braised-cabbage",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "pasta-wholemeal",
+        "grams": 50
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "paste cu varza calita (50 g paste nefierte, 200 g varza calita (o lingurita de ulei / portie))",
+    "sourcePlanId": "plan-17",
+    "createdAt": "2022-09-26T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-280",
+    "name": {
+      "en": "Baked trout with roasted vegetables"
+    },
+    "emoji": "🐟",
+    "servings": 1,
+    "prepMinutes": 13,
+    "cookMinutes": 35,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-trout-baked",
+        "servings": 1
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-roasted-vegetables",
+        "servings": 0.82
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "150 g pastrav la cuptor, 250 g legume la cuptor",
+    "sourcePlanId": "plan-17",
+    "createdAt": "2022-09-26T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-282",
+    "name": {
+      "en": "Grapes with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "grapes",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "150 g struguri, 10 g caju",
+    "sourcePlanId": "plan-17",
+    "createdAt": "2022-09-26T00:00:00.000Z",
+    "variant": "10 g cashews"
+  },
+  {
+    "id": "meal-lunch-283",
+    "name": {
+      "en": "Creamed spinach with tofu"
+    },
+    "emoji": "🥬",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "tofu",
+        "grams": 150
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-creamed-spinach",
+        "servings": 0.93
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "150 g tofu intr-o lingurita de ulei, 250 g mancare de spanac",
+    "sourcePlanId": "plan-17",
+    "createdAt": "2022-09-26T00:00:00.000Z",
+    "variant": "250 g creamed spinach"
+  },
+  {
+    "id": "meal-lunch-285",
+    "name": {
+      "en": "Creamed spinach with tofu"
+    },
+    "emoji": "🥬",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "tofu",
+        "grams": 150
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-creamed-spinach",
+        "servings": 0.75
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "150 g tofu intr-o lingurita de ulei, 200 g mancare de spanac",
+    "sourcePlanId": "plan-17",
+    "createdAt": "2022-09-26T00:00:00.000Z",
+    "variant": "200 g creamed spinach"
+  },
+  {
+    "id": "meal-dinner-286",
+    "name": {
+      "en": "Wholemeal bread with salmon & cottage cheese"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "salmon",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "cottage-cheese",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "50 g paine int, 50 g somon afumat, 100 g branza cottage, legume",
+    "sourcePlanId": "plan-17",
+    "createdAt": "2022-09-26T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-288",
+    "name": {
+      "en": "Omelette with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🍳",
+    "servings": 1,
+    "prepMinutes": 5,
+    "cookMinutes": 8,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-omelette",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "gombás rántotta (2 tojásból és 3-4 gombából) + 1/2 tányér zöldség, 1 tk. Olivaolaj + 40 g teljes kiőrlésű kenyér",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z",
+    "variant": "40 g wholemeal bread, no zucchini"
+  },
+  {
+    "id": "meal-snack-289",
+    "name": {
+      "en": "Grapefruit with nectarine"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "grapefruit",
+        "grams": 250
+      },
+      {
+        "kind": "food",
+        "foodId": "nectarine",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "gyümölcssaláta: 1 grépfrút + 1 nektarin",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-290",
+    "name": {
+      "en": "Squash stew with mixed vegetables"
+    },
+    "emoji": "🥘",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 100
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-squash-stew",
+        "servings": 0.59
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g csirkés zöldséges fasírt (50% hús, 50% zöldség, 1 tojás) + 250 g tökfőzelék (1 ek. olíva olaj és 1 tk. liszt/2 adag)",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-291",
+    "name": {
+      "en": "Wholemeal bread with yogurt"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 120
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "120 g banán kenyér + 150 ml 1,5-2 % joghurt",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z",
+    "variant": "120 g wholemeal bread"
+  },
+  {
+    "id": "meal-snack-292",
+    "name": {
+      "en": "Nectarine with walnuts"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "nectarine",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "walnuts",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 nektarin + 10 g dió",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-293",
+    "name": {
+      "en": "Chicken patties with squash stew"
+    },
+    "emoji": "🍢",
+    "servings": 1,
+    "prepMinutes": 16,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-chicken-patties",
+        "servings": 0.55
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-squash-stew",
+        "servings": 0.59
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g csirkés fasírt (50% hús, 50% zöldség, 1 tojás) + 250 g tökfőzelék",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-294",
+    "name": {
+      "en": "Wholemeal bread with yogurt"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 140
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "140 g banán kenyér + 150 ml 1,5-2% joghurt",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z",
+    "variant": "140 g wholemeal bread"
+  },
+  {
+    "id": "meal-lunch-295",
+    "name": {
+      "en": "Chickpeas with pickles"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chickpeas-cooked",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "pickles",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "rizses csicseriborsós étel (100 g főtt csicseriborsó, 150 g főtt barna rizs) + savanyú uborka",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-297",
+    "name": {
+      "en": "Egg with mozzarella & wholemeal bread"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 10,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 110
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 60
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "2 főtt tojás + muroksaláta (1 nagy reszelt murok, 1 tk. Olivaolaj, bazsalikom) + 40 g pirítós + 60 g mozzarella",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-300",
+    "name": {
+      "en": "Chicken breast with mixed vegetables"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 250
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "pikáns csirkemell: 100 g csirkemell + 250 g zöldség köret",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-301",
+    "name": {
+      "en": "Apple with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 5,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "apple",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "cinnamon",
+        "grams": 3
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 reszelt alma + fahéj + 10 g kesudió",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z",
+    "variant": "10 g cashews, 3 g cinnamon"
+  },
+  {
+    "id": "meal-breakfast-302",
+    "name": {
+      "en": "Wholemeal bread with mixed vegetables & extra virgin olive oil"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "eggplant",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g teljes kiőrlésű kenyér + vinetta joghurttal + fel tányér zöldség + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z",
+    "variant": "100 g eggplant"
+  },
+  {
+    "id": "meal-snack-303",
+    "name": {
+      "en": "Cottage cheese with apple"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 6,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "cottage-cheese",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "apple",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "200 g cottage túró + 1 alma",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-305",
+    "name": {
+      "en": "Guacamole with wholemeal bread, mixed vegetables & extra virgin olive oil"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "guacamole",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g teljes kiőrlésű kenyér + guacamole 1 avokadóból + fel tányér zöldség + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-306",
+    "name": {
+      "en": "Salmon with mixed vegetables & extra virgin olive oil"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 14,
+    "cookMinutes": 22,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salmon",
+        "grams": 120
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 250
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "120 g lazac roston vagy a lerben elkészítve + 250 g zöldségek 1 tk. Olivaolajban megdinsztelve",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-307",
+    "name": {
+      "en": "Chia pudding with nectarine"
+    },
+    "emoji": "🍮",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-chia-pudding",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "nectarine",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "chiamagos puding (150 ml tej, 2 ek. chiamag, 3 ek. zabpehely) + 1 nektarin",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-308",
+    "name": {
+      "en": "Bulgur with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "eggplant",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "bulgur",
+        "grams": 56
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "150 g tehéntúrós vinettás tekercs + 140 g főtt bulgur + vegyes saláta + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-309",
+    "name": {
+      "en": "Feta with wholemeal bread & egg"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 10,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      },
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 55
+      },
+      {
+        "kind": "food",
+        "foodId": "feta",
+        "grams": 40
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "40 g teljes kiőrlésű kenyér + tojás krém (1 tojásból, joghurt, mustár, só, bors) + 40 g feta + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-311",
+    "name": {
+      "en": "Hummus with wholemeal bread & pumpkin seeds"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      },
+      {
+        "kind": "food",
+        "foodId": "hummus",
+        "grams": 80
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "pumpkin-seeds",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "40 g teljes kiőrlésű kenyér + 80 g humusz + fel tányér zöldség + 1 tk. Olivaolaj + 10 g tokmag",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-312",
+    "name": {
+      "en": "Beef with celeriac & raw vegetable salad"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "beef",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "celeriac",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g marhahús lesütve (1 tk/ adag) + 200 g zeller püré (70% zeller, 30% krumpli) + vegyes saláta / cékla / savanyúság + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-313",
+    "name": {
+      "en": "Grapefruit with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "grapefruit",
+        "grams": 250
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 grépfrút + 15 g kesudió",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z",
+    "variant": "15 g cashews, 250 g grapefruit"
+  },
+  {
+    "id": "meal-snack-316",
+    "name": {
+      "en": "Grapefruit with walnuts"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "grapefruit",
+        "grams": 250
+      },
+      {
+        "kind": "food",
+        "foodId": "walnuts",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 grépfrút + 10 g dió",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-317",
+    "name": {
+      "en": "Quinoa with trout & garlic"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "trout",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "quinoa",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "garlic",
+        "grams": 30
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "150 g pisztráng a lerben vagy roston elkészítve + quinoás saláta (40 g nyers quinoával, 1 tk. olíva olaj) + 2 ek. fokhagymás joghurtos szósz",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-318",
+    "name": {
+      "en": "Bruschetta with telemea, feta & pumpkin seeds"
+    },
+    "emoji": "🍞",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-bruschetta",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "feta",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "pumpkin-seeds",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "bruschetta fetával (50 g kenyér meg pirítva, 60 g feta, paradicsom, fokhagyma, esetleg retek apróra vágva, petrezselyemzöld, bazsalikom, 1 tk. olíva olaj) + 10 g tokmag pirítva",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-319",
+    "name": {
+      "en": "Wholemeal bread with egg & spinach"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 55
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "spinach",
+        "grams": 240
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "2 tükörtojás 1 tk. Olivaolaj + 240 g spenót 1 tk. Olivaolajjal /adag + 40 g teljes kiőrlésű kenyér",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-321",
+    "name": {
+      "en": "Hungarian cheese spread with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🧀",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-korozott",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g teljes kiőrlésű kenyér + körözött (80 g túró, 1 ek. Joghurt, hagyma/ kapor) + fel tányér zöldség + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z",
+    "variant": "50 g wholemeal bread"
+  },
+  {
+    "id": "meal-lunch-322",
+    "name": {
+      "en": "Chicken breast with spinach & extra virgin olive oil"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "spinach",
+        "grams": 240
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g csirkemell roston 1 tk. olíva olajjal + 240 g spenót 1 tk. Olivaolajjal /adag",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-323",
+    "name": {
+      "en": "Chicken breast with white rice & mixed vegetables"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "rice-white",
+        "grams": 32
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 180
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "360 g csirkés gombás cukkinis rizses étel (100 g csirkemell, 80 g főtt rizs, 180 g zöldség) + cékla saláta (1,5 tk. olíva olaj)",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-324",
+    "name": {
+      "en": "Yogurt with plum"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "plum",
+        "grams": 120
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "120 g szilvas suti + 150 g joghurt",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z",
+    "variant": "120 g plum"
+  },
+  {
+    "id": "meal-lunch-325",
+    "name": {
+      "en": "Zucchini with raw vegetable salad"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "zucchini",
+        "grams": 360
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "360 g csirkés gombás cukkinis rizses étel + cékla saláta (1,5 tk. olíva olaj)",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-326",
+    "name": {
+      "en": "Salmon with celeriac & extra virgin olive oil"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 13,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salmon",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "celeriac",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "garlic",
+        "grams": 3
+      },
+      {
+        "kind": "food",
+        "foodId": "tomatoes",
+        "grams": 120
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g lazac + 200 g zeller hasáb 1 tk. Olivaolajjal + joghurtos fokhagymás szósz + rukkolás paradicsomos Sali + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-327",
+    "name": {
+      "en": "Yogurt with plum"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "plum",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "100 g szilvas suti + 150 g joghurt",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z",
+    "variant": "100 g plum"
+  },
+  {
+    "id": "meal-lunch-328",
+    "name": {
+      "en": "Lentils with feta & wholemeal bread"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 14,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "lentils",
+        "grams": 130
+      },
+      {
+        "kind": "food",
+        "foodId": "feta",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "vegyes saláta + 130 g lencse saláta + 50 g feta + 1 tk. Olivaolaj + 25 g pirítós",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-329",
+    "name": {
+      "en": "Feta with wholemeal bread, egg & raw vegetable salad"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 10,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 55
+      },
+      {
+        "kind": "food",
+        "foodId": "feta",
+        "grams": 40
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "1 tojás + 40 g feta + murok saláta + 1 tk. Olivaolaj + 40 g teljes kiőrlésű kenyér pirítva",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-330",
+    "name": {
+      "en": "Lentil stew with tofu & pickles"
+    },
+    "emoji": "🫘",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-lentil-stew",
+        "servings": 1.21
+      },
+      {
+        "kind": "food",
+        "foodId": "tofu",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "pickles",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "200 g lencsefőzelék + 150 g tofu 1 tk. Olivaolaj + 100 g savanyúság",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-331",
+    "name": {
+      "en": "Wholemeal bread with tuna in brine & mixed vegetables"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 15,
+    "cookMinutes": 22,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "tuna-canned",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g teljes kiőrlésű kenyér + tonhal krém (2 adaghoz: 130 g tonhal, 50 g feta) + fel tányér zöldség + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-333",
+    "name": {
+      "en": "Tuna in brine with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 15,
+    "cookMinutes": 22,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      },
+      {
+        "kind": "food",
+        "foodId": "tuna-canned",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "40 g teljes kiőrlésű kenyér + tonhal krém (2 adaghoz:) + fel tányér zöldség + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-334",
+    "name": {
+      "en": "Chicken breast with mixed vegetables & extra virgin olive oil"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 250
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g csirkemell roston 1 tk. olíva olajjal + 250 g zöldség köret 1 tk. Olivaolaj + joghurtos öntet",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-337",
+    "name": {
+      "en": "Grapefruit with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "grapefruit",
+        "grams": 250
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 gref + 20 g kesudio",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "20 g cashews, 250 g grapefruit"
+  },
+  {
+    "id": "meal-snack-339",
+    "name": {
+      "en": "Apple with walnuts"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "apple",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "walnuts",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 alma + 20 g dio",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "20 g walnuts"
+  },
+  {
+    "id": "meal-dinner-340",
+    "name": {
+      "en": "Mozzarella with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 80
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes salata (alap: zold levelu zoldseg: zold salata, baby spenot, rukkola, zsalya + 2-3-4 zoldseg) + 80 g mozzarella + 1 tk. olivaolaj",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "80 g mozzarella"
+  },
+  {
+    "id": "meal-breakfast-341",
+    "name": {
+      "en": "Mozzarella with wholemeal bread & egg"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 10,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 55
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 45
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "1 fott tojas + muroksalata (1 reszelt murok, oregano, bazsalikom, 2 tk. Olivaolaj) + 45 g mozzarella + 40 g teljes kiorlesu kenyer",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-342",
+    "name": {
+      "en": "Kiwi with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "kiwi",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "150 g kiwi + 20 g kesudio",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "20 g cashews"
+  },
+  {
+    "id": "meal-lunch-343",
+    "name": {
+      "en": "Bulgur with raw vegetable salad & broccoli"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "broccoli",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "bulgur",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt-garlic-sauce",
+        "grams": 30
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g brokkoli fasirt + 150 g fott bulgur + vegyes salata + 2 ek. tzatziki szosz",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-344",
+    "name": {
+      "en": "Orange with walnuts"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "orange",
+        "grams": 180
+      },
+      {
+        "kind": "food",
+        "foodId": "walnuts",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 narancs + 20 g dio",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "20 g walnuts"
+  },
+  {
+    "id": "meal-dinner-345",
+    "name": {
+      "en": "Mixed vegetables with yogurt"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g zoldsegleves + 1 ek. joghurt",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-346",
+    "name": {
+      "en": "Hungarian cheese spread with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🧀",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-korozott",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "40 g teljes kiorlesu kenyer + turokorozott (70 g tehenturo, 1 ek. joghurt + hagyma/ kapor/ paprika es komenymag) + fel tanyer zoldseg + 1 tk. olivaolaj",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "40 g wholemeal bread"
+  },
+  {
+    "id": "meal-snack-347",
+    "name": {
+      "en": "Pomelo with almonds"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "pomelo",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "almonds",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "200 g pomelo + 15 g mandula",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-348",
+    "name": {
+      "en": "Bulgur with broccoli & bell pepper"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "broccoli",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "bulgur",
+        "grams": 56
+      },
+      {
+        "kind": "food",
+        "foodId": "bell-pepper",
+        "grams": 120
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g brokkoli fasirt + 140 g fott bulgur + 2 db sult paprika",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-350",
+    "name": {
+      "en": "Pomelo with walnuts"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "pomelo",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "walnuts",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "200 g pomelo + 20 g dio",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-351",
+    "name": {
+      "en": "Salmon with green peas & raw vegetable salad"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 14,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salmon",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "peas",
+        "grams": 170
+      },
+      {
+        "kind": "food",
+        "foodId": "garlic",
+        "grams": 3
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g lazac + 170 g borsopure (borso, hagyma, fokhagyma) + fokhagyma szosz + vegyes salata + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-352",
+    "name": {
+      "en": "Pear with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "pear",
+        "grams": 170
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 korte + 20 g kesudio",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "20 g cashews"
+  },
+  {
+    "id": "meal-breakfast-353",
+    "name": {
+      "en": "Chia pudding with apple"
+    },
+    "emoji": "🍮",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-chia-pudding",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "apple",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "chiamagos puding : ejjelre beaztatunk : 130 ml tejbe + 20 g chiamagot + 20 g zabpehely + reggel hozzaadunk fel granatalma",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-355",
+    "name": {
+      "en": "Green peas with chicken breast & bell pepper"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "peas",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "bell-pepper",
+        "grams": 120
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g csirkemell roston + 200 g borsopure + 2 sult paprika",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-356",
+    "name": {
+      "en": "Spinach omelette with mixed vegetables"
+    },
+    "emoji": "🍳",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 8,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-omelette-spinach",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "spenotos rantotta (egy kis marek spenot + 2 tojas) + fel tanyer zoldseg + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-357",
+    "name": {
+      "en": "Orange with almonds"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "orange",
+        "grams": 180
+      },
+      {
+        "kind": "food",
+        "foodId": "almonds",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 narancs + 15 g mandula",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "15 g almonds"
+  },
+  {
+    "id": "meal-lunch-358",
+    "name": {
+      "en": "Quinoa with zucchini & pickles"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "quinoa",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "zucchini",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      },
+      {
+        "kind": "food",
+        "foodId": "pickles",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "150 g fott quinoa petrezselymesen + 200 g cukkinis lecso + 1 ek. joghurt + 60 g savanyu uborka",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-359",
+    "name": {
+      "en": "Cabbage with yogurt"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "cabbage",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g kaposztaleves + 1 ek joghurt",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-360",
+    "name": {
+      "en": "Wholemeal bread with mixed vegetables & extra virgin olive oil"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "eggplant",
+        "grams": 30
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "50 g teljes kiorlesu kenyer + 2 ek. vinetta (majonez helyett gorog joghurt 2%) + fel tanyer zoldseg + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "30 g eggplant"
+  },
+  {
+    "id": "meal-snack-361",
+    "name": {
+      "en": "Pomelo with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "pomelo",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "200 g pomelo + 20 g kesudio",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "20 g cashews"
+  },
+  {
+    "id": "meal-lunch-362",
+    "name": {
+      "en": "Chicken thigh with zucchini & pickles"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-thigh",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "zucchini",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      },
+      {
+        "kind": "food",
+        "foodId": "pickles",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g csirkecomb + 200 g cukkinis lecso + 1 ek. joghurt + 60 g savanyu uborka",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-363",
+    "name": {
+      "en": "Mango with cashews"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "mango",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "150 g mango + 20 g kesudio",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "20 g cashews"
+  },
+  {
+    "id": "meal-breakfast-364",
+    "name": {
+      "en": "Rolled oats with kefir & mixed berries"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 5,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "kefir",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "oats",
+        "grams": 45
+      },
+      {
+        "kind": "food",
+        "foodId": "berries-mixed",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "1 sana + 3 ek. zabpehely + 100 g erdei gyumolcs",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-365",
+    "name": {
+      "en": "Banana with walnuts"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "banana",
+        "grams": 120
+      },
+      {
+        "kind": "food",
+        "foodId": "walnuts",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 banan + 20 g dio",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-366",
+    "name": {
+      "en": "Celeriac purée with chicken thigh & cucumber"
+    },
+    "emoji": "🥔",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-thigh",
+        "grams": 100
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-celeriac-puree",
+        "servings": 0.85
+      },
+      {
+        "kind": "food",
+        "foodId": "cucumber",
+        "grams": 70
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g csirkecomb + 200 g zellerpure (70 % zeller + 30% krumpli) + 70 g uborka",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-367",
+    "name": {
+      "en": "Red kidney beans with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "beans-kidney-cooked",
+        "grams": 70
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes salata + 70 g voros paszuly fove + 1 tk. olivaolaj",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "70 g red kidney beans"
+  },
+  {
+    "id": "meal-lunch-369",
+    "name": {
+      "en": "Quinoa with extra virgin olive oil & Telemea"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "mushrooms",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 15
+      },
+      {
+        "kind": "food",
+        "foodId": "quinoa",
+        "grams": 56
+      },
+      {
+        "kind": "food",
+        "foodId": "spinach",
+        "grams": 30
+      },
+      {
+        "kind": "food",
+        "foodId": "telemea",
+        "grams": 40
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "quinoas gombas salata : 150 g gomba megparolva 1 ek. olivaolajban + 140 g fott quinoa + egy marek friss spenot/ rukkola + 40 g telemea",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-370",
+    "name": {
+      "en": "Cottage cheese with bell pepper"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bell-pepper",
+        "grams": 120
+      },
+      {
+        "kind": "food",
+        "foodId": "cottage-cheese",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "paprikara + turókrém (70 g tehenturó osszekavarva + 1 ek joghurtal + hagyma/ kapor)",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-371",
+    "name": {
+      "en": "Baked sweet potato with trout & garlic"
+    },
+    "emoji": "🍠",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 40,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "trout",
+        "grams": 100
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-baked-sweet-potato",
+        "servings": 0.73
+      },
+      {
+        "kind": "food",
+        "foodId": "broccoli",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "garlic",
+        "grams": 30
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "1 pisztrang + 150 g edeskrumpli a lerben + 50 g brokkoli + 1-2 ek. fokhagymasz joghurtos szosz",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-372",
+    "name": {
+      "en": "Green bean soup with yogurt"
+    },
+    "emoji": "🍲",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-ciorba-green-bean",
+        "servings": 0.53
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g zoldpaszuly leves + 1 ek. joghurt",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-373",
+    "name": {
+      "en": "Omelette with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🍳",
+    "servings": 1,
+    "prepMinutes": 6,
+    "cookMinutes": 8,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-omelette",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "zucchini",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "cukkinis rantotta : 2 tojasbol es 50 g cukkinivel + fel tanyer zoldseg + 1 tk. Olivaolaj + 40 g teljes kiorlesu kenyer",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "40 g wholemeal bread, 50 g zucchini"
+  },
+  {
+    "id": "meal-lunch-374",
+    "name": {
+      "en": "Baked sweet potato with Telemea & red kidney beans"
+    },
+    "emoji": "🍠",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 40,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-baked-sweet-potato",
+        "servings": 0.98
+      },
+      {
+        "kind": "food",
+        "foodId": "telemea",
+        "grams": 80
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "beans-kidney-cooked",
+        "grams": 50
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "200 g edeskrumpli a lerben + 80 g reszelt telemea + vegyes salata + 1 tk. Olivaolaj + 50 g voros paszuly",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-375",
+    "name": {
+      "en": "Rolled oats with yogurt & cashews"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 6,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "oats",
+        "grams": 45
+      },
+      {
+        "kind": "food",
+        "foodId": "berries-mixed",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "cashews",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "150 g joghurt + 3 ek zabpehely + 100 g erdei gyumolcs + 15 g kesudio",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-376",
+    "name": {
+      "en": "Banana with kiwi"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "banana",
+        "grams": 120
+      },
+      {
+        "kind": "food",
+        "foodId": "kiwi",
+        "grams": 120
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 banan + 120 g kiwi",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-377",
+    "name": {
+      "en": "Buckwheat with mozzarella & chicken breast"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "buckwheat",
+        "grams": 56
+      },
+      {
+        "kind": "food",
+        "foodId": "pickles",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "mozzarellas csirke: 100 g csirkehus + 60 g mozzarella + 140 g fott hajdina + 50 g savanyu uborka",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-378",
+    "name": {
+      "en": "Hummus with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      },
+      {
+        "kind": "food",
+        "foodId": "hummus",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "40 g teljes kiorlesu kenyer + 60 g humusz + fel tanyer zoldseg + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "60 g hummus, 5 g extra virgin olive oil"
+  },
+  {
+    "id": "meal-lunch-379",
+    "name": {
+      "en": "Buckwheat with mozzarella, chicken breast & bell pepper"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "buckwheat",
+        "grams": 56
+      },
+      {
+        "kind": "food",
+        "foodId": "bell-pepper",
+        "grams": 120
+      },
+      {
+        "kind": "food",
+        "foodId": "pickles",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "mozzarellas csirke: 100 g csirkehus + 60 g mozzarella + 140 g fott hajdina + 1 sult paprika + 30 g savanyu uborka",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-380",
+    "name": {
+      "en": "Pumpkin seeds with zucchini & yogurt"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "zucchini",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      },
+      {
+        "kind": "food",
+        "foodId": "pumpkin-seeds",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g cukkinikremleves + 1 ek. joghurt + 10 g piritott tokmag",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-381",
+    "name": {
+      "en": "Celeriac purée with egg & beetroot"
+    },
+    "emoji": "🥔",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 55
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-celeriac-puree",
+        "servings": 0.77
+      },
+      {
+        "kind": "food",
+        "foodId": "beetroot",
+        "grams": 70
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g csirkehusos zoldsegfasirt (50% hus, 50 g murok, krumpli, + 1 tojas, petrezselyemzold) + 180 g zellerpure + 70 g cekla",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-383",
+    "name": {
+      "en": "Egg spread with wholemeal bread, mixed vegetables & extra virgin olive oil"
+    },
+    "emoji": "🥚",
+    "servings": 1,
+    "prepMinutes": 16,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-egg-spread",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "pumpkin-seeds",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "40 g teljes kiorlesu kenyer + tojaskrem (1 fott tojas, joghurt, reszelt hagyma, so, bors, mustar) + fel tanyer zoldseg + 5 g piritott tokmag + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-385",
+    "name": {
+      "en": "Quinoa with extra virgin olive oil & chickpeas"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "quinoa",
+        "grams": 56
+      },
+      {
+        "kind": "food",
+        "foodId": "chickpeas-cooked",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "quinoa Sali : 140 g fott quinoa + 50 g csicseriborso + zoldsegek + 2 tk. Olivaolaj",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-386",
+    "name": {
+      "en": "Raw vegetable salad with yogurt"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g salataleves + 1 ek joghurt",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-388",
+    "name": {
+      "en": "Trout with mixed vegetables & garlic"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 14,
+    "cookMinutes": 22,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "trout",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "garlic",
+        "grams": 3
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "1 pisztrang + 200 g parolt zoldsegek + joghurt alapu fokhagyma szosz",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-389",
+    "name": {
+      "en": "Squash stew with egg"
+    },
+    "emoji": "🥘",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 55
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-squash-stew",
+        "servings": 0.47
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g csirkehusos zoldsegfasirt (50% hus, 50 g murok, krumpli, + 1 tojas, petrezselyemzold) + 200 g tokfozelek + 1 ek. joghurt",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-391",
+    "name": {
+      "en": "Mozzarella with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 65
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes salata + 65 g mozzarella + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "65 g mozzarella"
+  },
+  {
+    "id": "meal-breakfast-392",
     "name": {
       "en": "Rolled oats with yogurt & mixed berries"
     },
@@ -5349,13 +10592,259 @@ export const MEAL_RECIPES: Recipe[] = [
     "tags": [
       "breakfast"
     ],
-    "sourceLine": "150 g joghurt + 45 g zabpehely + 100 g erdei gyumolcs",
-    "sourcePlanId": "plan-13",
-    "createdAt": "2021-01-18T00:00:00.000Z",
+    "sourceLine": "150 g joghurt + 3 ek zabpehely + 100 g erdei gyumolcs",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z",
     "variant": "45 g rolled oats"
   },
   {
-    "id": "meal-dinner-205",
+    "id": "meal-snack-393",
+    "name": {
+      "en": "Orange with almonds"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "orange",
+        "grams": 180
+      },
+      {
+        "kind": "food",
+        "foodId": "almonds",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "1 narancs + 20 g mandula",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "20 g almonds"
+  },
+  {
+    "id": "meal-lunch-394",
+    "name": {
+      "en": "Egg muffins with wholemeal bread & sweetcorn"
+    },
+    "emoji": "🧁",
+    "servings": 1,
+    "prepMinutes": 13,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "spinach",
+        "grams": 180
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-egg-muffins",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "corn",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "200 g spenot (1 tk. Lisztel /adag) + tojasos muffin (3 tojasbol, 60 g kukorica, 2-3 gomba, zoldhagyma / 2 nap) + 40 g teljes kiorlesu kenyer",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-395",
+    "name": {
+      "en": "Chicken breast"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 300
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g csirkehusos zoldsegleves",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-396",
+    "name": {
+      "en": "Cottage cheese with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "cottage-cheese",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "200 g cottage turo + fel tanyer zoldseg + 40 g teljes kiorlesu kenyer piritva",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "40 g wholemeal bread"
+  },
+  {
+    "id": "meal-breakfast-397",
+    "name": {
+      "en": "Bruschetta with telemea"
+    },
+    "emoji": "🍞",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-bruschetta",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "oregano",
+        "grams": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "bruschetta : 40 g teljes kiorlesu kenyer piritva + paradicsom, 40 g telemea, oregano, bazsalikom + 2 tk. Olivaolaj, fokhagyma",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "10 g extra virgin olive oil"
+  },
+  {
+    "id": "meal-lunch-398",
+    "name": {
+      "en": "Chicken thigh with cabbage & yogurt"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-thigh",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "cabbage",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g csirkecomb + 200 g parolt kaposzta + 1 ek. joghurt",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-399",
+    "name": {
+      "en": "Tuna spread with wholemeal bread & cottage cheese"
+    },
+    "emoji": "🐟",
+    "servings": 1,
+    "prepMinutes": 15,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-tuna-spread",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "corn",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "cottage-cheese",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "40 g teljes kiorlesu kenyer + tonhalkrem (1 nagy tonhal konzerv sajat leveben + 60 g kukorica, 60 g tehenturo, 1 ek. joghurt + a tobbi ami a receptben van / 2 adag) + fel tanyer zoldseg + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-dinner-402",
     "name": {
       "en": "Telemea with pumpkin seeds & raw vegetable salad"
     },
@@ -5390,11 +10879,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "dinner"
     ],
     "sourceLine": "vegyes salata + 50 g telemea + 1 tk. olivaolaj + 10 g tokmag",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-206",
+    "id": "meal-breakfast-403",
     "name": {
       "en": "Egg spread with wholemeal bread & pumpkin seeds"
     },
@@ -5434,11 +10923,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "breakfast"
     ],
     "sourceLine": "50 g teljes kiorlesu kenyer + tojaskrem (2 tojas) + fel tanyer zoldseg + 1 tk. olivaolaj + 10 g tokmag",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-209",
+    "id": "meal-dinner-405",
     "name": {
       "en": "Kohlrabi soup with yogurt"
     },
@@ -5463,11 +10952,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "dinner"
     ],
     "sourceLine": "300 g karalabeleves (1 tk. olivaolajjal) + 1 ek. joghurt",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-210",
+    "id": "meal-breakfast-406",
     "name": {
       "en": "Wholemeal bread with feta & mixed vegetables"
     },
@@ -5507,11 +10996,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "breakfast"
     ],
     "sourceLine": "50 g teljes kiorlesu kenyer + vinetta + fel tanyer zoldseg + 1 tk. olivaolaj + 25 g telemea / feta",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-211",
+    "id": "meal-lunch-407",
     "name": {
       "en": "Bulgur with chicken breast & raw vegetable salad"
     },
@@ -5546,11 +11035,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "lunch"
     ],
     "sourceLine": "100 g grill csirkemell + 50 g nyers bulgur + vegyes salata + 1 tk. olivaolaj",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-212",
+    "id": "meal-snack-408",
     "name": {
       "en": "Yogurt with mixed berries & almonds"
     },
@@ -5580,50 +11069,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "snack"
     ],
     "sourceLine": "150 g joghurt + 100 g erdei gyumolcs + 10 g mandula / dio",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-213",
-    "name": {
-      "en": "Wholemeal bread with mixed vegetables & extra virgin olive oil"
-    },
-    "emoji": "🌅",
-    "servings": 1,
-    "prepMinutes": 11,
-    "cookMinutes": 18,
-    "components": [
-      {
-        "kind": "food",
-        "foodId": "bread-wholemeal",
-        "grams": 50
-      },
-      {
-        "kind": "food",
-        "foodId": "eggplant",
-        "grams": 100
-      },
-      {
-        "kind": "food",
-        "foodId": "vegetables-mixed",
-        "grams": 150
-      },
-      {
-        "kind": "food",
-        "foodId": "olive-oil",
-        "grams": 5
-      }
-    ],
-    "steps": [],
-    "tags": [
-      "breakfast"
-    ],
-    "sourceLine": "50 g teljes kiorlesu kenyer + vinetta + fel tanyer zoldseg + 1 tk. olivaolaj",
-    "sourcePlanId": "plan-13",
-    "createdAt": "2021-01-18T00:00:00.000Z"
-  },
-  {
-    "id": "meal-snack-214",
+    "id": "meal-snack-410",
     "name": {
       "en": "Apple with walnuts"
     },
@@ -5648,12 +11098,12 @@ export const MEAL_RECIPES: Recipe[] = [
       "snack"
     ],
     "sourceLine": "1 alma + 15 g dio",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z",
     "variant": "15 g walnuts"
   },
   {
-    "id": "meal-lunch-215",
+    "id": "meal-lunch-411",
     "name": {
       "en": "Bulgur with chicken breast & pumpkin seeds"
     },
@@ -5693,11 +11143,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "lunch"
     ],
     "sourceLine": "120 g grill csirkemell + 50 g nyers bulgur + vegyes salata + 1 tk. olivaolaj + 10 g tokmag",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-216",
+    "id": "meal-snack-412",
     "name": {
       "en": "Pomelo with cashews"
     },
@@ -5722,11 +11172,12 @@ export const MEAL_RECIPES: Recipe[] = [
       "snack"
     ],
     "sourceLine": "250 g pomelo + 10 g kesudio",
-    "sourcePlanId": "plan-13",
-    "createdAt": "2021-01-18T00:00:00.000Z"
+    "sourcePlanId": "plan-24",
+    "createdAt": "2021-01-18T00:00:00.000Z",
+    "variant": "10 g cashews"
   },
   {
-    "id": "meal-dinner-217",
+    "id": "meal-dinner-413",
     "name": {
       "en": "Feta with raw vegetable salad & extra virgin olive oil"
     },
@@ -5756,11 +11207,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "dinner"
     ],
     "sourceLine": "vegyes salata + 50 g feta + 1 tk. olivaolaj",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-218",
+    "id": "meal-breakfast-414",
     "name": {
       "en": "Egg muffins with wholemeal bread & mixed vegetables"
     },
@@ -5790,11 +11241,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "breakfast"
     ],
     "sourceLine": "tojasos muffin (1,5 tojas + zoldsegek/ adag)+ fel tanyer zoldseg + 1 tk. olivaolaj + 40 g teljes kiorlesu kenyer",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-219",
+    "id": "meal-lunch-415",
     "name": {
       "en": "Lentil stew with tofu"
     },
@@ -5819,11 +11270,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "lunch"
     ],
     "sourceLine": "150 g tofu + lencsefozelek (65 g nyers lencse es 1 tk. olivaolaj / adag)",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-220",
+    "id": "meal-dinner-416",
     "name": {
       "en": "Tuna in brine with raw vegetable salad & extra virgin olive oil"
     },
@@ -5853,11 +11304,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "dinner"
     ],
     "sourceLine": "vegyes salata + 130 g tonhal + 1 tk. olivaolaj",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-221",
+    "id": "meal-dinner-417",
     "name": {
       "en": "Beef sour soup with yogurt"
     },
@@ -5882,11 +11333,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "dinner"
     ],
     "sourceLine": "350 g marhahusos csorba (35 g marhahus, 1 tk. olivaolaj / adag) + 1 ek. joghurt",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-223",
+    "id": "meal-snack-419",
     "name": {
       "en": "Orange with walnuts"
     },
@@ -5911,11 +11362,12 @@ export const MEAL_RECIPES: Recipe[] = [
       "snack"
     ],
     "sourceLine": "1 narancs + 10 g dio",
-    "sourcePlanId": "plan-13",
-    "createdAt": "2021-01-18T00:00:00.000Z"
+    "sourcePlanId": "plan-24",
+    "createdAt": "2021-01-18T00:00:00.000Z",
+    "variant": "10 g walnuts"
   },
   {
-    "id": "meal-lunch-224",
+    "id": "meal-lunch-420",
     "name": {
       "en": "Roasted vegetables with cod"
     },
@@ -5940,11 +11392,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "lunch"
     ],
     "sourceLine": "150 g feher husu hal + 250 g zoldsegkoret (cukkini, paradicsom, edeskrumpli, brokkoli, 2 tk. olivaolaj)",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-225",
+    "id": "meal-snack-421",
     "name": {
       "en": "Pear with walnuts"
     },
@@ -5969,11 +11421,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "snack"
     ],
     "sourceLine": "1 korte + 10 g dio",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-226",
+    "id": "meal-dinner-422",
     "name": {
       "en": "Beef sour soup with wholemeal bread & yogurt"
     },
@@ -6003,11 +11455,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "dinner"
     ],
     "sourceLine": "300 g marhahusos csorba (35 g marhahus, 1 tk. olivaolaj / adag) + 1 ek. joghurt + 25 g teljes kiorlesu kenyer",
-    "sourcePlanId": "plan-13",
+    "sourcePlanId": "plan-24",
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-228",
+    "id": "meal-lunch-423",
     "name": {
       "en": "Chicken with mozzarella & tomato, bulgur & pickles"
     },
@@ -6037,11 +11489,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "lunch"
     ],
     "sourceLine": "piept de pui cu mozzarella si sos de rosii (100 g piept de pui, 30 g mozzarella), 50 g bulgur nefiert, castraveti murati",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-229",
+    "id": "meal-snack-424",
     "name": {
       "en": "Grapefruit with cashews"
     },
@@ -6066,12 +11518,12 @@ export const MEAL_RECIPES: Recipe[] = [
       "snack"
     ],
     "sourceLine": "150 g grapefruit, 20 g caju",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z",
     "variant": "20 g cashews, 150 g grapefruit"
   },
   {
-    "id": "meal-snack-230",
+    "id": "meal-snack-425",
     "name": {
       "en": "Banana with cashews"
     },
@@ -6096,11 +11548,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "snack"
     ],
     "sourceLine": "150 g banana, 10 g caju",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-231",
+    "id": "meal-lunch-426",
     "name": {
       "en": "Salmon with raw vegetable salad & extra virgin olive oil"
     },
@@ -6130,11 +11582,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "lunch"
     ],
     "sourceLine": "125 g somon, 200 g piure de conopida salata de cruditati, o lingurita de ulei de masline",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-233",
+    "id": "meal-lunch-428",
     "name": {
       "en": "Salmon with sweet potato & raw vegetable salad"
     },
@@ -6164,12 +11616,12 @@ export const MEAL_RECIPES: Recipe[] = [
       "lunch"
     ],
     "sourceLine": "125 g somon, 200 g cartofi dulci la cuptor, salata de cruditati",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z",
     "variant": "no yogurt garlic sauce"
   },
   {
-    "id": "meal-dinner-234",
+    "id": "meal-dinner-429",
     "name": {
       "en": "Tomato & mushroom bruschetta with sautéed mushrooms"
     },
@@ -6199,11 +11651,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "dinner"
     ],
     "sourceLine": "bruschete cu rosii si ciuperci : 50 g paine int, 4-5 buc. de ciuperci calite intr-o lingurita de ulei de masline, rosii, busuioc, usturoi",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-236",
+    "id": "meal-lunch-431",
     "name": {
       "en": "Fried eggs with creamed spinach"
     },
@@ -6228,11 +11680,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "lunch"
     ],
     "sourceLine": "2 ochiuri, 250 g mancare de spanac (o lingurita de ulei / portie)",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-237",
+    "id": "meal-dinner-432",
     "name": {
       "en": "Lentils with puffed rice cakes & raw vegetable salad"
     },
@@ -6267,11 +11719,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "dinner"
     ],
     "sourceLine": "salata de cruditati, 50 g linte nefiarta, o lingurita de ulei de masline, 15 g orez expandat",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-238",
+    "id": "meal-snack-433",
     "name": {
       "en": "Pear with almonds"
     },
@@ -6296,12 +11748,12 @@ export const MEAL_RECIPES: Recipe[] = [
       "snack"
     ],
     "sourceLine": "150 g pere, 15 g migdale",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z",
     "variant": "15 g almonds"
   },
   {
-    "id": "meal-lunch-239",
+    "id": "meal-lunch-434",
     "name": {
       "en": "Tabbouleh with pork loin under the lid & mixed vegetables"
     },
@@ -6331,11 +11783,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "lunch"
     ],
     "sourceLine": "100 g cotlet la gratar, salata tabbouleh (50 g quinoa nefiarta, legume, o lingurita de ulei de masline)",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-240",
+    "id": "meal-dinner-435",
     "name": {
       "en": "Cream of asparagus soup with wholemeal bread"
     },
@@ -6360,11 +11812,11 @@ export const MEAL_RECIPES: Recipe[] = [
       "dinner"
     ],
     "sourceLine": "350 g supa crema de sparanghel (o lingurita de ulei de masline / portie), 25 g paine int",
-    "sourcePlanId": "plan-14",
+    "sourcePlanId": "plan-25",
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-241",
+    "id": "meal-breakfast-436",
     "name": {
       "en": "Carrot salad with mozzarella & wholemeal bread"
     },
@@ -6394,7 +11846,8 @@ export const MEAL_RECIPES: Recipe[] = [
       "breakfast"
     ],
     "sourceLine": "50 g paine int + 125 g mozzarella in apa, salata de morcovi + o lingurita de ulei de masline",
-    "sourcePlanId": "plan-14",
-    "createdAt": "2022-05-09T00:00:00.000Z"
+    "sourcePlanId": "plan-25",
+    "createdAt": "2022-05-09T00:00:00.000Z",
+    "variant": "125 g mozzarella"
   }
 ]
