@@ -51,7 +51,16 @@ export default function Planner() {
   } = useMealPlanStore()
   const ctx = useNutritionContext()
 
-  const [range, setRange] = useState<PlanRange>('week')
+  /*
+   * The day, not the week.
+   *
+   * The week grid is the better view for planning and the wrong one for the
+   * thing this screen is opened for most: what am I eating now, and what have
+   * I had so far. That answer only exists in the day view, and it was two taps
+   * away every single time. Planning a week is deliberate and can afford a
+   * tap; checking off a snack cannot.
+   */
+  const [range, setRange] = useState<PlanRange>('day')
   /**
    * The day being looked at, derived rather than stored.
    *
@@ -164,6 +173,12 @@ export default function Planner() {
    * only what is drawn narrows to one date.
    */
   const windowRange: PlanRange = range === 'day' ? 'week' : range
+  /*
+   * Named after the window, not the view. The summary underneath a day still
+   * sums the week the day sits in, and keying its wording off the view meant
+   * that opening on the day view called that week "this fortnight".
+   */
+  const spanPhrase = windowRange === 'week' ? 'this week' : 'in this fortnight'
   const windowDates = useMemo(
     () => getRangeDates(weekDates[0], windowRange),
     [weekDates, windowRange],
@@ -507,14 +522,14 @@ export default function Planner() {
               cannot see in any case. */}
           <span>
             {plannedDays === 0 ? (
-              <>Nothing planned {range === 'week' ? 'this week' : 'in this fortnight'} yet.</>
+              <>Nothing planned {spanPhrase} yet.</>
             ) : (
               <>
                 <strong className="font-mono">
                   {Math.round(weekTotal.calories / plannedDays)}
                 </strong>{' '}
                 kcal a day on average, across {plannedDays} planned {plannedDays === 1 ? 'day' : 'days'}
-                {range === 'week' ? ' this week' : ' in this fortnight'}.
+                {' '}{spanPhrase}.
               </>
             )}
           </span>
