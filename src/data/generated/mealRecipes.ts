@@ -1593,7 +1593,7 @@ export const MEAL_RECIPES: Recipe[] = [
       {
         "kind": "food",
         "foodId": "brownie",
-        "grams": 60
+        "grams": 90
       },
       {
         "kind": "food",
@@ -3074,7 +3074,7 @@ export const MEAL_RECIPES: Recipe[] = [
       {
         "kind": "food",
         "foodId": "cake-coconut-raspberry",
-        "grams": 40
+        "grams": 90
       },
       {
         "kind": "food",
@@ -4632,7 +4632,7 @@ export const MEAL_RECIPES: Recipe[] = [
       {
         "kind": "food",
         "foodId": "pizza-slice",
-        "grams": 40
+        "grams": 110
       }
     ],
     "steps": [],

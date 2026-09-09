@@ -59,6 +59,11 @@ const ITEM_GRAMS: Record<string, number> = {
   kiwi: 75,
   mango: 200,
   ou: 55, oua: 55, tojas: 55,
+  // A slice of nothing in particular. Every word above names one food and can
+  // carry one weight; this one names a shape, and a slice of pizza, of bread
+  // and of cake are three different things. The importer asks the food it
+  // resolved what its own slice weighs and only falls back to this when the
+  // food has not said.
   felie: 40,
   clementina: 75, clementine: 75, mandarina: 75,
 }
