@@ -311,6 +311,250 @@ const PHRASES: Record<string, string> = {
   'brokkoli': 'broccoli',
   'sos': 'sauce',
   'pizza': 'pizza',
+  'supa': 'soup',
+  'crema': 'cream',
+  'briose': 'muffins',
+  'tigaie': 'pan',
+  'nefierte': 'uncooked',
+  'branza': 'cheese',
+
+  // ─── Hungarian ────────────────────────────────────────────────────────────
+  // The twelve weeks that arrived as PDFs are almost all Hungarian, and the
+  // table above had been written against fourteen mostly Romanian ones. Every
+  // word here was a word somebody could not read on the screen.
+  'teljes kiorlesu kenyer': 'wholemeal bread',
+  'teljes kiorlesu': 'wholemeal',
+  'vanilia eszencia': 'vanilla extract',
+  'tehenturo': 'curd cheese',
+  'tokehal': 'cod',
+
+  // Főzelék is a thickened vegetable stew, eaten as the main part of a meal.
+  'borsofozelek': 'pea stew',
+  'gombafozelek': 'mushroom stew',
+  'tokfozelek': 'squash stew',
+  'fozelek': 'stew',
+
+  'brokkolifasirt': 'broccoli patties',
+  'lencsefasirt': 'lentil patties',
+  'zoldsegfasirt': 'vegetable patties',
+  'csirkehusos zoldsegfasirt': 'chicken and vegetable patties',
+  'fasirt': 'patties',
+  'gombapaprikas': 'mushroom paprikash',
+  'csirkehusos': 'chicken',
+  'csirkehus': 'chicken',
+  'csirkes': 'chicken',
+  'csirke': 'chicken',
+  'tukortojas': 'fried eggs',
+  'rantotta': 'scrambled eggs',
+  'tojasbol': 'from eggs',
+  'zabliszt': 'oat flour',
+  'korozott': 'Hungarian cheese spread',
+  'botos': 'chicken with mushrooms and peppers',
+  'borsopure': 'pea puree',
+  'salsa hal': 'fish with salsa',
+
+  'zoldseges': 'with vegetables',
+  'gyumolcs': 'fruit',
+  'kaposzta': 'cabbage',
+  'grepfrut': 'grapefruit',
+  'petrezselymes': 'parsley',
+  'mozzarellas': 'mozzarella',
+  'csicseriborsos': 'chickpea',
+  'csicseriborso': 'chickpeas',
+  'telemeas': 'telemea',
+  'quinoas': 'quinoa',
+  'cukkinis': 'courgette',
+  'gombas': 'mushroom',
+  'joghurtos': 'yogurt',
+  'rizses': 'rice',
+  'rukkola': 'rocket',
+  'tokmag': 'pumpkin seeds',
+  'kesudio': 'cashews',
+  'murok': 'carrot',
+  'cekla': 'beetroot',
+  'korte': 'pear',
+  'banan': 'banana',
+  'tanyer': 'plate',
+  'salata': 'salad',
+  'sali': 'salad',
+  'vegyes': 'mixed',
+  'savanyu': 'sour',
+  'megfozve': 'cooked',
+  'roston': 'grilled',
+  'parolt': 'steamed',
+  'piritott': 'toasted',
+  'piritva': 'toasted',
+  'csapott': 'level',
+  'pikans': 'spicy',
+  'eszenc': 'essence',
+  'barna': 'brown',
+  'szosz': 'sauce',
+  'pure': 'puree',
+  'krem': 'cream',
+  'etel': 'dish',
+  'sult': 'roast',
+  'vagy': 'or',
+  'hus': 'meat',
+  'hal': 'fish',
+  'viz': 'water',
+  'dio': 'walnuts',
+  'so': 'salt',
+  'tk': 'tsp',
+  'ek': 'tbsp',
+  'db': 'pieces',
+  'zoldsegleves': 'vegetable soup',
+  'kaposztaleves': 'cabbage soup',
+  'leves': 'soup',
+  'turokorozott': 'curd cheese spread',
+  'tehenturos': 'curd cheese',
+  'petrezselyemzold': 'parsley',
+  'komenymag': 'caraway seeds',
+  'granatalma': 'pomegranate',
+  'gyumolcssalata': 'fruit salad',
+  'muroksalata': 'carrot salad',
+  'szilvas suti': 'plum cake',
+  'sajat leveben': 'in its own juice',
+  'barnarizs': 'brown rice',
+  'edeskrumplis': 'sweet potato',
+  'paszulyos': 'bean',
+  'gombabol': 'from mushrooms',
+  'joghurtbol': 'from yogurt',
+  'muffinhoz': 'for muffins',
+  'megdinsztelve': 'braised',
+  'megpiritva': 'toasted',
+  'elkeszitve': 'prepared',
+  'fokhagymas': 'garlic',
+  'paradicsomos': 'tomato',
+  'gyumolcsos': 'fruit',
+  'mexikoi': 'Mexican',
+  'adaghoz': 'per serving',
+  'egy marek': 'a handful',
+  'joghurttal': 'with yogurt',
+  'murokkal': 'with carrot',
+  'fahejjal': 'with cinnamon',
+  'fahejas': 'cinnamon',
+  'vinettas': 'aubergine',
+  'hagymas': 'onion',
+  'kapia': 'kapia pepper',
+  'lesutve': 'pan-fried',
+  'fustolt': 'smoked',
+  'greceasca': 'Greek',
+  'grecesc': 'Greek',
+  'perisoare': 'meatballs',
+  'ciorba': 'sour soup',
+  'leveben': 'in its juice',
+  'gorog': 'Greek',
+  'marek': 'handful',
+  'lecso': 'lecso',
+  'koret': 'side',
+  'liszt': 'flour',
+  'szilvas': 'plum',
+  'mangos': 'mango',
+  'almas': 'apple',
+  'magos': 'seeded',
+  'umplut': 'stuffed',
+  'fulgi': 'flakes',
+  'puding': 'pudding',
+  'piros': 'red',
+  'voros': 'red',
+  'zold': 'green',
+  'nagy': 'large',
+  'sajat': 'own',
+  'vanilia': 'vanilla',
+  'pancakes': 'pancakes',
+  'olaj': 'oil',
+  'suti': 'cake',
+  'mult': 'much',
+  'mag': 'seeds',
+  'mix': 'mix',
+  'sau': 'or',
+  'egy': 'one',
+  'intr': 'in',
+  'int': 'wholemeal',
+  'cukkinikremleves': 'cream of courgette soup',
+  'kaposztasalata': 'cabbage salad',
+  'osszekavarva': 'stirred together',
+  'petrezselymesen': 'with parsley',
+  'osszefozunk': 'cook together',
+  'avokadokrem': 'avocado spread',
+  'turokrem': 'curd cheese spread',
+  'fokhagymasz': 'garlic sauce',
+  'cukkinivel': 'with courgette',
+  'salataleves': 'salad soup',
+  'kaposztabol': 'from cabbage',
+  'kolozsvari': 'Kolozsvar style',
+  'lagytojas': 'soft boiled egg',
+  'zoldhagyma': 'spring onion',
+  'puffasztott': 'puffed',
+  'megparolva': 'steamed',
+  'beaztatunk': 'soak',
+  'hozzaadunk': 'add',
+  'chiamagot': 'chia seeds',
+  'chiamag': 'chia seeds',
+  'receptben': 'in the recipe',
+  'quinoaval': 'with quinoa',
+  'joghurtal': 'with yogurt',
+  'paprikara': 'on peppers',
+  'almaval': 'with apple',
+  'fetaval': 'with feta',
+  'esetleg': 'optionally',
+  'kozepes': 'medium',
+  'meretu': 'sized',
+  'ejjelre': 'overnight',
+  'majonez': 'mayonnaise',
+  'helyett': 'instead of',
+  'rukkolas': 'rocket',
+  'tortilla': 'tortilla',
+  'konzerv': 'tinned',
+  'percig': 'minutes',
+  'mindent': 'everything',
+  'daralt': 'minced',
+  'lisztel': 'with flour',
+  'tekercs': 'roll',
+  'aprora': 'finely',
+  'reggel': 'in the morning',
+  'zsalya': 'sage',
+  'levelu': 'leaved',
+  'hasab': 'wedges',
+  'ontet': 'dressing',
+  'friss': 'fresh',
+  'retek': 'radish',
+  'vagva': 'chopped',
+  'fenyo': 'pine',
+  'erdei': 'wild',
+  'alapu': 'based',
+  'alap': 'base',
+  'lagy': 'soft',
+  'fove': 'boiled',
+  'tobbi': 'the rest',
+  'baby': 'baby',
+  'nap': 'day',
+  'kis': 'small',
+  'lap': 'sheet',
+  'ami': 'which',
+  'van': 'is',
+}
+
+/**
+ * The accented spellings of each plain letter, so a key written once matches
+ * however she spelled it.
+ *
+ * The table below is keyed unaccented, because the fourteen weeks it was
+ * written against were typed that way. The twelve that arrived as PDFs are
+ * fully accented: "fél tányér zöldség" against a key of "fel tanyer zoldseg".
+ * Writing every phrase twice would double a hundred lines and leave the two
+ * copies to drift, so the key is expanded into a pattern instead.
+ */
+const ACCENTS: Record<string, string> = {
+  a: 'aáàâăä', e: 'eéèêë', i: 'iíìîï', o: 'oóòôöő',
+  u: 'uúùûüű', s: 'sșşš', t: 'tțţ', c: 'cç', n: 'nñ', z: 'zž',
+}
+
+/** One phrase, as a pattern that reads through its accents. */
+export function accentInsensitive(phrase: string): string {
+  return phrase
+    .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    .replace(/[a-z]/g, (ch) => (ACCENTS[ch] ? `[${ACCENTS[ch]}]` : ch))
 }
 
 /** Words a line can contain that need no translation. */
@@ -358,9 +602,17 @@ export function toEnglish(line: string, dictionary: [string, string][]): string 
   let out = ` ${line.toLowerCase()} `
 
   for (const [from, to] of dictionary) {
+    /*
+     * `u`, so that a letter means a letter.
+     *
+     * The class used to be `a-zà-ÿ`, which is Latin-1 and stops at ÿ. Hungarian
+     * ő and ű live past it, and so do Romanian ă, ș and ț, so every word
+     * carrying one was treated as two: "kiőrlésű" was "ki" and "rlés", "főtt"
+     * was "f" and "tt", and neither half matched anything in the dictionary.
+     */
     const pattern = new RegExp(
-      `(^|[^a-zà-ÿ])${from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').trim()}(?=[^a-zà-ÿ]|$)`,
-      'gi',
+      `(^|[^\\p{L}])${accentInsensitive(from.trim())}(?=[^\\p{L}]|$)`,
+      'giu',
     )
     out = out.replace(pattern, (_m, before: string) => {
       parked.push(to)
@@ -386,17 +638,17 @@ export function coverage(lines: string[], dictionary: [string, string][]): {
 } {
   const english = new Set<string>()
   for (const [, value] of dictionary) {
-    for (const word of value.toLowerCase().split(/[^a-zà-ÿ]+/)) if (word) english.add(word)
+    for (const word of value.toLowerCase().split(/[^\p{L}]+/u)) if (word) english.add(word)
   }
 
   const left = new Map<string, number>()
   let words = 0
 
   for (const line of lines) {
-    for (const word of toEnglish(line, dictionary).toLowerCase().split(/[^a-zà-ÿ0-9%½]+/)) {
+    for (const word of toEnglish(line, dictionary).toLowerCase().split(/[^\p{L}0-9%½]+/u)) {
       if (!word || PASS_THROUGH.test(word)) continue
       words++
-      if (/^[a-zà-ÿ]/.test(word) && !english.has(word)) {
+      if (/^\p{L}/u.test(word) && !english.has(word)) {
         left.set(word, (left.get(word) ?? 0) + 1)
       }
     }

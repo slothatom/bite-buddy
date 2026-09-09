@@ -453,6 +453,25 @@ const SPECS: DishSpec[] = [
     byWeight: true,
   },
 
+  {
+    id: 'dish-banana-oat-muffins', en: 'Banana & oat muffins', hu: 'banános zabmuffin', emoji: '🧁',
+    // Her own note on the line: six muffins from this.
+    servings: 6, parts: [['oats', 100], ['banana', 120], ['egg', 55], ['yogurt', 80], ['walnuts', 30]],
+    tags: ['batch', 'vegetarian'], prep: 10, cook: 25,
+    steps: ['Blend the oats, banana, egg and yogurt to a batter.', 'Fold in the nuts and bake in a muffin tin.'],
+    aliases: ['banános zabmuffin', 'zabmuffin', 'muffin'],
+  },
+  {
+    id: 'dish-botos-chicken', en: 'Chicken with mushrooms & peppers', hu: 'botos hús', emoji: '🍗',
+    // Her own note: 70 g of raw chicken breast and 150 g of vegetables, the
+    // vegetables being mushroom, pepper and onion.
+    servings: 1, parts: [['chicken-breast', 70], ['mushrooms', 70], ['bell-pepper', 50],
+      ['onion', 30], ['olive-oil', 5]],
+    tags: ['high-protein', 'quick'], prep: 10, cook: 15,
+    steps: ['Sear the chicken.', 'Add the sliced mushrooms, pepper and onion and cook down.'],
+    aliases: ['botos hus', 'botos'],
+  },
+
   // ─── Mains ─────────────────────────────────────────────────────────────────
   {
     id: 'dish-spicy-pan-chicken', en: 'Spicy chicken & vegetable pan', ro: 'tigaie picantă', emoji: '🌶️',
@@ -509,7 +528,7 @@ const SPECS: DishSpec[] = [
     servings: 1, parts: [['cod', 150], ['avocado', 50], ['mango', 50], ['lemon-juice', 5], ['olive-oil', 5]],
     tags: ['pescatarian', 'high-protein'], prep: 12, cook: 12,
     steps: ['Roast or pan-fry the cod.', 'Dice avocado and mango with lemon and oil; spoon over.'],
-    aliases: ['cod cu sos de salsa'],
+    aliases: ['cod cu sos de salsa', 'salsa hal'],
   },
   {
     id: 'dish-salmon-sweet-potato', en: 'Baked salmon with sweet potato', ro: 'somon cu cartofi dulci la cuptor', emoji: '🐟',

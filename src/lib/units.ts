@@ -60,6 +60,7 @@ const ITEM_GRAMS: Record<string, number> = {
   kiwi: 75,
   mango: 200,
   ou: 55, oua: 55, tojas: 55,
+  avocado: 150, avokado: 150,
   // A slice of nothing in particular. Every word above names one food and can
   // carry one weight; this one names a shape, and a slice of pizza, of bread
   // and of cake are three different things. The importer asks the food it
@@ -158,7 +159,7 @@ export function parseFragment(fragment: string): ParsedQuantity {
    * directly that no letter follows, accented ones included, is what `\b` was
    * meant to say.
    */
-  const weight = text.match(/(\d+(?:[.,]\d+)?)\s*(g|gr|grame|ml|dl)(?![a-zà-ÿ])/i)
+  const weight = text.match(/(\d+(?:[.,]\d+)?)\s*(g|gr|grame|ml|dl)(?!\p{L})/iu)
   if (weight) {
     const value = parseNumber(weight[1]) ?? 0
     const grams = /^dl$/i.test(weight[2]) ? value * 100 : value
@@ -240,7 +241,7 @@ function statesAnAmount(text: string): boolean {
   const bare = text.replace(/\([^)]*\)/g, ' ')
   if (parseFragment(bare).grams === undefined) return false
   if (/\d/.test(bare)) return true
-  const words = bare.toLowerCase().split(/[^a-zà-ÿ.]+/)
+  const words = bare.toLowerCase().split(/[^\p{L}.]+/u)
   return words.some((w) => w in SPOON_GRAMS)
 }
 
@@ -280,7 +281,7 @@ const SPOON_STARTS = new RegExp(
  */
 function writesAnAmount(text: string): boolean {
   if (/\d/.test(text)) return true
-  const words = text.toLowerCase().split(/[^a-zà-ÿ.]+/)
+  const words = text.toLowerCase().split(/[^\p{L}.]+/u)
   return words.some((w) => w in SPOON_GRAMS)
 }
 

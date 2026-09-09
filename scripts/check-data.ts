@@ -72,6 +72,11 @@ const ENERGY_NOT_IN_MACROS = new Set([
   // check sharp for the foods where a disagreement really is a mis-keyed
   // number, which is the only reason it exists.
   'beer-lager', 'wine-red', 'wine-white',
+  // Most of brewer's yeast's fibre is beta-glucan, which ferments and yields
+  // energy, so its stated 325 kcal counts what the Atwater rule here assumes
+  // fibre does not. Subtracting it reads as a 14% error in a figure that is
+  // right.
+  'brewers-yeast',
 ])
 
 for (const food of FOODS) {

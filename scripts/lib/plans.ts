@@ -1,6 +1,7 @@
 import { readdirSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { readDocxParagraphs } from './docx.js'
+import { readPdfLines } from './pdf.js'
 import { splitComponents, parseFragment, normaliseTerm } from '../../src/lib/units.js'
 import type { MealSlot, PlanLanguage } from '../../src/types/index.js'
 
@@ -80,8 +81,13 @@ export interface RawPlan {
   days: RawDay[]
 }
 
+/** The lines of a plan, whichever of the two forms she sent it in. */
+function linesOf(path: string): string[] {
+  return path.toLowerCase().endsWith('.pdf') ? readPdfLines(path) : readDocxParagraphs(path)
+}
+
 function describeFile(file: string): Omit<RawPlan, 'days' | 'id' | 'file'> {
-  const name = basename(file, '.docx')
+  const name = basename(file, '.docx').replace(/\.pdf$/i, '')
   // Uploaded files carry an 8-hex prefix; strip it before matching.
   const stem = name.replace(/^[0-9a-f]{8}-/, '')
 
@@ -110,7 +116,7 @@ function parseDocument(path: string, id: string): RawPlan {
   const days: RawDay[] = []
   let current: RawDay | undefined
 
-  for (const line of readDocxParagraphs(path)) {
+  for (const line of linesOf(path)) {
     // Most documents write "Miercuri    :", but one writes a bare "MIERCURI".
     const bareDay = DAY_NAMES[normaliseTerm(line).replace(/\s+/g, '')]
     if (bareDay !== undefined) {
@@ -199,7 +205,7 @@ function titleCase(s: string): string {
 
 export function loadPlans(sourceDir: string): RawPlan[] {
   const files = readdirSync(sourceDir)
-    .filter((f) => f.toLowerCase().endsWith('.docx') && !f.startsWith('~$'))
+    .filter((f) => /\.(docx|pdf)$/i.test(f) && !f.startsWith('~$'))
     .sort()
 
   return files.map((f, i) => parseDocument(join(sourceDir, f), `plan-${String(i + 1).padStart(2, '0')}`))

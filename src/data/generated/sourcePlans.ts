@@ -7283,6 +7283,1086 @@ export const SOURCE_PLANS: SourcePlan[] = [
   },
   {
     "id": "plan-18",
+    "file": "Arany-Mák-01.12.2020.pdf",
+    "label": "Week of 1 Dec 2020",
+    "language": "ro",
+    "issuedOn": "2020-12-01",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + 80 g humusz + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-288",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grapefruit + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g brokkoli fasirt + 140 g főtt hajdina + 100 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-290",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + 80 g humusz + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-288",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "botos hús (70 g csirkemell nyersen, 150 g zöldség: gomba, paprika, hagyma) + 130 g főtt hajdina + 80 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-292",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g joghurt + 50 g erdei gyümölcs",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-293",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "2 főtt tojás + murok saláta + 1 tk. olívaolaj + 40 g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-294",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "botos hús (70 g csirkemell nyersen, 150 g zöldség + 170 g zellerpüré (70 % zeller, 30% krumpli) + 80 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-295",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "zabkása (100 ml tej, 100 ml víz, 30 g zabpehely, 1 reszelt alma, fahéj, vanília)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-porridge",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g klementin + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-297",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkemell roston + 250 g zöldség mix + 2 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-298",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 körte + 5 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-299",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + vinetta + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-300",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g kiwi + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-072",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g tofu + 250 g gombafőzelék (1 tk. olívaolaj, 50 g joghurt / adag)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-302",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-020",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + vinetta + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-300",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g kiwi + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-140",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g tofu + 250 g gombafőzelék (1 tk. olívaolaj / adag)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-302",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g klementin",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "clementine",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "cukkinis rántotta (2 tojás) + fél tányér zöldség + 1 tk. olívaolaj + 40 g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-305",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g lazac roston / lerben + 140 g főtt bulgur + vegyes saláta + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-306",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-19",
+    "file": "Arany-Mák-02.11.2020.pdf",
+    "label": "Week of 2 Nov 2020",
+    "language": "ro",
+    "issuedOn": "2020-11-02",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + körözött (100 g tehéntúró, 1 ek. joghurt, hagyma/kapor) + fél tányér zöldség + 10 g szezámmag + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-307",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "350 g csicseriborsós édeskrumplis étel + 100 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-309",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + körözött (80 g tehéntúró, 1 ek. joghurt, kapor/ hagyma) + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-310",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 körte + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-311",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "salsa hal (1 adag: fel avokadó, fel mangó, 150 g tőkehal) + 140 g főtt bulgur",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-312",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "telemeás bruschetta (50 g teljes kiőrlésű kenyér meg pirítva, 50 g telemea, paradicsom, fokhagyma, bazsalikom, 1 tk. olívaolaj)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-bruschetta",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "salsa hal (1 adag: fel avokadó, fel mangó, 150 g tőkehal) + 140 g főtt bulgur",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-312",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-020",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "almás fahéjas zabkása (30 g zabpehely)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-porridge",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-315",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g karaj grillen 1 tk. olívaolajjal + 200 g párolt káposzta + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-316",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 körte",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pear",
+                "grams": 170
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "2 tükörtojás + 150 g cékla saláta + 1 tk. olívaolaj + 40 g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-317",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-315",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "80 g karaj grillen 1 tk. olívaolajjal + 200 g párolt káposzta + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-318",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "80 g mozzarella + cékla saláta + 1 tk. olívaolaj + 50 g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-319",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g lencsefasirt + quinoás saláta (rukkola / spenót, 100 g párolt gomba, 150 g főtt quinoás) + 100 g joghurtból tzatziki szósz",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-320",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "3 db muffin (6 db muffinhoz: 100 g zabpehely, 1 banán, 1 tojás, 80 g joghurt, 30 g dió) + 150 g joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-321",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g lencsefasirt + quinoás saláta (rukkola / spenót, 100 g párolt gomba, 150 g főtt quinoás) + 50 g tzatziki",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-322",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-20",
+    "file": "Arany-Mák-04.01.2021.pdf",
+    "label": "Week of 4 Jan 2021",
+    "language": "ro",
+    "issuedOn": "2021-01-04",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "60 g teljes kiorlesu kenyer + vinetta + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-323",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g joghurt + 70 g erdei gyumolcs + 15 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-324",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g tofu 1 tk. olivaolajjal + petrezselymes gombapaprikas (2 adag: 2 tk. olivaolaj, joghurt, 1 csapott ek. zabliszt vagy teljes kiorlesu kenyer) + savanyu uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-325",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 mango + 15 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-326",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csutortok:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiorlesu kenyer + vinetta + fel tanyer zoldseg + 1 tk. olivaolaj + 50 g feta",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-327",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grapefruit + 10 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-025",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g tofu + petrezselymes gombapaprikas",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-328",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "250 g pomelo",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pomelo",
+                "grams": 250
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Pentek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "pancakes 1 tk. olivaolajjal (70 g zabpehely + 2 tojas + 2 banan + fahej + vanilia eszenc)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-329",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g pisztrang a lerben + 200 g borsopure + vegyes salata + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-330",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "250 g pomelo",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pomelo",
+                "grams": 250
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "pancakes 1 tk. olivaolaj (70 g zabpehely + 2 tojas + 2 banan + fahej + vanilia eszenc)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-329",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "250 g pomelo",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pomelo",
+                "grams": 250
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g pisztrang + 200 g borsopure + vegyes salata + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-330",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasarnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "telemeas bruschetta : 50 g kenyer megpiritva + 50 g telemea, fokhagyma, paradicsom, 1 tk. olivaolaj, bazsalikom, so, bors",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-333",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "quinoas avokados salata: 45 g nyers quinoa megfozve + 1 avokado + zoldsegek + 10 g tokmag + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-334",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "250 g pomelo",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "pomelo",
+                "grams": 250
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hetfo:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiorlesu kenyer + korozott (100 g turo, 1-2 ek. joghurt, hagyma / kapor) + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-310",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grapefruit + 10 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-025",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "voros paszulyos quinoa salata : 50 g nyers quinoa megfozve + zoldsegek + 90 g fott voros paszuly + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-336",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiorlesu kenyer + korozott (100 g turo, 1-2 ek. joghurt, hagyma / kapor) + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-310",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g klementin / narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "clementine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "chili con carne (120 g nyers csirkemell, 100 g fott voros paszuly, 1 tk. olivaolaj) + 40 g nyers bulgur + savanyu uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-021",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-022",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-21",
     "file": "Arany-Mák-05.10.2020.docx",
     "label": "Week of 5 Oct 2020",
     "language": "ro",
@@ -7299,7 +8379,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-288",
+                "recipeId": "meal-breakfast-305",
                 "servings": 1
               }
             ]
@@ -7310,7 +8390,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-289",
+                "recipeId": "meal-snack-338",
                 "servings": 1
               }
             ]
@@ -7321,7 +8401,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-290",
+                "recipeId": "meal-lunch-339",
                 "servings": 1
               }
             ]
@@ -7349,7 +8429,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-291",
+                "recipeId": "meal-breakfast-340",
                 "servings": 1
               }
             ]
@@ -7360,7 +8440,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-292",
+                "recipeId": "meal-snack-341",
                 "servings": 1
               }
             ]
@@ -7371,7 +8451,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-293",
+                "recipeId": "meal-lunch-342",
                 "servings": 1
               }
             ]
@@ -7399,7 +8479,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-294",
+                "recipeId": "meal-breakfast-343",
                 "servings": 1
               }
             ]
@@ -7421,7 +8501,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-295",
+                "recipeId": "meal-lunch-344",
                 "servings": 1
               }
             ]
@@ -7449,7 +8529,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-297",
+                "recipeId": "meal-breakfast-346",
                 "servings": 1
               }
             ]
@@ -7471,7 +8551,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-295",
+                "recipeId": "meal-lunch-344",
                 "servings": 1
               }
             ]
@@ -7499,7 +8579,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-291",
+                "recipeId": "meal-breakfast-340",
                 "servings": 1
               }
             ]
@@ -7521,7 +8601,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-300",
+                "recipeId": "meal-lunch-349",
                 "servings": 1
               }
             ]
@@ -7532,7 +8612,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-301",
+                "recipeId": "meal-snack-350",
                 "servings": 1
               }
             ]
@@ -7549,7 +8629,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-302",
+                "recipeId": "meal-breakfast-351",
                 "servings": 1
               }
             ]
@@ -7560,7 +8640,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-303",
+                "recipeId": "meal-snack-352",
                 "servings": 1
               }
             ]
@@ -7571,7 +8651,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-300",
+                "recipeId": "meal-lunch-349",
                 "servings": 1
               }
             ]
@@ -7599,7 +8679,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-305",
+                "recipeId": "meal-breakfast-354",
                 "servings": 1
               }
             ]
@@ -7621,7 +8701,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-306",
+                "recipeId": "meal-lunch-355",
                 "servings": 1
               }
             ]
@@ -7642,7 +8722,727 @@ export const SOURCE_PLANS: SourcePlan[] = [
     ]
   },
   {
-    "id": "plan-19",
+    "id": "plan-22",
+    "file": "Arany-Mák-07.12.2020.pdf",
+    "label": "Week of 7 Dec 2020",
+    "language": "ro",
+    "issuedOn": "2020-12-07",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "chiamagos puding: 150 ml tej, 2 ek. Chiamag, 3 ek. Zabpehely + fél mangó",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-016",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "fél mangó + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-356",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "mozzarellas csirke (100 g csirkemell, 40 g mozzarella) + 140 g főtt bulgur + 100 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-357",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + tonhal krém (2 adag: 100 g tonhal saját levében, 70 g túró) + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-358",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "250 g pomelo + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-359",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "mozzarellas csirke (100 g csirkemell, 40 g mozzarella) + 140 g főtt bulgur + 100 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-357",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "250 g pomelo + 5 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-360",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + tonhal krém + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-358",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-020",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "2 db tükörtojás + 250 g lencsefőzelék 1 tk. olívaolajjal + 100 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-362",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 reszelt alma fahéjjal",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "cinnamon",
+                "grams": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "zabkása (100 ml tej, 100 ml víz, 30 g zabpehely, 1 reszelt alma, fahéj, vanília eszenc)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-porridge",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grapefruit + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g tofu a lerben + 200 g lencsefőzelék 1 tk. olívaolaj + vegyes saláta + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-364",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "250 g pomelo + 5 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-360",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "bruschetta: 50 g teljes kiőrlésű kenyér + 50 g telemea, 20 g olíva bogyó + paradicsom + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-365",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 5 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-366",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g pisztráng + 200 g piros párolt káposzta 1 tk. Olívaolajjal / adag + 1 ek. Joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-367",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 5 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-039",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + tojás krém 1 tojásból + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-368",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grapefruit + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g pisztráng + 200 g piros párolt káposzta + 1 ek. Joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-369",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g klementin",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "clementine",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + körözött (100 g tehéntúró) + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-310",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-315",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "krumpli saláta: zöld saláta, 200 g főtt krumpli, kápia paprika, hagyma, 1 tk. olívaolaj, 100 g vörös bab, 30 g olíva bogyó + 40 g feta",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-371",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-23",
+    "file": "Arany-Mák-10.11.2020.pdf",
+    "label": "Week of 10 Nov 2020",
+    "language": "ro",
+    "issuedOn": "2020-11-10",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "3 db muffin + 150 g joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-321",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 5 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-373",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g lazac + 200 g zeller püré + vegyes saláta + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-374",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 5 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-039",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "1 főtt tojás + 25 g telemea + zöldségek + 1 tk. olívaolaj + 40 g kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-375",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 körte + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-311",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g lazac + 200 g zeller püré + vegyes saláta + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-374",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 15 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-376",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + tonhalkrém (130 g tonhal, 100 g ricotta) + fel tányér zöldség + 1 tk. Olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-377",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-315",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "200 g petrezselymes gombapaprikás,1 tk. olívaolaj (1 csapott ek. teljes kiőrlésű liszt) + 140 g főtt bulgur + savanyú uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-378",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "erdei gyümölcsös joghurt: 150 g joghurt 2% + 70 g erdei gyümölcs",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-379",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + tonhalkrem + fel tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-380",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-315",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "200 g petrezselymes gombapaprikás + 140 g főtt bulgur + 100 g hagymás-kápia savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-381",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "chia magos puding: 130 ml tej, 2 ek. chia mag, 2 ek. zabpehely, fél mangó",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-382",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g mangó + erdei gyümölcs + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-383",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "pikáns csirkemell (100 g csirkemell, 200 g zöldségek)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-384",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + 80 g humusz + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-288",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "pikáns csirkemell",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-384",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + 80 g humusz + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-288",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "2 tükörtojás + 200 g spenót főzelék + 25 g kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-386",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-24",
     "file": "Arany-Mák-12.10.2020.docx",
     "label": "Week of 12 Oct 2020",
     "language": "ro",
@@ -7659,7 +9459,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-307",
+                "recipeId": "meal-breakfast-387",
                 "servings": 1
               }
             ]
@@ -7681,7 +9481,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-308",
+                "recipeId": "meal-lunch-388",
                 "servings": 1
               }
             ]
@@ -7709,7 +9509,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-309",
+                "recipeId": "meal-breakfast-389",
                 "servings": 1
               }
             ]
@@ -7731,7 +9531,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-308",
+                "recipeId": "meal-lunch-388",
                 "servings": 1
               }
             ]
@@ -7759,7 +9559,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-311",
+                "recipeId": "meal-breakfast-391",
                 "servings": 1
               }
             ]
@@ -7781,7 +9581,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-312",
+                "recipeId": "meal-lunch-392",
                 "servings": 1
               }
             ]
@@ -7809,7 +9609,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-311",
+                "recipeId": "meal-breakfast-391",
                 "servings": 1
               }
             ]
@@ -7820,7 +9620,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-313",
+                "recipeId": "meal-snack-393",
                 "servings": 1
               }
             ]
@@ -7831,7 +9631,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-312",
+                "recipeId": "meal-lunch-392",
                 "servings": 1
               }
             ]
@@ -7870,7 +9670,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-316",
+                "recipeId": "meal-snack-289",
                 "servings": 1
               }
             ]
@@ -7881,7 +9681,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-317",
+                "recipeId": "meal-lunch-396",
                 "servings": 1
               }
             ]
@@ -7909,7 +9709,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-318",
+                "recipeId": "meal-breakfast-397",
                 "servings": 1
               }
             ]
@@ -7931,7 +9731,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-319",
+                "recipeId": "meal-lunch-398",
                 "servings": 1
               }
             ]
@@ -7959,7 +9759,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-321",
+                "recipeId": "meal-breakfast-310",
                 "servings": 1
               }
             ]
@@ -7981,7 +9781,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-322",
+                "recipeId": "meal-lunch-400",
                 "servings": 1
               }
             ]
@@ -8002,7 +9802,804 @@ export const SOURCE_PLANS: SourcePlan[] = [
     ]
   },
   {
-    "id": "plan-20",
+    "id": "plan-25",
+    "file": "Arany-Mák-14.12.2020.pdf",
+    "label": "Week of 14 Dec 2020",
+    "language": "ro",
+    "issuedOn": "2020-12-14",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50g teljes kiőrlésű kenyér + körözött + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-310",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grapefruit + 10g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "csirkés borsófőzelék (100g csirkemell, 50g borsó, 50g murok, 1 tk. olaj) + 140g főtt bulgur + savanyú uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-403",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "vegyes saláta + 75g tonhal + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-405",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "150g joghurt + 30g zabpehely + 100g erdei gyümölcs",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-019",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-020",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "csirkés borsófőzelék + 140g főtt bulgur + savanyú uborka",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-403",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150g kiwi + 10g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-072",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "vegyes saláta + 72g Tony junior + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-410",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50g teljes kiőrlésű kenyér + avokadó krém + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-354",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "2 db tükörtojás + 250g spenót + 40g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-412",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 reszelt alma fahéjjal",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "cinnamon",
+                "grams": 3
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350g marhahúsos csorba (1 tk. olaj / adag)+ 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-413",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "3 db zabkeksz + 150g joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-414",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grapefruit + 10g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100g brokkolifasirt + 140g főtt hajdina + vegyes saláta + 1 tk. olívaolaj+ fokhagyma szósz",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-415",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "350g marhahúsos csorba + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-413",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "3 db zabkeksz + 150g joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-414",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150g kiwi + 10g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-072",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100g brokkolifasirt + 140g főtt hajdina + 100g savanyúság+ fokhagyma szósz",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-417",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150g klementin + 10g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-418",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "vegyes saláta + 72g Tony junior + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-410",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "cukkinis rántotta (2 tojásból) + fél tányér zöldség + 40g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-305",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "200g pomelo + 10g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-420",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100g lazac + 200g edeskrumpli a lerben + vegyes saláta + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-421",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150g klementin",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "clementine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300g káposztaleves + 1 ek. Joghurt + 25g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-422",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "bruschetta: 50g teljes kiőrlésű kenyér + 50g feta",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-144",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "200g pomelo + 10g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-420",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100g lazac + 200g edeskrumpli a lerben + vegyes saláta + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-421",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "dinner",
+            "text": "300g káposztaleves + 1 ek. Joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-dinner-424",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-26",
+    "file": "Arany-Mák-16.11.2020.pdf",
+    "label": "Week of 16 Nov 2020",
+    "language": "ro",
+    "issuedOn": "2020-11-16",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + 80 g humusz + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-288",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 5 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-373",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g pisztráng + 200 g zöldpaszuly párolva 1 tk. olívaolajjal (1 tk. zabliszt / 2 adag)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-425",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "150 g joghurt + 30 g zabpehely + 100 g erdei gyümölcs",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-019",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 közepes méretű banán + 60 g tehéntúró",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-426",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkemell roston 1 tk. olívaolajjal + 200 g zöldpaszuly párolva",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-245",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 15 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-376",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + tojáskrém 1 főtt tojásból + 10 g pirított tökmag + fél tányér zöldség + 1 tk. olívaolaj + 30 g telemea",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-428",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 kaki",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "persimmon",
+                "grams": 168
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkés zöldséges fasirt + 220 g borsófőzelék murokkal (1 csapott ek. zabliszt, 2 tk. olívaolaj/2 adag)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-429",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + körözött (80 g tehéntúró, 1 ek. joghurt, hagyma / kapor / paprika, köménymag) + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-430",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkés zöldséges fasirt + 220 g borsófőzelék murokkal",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-429",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "40 g teljes kiőrlésű kenyér + körözött (70 g tehéntúró, 1 ek. joghurt, hagyma/kapor/paprika, köménymag) + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-430",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g erdei gyümölcs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "berries-mixed",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "pestos laska (1 adag: 20 g parmezán, 1 ek. olívaolaj, 15 g fenyő mag vagy kesudió, 180 g főtt laska)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-433",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "2 főtt tojás + murok saláta + 1 tk. olívaolaj + 25 g kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-434",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "pestos laska",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-pesto-pasta",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + avokadó krém 100 g avokadóból + fél tányér zöldség + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-436",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g karaj roston + 200 g mexikói párolt zöldségek 1 tk. olívaolajjal",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-437",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-27",
     "file": "Arany-Mák-19.10.2020.docx",
     "label": "Week of 19 Oct 2020",
     "language": "ro",
@@ -8019,7 +10616,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-321",
+                "recipeId": "meal-breakfast-310",
                 "servings": 1
               }
             ]
@@ -8041,7 +10638,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-323",
+                "recipeId": "meal-lunch-438",
                 "servings": 1
               }
             ]
@@ -8069,7 +10666,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-324",
+                "recipeId": "meal-breakfast-439",
                 "servings": 1
               }
             ]
@@ -8091,7 +10688,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-325",
+                "recipeId": "meal-lunch-440",
                 "servings": 1
               }
             ]
@@ -8119,7 +10716,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-324",
+                "recipeId": "meal-breakfast-439",
                 "servings": 1
               }
             ]
@@ -8141,7 +10738,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-326",
+                "recipeId": "meal-lunch-441",
                 "servings": 1
               }
             ]
@@ -8169,7 +10766,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-327",
+                "recipeId": "meal-breakfast-442",
                 "servings": 1
               }
             ]
@@ -8191,7 +10788,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-328",
+                "recipeId": "meal-lunch-443",
                 "servings": 1
               }
             ]
@@ -8219,7 +10816,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-329",
+                "recipeId": "meal-breakfast-444",
                 "servings": 1
               }
             ]
@@ -8230,7 +10827,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-316",
+                "recipeId": "meal-snack-289",
                 "servings": 1
               }
             ]
@@ -8241,7 +10838,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-330",
+                "recipeId": "meal-lunch-445",
                 "servings": 1
               }
             ]
@@ -8269,7 +10866,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-331",
+                "recipeId": "meal-breakfast-446",
                 "servings": 1
               }
             ]
@@ -8291,7 +10888,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-330",
+                "recipeId": "meal-lunch-445",
                 "servings": 1
               }
             ]
@@ -8319,7 +10916,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-333",
+                "recipeId": "meal-breakfast-358",
                 "servings": 1
               }
             ]
@@ -8341,7 +10938,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-334",
+                "recipeId": "meal-lunch-449",
                 "servings": 1
               }
             ]
@@ -8362,7 +10959,1087 @@ export const SOURCE_PLANS: SourcePlan[] = [
     ]
   },
   {
-    "id": "plan-21",
+    "id": "plan-28",
+    "file": "Arany-Mák-23.11.2020.pdf",
+    "label": "Week of 23 Nov 2020",
+    "language": "ro",
+    "issuedOn": "2020-11-23",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "paradicsomos bruschetta: 40 g teljes kiőrlésű kenyér + paradicsom, 15 g parmezan, 30 g olíva bogyó, + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-451",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-315",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g lazac + 250 g párolt zöldségek (1 tk. olívaolaj)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-452",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "chiamagos puding: 130 ml tej, 2 ek. chiamag, 2 ek. zabpehely + fél mangó",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-453",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "fél mangó + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-033",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g csirkemell roston + 250 g párolt zöldségek (1 tk. olívaolaj) + 10 g parmezan",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-454",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-020",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "spenótos rántottá: 2 tojasbol, 15 g parmezan + fél tányér zöldség + 1 tk. olívaolaj + 25 g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-455",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grapefruit + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-025",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "csicseriborsos rizses étel (150 g csicseriborsó + 140 g főtt barnarizs) + káposztasaláta + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-456",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "90 g mozzarella + murok saláta + 1 tk. olívaolaj + 40 g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-457",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g klementin",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "clementine",
+                "grams": 150
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "csicseriborsos rizses étel (150 g csicseriborsó + 140 g főtt barnarizs) + vegyes saláta + 1 tk. olívaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-458",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-022",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "zabkasa (100 ml tej, 100 ml víz, 30 g zabpehely, 1 alma, fahéj, vanília eszenc)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-459",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g klementin + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-418",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "avokádós, mangos tőkehal (150 g hal, fél avokadó, fél mangó) + 140 g főtt bulgur",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-461",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "100 g erdei gyümölcs + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-462",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "2 tükörtojás + fél tányér zöldség + 1 tk. olívaolaj + 35 g kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-463",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-022",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g avokadós, mangos tőkehal + 140 g főtt bulgur",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-461",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g klementin",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "clementine",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "150 g joghurt + 30 g zabpehely + 100 g erdei gyümölcs",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-019",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grapefruit + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g brokkoli fasirt + 200 g édeskrumpli + 100 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-465",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-29",
+    "file": "Arany-Mák-25.01.2021-étrend.pdf",
+    "label": "Week of 25 Jan 2021",
+    "language": "ro",
+    "issuedOn": "2021-01-25",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiorlesu kenyer + avokadokrem + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-354",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-020",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "150 g feher husu hal + 250 g zoldsegkoret (cukkini, paradicsom, edeskrumpli, brokkoli)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-467",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g kiwi + 8 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-468",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csutortok:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "150 g joghurt + 40 g puffasztott hajdina + 100 g erdei gyumolcs",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-469",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grapefruit + 10 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-025",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "pizza - 60 g tortilla lap + paradicsom szosz, paprika, hagyma, 50 g mozzarella, 100 g gomba, rukkola, 10 g soreleszto, 50 g paszuly, 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-470",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Pentek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiorlesu kenyer + 100 g korozott + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-310",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "pizza - 60 g tortilla lap + paradicsom szosz, paprika, hagyma, 50 g mozzarella, 100 g gomba, rukkola, 10 g soreleszto, 50 g paszuly, 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-470",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-022",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiorlesu kenyer + 100 g korozott + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-310",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 15 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-472",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "savanyu kaposztabol kolozsvari kaposzta (1 adag: 100 g daralt hus, 50 g barna rizs, 150 g savanyu kaposzta, 1 tk. olivaolaj) + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-473",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "250 g pomelo + 10 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-359",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasarnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "zabkasa (100 ml tej, 100 ml viz, 30 g zabkasa, 1 reszelt alma, fahej, vanilia eszenc)",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "dish-porridge",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-020",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "savanyu kaposztabol kolozsvari kaposzta (1 adag: 100 g daralt hus, 50 g barna rizs, 150 g savanyu kaposzta, 1 tk. olivaolaj) + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-473",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g kiwi + 10 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-140",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hetfo:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g kenyer piritva + 50 g fustolt lazac + 1 fott / lagy tojas + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-475",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-315",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g zoldseges csirkes fasirt (50 % csirkemell, 50 % murok es krumpli, 1 tojas) + 250 g tokfozelek (1 tk. olivaolaj/adag) + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-342",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g kenyer piritva + 50 g fustolt lazac + 1 fott /lagytojas + fel tanyer zoldseg + 1 tk. olivaolaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-475",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 korte + 10 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-311",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g zoldseges csirkes fasirt (50 % csirkemell, 50 % murok es krumpli, 1 tojas) + 250 g tokfozelek (1 tk. olivaolaj/adag) + 1 ek. joghurt",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-342",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs + 10 g dio",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-315",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-30",
+    "file": "Arany-Mák-26.10.2020.pdf",
+    "label": "Week of 26 Oct 2020",
+    "language": "ro",
+    "issuedOn": "2020-10-26",
+    "subject": "self",
+    "days": [
+      {
+        "dayName": "Szerda:",
+        "weekday": 3,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "spenótos rántotta 2 tojásból + ½ tányér zöldség + 1 tk. olíva olaj + 25 g teljes kiőrlésű kenyér",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-478",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "mozzarellás csirkemell (100 g csirkemell, 60 g mozzarella) + 140 g főtt bulgur + cékla saláta",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-479",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 5 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-480",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Csütörtök:",
+        "weekday": 4,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "chiamagos puding (150 ml tej, 2 ek. chiamag, 3 ek zabpehely) + ½ mangó",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-016",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "½ mangó + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-356",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "mozzarellas csirkemell (100 g csirkemell, 60 g mozzarella) + 140 g főtt bulgur + vegyes saláta + 1 tk. olíva olaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-483",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "apple",
+                "grams": 150
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Péntek:",
+        "weekday": 5,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + 1 avokadó + fel tányér zöldség + 1 tk. olíva olaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-354",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g brokkolifasirt + 200 g zeller püré + 100 g savanyúság + 10 g pirított tökmag",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-485",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "150 g joghurt + 1 alma",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-486",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Szombat:",
+        "weekday": 6,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + vinetta + fel tányér zöldség + 1 tk. olíva olaj + 25 g feta",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-487",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "100 g brokkolifasirt + 140 g főtt köles + 100 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-488",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-022",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Vasárnap:",
+        "weekday": 0,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + vinetta + ½ tányér zöldség + 1 tk. olíva olaj + 25 g feta",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-487",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 grépfrút + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-289",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "120 g pisztráng + 250 g zöldségökért 1 tk. olíva olajjal+ fokhagyma szósz",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-490",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Hétfő:",
+        "weekday": 1,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "50 g teljes kiőrlésű kenyér + tojás krém (1 tojás, mustár, joghurt, petrezselyemzöld, reszelt hagyma) + fel tányér zöldség + 1 tk. olíva olaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-368",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 narancs",
+            "entries": [
+              {
+                "kind": "food",
+                "foodId": "orange",
+                "grams": 180
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "120 g pisztráng + 200 g mexikói zöldségek + 1 tk. olíva olaj",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-492",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "dayName": "Kedd:",
+        "weekday": 2,
+        "meals": [
+          {
+            "slot": "breakfast",
+            "text": "150 g joghurt + 30 g zabpehely + 100 g erdei gyümölcs + 10 g tökmag",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-breakfast-493",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 körte + 10 g dió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-311",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "lunch",
+            "text": "350 g csicseriborsos édeskrumpli (120 g főtt csicseriborsó / 1 adag es 1 ek. olíva olaj / 2 adag) + 100 g savanyúság",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-lunch-309",
+                "servings": 1
+              }
+            ]
+          },
+          {
+            "slot": "snack",
+            "text": "1 alma + 10 g kesudió",
+            "entries": [
+              {
+                "kind": "recipe",
+                "recipeId": "meal-snack-133",
+                "servings": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan-31",
     "file": "Arany-Mák-reg-al-1.docx",
     "label": "Undated week",
     "language": "ro",
@@ -8389,7 +12066,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-337",
+                "recipeId": "meal-snack-496",
                 "servings": 1
               }
             ]
@@ -8400,7 +12077,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-300",
+                "recipeId": "meal-lunch-349",
                 "servings": 1
               }
             ]
@@ -8411,7 +12088,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-339",
+                "recipeId": "meal-snack-498",
                 "servings": 1
               }
             ]
@@ -8422,7 +12099,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-340",
+                "recipeId": "meal-dinner-499",
                 "servings": 1
               }
             ]
@@ -8439,7 +12116,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-341",
+                "recipeId": "meal-breakfast-500",
                 "servings": 1
               }
             ]
@@ -8450,7 +12127,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-342",
+                "recipeId": "meal-snack-501",
                 "servings": 1
               }
             ]
@@ -8461,7 +12138,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-343",
+                "recipeId": "meal-lunch-502",
                 "servings": 1
               }
             ]
@@ -8472,7 +12149,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-344",
+                "recipeId": "meal-snack-503",
                 "servings": 1
               }
             ]
@@ -8483,7 +12160,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-345",
+                "recipeId": "meal-dinner-504",
                 "servings": 1
               }
             ]
@@ -8500,7 +12177,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-346",
+                "recipeId": "meal-breakfast-430",
                 "servings": 1
               }
             ]
@@ -8511,7 +12188,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-347",
+                "recipeId": "meal-snack-506",
                 "servings": 1
               }
             ]
@@ -8522,7 +12199,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-348",
+                "recipeId": "meal-lunch-507",
                 "servings": 1
               }
             ]
@@ -8533,7 +12210,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-339",
+                "recipeId": "meal-snack-498",
                 "servings": 1
               }
             ]
@@ -8544,7 +12221,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-345",
+                "recipeId": "meal-dinner-504",
                 "servings": 1
               }
             ]
@@ -8561,7 +12238,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-321",
+                "recipeId": "meal-breakfast-310",
                 "servings": 1
               }
             ]
@@ -8572,7 +12249,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-350",
+                "recipeId": "meal-snack-509",
                 "servings": 1
               }
             ]
@@ -8583,7 +12260,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-351",
+                "recipeId": "meal-lunch-510",
                 "servings": 1
               }
             ]
@@ -8594,7 +12271,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-352",
+                "recipeId": "meal-snack-511",
                 "servings": 1
               }
             ]
@@ -8605,7 +12282,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-345",
+                "recipeId": "meal-dinner-504",
                 "servings": 1
               }
             ]
@@ -8622,7 +12299,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-353",
+                "recipeId": "meal-breakfast-512",
                 "servings": 1
               }
             ]
@@ -8644,7 +12321,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-355",
+                "recipeId": "meal-lunch-514",
                 "servings": 1
               }
             ]
@@ -8683,7 +12360,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-356",
+                "recipeId": "meal-breakfast-515",
                 "servings": 1
               }
             ]
@@ -8694,7 +12371,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-357",
+                "recipeId": "meal-snack-516",
                 "servings": 1
               }
             ]
@@ -8705,7 +12382,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-358",
+                "recipeId": "meal-lunch-517",
                 "servings": 1
               }
             ]
@@ -8727,7 +12404,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-359",
+                "recipeId": "meal-dinner-424",
                 "servings": 1
               }
             ]
@@ -8744,7 +12421,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-360",
+                "recipeId": "meal-breakfast-519",
                 "servings": 1
               }
             ]
@@ -8755,7 +12432,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-361",
+                "recipeId": "meal-snack-520",
                 "servings": 1
               }
             ]
@@ -8766,7 +12443,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-362",
+                "recipeId": "meal-lunch-521",
                 "servings": 1
               }
             ]
@@ -8777,7 +12454,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-363",
+                "recipeId": "meal-snack-522",
                 "servings": 1
               }
             ]
@@ -8788,7 +12465,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-359",
+                "recipeId": "meal-dinner-424",
                 "servings": 1
               }
             ]
@@ -8805,7 +12482,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-364",
+                "recipeId": "meal-breakfast-523",
                 "servings": 1
               }
             ]
@@ -8816,7 +12493,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-365",
+                "recipeId": "meal-snack-524",
                 "servings": 1
               }
             ]
@@ -8827,7 +12504,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-366",
+                "recipeId": "meal-lunch-525",
                 "servings": 1
               }
             ]
@@ -8849,7 +12526,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-367",
+                "recipeId": "meal-dinner-526",
                 "servings": 1
               }
             ]
@@ -8859,7 +12536,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
     ]
   },
   {
-    "id": "plan-22",
+    "id": "plan-32",
     "file": "Arany-Mák-reg-al-2.docx",
     "label": "Undated week",
     "language": "ro",
@@ -8886,7 +12563,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-369",
+                "recipeId": "meal-lunch-528",
                 "servings": 1
               }
             ]
@@ -8908,7 +12585,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-370",
+                "recipeId": "meal-dinner-529",
                 "servings": 1
               }
             ]
@@ -8925,7 +12602,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-346",
+                "recipeId": "meal-breakfast-430",
                 "servings": 1
               }
             ]
@@ -8947,7 +12624,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-371",
+                "recipeId": "meal-lunch-530",
                 "servings": 1
               }
             ]
@@ -8969,7 +12646,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-372",
+                "recipeId": "meal-dinner-531",
                 "servings": 1
               }
             ]
@@ -8986,7 +12663,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-373",
+                "recipeId": "meal-breakfast-532",
                 "servings": 1
               }
             ]
@@ -9008,7 +12685,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-374",
+                "recipeId": "meal-lunch-533",
                 "servings": 1
               }
             ]
@@ -9030,7 +12707,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-372",
+                "recipeId": "meal-dinner-531",
                 "servings": 1
               }
             ]
@@ -9047,7 +12724,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-375",
+                "recipeId": "meal-breakfast-534",
                 "servings": 1
               }
             ]
@@ -9058,7 +12735,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-376",
+                "recipeId": "meal-snack-535",
                 "servings": 1
               }
             ]
@@ -9069,7 +12746,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-377",
+                "recipeId": "meal-lunch-536",
                 "servings": 1
               }
             ]
@@ -9080,7 +12757,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-372",
+                "recipeId": "meal-dinner-531",
                 "servings": 1
               }
             ]
@@ -9097,7 +12774,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-378",
+                "recipeId": "meal-breakfast-537",
                 "servings": 1
               }
             ]
@@ -9119,7 +12796,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-379",
+                "recipeId": "meal-lunch-538",
                 "servings": 1
               }
             ]
@@ -9141,7 +12818,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-380",
+                "recipeId": "meal-dinner-539",
                 "servings": 1
               }
             ]
@@ -9158,7 +12835,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-378",
+                "recipeId": "meal-breakfast-537",
                 "servings": 1
               }
             ]
@@ -9180,7 +12857,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-381",
+                "recipeId": "meal-lunch-540",
                 "servings": 1
               }
             ]
@@ -9202,7 +12879,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-380",
+                "recipeId": "meal-dinner-539",
                 "servings": 1
               }
             ]
@@ -9230,7 +12907,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-350",
+                "recipeId": "meal-snack-509",
                 "servings": 1
               }
             ]
@@ -9241,7 +12918,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-381",
+                "recipeId": "meal-lunch-540",
                 "servings": 1
               }
             ]
@@ -9263,7 +12940,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-367",
+                "recipeId": "meal-dinner-526",
                 "servings": 1
               }
             ]
@@ -9280,7 +12957,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-383",
+                "recipeId": "meal-breakfast-542",
                 "servings": 1
               }
             ]
@@ -9291,7 +12968,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-316",
+                "recipeId": "meal-snack-289",
                 "servings": 1
               }
             ]
@@ -9301,7 +12978,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
     ]
   },
   {
-    "id": "plan-23",
+    "id": "plan-33",
     "file": "Arany-Mák-reg-al-3.docx",
     "label": "Undated week",
     "language": "ro",
@@ -9317,7 +12994,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-385",
+                "recipeId": "meal-lunch-544",
                 "servings": 1
               }
             ]
@@ -9339,7 +13016,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-386",
+                "recipeId": "meal-dinner-545",
                 "servings": 1
               }
             ]
@@ -9367,7 +13044,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-316",
+                "recipeId": "meal-snack-289",
                 "servings": 1
               }
             ]
@@ -9378,7 +13055,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-388",
+                "recipeId": "meal-lunch-547",
                 "servings": 1
               }
             ]
@@ -9417,7 +13094,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-378",
+                "recipeId": "meal-breakfast-537",
                 "servings": 1
               }
             ]
@@ -9439,7 +13116,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-389",
+                "recipeId": "meal-lunch-548",
                 "servings": 1
               }
             ]
@@ -9461,7 +13138,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-386",
+                "recipeId": "meal-dinner-545",
                 "servings": 1
               }
             ]
@@ -9478,7 +13155,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-378",
+                "recipeId": "meal-breakfast-537",
                 "servings": 1
               }
             ]
@@ -9500,7 +13177,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-389",
+                "recipeId": "meal-lunch-548",
                 "servings": 1
               }
             ]
@@ -9522,7 +13199,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-391",
+                "recipeId": "meal-dinner-550",
                 "servings": 1
               }
             ]
@@ -9539,7 +13216,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-392",
+                "recipeId": "meal-breakfast-551",
                 "servings": 1
               }
             ]
@@ -9550,7 +13227,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-393",
+                "recipeId": "meal-snack-552",
                 "servings": 1
               }
             ]
@@ -9561,7 +13238,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-394",
+                "recipeId": "meal-lunch-553",
                 "servings": 1
               }
             ]
@@ -9583,7 +13260,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-395",
+                "recipeId": "meal-dinner-554",
                 "servings": 1
               }
             ]
@@ -9600,7 +13277,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-396",
+                "recipeId": "meal-breakfast-555",
                 "servings": 1
               }
             ]
@@ -9622,7 +13299,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-394",
+                "recipeId": "meal-lunch-553",
                 "servings": 1
               }
             ]
@@ -9644,7 +13321,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-395",
+                "recipeId": "meal-dinner-554",
                 "servings": 1
               }
             ]
@@ -9661,7 +13338,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-397",
+                "recipeId": "meal-breakfast-556",
                 "servings": 1
               }
             ]
@@ -9672,7 +13349,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-316",
+                "recipeId": "meal-snack-289",
                 "servings": 1
               }
             ]
@@ -9683,7 +13360,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-398",
+                "recipeId": "meal-lunch-557",
                 "servings": 1
               }
             ]
@@ -9705,7 +13382,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-395",
+                "recipeId": "meal-dinner-554",
                 "servings": 1
               }
             ]
@@ -9722,7 +13399,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-399",
+                "recipeId": "meal-breakfast-558",
                 "servings": 1
               }
             ]
@@ -9744,7 +13421,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-398",
+                "recipeId": "meal-lunch-557",
                 "servings": 1
               }
             ]
@@ -9776,7 +13453,15 @@ export const SOURCE_PLANS: SourcePlan[] = [
     ]
   },
   {
-    "id": "plan-24",
+    "id": "plan-34",
+    "file": "Dospinescu-Olivia-r-al-2.pdf",
+    "label": "Olivia, week 1 (Olivia)",
+    "language": "ro",
+    "subject": "other",
+    "days": []
+  },
+  {
+    "id": "plan-35",
     "file": "a7a0f138-AranyM_k18.01.2021_trend.docx",
     "label": "Week of 18 Jan 2021",
     "language": "hu",
@@ -9793,7 +13478,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-392",
+                "recipeId": "meal-breakfast-551",
                 "servings": 1
               }
             ]
@@ -9837,7 +13522,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-402",
+                "recipeId": "meal-dinner-560",
                 "servings": 1
               }
             ]
@@ -9854,7 +13539,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-403",
+                "recipeId": "meal-breakfast-561",
                 "servings": 1
               }
             ]
@@ -9898,7 +13583,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-405",
+                "recipeId": "meal-dinner-563",
                 "servings": 1
               }
             ]
@@ -9915,7 +13600,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-406",
+                "recipeId": "meal-breakfast-487",
                 "servings": 1
               }
             ]
@@ -9937,7 +13622,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-407",
+                "recipeId": "meal-lunch-565",
                 "servings": 1
               }
             ]
@@ -9948,7 +13633,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-408",
+                "recipeId": "meal-snack-566",
                 "servings": 1
               }
             ]
@@ -9959,7 +13644,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-405",
+                "recipeId": "meal-dinner-563",
                 "servings": 1
               }
             ]
@@ -9976,7 +13661,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-302",
+                "recipeId": "meal-breakfast-351",
                 "servings": 1
               }
             ]
@@ -9987,7 +13672,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-410",
+                "recipeId": "meal-snack-472",
                 "servings": 1
               }
             ]
@@ -9998,7 +13683,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-411",
+                "recipeId": "meal-lunch-568",
                 "servings": 1
               }
             ]
@@ -10009,7 +13694,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-412",
+                "recipeId": "meal-snack-359",
                 "servings": 1
               }
             ]
@@ -10020,7 +13705,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-413",
+                "recipeId": "meal-dinner-569",
                 "servings": 1
               }
             ]
@@ -10037,7 +13722,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-414",
+                "recipeId": "meal-breakfast-570",
                 "servings": 1
               }
             ]
@@ -10059,7 +13744,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-415",
+                "recipeId": "meal-lunch-571",
                 "servings": 1
               }
             ]
@@ -10081,7 +13766,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-416",
+                "recipeId": "meal-dinner-572",
                 "servings": 1
               }
             ]
@@ -10098,7 +13783,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-414",
+                "recipeId": "meal-breakfast-570",
                 "servings": 1
               }
             ]
@@ -10120,7 +13805,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-415",
+                "recipeId": "meal-lunch-571",
                 "servings": 1
               }
             ]
@@ -10142,7 +13827,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-417",
+                "recipeId": "meal-dinner-413",
                 "servings": 1
               }
             ]
@@ -10170,7 +13855,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-419",
+                "recipeId": "meal-snack-315",
                 "servings": 1
               }
             ]
@@ -10181,7 +13866,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-420",
+                "recipeId": "meal-lunch-467",
                 "servings": 1
               }
             ]
@@ -10192,7 +13877,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-421",
+                "recipeId": "meal-snack-311",
                 "servings": 1
               }
             ]
@@ -10203,7 +13888,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-422",
+                "recipeId": "meal-dinner-576",
                 "servings": 1
               }
             ]
@@ -10213,7 +13898,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
     ]
   },
   {
-    "id": "plan-25",
+    "id": "plan-36",
     "file": "e84da1db-AranyMakdieta09.05.2022.docx",
     "label": "Week of 9 May 2022",
     "language": "ro",
@@ -10252,7 +13937,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-423",
+                "recipeId": "meal-lunch-577",
                 "servings": 1
               }
             ]
@@ -10302,7 +13987,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-424",
+                "recipeId": "meal-snack-578",
                 "servings": 1
               }
             ]
@@ -10313,7 +13998,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-423",
+                "recipeId": "meal-lunch-577",
                 "servings": 1
               }
             ]
@@ -10363,7 +14048,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-425",
+                "recipeId": "meal-snack-579",
                 "servings": 1
               }
             ]
@@ -10374,7 +14059,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-426",
+                "recipeId": "meal-lunch-580",
                 "servings": 1
               }
             ]
@@ -10435,7 +14120,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-428",
+                "recipeId": "meal-lunch-582",
                 "servings": 1
               }
             ]
@@ -10457,7 +14142,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-429",
+                "recipeId": "meal-dinner-583",
                 "servings": 1
               }
             ]
@@ -10496,7 +14181,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-431",
+                "recipeId": "meal-lunch-585",
                 "servings": 1
               }
             ]
@@ -10518,7 +14203,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-432",
+                "recipeId": "meal-dinner-586",
                 "servings": 1
               }
             ]
@@ -10546,7 +14231,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-snack-433",
+                "recipeId": "meal-snack-587",
                 "servings": 1
               }
             ]
@@ -10557,7 +14242,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-434",
+                "recipeId": "meal-lunch-588",
                 "servings": 1
               }
             ]
@@ -10579,7 +14264,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-435",
+                "recipeId": "meal-dinner-589",
                 "servings": 1
               }
             ]
@@ -10596,7 +14281,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-breakfast-436",
+                "recipeId": "meal-breakfast-590",
                 "servings": 1
               }
             ]
@@ -10618,7 +14303,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-lunch-434",
+                "recipeId": "meal-lunch-588",
                 "servings": 1
               }
             ]
@@ -10640,7 +14325,7 @@ export const SOURCE_PLANS: SourcePlan[] = [
             "entries": [
               {
                 "kind": "recipe",
-                "recipeId": "meal-dinner-435",
+                "recipeId": "meal-dinner-589",
                 "servings": 1
               }
             ]
