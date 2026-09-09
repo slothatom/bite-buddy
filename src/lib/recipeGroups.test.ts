@@ -128,8 +128,14 @@ describe('the same dish written at different portions', () => {
     for (const r of ALL_RECIPES) {
       expect(r.name.en, r.id).not.toMatch(/\(/)
     }
+    // How many there are is a fact about how many weeks have been imported,
+    // and it changed the day eleven more arrived. What this test is about is
+    // that each one carries its portion in its own field, so asserting the
+    // count would only mean re-editing this line every time she writes another
+    // plan.
     const grapefruit = ALL_RECIPES.filter((r) => r.name.en === 'Grapefruit with cashews')
-    expect(grapefruit).toHaveLength(4)
+    expect(grapefruit.length).toBeGreaterThan(1)
+    expect(grapefruit.every((r) => r.variant)).toBe(true)
     expect(grapefruit.map((r) => r.variant)).toContain('20 g cashews, 150 g grapefruit')
   })
 

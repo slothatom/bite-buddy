@@ -252,9 +252,15 @@ describe('a seasoning is worth naming when nothing else differs', () => {
       plan(['breakfast', '[removed plan text]']),
     ])
 
-    // The first of these is the dish itself and keeps the dish's name; the
-    // second is that dish plus vanilla, and now says so.
-    expect(built).toEqual(['Apple & cinnamon porridge with vanilla extract'])
+    // The first of these is a plain porridge with apples added to it and keeps
+    // that name; the second is the apple porridge dish plus vanilla, and says
+    // so. They stopped being one recipe when the colon began separating a
+    // dish's name from its contents, which let the first line match the plain
+    // porridge it actually names.
+    expect(built).toEqual([
+      'Oat porridge with apple',
+      'Apple & cinnamon porridge with vanilla extract',
+    ])
   })
 })
 

@@ -54,7 +54,8 @@ const ITEM_GRAMS: Record<string, number> = {
   mar: 150, mere: 150, alma: 150,
   para: 170, pere: 170, korte: 170,
   portocala: 180, portocale: 180, narancs: 180,
-  grapefruit: 250,
+  grapefruit: 250, grepfrut: 250, gref: 250,
+  nectarina: 150, nectarine: 150, nektarin: 150,
   banana: 120,
   kiwi: 75,
   mango: 200,
@@ -147,7 +148,17 @@ export function parseFragment(fragment: string): ParsedQuantity {
   }
 
   // 2. Explicit weight or volume: "135 g ton", "330 ml kefir", "150 ml lapte".
-  const weight = text.match(/(\d+(?:[.,]\d+)?)\s*(g|gr|grame|ml|dl)\b/i)
+  /*
+   * `\b` is not a word boundary when the next letter is accented.
+   *
+   * JavaScript counts only [A-Za-z0-9_] as word characters, so in "1 grépfrút"
+   * the engine reads "1 gr" as one gram and finds a boundary before the "é"
+   * that is not there in the language. The line came in as a single gram of
+   * grapefruit, and "1 narancs / 1 grépfrút" as one gram of orange. Asking
+   * directly that no letter follows, accented ones included, is what `\b` was
+   * meant to say.
+   */
+  const weight = text.match(/(\d+(?:[.,]\d+)?)\s*(g|gr|grame|ml|dl)(?![a-zà-ÿ])/i)
   if (weight) {
     const value = parseNumber(weight[1]) ?? 0
     const grams = /^dl$/i.test(weight[2]) ? value * 100 : value
@@ -233,6 +244,66 @@ function statesAnAmount(text: string): boolean {
   return words.some((w) => w in SPOON_GRAMS)
 }
 
+/**
+ * A spoon measure that begins a second amount inside one fragment.
+ *
+ * Romanian writes "150 g tofu cu o lingurita de ulei", and `JOINERS` splits on
+ * the "cu". Hungarian has no word to split on: "240 g spenót 1 tk.
+ * Olivaolajjal" carries its "with" as a case ending on the noun itself. So the
+ * fragment stayed whole, the 240 g attached to whichever food matched best,
+ * and "olivaolajjal" beats "spenót", which stored 240 g of olive oil, lost the
+ * spinach entirely and made a 2,242 kcal lunch.
+ *
+ * The signal that is there instead is the spoon. A fragment that has already
+ * written an amount and then writes "1 tk." is naming a second thing, because
+ * nothing in these plans is called "something 1 teaspoon".
+ *
+ * Applied after the joining words, not before. Run first it cut "150 g tofu cu
+ * o lingurita de ulei" in front of the spoon and left the "cu" stranded on the
+ * tofu, where the joiner pass could no longer see it.
+ */
+const SPOON_STARTS = new RegExp(
+  String.raw`\s+(?=(?:\d+(?:[.,]\d+)?|o|un|una|egy)\s*`
+  + String.raw`(?:lingurit[ae]|lingur[ai]|lg|lgt|tk\.?|ek\.?|teaskanal|evokanal)\b)`,
+  'gi',
+)
+
+/**
+ * Whether an amount was written here at all, in any form.
+ *
+ * Looser than `statesAnAmount`, which also insists the fragment resolve to a
+ * weight. That is right for a joining word, where splitting a dish's name is
+ * the risk. It is wrong here: "2 tükörtojás" states an amount perfectly
+ * clearly and resolves to no weight only because the app has never heard of a
+ * fried egg by that name, and refusing to split on that basis keeps a known
+ * misreading rather than admitting an unknown food.
+ */
+function writesAnAmount(text: string): boolean {
+  if (/\d/.test(text)) return true
+  const words = text.toLowerCase().split(/[^a-zà-ÿ.]+/)
+  return words.some((w) => w in SPOON_GRAMS)
+}
+
+/**
+ * Puts a break before each such spoon, leaving parentheticals alone.
+ *
+ * Offsets are found against a copy with every parenthetical blanked out to the
+ * same length, so a teaspoon inside brackets belongs to the dish in front of
+ * it, exactly as it does for the joining words.
+ */
+function breakBeforeSpoons(line: string): string {
+  const masked = line.replace(/\([^)]*\)/g, (m) => ' '.repeat(m.length))
+  const cuts: number[] = []
+  for (const m of masked.matchAll(SPOON_STARTS)) {
+    const at = m.index ?? 0
+    const before = masked.slice(0, at).split(/[,+]/).pop() ?? ''
+    if (before.trim() && writesAnAmount(before)) cuts.push(at)
+  }
+  let out = line
+  for (const at of cuts.reverse()) out = `${out.slice(0, at)} + ${out.slice(at + 1)}`
+  return out
+}
+
 export function splitComponents(line: string): string[] {
   const out: string[] = []
   let depth = 0
@@ -241,7 +312,7 @@ export function splitComponents(line: string): string[] {
   // weight of their own. Otherwise it is part of a dish's name, and splitting
   // "terci de ovaz cu mere" gave a porridge's 100 ml of milk to the apples.
   // Parentheticals are left alone: inside them the words belong to one recipe.
-  const joined = line.replace(/\([^)]*\)/g, (m) => m.replace(JOINERS, ' \uE000 '))
+  const joined = breakBeforeSpoons(line.replace(/\([^)]*\)/g, (m) => m.replace(JOINERS, ' \uE000 '))
     .replace(JOINERS, (m, offset: number, whole: string) => {
       // Only the fragment on each side, not the whole rest of the line. Testing
       // the remainder let a later "150 g iaurt" vouch for "chec cu branza si
@@ -250,13 +321,29 @@ export function splitComponents(line: string): string[] {
       const after = (whole.slice(offset + m.length).split(/[,+]/)[0] ?? '')
       return statesAnAmount(before) && statesAnAmount(after) ? ' + ' : m
     })
-    .replace(/ \uE000 /g, ' cu ')
+    .replace(/ \uE000 /g, ' cu '))
 
   for (let i = 0; i < joined.length; i++) {
     const ch = joined[i]
     if (ch === '(') depth++
     if (ch === ')') depth = Math.max(0, depth - 1)
-    if (depth === 0 && (ch === ',' || ch === '+')) {
+    /*
+     * A colon separates a dish from what it is made of.
+     *
+     * "quinoas gombas salata : 150 g gomba megparolva" is a name and then an
+     * ingredient, and read as one fragment the 150 g attached to the quinoa in
+     * the name rather than to the mushrooms, which made a 1,307 kcal salad out
+     * of 290 g of dry quinoa. The same shape swallowed the weight in "salata
+     * cezar : 120 g piept de curcan" and "tigaie picanta: 120 g piept de pui",
+     * where the number she wrote was simply dropped and the dish's own figure
+     * stood in fifty-eight fragments.
+     *
+     * Only at the top level, so the labels she uses inside brackets, "pt 2
+     * portii:" and "sos:", still belong to the dish in front of them. The slot
+     * name's own colon never reaches here; it is consumed when the line is
+     * split into meals.
+     */
+    if (depth === 0 && (ch === ',' || ch === '+' || ch === ':')) {
       // A comma between two digits is a decimal point, not a separator -
       // "iaurt 1,5-3,5%" is one component, not three.
       const isDecimal = ch === ',' && /\d/.test(joined[i - 1] ?? '') && /\d/.test(joined[i + 1] ?? '')

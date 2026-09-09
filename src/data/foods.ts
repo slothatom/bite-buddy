@@ -25,7 +25,8 @@ export const FOODS: Food[] = [
   {
     id: 'bread-wholemeal',
     names: { en: 'Wholemeal bread', ro: 'pâine integrală', hu: 'teljes kiőrlésű kenyér' },
-    aliases: ['paine int', 'paine integrala', 'paine int prajita', 'teljes kiorlesu kenyer', 'kenyer', 'paine'],
+    aliases: ['paine int', 'paine integrala', 'paine int prajita', 'teljes kiorlesu kenyer', 'kenyer', 'paine',
+      'piritos', 'pirtos'],
     category: 'grains', medTier: 'daily', state: 'as-sold',
     per100g: { calories: 247, protein: 13, carbs: 41, fat: 3.4, fiber: 7, sodium: 450 },
     units: [{ label: 'slice', grams: 30 }],
@@ -394,7 +395,7 @@ export const FOODS: Food[] = [
   {
     id: 'sweet-potato',
     names: { en: 'Sweet potato', ro: 'cartofi dulci', hu: 'édesburgonya' },
-    aliases: ['cartofi dulci', 'edesburgonya'],
+    aliases: ['cartofi dulci', 'edesburgonya', 'edeskrumpli', 'edeskrumpli a lerben'],
     category: 'vegetables', medTier: 'daily', state: 'raw',
     per100g: { calories: 86, protein: 1.6, carbs: 20.1, fat: 0.1, fiber: 3, potassium: 337 },
     units: [], source: 'curated',
@@ -463,8 +464,8 @@ export const FOODS: Food[] = [
   },
   {
     id: 'grapefruit',
-    names: { en: 'Grapefruit', ro: 'grapefruit' },
-    aliases: ['grapefruit'],
+    names: { en: 'Grapefruit', ro: 'grapefruit', hu: 'grépfrút' },
+    aliases: ['grapefruit', 'grepfrut', 'gref'],
     category: 'fruits', medTier: 'daily', state: 'raw',
     per100g: { calories: 42, protein: 0.8, carbs: 10.7, fat: 0.1, fiber: 1.6, vitaminC: 31, sodium: 0 },
     units: [{ label: 'grapefruit', grams: 250 }],
@@ -579,8 +580,8 @@ export const FOODS: Food[] = [
   },
   {
     id: 'nectarine',
-    names: { en: 'Nectarine', ro: 'nectarine' },
-    aliases: ['nectarine', 'nectarina'],
+    names: { en: 'Nectarine', ro: 'nectarine', hu: 'nektarin' },
+    aliases: ['nectarine', 'nectarina', 'nektarin'],
     category: 'fruits', medTier: 'daily', state: 'raw',
     per100g: { calories: 44, protein: 1.1, carbs: 10.6, fat: 0.3, fiber: 1.7, sodium: 0 },
     units: [], source: 'curated',
@@ -683,7 +684,7 @@ export const FOODS: Food[] = [
   {
     id: 'milk',
     names: { en: 'Milk', ro: 'lapte', hu: 'tej' },
-    aliases: ['lapte', 'tej'],
+    aliases: ['lapte', 'tej', 'tejbe', 'tejben'],
     category: 'dairy', medTier: 'moderate', state: 'as-sold',
     per100g: { calories: 47, protein: 3.4, carbs: 4.8, fat: 1.5, calcium: 120, fiber: 0, sodium: 38 },
     units: [], source: 'curated',
@@ -723,7 +724,7 @@ export const FOODS: Food[] = [
   {
     id: 'cottage-cheese',
     names: { en: 'Cottage cheese', ro: 'brânză de vaci', hu: 'túró' },
-    aliases: ['branza de vaci', 'branza cottage', 'turo'],
+    aliases: ['branza de vaci', 'branza cottage', 'turo', 'cottage'],
     category: 'dairy', medTier: 'moderate', state: 'as-sold',
     per100g: { calories: 98, protein: 11, carbs: 3.4, fat: 4.3, calcium: 83, fiber: 0.1, sodium: 403 },
     units: [], source: 'curated',
@@ -815,7 +816,8 @@ export const FOODS: Food[] = [
   {
     id: 'chicken-breast',
     names: { en: 'Chicken breast', ro: 'piept de pui', hu: 'csirkemell' },
-    aliases: ['piept de pui', 'csirkemell', 'grill csirkemell', 'piept de pui la gratar'],
+    aliases: ['piept de pui', 'csirkemell', 'grill csirkemell', 'piept de pui la gratar',
+      'csirkehus', 'csirkehust'],
     category: 'poultry', medTier: 'moderate', state: 'raw',
     per100g: { calories: 120, protein: 22.5, carbs: 0, fat: 2.6, sodium: 66 },
     units: [], source: 'curated',
@@ -831,7 +833,7 @@ export const FOODS: Food[] = [
   {
     id: 'egg',
     names: { en: 'Egg', ro: 'ou', hu: 'tojás' },
-    aliases: ['ou', 'oua', 'tojas', 'ochiuri', 'oua posate', 'ou semi'],
+    aliases: ['ou', 'oua', 'tojas', 'ochiuri', 'oua posate', 'ou semi', 'oua fierte', 'tukortojas'],
     category: 'eggs', medTier: 'moderate', state: 'raw',
     per100g: { calories: 143, protein: 12.6, carbs: 0.7, fat: 9.5, vitaminD: 2, fiber: 0, sodium: 129 },
     units: [{ label: 'egg', grams: 55 }],
@@ -866,7 +868,8 @@ export const FOODS: Food[] = [
   {
     id: 'olive-oil',
     names: { en: 'Extra virgin olive oil', ro: 'ulei de măsline', hu: 'olívaolaj' },
-    aliases: ['ulei de masline', 'ulei', 'olivaolaj', 'olivaolajjal'],
+    aliases: ['ulei de masline', 'ulei', 'olivaolaj', 'olivaolajjal', 'oliva olajjal', 'oliva olaj',
+      'olivaolajban'],
     category: 'fats-vinegars', medTier: 'daily', state: 'as-sold',
     per100g: { calories: 884, protein: 0, carbs: 0, fat: 100, saturatedFat: 13.8, fiber: 0, sodium: 0 },
     units: [{ label: 'tsp', grams: 5 }, { label: 'tbsp', grams: 15 }],
@@ -901,7 +904,7 @@ export const FOODS: Food[] = [
   {
     id: 'yogurt-garlic-sauce',
     names: { en: 'Yogurt garlic sauce', ro: 'sos de usturoi cu iaurt', hu: 'joghurtos fokhagymaszósz' },
-    aliases: ['sos de usturoi', 'sos de usrutoi', 'joghurtos fokhagyma szosz', 'sos de usturoi pe baza de iaurt',
+    aliases: ['sos de usturoi', 'sos de usrutoi', 'joghurtos fokhagyma szosz', 'tzatziki szosz', 'sos de usturoi pe baza de iaurt',
       'sos de baza de iaurt si usturoi', 'iaurt cu sos de usturoi'],
     category: 'spreads-sauces', medTier: 'moderate', state: 'as-sold',
     per100g: { calories: 70, protein: 3.4, carbs: 5, fat: 4 },
@@ -969,7 +972,7 @@ export const FOODS: Food[] = [
   {
     id: 'vanilla-extract',
     names: { en: 'Vanilla extract', ro: 'esență de vanilie' },
-    aliases: ['esenta de vanilie'],
+    aliases: ['esenta de vanilie', 'vanilia eszencia', 'vanilia eszenc'],
     category: 'herbs-spices', medTier: 'moderate', state: 'as-sold',
     per100g: { calories: 288, protein: 0.1, carbs: 12.7, fat: 0.1, fiber: 0, sodium: 9 },
     units: [], source: 'curated',
@@ -995,6 +998,64 @@ export const FOODS: Food[] = [
     units: [{ label: 'tsp', grams: 7 }],
     source: 'curated',
   },
+  // ─── Foods the autumn 2020 and 2022 plans brought with them ───────────────
+  // Eleven weeks of plans arrived after the first import and named these; the
+  // library had never seen any of them, so the meals came in with holes.
+  // Figures per 100 g, in the state the plans weigh them.
+  {
+    id: 'chicken-thigh',
+    names: { en: 'Chicken thigh', ro: 'pulpă de pui', hu: 'csirkecomb' },
+    aliases: ['pulpa de pui', 'pulpe de pui', 'pulpa de pui la cuptor', 'pulpa de pui dezosata',
+      'csirkecomb', 'csirkecombot'],
+    category: 'poultry', medTier: 'moderate', state: 'raw',
+    per100g: { calories: 119, protein: 19.7, carbs: 0, fat: 4.1, sodium: 86 },
+    units: [], source: 'curated',
+  },
+  {
+    id: 'zander',
+    names: { en: 'Zander', ro: 'șalău', hu: 'fogas' },
+    aliases: ['salau', 'salau la cuptor', 'fogas'],
+    category: 'fish-seafood', medTier: 'weekly', state: 'raw',
+    per100g: { calories: 84, protein: 19.1, carbs: 0, fat: 0.7, sodium: 51 },
+    units: [], source: 'curated',
+  },
+  {
+    id: 'butter',
+    names: { en: 'Butter', ro: 'unt', hu: 'vaj' },
+    aliases: ['unt', 'vaj'],
+    category: 'fats-vinegars', medTier: 'rare', state: 'as-sold',
+    per100g: { calories: 717, protein: 0.9, carbs: 0.1, fat: 81.1, sodium: 11 },
+    units: [{ label: 'tsp', grams: 5 }],
+    source: 'curated',
+  },
+  {
+    id: 'buckwheat',
+    names: { en: 'Buckwheat', ro: 'hrișcă', hu: 'hajdina' },
+    // Weighed dry, like every other grain in these plans.
+    aliases: ['hrisca', 'hajdina', 'fott hajdina'],
+    category: 'grains', medTier: 'daily', state: 'dry',
+    per100g: { calories: 343, protein: 13.3, carbs: 71.5, fat: 3.4, fiber: 10, sodium: 1 },
+    units: [], source: 'curated',
+  },
+  {
+    id: 'pumpkin',
+    names: { en: 'Pumpkin', ro: 'dovleac', hu: 'tök' },
+    aliases: ['dovleac', 'dovleac copt', 'dovleac la cuptor', 'dovleac placintar',
+      'dovleac placintar la cuptor', 'tok', 'sutotok'],
+    category: 'vegetables', medTier: 'daily', state: 'raw',
+    per100g: { calories: 26, protein: 1, carbs: 6.5, fat: 0.1, fiber: 0.5, sodium: 1 },
+    units: [], source: 'curated',
+  },
+  {
+    id: 'oregano',
+    names: { en: 'Oregano', ro: 'oregano', hu: 'oregánó' },
+    aliases: ['oregano', 'oreganó'],
+    category: 'herbs-spices', medTier: 'daily', state: 'as-sold',
+    per100g: { calories: 265, protein: 9, carbs: 68.9, fat: 4.3, fiber: 42.5, sodium: 25 },
+    units: [{ label: 'tsp', grams: 1 }],
+    source: 'curated',
+  },
+
   // ─── Drinks ────────────────────────────────────────────────────────────────
   // A day has drinks in it and this list had water, so everything anybody
   // actually drinks was unrecordable: a tracker that cannot hold a coffee is a

@@ -193,9 +193,10 @@ test.describe('the main flow', () => {
   test('load a dietician week, then build a grocery list from it', async ({ page }) => {
     const errors = trackErrors(page)
 
-    // 1. The archive offers all 14 plans.
+    // 1. The archive offers every plan she has written. Twenty-five of them
+    //    now: fourteen were imported first, and eleven more arrived later.
     await goto(page, '/settings/history')
-    await expect(page.getByRole('button', { name: /^Load$/ })).toHaveCount(14)
+    await expect(page.getByRole('button', { name: /^Load$/ })).toHaveCount(25)
 
     // 2. Loading one fills the planner. Into next week, so all seven days are
     // still ahead and the shopping list further down will offer all of them.
@@ -556,11 +557,13 @@ test.describe('the recipe library', () => {
   test('the same dish written four times is one recipe, not four', async ({ page }) => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Dinner/ }).click()
-    await page.getByPlaceholder(/Search in English/).fill('green bean soup')
+    await page.getByPlaceholder(/Search in English/).fill('green bean soup with wholemeal bread')
 
     // Four lines across the plans, worded four ways, down to a typo in "sos de
     // usturoi". The importer reads them as the one dinner they are, so there is
-    // nothing here to group and no numbering to hide.
+    // nothing here to group and no numbering to hide. Named in full, because a
+    // later plan added a Hungarian green bean soup that is a different dinner:
+    // 300 g with yogurt and no bread.
     await expect(page.locator('.card')).toHaveCount(1)
     await expect(page.getByText('(2)')).toHaveCount(0)
     await expect(page.getByText(/versions/)).toHaveCount(0)
@@ -569,7 +572,7 @@ test.describe('the recipe library', () => {
   test('the same dish at three portions is one card, with the portions inside it', async ({ page }) => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Breakfast/ }).click()
-    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt')
+    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt & mixed berries')
 
     // 30, 40 and 45 g of oats is a real choice rather than a repeat, so all
     // three survive the import, and each name says which one it is.
@@ -613,7 +616,7 @@ test.describe('the recipe library', () => {
   test('a dish written at different portions is never swept up automatically', async ({ page }) => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Breakfast/ }).click()
-    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt')
+    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt & mixed berries')
 
     // 30 g and 45 g of oats are a real choice, so this one keeps its versions
     // and nothing offers to fold them together.
@@ -625,7 +628,7 @@ test.describe('the recipe library', () => {
   test('merging by hand keeps the version you are looking at, and can be undone', async ({ page }) => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Breakfast/ }).click()
-    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt')
+    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt & mixed berries')
     await page.locator('.card button').nth(1).click()
 
     await page.getByRole('button', { name: /Merge these into one/ }).click()
@@ -640,7 +643,7 @@ test.describe('the recipe library', () => {
   })
 
   test('a day already planned survives a merge', async ({ page }) => {
-    // The fourteen archived weeks name recipe ids in code, so a merge must not
+    // The archived weeks name recipe ids in code, so a merge must not
     // leave a planned day pointing at nothing. Nor must the importer's own
     // merging: a week loaded from the archive names the recipes that survived
     // it, and any id it folded away resolves through the aliases it wrote.
@@ -652,7 +655,7 @@ test.describe('the recipe library', () => {
 
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Breakfast/ }).click()
-    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt')
+    await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt & mixed berries')
     await page.locator('.card button').nth(1).click()
     await page.getByRole('button', { name: /Merge these into one/ }).click()
     await page.getByRole('button', { name: 'Merge into this one' }).click()
@@ -732,7 +735,7 @@ test.describe('the recipe library', () => {
   test('a recipe says what it is and what it asks of you', async ({ page }) => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Dinner/ }).click()
-    await page.getByPlaceholder(/Search in English/).fill('green bean soup')
+    await page.getByPlaceholder(/Search in English/).fill('green bean soup with wholemeal bread')
     await page.locator('.card button').nth(1).click()
 
     await expect(page.getByText('Soup', { exact: true })).toBeVisible()
@@ -995,7 +998,7 @@ test.describe('building a recipe from the food database', () => {
     // of two of them can have a fibre floor rather than a fibre total.
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Dinner/ }).click()
-    await page.getByPlaceholder(/Search in English/).fill('green bean soup')
+    await page.getByPlaceholder(/Search in English/).fill('green bean soup with wholemeal bread')
     await page.locator('.card button').nth(1).click()
 
     const note = page.getByText(/means a floor, not a total/)
