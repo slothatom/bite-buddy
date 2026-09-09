@@ -17,8 +17,16 @@ const SLOT_KEYS: Record<string, MealSlot> = {
   // Romanian
   md: 'breakfast', g1: 'snack', pranz: 'lunch', p: 'lunch', g2: 'snack', cina: 'dinner', c: 'dinner',
   // Hungarian
-  reggeli: 'breakfast', uzsi1: 'snack', ebed: 'lunch', uzsi2: 'snack', vacsi: 'dinner',
+  // She writes dinner both ways. "Vacsora" is the word; "Vacsi" is the
+  // shortening, and for a long time it was the only one here, so eighty-four
+  // dinners across thirteen weeks were read as lines with no meal to put them
+  // in and dropped without a word.
+  reggeli: 'breakfast', uzsi1: 'snack', ebed: 'lunch', uzsi2: 'snack',
+  vacsi: 'dinner', vacsora: 'dinner',
 }
+
+/** The half of those that are Hungarian, for telling the two kinds of plan apart. */
+const HUNGARIAN_SLOTS = new Set(['reggeli', 'uzsi1', 'ebed', 'uzsi2', 'vacsi', 'vacsora'])
 
 const DAY_NAMES: Record<string, number> = {
   // Romanian, 0 = Sunday
@@ -86,12 +94,30 @@ function linesOf(path: string): string[] {
   return path.toLowerCase().endsWith('.pdf') ? readPdfLines(path) : readDocxParagraphs(path)
 }
 
-function describeFile(file: string): Omit<RawPlan, 'days' | 'id' | 'file'> {
+/**
+ * Which language a plan is written in, read from the plan.
+ *
+ * This used to be a guess at the file's name: `_trend` at the end, or the
+ * letters "AranyM" then any character then a "k". That held while the
+ * Hungarian ones were called `AranyM_k11.01.2021_trend.docx`, and stopped the
+ * day the rest of the archive arrived as `Arany-Mák-01.12.2020.pdf`, where the
+ * hyphen is one character too many for the pattern. Sixteen of the thirty-six
+ * weeks flew a Romanian flag over Hungarian food.
+ *
+ * The meal labels say it outright and cannot be renamed by a download: a
+ * Hungarian plan writes Reggeli, Uzsi1, Ebéd, Uzsi2 and Vacsi, a Romanian one
+ * MD, G1, Pranz, G2 and Cina.
+ */
+function languageOf(keys: string[]): PlanLanguage {
+  const hungarian = keys.filter((k) => HUNGARIAN_SLOTS.has(k)).length
+  return hungarian * 2 > keys.length ? 'hu' : 'ro'
+}
+
+function describeFile(file: string): Omit<RawPlan, 'days' | 'id' | 'file' | 'language'> {
   const name = basename(file, '.docx').replace(/\.pdf$/i, '')
   // Uploaded files carry an 8-hex prefix; strip it before matching.
   const stem = name.replace(/^[0-9a-f]{8}-/, '')
 
-  const isHungarian = /_trend$/i.test(stem) || /AranyM_k/i.test(stem)
   const other = /Dospinescu|Olivia/i.test(stem)
 
   const date = stem.match(/(\d{2})\.(\d{2})\.(\d{4})/)
@@ -105,7 +131,6 @@ function describeFile(file: string): Omit<RawPlan, 'days' | 'id' | 'file'> {
 
   return {
     label: other ? `${label} (Olivia)` : label,
-    language: isHungarian ? 'hu' : 'ro',
     issuedOn,
     subject: other ? 'other' : 'self',
   }
@@ -114,6 +139,7 @@ function describeFile(file: string): Omit<RawPlan, 'days' | 'id' | 'file'> {
 function parseDocument(path: string, id: string): RawPlan {
   const meta = describeFile(path)
   const days: RawDay[] = []
+  const slotKeys: string[] = []
   let current: RawDay | undefined
 
   for (const line of linesOf(path)) {
@@ -143,6 +169,7 @@ function parseDocument(path: string, id: string): RawPlan {
 
     const slot = SLOT_KEYS[key]
     if (!slot || !current) continue
+    slotKeys.push(key)
     if (value === '-') continue
 
     current.meals.push({
@@ -152,7 +179,7 @@ function parseDocument(path: string, id: string): RawPlan {
     })
   }
 
-  return { id, file: basename(path), ...meta, days }
+  return { id, file: basename(path), ...meta, language: languageOf(slotKeys), days }
 }
 
 function bare(text: string): Omit<RawFragment, 'inner' | 'innerFragments'> {

@@ -68,7 +68,18 @@ function readObjects(buf: Buffer): { objects: Objects; pages: string[] } {
     if (buf[from] === 0x0a) from++
     const to = at + endStream
     if (to <= from) continue
-    if (dict.includes('FontFile') || dict.includes('/Image') || dict.includes('/Metadata')) continue
+    /*
+     * `/Length1` is how an embedded font program announces itself.
+     *
+     * `/FontFile2` names it from the font descriptor, which is a different
+     * object, so the stream's own dictionary says only its two lengths. Read
+     * as page content, six hundred kilobytes of glyph outlines produced a run
+     * of bytes that the line joiner then stuck onto the end of the last meal
+     * of the document: "Vacsora: vegyes saláta + 50 g feta + 1 tk. olívaolaj"
+     * and then a paragraph of rubbish.
+     */
+    if (dict.includes('FontFile') || dict.includes('/Length1')) continue
+    if (dict.includes('/Image') || dict.includes('/Metadata') || dict.includes('/XRef')) continue
 
     let data: string
     if (dict.includes('FlateDecode')) {
@@ -315,8 +326,51 @@ function runs(stream: string, fonts: Map<string, Map<number, string>>): Run[] {
  */
 const SAME_LINE = 3
 
-function pageLines(stream: string, fonts: Map<string, Map<number, string>>): string[] {
-  const sorted = runs(stream, fonts).sort((a, b) => b.y - a.y || a.x - b.x)
+/**
+ * Where a page is split into two columns, if it is.
+ *
+ * One of the thirty-six weeks is laid out as two columns, and read straight
+ * down the page it came out as "Miercuri: Sambata:" and lunch with somebody
+ * else's breakfast welded to the end of it. Nothing parsed, and the plan
+ * arrived with no days in it at all.
+ *
+ * A gutter is a band no text begins in, and there are usually several: a left
+ * column has sparse patches all through it wherever no run happens to start.
+ * Taking the widest put the split inside the left column, which cut "farfurie"
+ * in half and posted "rie" to the other side of the page. The gutter is the
+ * *last* clear band, because everything to the left of it is still column one.
+ *
+ * Both sides also have to be substantial, which is what keeps an ordinary page
+ * whole: on one column of prose the right-hand end is a thin tail, not half a
+ * page of text.
+ */
+const GUTTER = 35
+
+function columnSplit(all: Run[]): number | null {
+  if (all.length < 40) return null
+
+  const xs = [...new Set(all.map((r) => r.x))].sort((a, b) => a - b)
+  const low = xs[0]
+  const high = xs[xs.length - 1]
+  if (high - low < 200) return null
+
+  const enough = all.length * 0.25
+  let best: number | null = null
+
+  for (let i = 1; i < xs.length; i++) {
+    if (xs[i] - xs[i - 1] < GUTTER) continue
+    const at = (xs[i - 1] + xs[i]) / 2
+    const left = all.filter((r) => r.x < at).length
+    if (left < enough || all.length - left < enough) continue
+    best = at
+  }
+
+  return best
+}
+
+/** Runs gathered into lines, down the page and then across it. */
+function linesFrom(all: Run[]): string[] {
+  const sorted = [...all].sort((a, b) => b.y - a.y || a.x - b.x)
   const lines: string[] = []
   let top: number | null = null
 
@@ -330,6 +384,19 @@ function pageLines(stream: string, fonts: Map<string, Map<number, string>>): str
   }
 
   return lines
+}
+
+function pageLines(stream: string, fonts: Map<string, Map<number, string>>): string[] {
+  const all = runs(stream, fonts)
+  const split = columnSplit(all)
+  if (split == null) return linesFrom(all)
+
+  // The left column first and then the right, which is the order they are
+  // read in and the order the days run.
+  return [
+    ...linesFrom(all.filter((r) => r.x < split)),
+    ...linesFrom(all.filter((r) => r.x >= split)),
+  ]
 }
 
 /**
@@ -361,6 +428,11 @@ export function readPdfLines(path: string): string[] {
       // Word writes non-breaking spaces literally, as `docx.ts` also finds.
       const clean = text.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim()
       if (!clean) continue
+      // Whatever else a meal line is, it is words. A run that is mostly
+      // control characters came from something that is not text, and the next
+      // one will not have the same dictionary to be excluded by.
+      const readable = clean.replace(/[^\p{L}\d\s.,:;()/+%'"-]/gu, '').length
+      if (readable / clean.length < 0.8) continue
       // Page numbers, and the header and footer artefacts around them.
       if (/^\d{1,2}$/.test(clean)) continue
 

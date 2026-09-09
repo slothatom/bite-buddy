@@ -251,9 +251,26 @@ export function TierBadge({ tier }: { tier: MedTier }) {
  * text, rather than italic, near-invisible grey.
  */
 export function SourceLine({
-  text, truncate = false, clamp, translate = false,
+  text, truncate = false, clamp, translate = false, lead = false, lang = 'ro',
 }: {
   text: string
+  /**
+   * Whether the dietician's own wording is the headline.
+   *
+   * Off everywhere but the plan archive. The English goes first in the rest of
+   * the app because for one of the two people here the Romanian is not
+   * readable at all, and a line they cannot read is not a heading. The archive
+   * is the other case: it is where her weeks are read as hers, so her words
+   * lead and the reading sits under them.
+   */
+  lead?: boolean
+  /**
+   * Which language the original is in.
+   *
+   * It was always announced as Romanian, so a screen reader read eighteen
+   * Hungarian weeks aloud in Romanian. The plan knows which it is.
+   */
+  lang?: 'ro' | 'hu'
   /**
    * Whether this is a line of the dietician's, or simply foreign text.
    *
@@ -292,13 +309,31 @@ export function SourceLine({
 
   if (dense || !english || english.toLowerCase() === text.toLowerCase()) {
     const shown = dense && english ? english : text
-    return <span className={`text-[13px] text-ink-500 min-w-0 ${wrap}`} title={text}>{shown}</span>
+    const asWritten = shown === text
+    return (
+      <span
+        className={`text-[13px] text-ink-500 min-w-0 ${wrap}`}
+        lang={asWritten ? lang : undefined}
+        title={text}
+      >
+        {shown}
+      </span>
+    )
+  }
+
+  if (lead) {
+    return (
+      <span className="block min-w-0">
+        <span className={`text-[13px] text-ink-900 min-w-0 ${wrap}`} lang={lang}>{text}</span>
+        <span className={`text-[13px] text-ink-500 min-w-0 italic ${wrap}`}>{english}</span>
+      </span>
+    )
   }
 
   return (
     <span className="block min-w-0">
       <span className={`text-[13px] text-ink-700 min-w-0 ${wrap}`}>{english}</span>
-      <span className={`text-[13px] text-ink-500 min-w-0 italic ${wrap}`} lang="ro">{text}</span>
+      <span className={`text-[13px] text-ink-500 min-w-0 italic ${wrap}`} lang={lang}>{text}</span>
     </span>
   )
 }

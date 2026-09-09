@@ -725,7 +725,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "vegyes salata + 50 g telemea + 1 tk. olivaolaj",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "50 g Telemea"
   },
   {
     "id": "meal-breakfast-024",
@@ -923,7 +924,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "250 g puliszka + 150 g ricotta + 150 g joghurt",
     "sourcePlanId": "plan-02",
-    "createdAt": "2021-01-11T00:00:00.000Z"
+    "createdAt": "2021-01-11T00:00:00.000Z",
+    "variant": "150 g ricotta"
   },
   {
     "id": "meal-snack-033",
@@ -2854,7 +2856,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "mamaliga (din 50 g faina de malai), 100 g branza de vaci, o lg de iaurt",
     "sourcePlanId": "plan-06",
     "createdAt": "2022-11-21T00:00:00.000Z",
-    "variant": "15 g yogurt"
+    "variant": "15 g yogurt, 100 g cottage cheese"
   },
   {
     "id": "meal-breakfast-100",
@@ -3509,7 +3511,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "300 g supa crema de ciuperci, 20 g paine int prajita",
     "sourcePlanId": "plan-08",
-    "createdAt": "2022-01-01T00:00:00.000Z"
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "20 g wholemeal bread"
   },
   {
     "id": "meal-lunch-129",
@@ -4793,7 +4796,7 @@ export const MEAL_RECIPES: Recipe[] = [
   {
     "id": "meal-lunch-179",
     "name": {
-      "en": "Salmon with raw vegetable salad, extra virgin olive oil & yogurt garlic sauce"
+      "en": "Salmon with raw vegetable salad & extra virgin olive oil"
     },
     "emoji": "🍽️",
     "servings": 1,
@@ -4827,7 +4830,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "125 g somon la gratar, salata de cruditati, o lingurita de ulei de masline, 50 g sos de usturoi",
     "sourcePlanId": "plan-11",
-    "createdAt": "2022-07-04T00:00:00.000Z"
+    "createdAt": "2022-07-04T00:00:00.000Z",
+    "variant": "125 g salmon, 50 g yogurt garlic sauce"
   },
   {
     "id": "meal-snack-180",
@@ -5372,7 +5376,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "200 g mamaliga, 100 g branza de vaci, 2 lg de iaurt",
     "sourcePlanId": "plan-12",
     "createdAt": "2022-07-11T00:00:00.000Z",
-    "variant": "30 g yogurt"
+    "variant": "30 g yogurt, 100 g cottage cheese"
   },
   {
     "id": "meal-snack-200",
@@ -5731,7 +5735,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "50 g paine int, 2 oua fierte, jumatate de farfurie de legume",
     "sourcePlanId": "plan-13",
-    "createdAt": "2022-10-01T00:00:00.000Z"
+    "createdAt": "2022-10-01T00:00:00.000Z",
+    "variant": "50 g wholemeal bread"
   },
   {
     "id": "meal-breakfast-214",
@@ -6668,7 +6673,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "mamaliga din 50 g faina de malai, 100 g branza de vaci, 50 g iaurt",
     "sourcePlanId": "plan-15",
     "createdAt": "2022-11-07T00:00:00.000Z",
-    "variant": "50 g yogurt"
+    "variant": "50 g yogurt, 100 g cottage cheese"
   },
   {
     "id": "meal-lunch-254",
@@ -6811,7 +6816,8 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "paste cu legume (50 g paste integrale nefierte, 200 g legume calite intr-o lingurita de ulei de masline)",
     "sourcePlanId": "plan-16",
-    "createdAt": "2022-09-12T00:00:00.000Z"
+    "createdAt": "2022-09-12T00:00:00.000Z",
+    "variant": "150 g"
   },
   {
     "id": "meal-dinner-258",
@@ -7708,7 +7714,42 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-01T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-292",
+    "id": "meal-dinner-292",
+    "name": {
+      "en": "Tuna in brine with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 14,
+    "cookMinutes": 22,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "tuna-canned",
+        "grams": 75
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes saláta + 75 g tonhal saját levében + 1 tk. olívaolaj",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-12-01T00:00:00.000Z",
+    "variant": "75 g tuna in brine"
+  },
+  {
+    "id": "meal-lunch-293",
     "name": {
       "en": "Chicken with mushrooms & peppers, buckwheat & mixed vegetables"
     },
@@ -7747,7 +7788,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-293",
+    "id": "meal-snack-294",
     "name": {
       "en": "Yogurt with mixed berries"
     },
@@ -7777,7 +7818,37 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "50 g mixed berries"
   },
   {
-    "id": "meal-breakfast-294",
+    "id": "meal-dinner-295",
+    "name": {
+      "en": "Green bean soup with yogurt"
+    },
+    "emoji": "🍲",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-ciorba-green-bean",
+        "servings": 0.53
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g zöldpaszuly leves (1 tk. olívaolaj / adag)+ 1 ek. joghurt",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-12-01T00:00:00.000Z",
+    "variant": "300 g green bean soup"
+  },
+  {
+    "id": "meal-breakfast-296",
     "name": {
       "en": "Egg with wholemeal bread & raw vegetable salad"
     },
@@ -7817,7 +7888,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "40 g wholemeal bread"
   },
   {
-    "id": "meal-lunch-295",
+    "id": "meal-lunch-297",
     "name": {
       "en": "Pickles"
     },
@@ -7841,7 +7912,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-297",
+    "id": "meal-snack-300",
     "name": {
       "en": "Clementine with walnuts"
     },
@@ -7870,7 +7941,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-01T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-298",
+    "id": "meal-lunch-301",
     "name": {
       "en": "Chicken breast with extra virgin olive oil & mixed vegetables"
     },
@@ -7904,7 +7975,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-299",
+    "id": "meal-snack-302",
     "name": {
       "en": "Pear with cashews"
     },
@@ -7934,7 +8005,42 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "5 g cashews"
   },
   {
-    "id": "meal-breakfast-300",
+    "id": "meal-dinner-303",
+    "name": {
+      "en": "Mozzarella with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 65
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes saláta + 65 g mozzarella + 1 tk. olívaolaj",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-12-01T00:00:00.000Z",
+    "variant": "65 g mozzarella"
+  },
+  {
+    "id": "meal-breakfast-304",
     "name": {
       "en": "Wholemeal bread with mixed vegetables & extra virgin olive oil"
     },
@@ -7974,7 +8080,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "40 g wholemeal bread, 100 g eggplant"
   },
   {
-    "id": "meal-lunch-302",
+    "id": "meal-lunch-306",
     "name": {
       "en": "Tofu with mushrooms"
     },
@@ -8003,7 +8109,82 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-01T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-305",
+    "id": "meal-dinner-307",
+    "name": {
+      "en": "Mozzarella with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "telemea",
+        "grams": 15
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes saláta + 50 g mozzarella, 15 g telemea + 1 tk. olívaolaj",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-12-01T00:00:00.000Z",
+    "variant": "50 g mozzarella"
+  },
+  {
+    "id": "meal-dinner-310",
+    "name": {
+      "en": "Salmon with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 14,
+    "cookMinutes": 22,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salmon",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "100 g lazac roston / a lerben + vegyes saláta + 1 tk. olívaolaj",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-12-01T00:00:00.000Z",
+    "variant": "100 g salmon, no yogurt garlic sauce"
+  },
+  {
+    "id": "meal-breakfast-311",
     "name": {
       "en": "Omelette with wholemeal bread & mixed vegetables"
     },
@@ -8038,7 +8219,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "40 g wholemeal bread, no zucchini"
   },
   {
-    "id": "meal-lunch-306",
+    "id": "meal-lunch-312",
     "name": {
       "en": "Salmon with bulgur & raw vegetable salad"
     },
@@ -8077,7 +8258,36 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-01T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-307",
+    "id": "meal-dinner-313",
+    "name": {
+      "en": "Chicken sour soup with yogurt"
+    },
+    "emoji": "🍲",
+    "servings": 1,
+    "prepMinutes": 16,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-ciorba-chicken",
+        "servings": 0.64
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g csirkés csorba + 1 ek. joghurt",
+    "sourcePlanId": "plan-18",
+    "createdAt": "2020-12-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-314",
     "name": {
       "en": "Hungarian cheese spread with wholemeal bread & sesame seeds"
     },
@@ -8121,7 +8331,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-02T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-309",
+    "id": "meal-lunch-316",
     "name": {
       "en": "Chickpeas with pickles"
     },
@@ -8151,7 +8361,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "350 g chickpeas"
   },
   {
-    "id": "meal-breakfast-310",
+    "id": "meal-breakfast-318",
     "name": {
       "en": "Hungarian cheese spread with wholemeal bread & mixed vegetables"
     },
@@ -8191,7 +8401,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "50 g wholemeal bread"
   },
   {
-    "id": "meal-snack-311",
+    "id": "meal-snack-319",
     "name": {
       "en": "Pear with walnuts"
     },
@@ -8220,7 +8430,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-02T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-312",
+    "id": "meal-lunch-320",
     "name": {
       "en": "Cod with mango salsa, bulgur"
     },
@@ -8249,7 +8459,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-02T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-315",
+    "id": "meal-snack-323",
     "name": {
       "en": "Orange with walnuts"
     },
@@ -8276,10 +8486,10 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "1 narancs + 10 g dió",
     "sourcePlanId": "plan-19",
     "createdAt": "2020-11-02T00:00:00.000Z",
-    "variant": "10 g walnuts"
+    "variant": "10 g walnuts, 180 g orange"
   },
   {
-    "id": "meal-lunch-316",
+    "id": "meal-lunch-324",
     "name": {
       "en": "Pork loin with cabbage & extra virgin olive oil"
     },
@@ -8319,7 +8529,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "100 g pork loin"
   },
   {
-    "id": "meal-breakfast-317",
+    "id": "meal-breakfast-326",
     "name": {
       "en": "Wholemeal bread with egg & extra virgin olive oil"
     },
@@ -8358,7 +8568,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-02T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-318",
+    "id": "meal-lunch-327",
     "name": {
       "en": "Pork loin with cabbage & extra virgin olive oil"
     },
@@ -8398,7 +8608,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "80 g pork loin"
   },
   {
-    "id": "meal-breakfast-319",
+    "id": "meal-breakfast-328",
     "name": {
       "en": "Mozzarella with wholemeal bread & raw vegetable salad"
     },
@@ -8438,7 +8648,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "80 g mozzarella"
   },
   {
-    "id": "meal-lunch-320",
+    "id": "meal-lunch-329",
     "name": {
       "en": "Quinoa with lentils & yogurt garlic sauce"
     },
@@ -8473,7 +8683,41 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "100 g yogurt garlic sauce"
   },
   {
-    "id": "meal-breakfast-321",
+    "id": "meal-dinner-330",
+    "name": {
+      "en": "Mixed vegetables with wholemeal bread & pumpkin seeds"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 5,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      },
+      {
+        "kind": "food",
+        "foodId": "pumpkin-seeds",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g zöldségkrémleves + 25 g pirítós, 10 g tökmag",
+    "sourcePlanId": "plan-19",
+    "createdAt": "2020-11-02T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-331",
     "name": {
       "en": "Banana & oat muffins"
     },
@@ -8503,7 +8747,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "150 g yogurt"
   },
   {
-    "id": "meal-lunch-322",
+    "id": "meal-lunch-332",
     "name": {
       "en": "Quinoa with lentils & yogurt garlic sauce"
     },
@@ -8538,7 +8782,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "50 g yogurt garlic sauce"
   },
   {
-    "id": "meal-breakfast-323",
+    "id": "meal-breakfast-333",
     "name": {
       "en": "Wholemeal bread with mixed vegetables & extra virgin olive oil"
     },
@@ -8578,7 +8822,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "60 g wholemeal bread, 100 g eggplant"
   },
   {
-    "id": "meal-snack-324",
+    "id": "meal-snack-334",
     "name": {
       "en": "Yogurt with mixed berries & cashews"
     },
@@ -8612,7 +8856,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-04T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-325",
+    "id": "meal-lunch-335",
     "name": {
       "en": "Tofu with extra virgin olive oil & bell pepper"
     },
@@ -8651,7 +8895,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-04T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-326",
+    "id": "meal-snack-336",
     "name": {
       "en": "Mango with walnuts"
     },
@@ -8681,7 +8925,37 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "200 g mango"
   },
   {
-    "id": "meal-breakfast-327",
+    "id": "meal-dinner-337",
+    "name": {
+      "en": "Green bean soup with yogurt"
+    },
+    "emoji": "🍲",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-ciorba-green-bean",
+        "servings": 0.61
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g zoldpaszuly leves (1 tk. olivaolaj / adag)+ 1 ek. joghurt",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2021-01-04T00:00:00.000Z",
+    "variant": "350 g green bean soup"
+  },
+  {
+    "id": "meal-breakfast-338",
     "name": {
       "en": "Feta with wholemeal bread & mixed vegetables"
     },
@@ -8725,7 +8999,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-04T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-328",
+    "id": "meal-lunch-339",
     "name": {
       "en": "Tofu with bell pepper"
     },
@@ -8754,7 +9028,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-04T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-329",
+    "id": "meal-breakfast-341",
     "name": {
       "en": "Extra virgin olive oil"
     },
@@ -8778,7 +9052,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-04T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-330",
+    "id": "meal-lunch-342",
     "name": {
       "en": "Trout with green peas & raw vegetable salad"
     },
@@ -8817,7 +9091,36 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-04T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-333",
+    "id": "meal-dinner-343",
+    "name": {
+      "en": "Raw vegetable salad with extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes salata + 1 tony junios + 1 tk. olivaolaj",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2021-01-04T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-346",
     "name": {
       "en": "Bruschetta with telemea"
     },
@@ -8852,7 +9155,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "5 g extra virgin olive oil"
   },
   {
-    "id": "meal-lunch-334",
+    "id": "meal-lunch-347",
     "name": {
       "en": "Avocado with quinoa & pumpkin seeds"
     },
@@ -8896,7 +9199,41 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-04T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-336",
+    "id": "meal-dinner-348",
+    "name": {
+      "en": "Wholemeal bread with zucchini & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "zucchini",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g cukkinikremleves 1 tk. olivaolajjal + 25 g kenyer piritva",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2021-01-04T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-350",
     "name": {
       "en": "Quinoa with red kidney beans & mixed vegetables"
     },
@@ -8935,7 +9272,41 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-04T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-338",
+    "id": "meal-dinner-351",
+    "name": {
+      "en": "Wholemeal bread with pumpkin seeds & zucchini"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "zucchini",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      },
+      {
+        "kind": "food",
+        "foodId": "pumpkin-seeds",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g cukkinikremleves + 25 g kenyer piritva + 10 g tokmag",
+    "sourcePlanId": "plan-20",
+    "createdAt": "2021-01-04T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-353",
     "name": {
       "en": "Grapefruit with nectarine"
     },
@@ -8964,7 +9335,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-05T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-339",
+    "id": "meal-lunch-354",
     "name": {
       "en": "Squash stew with mixed vegetables"
     },
@@ -8993,7 +9364,46 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-05T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-340",
+    "id": "meal-dinner-355",
+    "name": {
+      "en": "Celeriac with wholemeal bread & mixed seeds"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "celeriac",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "seeds-mixed",
+        "grams": 10
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g zellerkrémleves 1 tk. Olivaolaj/adag + 10 g pirított magvak + 25 g pirítós",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-356",
     "name": {
       "en": "Wholemeal bread with yogurt"
     },
@@ -9023,7 +9433,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "120 g wholemeal bread"
   },
   {
-    "id": "meal-snack-341",
+    "id": "meal-snack-357",
     "name": {
       "en": "Nectarine with walnuts"
     },
@@ -9052,7 +9462,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-05T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-342",
+    "id": "meal-lunch-358",
     "name": {
       "en": "Chicken patties with squash stew"
     },
@@ -9081,7 +9491,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-05T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-343",
+    "id": "meal-breakfast-359",
     "name": {
       "en": "Wholemeal bread with yogurt"
     },
@@ -9111,7 +9521,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "140 g wholemeal bread"
   },
   {
-    "id": "meal-lunch-344",
+    "id": "meal-lunch-360",
     "name": {
       "en": "Chickpeas with pickles"
     },
@@ -9141,7 +9551,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "100 g chickpeas"
   },
   {
-    "id": "meal-breakfast-346",
+    "id": "meal-breakfast-363",
     "name": {
       "en": "Egg with mozzarella & wholemeal bread"
     },
@@ -9180,7 +9590,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-05T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-349",
+    "id": "meal-lunch-366",
     "name": {
       "en": "Chicken breast with mixed vegetables"
     },
@@ -9209,7 +9619,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-05T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-350",
+    "id": "meal-snack-367",
     "name": {
       "en": "Apple with cashews"
     },
@@ -9244,7 +9654,41 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "10 g cashews, 3 g cinnamon"
   },
   {
-    "id": "meal-breakfast-351",
+    "id": "meal-dinner-368",
+    "name": {
+      "en": "Mixed vegetables with extra virgin olive oil & yogurt"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 5,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g zöldségleves 1 tk. Olivaolajjal/adag + 1 ek. joghurt",
+    "sourcePlanId": "plan-21",
+    "createdAt": "2020-10-05T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-369",
     "name": {
       "en": "Wholemeal bread with mixed vegetables & extra virgin olive oil"
     },
@@ -9284,7 +9728,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "50 g wholemeal bread, 100 g eggplant"
   },
   {
-    "id": "meal-snack-352",
+    "id": "meal-snack-370",
     "name": {
       "en": "Cottage cheese with apple"
     },
@@ -9313,7 +9757,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-05T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-354",
+    "id": "meal-breakfast-372",
     "name": {
       "en": "Avocado with wholemeal bread & mixed vegetables"
     },
@@ -9353,7 +9797,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "150 g avocado"
   },
   {
-    "id": "meal-lunch-355",
+    "id": "meal-lunch-373",
     "name": {
       "en": "Salmon with mixed vegetables & extra virgin olive oil"
     },
@@ -9387,7 +9831,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-05T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-356",
+    "id": "meal-snack-375",
     "name": {
       "en": "Mango with walnuts"
     },
@@ -9417,7 +9861,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "100 g mango"
   },
   {
-    "id": "meal-lunch-357",
+    "id": "meal-lunch-376",
     "name": {
       "en": "Mozzarella with bulgur & pickles"
     },
@@ -9451,7 +9895,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-07T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-358",
+    "id": "meal-breakfast-377",
     "name": {
       "en": "Tuna in brine with wholemeal bread & mixed vegetables"
     },
@@ -9490,7 +9934,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-07T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-359",
+    "id": "meal-snack-378",
     "name": {
       "en": "Pomelo with cashews"
     },
@@ -9520,7 +9964,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "10 g cashews"
   },
   {
-    "id": "meal-snack-360",
+    "id": "meal-snack-379",
     "name": {
       "en": "Pomelo with cashews"
     },
@@ -9550,7 +9994,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "5 g cashews"
   },
   {
-    "id": "meal-lunch-362",
+    "id": "meal-lunch-381",
     "name": {
       "en": "Lentil stew with egg & pickles"
     },
@@ -9584,7 +10028,41 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-07T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-364",
+    "id": "meal-dinner-382",
+    "name": {
+      "en": "Cream of mushroom soup with wholemeal bread & yogurt"
+    },
+    "emoji": "🍄",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-soup-mushroom-cream",
+        "servings": 0.51
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g gombakrémleves + 1 ek. joghurt + 25 g kenyér pirítva",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2020-12-07T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-384",
     "name": {
       "en": "Lentil stew with tofu & raw vegetable salad"
     },
@@ -9618,7 +10096,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-07T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-365",
+    "id": "meal-breakfast-385",
     "name": {
       "en": "Bruschetta with telemea, olives"
     },
@@ -9647,7 +10125,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-07T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-366",
+    "id": "meal-snack-386",
     "name": {
       "en": "Orange with cashews"
     },
@@ -9677,7 +10155,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "5 g cashews, 180 g orange"
   },
   {
-    "id": "meal-lunch-367",
+    "id": "meal-lunch-387",
     "name": {
       "en": "Trout with cabbage & extra virgin olive oil"
     },
@@ -9716,7 +10194,41 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-07T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-368",
+    "id": "meal-dinner-388",
+    "name": {
+      "en": "Tofu with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "tofu",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes saláta + 150 g tofu a lerben + 1 tk. olívaolaj",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2020-12-07T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-389",
     "name": {
       "en": "Wholemeal bread with egg & mixed vegetables"
     },
@@ -9756,7 +10268,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "50 g wholemeal bread"
   },
   {
-    "id": "meal-lunch-369",
+    "id": "meal-lunch-390",
     "name": {
       "en": "Trout with cabbage & yogurt"
     },
@@ -9790,7 +10302,36 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-07T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-371",
+    "id": "meal-dinner-391",
+    "name": {
+      "en": "Raw vegetable salad with yogurt"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g salátaleves + 1 ek. Joghurt",
+    "sourcePlanId": "plan-22",
+    "createdAt": "2020-12-07T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-393",
     "name": {
       "en": "Potato with red kidney beans & feta"
     },
@@ -9849,7 +10390,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-07T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-373",
+    "id": "meal-snack-395",
     "name": {
       "en": "Grapefruit with walnuts"
     },
@@ -9879,7 +10420,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "5 g walnuts"
   },
   {
-    "id": "meal-lunch-374",
+    "id": "meal-lunch-396",
     "name": {
       "en": "Salmon with celeriac & raw vegetable salad"
     },
@@ -9918,7 +10459,46 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-10T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-375",
+    "id": "meal-dinner-397",
+    "name": {
+      "en": "Telemea with broccoli & red kidney beans"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "broccoli",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "telemea",
+        "grams": 40
+      },
+      {
+        "kind": "food",
+        "foodId": "beans-kidney-cooked",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "brokkoli saláta: 200 g brokkoli, 40 g telemea, 50 g vörös paszuly + 1 tk. olívaolaj",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2020-11-10T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-398",
     "name": {
       "en": "Wholemeal bread with egg & Telemea"
     },
@@ -9962,7 +10542,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-10T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-376",
+    "id": "meal-snack-399",
     "name": {
       "en": "Orange with cashews"
     },
@@ -9992,7 +10572,31 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "15 g cashews, 180 g orange"
   },
   {
-    "id": "meal-breakfast-377",
+    "id": "meal-dinner-400",
+    "name": {
+      "en": "Raw vegetable salad"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 300
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g salátaleves (1 tojás két adaghoz)",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2020-11-10T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-401",
     "name": {
       "en": "Tuna spread with ricotta & wholemeal bread"
     },
@@ -10037,7 +10641,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "50 g wholemeal bread"
   },
   {
-    "id": "meal-lunch-378",
+    "id": "meal-lunch-402",
     "name": {
       "en": "Bulgur with bell pepper & extra virgin olive oil"
     },
@@ -10076,7 +10680,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-10T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-379",
+    "id": "meal-snack-403",
     "name": {
       "en": "Yogurt with mixed berries"
     },
@@ -10106,7 +10710,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "70 g mixed berries"
   },
   {
-    "id": "meal-breakfast-380",
+    "id": "meal-breakfast-405",
     "name": {
       "en": "Tuna spread with wholemeal bread, mixed vegetables & extra virgin olive oil"
     },
@@ -10145,7 +10749,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-10T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-381",
+    "id": "meal-lunch-406",
     "name": {
       "en": "Bulgur with bell pepper & pickles"
     },
@@ -10179,7 +10783,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-10T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-382",
+    "id": "meal-breakfast-407",
     "name": {
       "en": "Chia seeds with rolled oats & milk"
     },
@@ -10218,7 +10822,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-10T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-383",
+    "id": "meal-snack-408",
     "name": {
       "en": "Mango with mixed berries & walnuts"
     },
@@ -10252,7 +10856,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-10T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-384",
+    "id": "meal-lunch-409",
     "name": {
       "en": "Chicken breast"
     },
@@ -10277,7 +10881,42 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "100 g"
   },
   {
-    "id": "meal-lunch-386",
+    "id": "meal-dinner-412",
+    "name": {
+      "en": "Polenta with ricotta & yogurt"
+    },
+    "emoji": "🌽",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-polenta",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "ricotta",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "180 g puliszka + 100 g ricotta + 1 ek. joghurt",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2020-11-10T00:00:00.000Z",
+    "variant": "100 g ricotta"
+  },
+  {
+    "id": "meal-lunch-413",
     "name": {
       "en": "Egg with wholemeal bread & spinach"
     },
@@ -10311,7 +10950,42 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-10T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-387",
+    "id": "meal-dinner-414",
+    "name": {
+      "en": "Feta with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "feta",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes saláta + 50 g feta + 1 tk. olívaolaj",
+    "sourcePlanId": "plan-23",
+    "createdAt": "2020-11-10T00:00:00.000Z",
+    "variant": "50 g feta"
+  },
+  {
+    "id": "meal-breakfast-415",
     "name": {
       "en": "Chia pudding with nectarine"
     },
@@ -10340,7 +11014,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-12T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-388",
+    "id": "meal-lunch-416",
     "name": {
       "en": "Bulgur with raw vegetable salad & extra virgin olive oil"
     },
@@ -10379,7 +11053,36 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-12T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-389",
+    "id": "meal-dinner-417",
+    "name": {
+      "en": "Cream of mushroom soup with mixed seeds"
+    },
+    "emoji": "🍄",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-soup-mushroom-cream",
+        "servings": 0.51
+      },
+      {
+        "kind": "food",
+        "foodId": "seeds-mixed",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g gombakrémleves + 10 g pirított magvak",
+    "sourcePlanId": "plan-24",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-418",
     "name": {
       "en": "Feta with wholemeal bread & egg"
     },
@@ -10418,7 +11121,41 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-12T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-391",
+    "id": "meal-dinner-420",
+    "name": {
+      "en": "Cream of mushroom soup with wholemeal bread & mixed seeds"
+    },
+    "emoji": "🍄",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-soup-mushroom-cream",
+        "servings": 0.51
+      },
+      {
+        "kind": "food",
+        "foodId": "seeds-mixed",
+        "grams": 10
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g gombakrémleves + 10 g pirított magvak + 25 g pirítós",
+    "sourcePlanId": "plan-24",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-421",
     "name": {
       "en": "Hummus with wholemeal bread & pumpkin seeds"
     },
@@ -10462,7 +11199,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-12T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-392",
+    "id": "meal-lunch-422",
     "name": {
       "en": "Beef with celeriac & raw vegetable salad"
     },
@@ -10501,7 +11238,42 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-12T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-393",
+    "id": "meal-dinner-423",
+    "name": {
+      "en": "Feta with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "feta",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes saláta + 60 g feta + 1 tk. Olivaolaj",
+    "sourcePlanId": "plan-24",
+    "createdAt": "2020-10-12T00:00:00.000Z",
+    "variant": "60 g feta"
+  },
+  {
+    "id": "meal-snack-424",
     "name": {
       "en": "Grapefruit with cashews"
     },
@@ -10531,7 +11303,31 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "15 g cashews, 250 g grapefruit"
   },
   {
-    "id": "meal-lunch-396",
+    "id": "meal-dinner-426",
+    "name": {
+      "en": "Quinoa"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "quinoa",
+        "grams": 100
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "quinoás fetás saláta (40 g nyers quinoával, 40 g feta, 1 tk. olíva olaj)",
+    "sourcePlanId": "plan-24",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-428",
     "name": {
       "en": "Quinoa with trout & garlic"
     },
@@ -10565,7 +11361,36 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-12T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-397",
+    "id": "meal-dinner-429",
+    "name": {
+      "en": "Green beans with yogurt"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "green-beans",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g zöld paszuly leves (1 tk. Olivaolaj / adag) + 1 ek. joghurt",
+    "sourcePlanId": "plan-24",
+    "createdAt": "2020-10-12T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-430",
     "name": {
       "en": "Bruschetta with telemea, feta & pumpkin seeds"
     },
@@ -10599,7 +11424,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-12T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-398",
+    "id": "meal-lunch-431",
     "name": {
       "en": "Wholemeal bread with egg, spinach & extra virgin olive oil"
     },
@@ -10643,7 +11468,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-12T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-400",
+    "id": "meal-lunch-433",
     "name": {
       "en": "Chicken breast with spinach & extra virgin olive oil"
     },
@@ -10682,7 +11507,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-12T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-403",
+    "id": "meal-lunch-436",
     "name": {
       "en": "Bulgur with green peas & pickles"
     },
@@ -10716,71 +11541,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-14T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-405",
-    "name": {
-      "en": "Tuna in brine with raw vegetable salad & extra virgin olive oil"
-    },
-    "emoji": "🌙",
-    "servings": 1,
-    "prepMinutes": 14,
-    "cookMinutes": 22,
-    "components": [
-      {
-        "kind": "food",
-        "foodId": "salad-raw",
-        "grams": 200
-      },
-      {
-        "kind": "food",
-        "foodId": "tuna-canned",
-        "grams": 75
-      },
-      {
-        "kind": "food",
-        "foodId": "olive-oil",
-        "grams": 5
-      }
-    ],
-    "steps": [],
-    "tags": [
-      "dinner"
-    ],
-    "sourceLine": "vegyes saláta + 75g tonhal + 1 tk. olívaolaj",
-    "sourcePlanId": "plan-25",
-    "createdAt": "2020-12-14T00:00:00.000Z",
-    "variant": "75 g tuna in brine"
-  },
-  {
-    "id": "meal-dinner-410",
-    "name": {
-      "en": "Raw vegetable salad with extra virgin olive oil"
-    },
-    "emoji": "🌙",
-    "servings": 1,
-    "prepMinutes": 9,
-    "cookMinutes": 0,
-    "components": [
-      {
-        "kind": "food",
-        "foodId": "salad-raw",
-        "grams": 200
-      },
-      {
-        "kind": "food",
-        "foodId": "olive-oil",
-        "grams": 5
-      }
-    ],
-    "steps": [],
-    "tags": [
-      "dinner"
-    ],
-    "sourceLine": "vegyes saláta + 72g Tony junior + 1 tk. olívaolaj",
-    "sourcePlanId": "plan-25",
-    "createdAt": "2020-12-14T00:00:00.000Z"
-  },
-  {
-    "id": "meal-lunch-412",
+    "id": "meal-lunch-445",
     "name": {
       "en": "Wholemeal bread with egg & spinach"
     },
@@ -10814,7 +11575,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-14T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-413",
+    "id": "meal-dinner-446",
     "name": {
       "en": "Beef sour soup with yogurt"
     },
@@ -10840,10 +11601,11 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "350g marhahúsos csorba (1 tk. olaj / adag)+ 1 ek. joghurt",
     "sourcePlanId": "plan-25",
-    "createdAt": "2020-12-14T00:00:00.000Z"
+    "createdAt": "2020-12-14T00:00:00.000Z",
+    "variant": "350 g beef sour soup"
   },
   {
-    "id": "meal-breakfast-414",
+    "id": "meal-breakfast-447",
     "name": {
       "en": "Yogurt with oat biscuits"
     },
@@ -10872,7 +11634,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-14T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-415",
+    "id": "meal-lunch-448",
     "name": {
       "en": "Buckwheat with raw vegetable salad & extra virgin olive oil"
     },
@@ -10916,7 +11678,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-14T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-417",
+    "id": "meal-lunch-450",
     "name": {
       "en": "Buckwheat with broccoli, pickles & garlic"
     },
@@ -10955,7 +11717,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-14T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-418",
+    "id": "meal-snack-451",
     "name": {
       "en": "Clementine with cashews"
     },
@@ -10984,7 +11746,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-14T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-420",
+    "id": "meal-snack-453",
     "name": {
       "en": "Pomelo with walnuts"
     },
@@ -11014,7 +11776,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "10 g walnuts"
   },
   {
-    "id": "meal-lunch-421",
+    "id": "meal-lunch-454",
     "name": {
       "en": "Baked sweet potato with salmon & raw vegetable salad"
     },
@@ -11048,7 +11810,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-14T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-422",
+    "id": "meal-dinner-455",
     "name": {
       "en": "Cabbage with wholemeal bread & yogurt"
     },
@@ -11082,7 +11844,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-12-14T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-424",
+    "id": "meal-dinner-457",
     "name": {
       "en": "Cabbage with yogurt"
     },
@@ -11112,7 +11874,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "300 g cabbage"
   },
   {
-    "id": "meal-lunch-425",
+    "id": "meal-lunch-458",
     "name": {
       "en": "Trout with green beans & extra virgin olive oil"
     },
@@ -11146,7 +11908,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-16T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-426",
+    "id": "meal-snack-460",
     "name": {
       "en": "Banana with cottage cheese"
     },
@@ -11175,7 +11937,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-16T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-428",
+    "id": "meal-breakfast-462",
     "name": {
       "en": "Egg spread with wholemeal bread & Telemea"
     },
@@ -11224,7 +11986,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-16T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-429",
+    "id": "meal-lunch-463",
     "name": {
       "en": "Green peas with mixed vegetables"
     },
@@ -11253,7 +12015,37 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-16T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-430",
+    "id": "meal-dinner-464",
+    "name": {
+      "en": "Cream of mushroom soup with wholemeal bread"
+    },
+    "emoji": "🍄",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-soup-mushroom-cream",
+        "servings": 0.51
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g gombakrémleves + 25 g kenyér pirítva",
+    "sourcePlanId": "plan-26",
+    "createdAt": "2020-11-16T00:00:00.000Z",
+    "variant": "25 g wholemeal bread"
+  },
+  {
+    "id": "meal-breakfast-465",
     "name": {
       "en": "Hungarian cheese spread with wholemeal bread & mixed vegetables"
     },
@@ -11293,7 +12085,41 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "40 g wholemeal bread"
   },
   {
-    "id": "meal-lunch-433",
+    "id": "meal-dinner-467",
+    "name": {
+      "en": "Cream of mushroom soup with wholemeal bread & pumpkin seeds"
+    },
+    "emoji": "🍄",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 25,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-soup-mushroom-cream",
+        "servings": 0.51
+      },
+      {
+        "kind": "food",
+        "foodId": "pumpkin-seeds",
+        "grams": 10
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g gombakrémleves + 10 g pirított tökmag + 25 g kenyér pirítva",
+    "sourcePlanId": "plan-26",
+    "createdAt": "2020-11-16T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-469",
     "name": {
       "en": "Pesto pasta with cashews"
     },
@@ -11322,7 +12148,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-16T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-434",
+    "id": "meal-breakfast-471",
     "name": {
       "en": "Egg with wholemeal bread & raw vegetable salad"
     },
@@ -11362,7 +12188,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "25 g wholemeal bread"
   },
   {
-    "id": "meal-breakfast-436",
+    "id": "meal-breakfast-473",
     "name": {
       "en": "Avocado with wholemeal bread & mixed vegetables"
     },
@@ -11402,7 +12228,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "100 g avocado"
   },
   {
-    "id": "meal-lunch-437",
+    "id": "meal-lunch-474",
     "name": {
       "en": "Pork loin with mixed vegetables & extra virgin olive oil"
     },
@@ -11436,7 +12262,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-16T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-438",
+    "id": "meal-lunch-475",
     "name": {
       "en": "Chicken breast with white rice & mixed vegetables"
     },
@@ -11475,7 +12301,41 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-19T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-439",
+    "id": "meal-dinner-476",
+    "name": {
+      "en": "Green peas with mixed seeds & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 12,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "peas",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "seeds-mixed",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g borsó krémleves (borsó, fehérrépa, krumpli) + 1 tk. olíva olaj + 10 g pirított magvak",
+    "sourcePlanId": "plan-27",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-477",
     "name": {
       "en": "Yogurt with plum"
     },
@@ -11505,7 +12365,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "120 g plum"
   },
   {
-    "id": "meal-lunch-440",
+    "id": "meal-lunch-478",
     "name": {
       "en": "Zucchini with raw vegetable salad"
     },
@@ -11534,7 +12394,36 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-19T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-441",
+    "id": "meal-dinner-479",
+    "name": {
+      "en": "Green peas with mixed seeds"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 30,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "peas",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "seeds-mixed",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g borsó krémleves (borsó, fehérrépa, krumpli) + 10 g pirított magvak",
+    "sourcePlanId": "plan-27",
+    "createdAt": "2020-10-19T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-480",
     "name": {
       "en": "Salmon with celeriac & extra virgin olive oil"
     },
@@ -11583,7 +12472,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-19T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-442",
+    "id": "meal-breakfast-482",
     "name": {
       "en": "Yogurt with plum"
     },
@@ -11613,7 +12502,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "100 g plum"
   },
   {
-    "id": "meal-lunch-443",
+    "id": "meal-lunch-483",
     "name": {
       "en": "Lentils with feta & wholemeal bread"
     },
@@ -11657,7 +12546,37 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-19T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-444",
+    "id": "meal-dinner-484",
+    "name": {
+      "en": "Beef sour soup with yogurt"
+    },
+    "emoji": "🍲",
+    "servings": 1,
+    "prepMinutes": 16,
+    "cookMinutes": 60,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-ciorba-beef",
+        "servings": 0.53
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g marhahúsos csorba + 1 ek. joghurt",
+    "sourcePlanId": "plan-27",
+    "createdAt": "2020-10-19T00:00:00.000Z",
+    "variant": "300 g beef sour soup"
+  },
+  {
+    "id": "meal-breakfast-485",
     "name": {
       "en": "Feta with wholemeal bread, egg & raw vegetable salad"
     },
@@ -11701,7 +12620,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-19T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-445",
+    "id": "meal-lunch-486",
     "name": {
       "en": "Lentil stew with tofu & pickles"
     },
@@ -11735,7 +12654,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-19T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-446",
+    "id": "meal-breakfast-487",
     "name": {
       "en": "Wholemeal bread with tuna in brine & mixed vegetables"
     },
@@ -11774,7 +12693,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-19T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-449",
+    "id": "meal-lunch-490",
     "name": {
       "en": "Chicken breast with mixed vegetables & extra virgin olive oil"
     },
@@ -11818,7 +12737,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-19T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-451",
+    "id": "meal-breakfast-493",
     "name": {
       "en": "Bruschetta with telemea, parmesan & olives"
     },
@@ -11852,7 +12771,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-23T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-452",
+    "id": "meal-lunch-494",
     "name": {
       "en": "Salmon with mixed vegetables"
     },
@@ -11881,7 +12800,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-23T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-453",
+    "id": "meal-breakfast-495",
     "name": {
       "en": "Chia pudding with mango"
     },
@@ -11916,7 +12835,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "30 g chia seeds"
   },
   {
-    "id": "meal-lunch-454",
+    "id": "meal-lunch-496",
     "name": {
       "en": "Chicken breast with mixed vegetables & parmesan"
     },
@@ -11950,7 +12869,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-23T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-455",
+    "id": "meal-breakfast-497",
     "name": {
       "en": "Spinach omelette with wholemeal bread & parmesan"
     },
@@ -11989,7 +12908,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-23T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-456",
+    "id": "meal-lunch-498",
     "name": {
       "en": "Chickpeas with extra virgin olive oil & cabbage"
     },
@@ -12023,7 +12942,32 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-23T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-457",
+    "id": "meal-dinner-499",
+    "name": {
+      "en": "Mixed vegetables"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 300
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g zöldségleves",
+    "sourcePlanId": "plan-28",
+    "createdAt": "2020-11-23T00:00:00.000Z",
+    "variant": "300 g"
+  },
+  {
+    "id": "meal-breakfast-500",
     "name": {
       "en": "Mozzarella with wholemeal bread & raw vegetable salad"
     },
@@ -12063,7 +13007,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "90 g mozzarella"
   },
   {
-    "id": "meal-lunch-458",
+    "id": "meal-lunch-501",
     "name": {
       "en": "Chickpeas with raw vegetable salad & extra virgin olive oil"
     },
@@ -12097,7 +13041,36 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-23T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-459",
+    "id": "meal-dinner-502",
+    "name": {
+      "en": "Mixed vegetables with yogurt"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g zöldségleves + 1 ek. joghurt",
+    "sourcePlanId": "plan-28",
+    "createdAt": "2020-11-23T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-503",
     "name": {
       "en": "Oat porridge with apple"
     },
@@ -12127,7 +13100,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "150 g apple, no vanilla extract"
   },
   {
-    "id": "meal-lunch-461",
+    "id": "meal-lunch-505",
     "name": {
       "en": "Avocado with bulgur & cod"
     },
@@ -12161,7 +13134,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-23T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-462",
+    "id": "meal-snack-506",
     "name": {
       "en": "Mixed berries with cashews"
     },
@@ -12190,7 +13163,47 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-23T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-463",
+    "id": "meal-dinner-507",
+    "name": {
+      "en": "Mozzarella with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 45
+      },
+      {
+        "kind": "food",
+        "foodId": "parmesan",
+        "grams": 10
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes saláta + 45 g mozzarella, 10 g parmezan + 1 tk. olívaolaj",
+    "sourcePlanId": "plan-28",
+    "createdAt": "2020-11-23T00:00:00.000Z",
+    "variant": "45 g mozzarella"
+  },
+  {
+    "id": "meal-breakfast-508",
     "name": {
       "en": "Wholemeal bread with egg & mixed vegetables"
     },
@@ -12230,7 +13243,41 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "35 g wholemeal bread"
   },
   {
-    "id": "meal-lunch-465",
+    "id": "meal-dinner-510",
+    "name": {
+      "en": "Goat cheese with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "goat-cheese",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes saláta + 50 g kecskesajt + 1 tk. olívaolaj",
+    "sourcePlanId": "plan-28",
+    "createdAt": "2020-11-23T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-511",
     "name": {
       "en": "Sweet potato with broccoli & pickles"
     },
@@ -12264,7 +13311,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-11-23T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-467",
+    "id": "meal-lunch-514",
     "name": {
       "en": "Roasted vegetables with cod"
     },
@@ -12293,7 +13340,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-25T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-468",
+    "id": "meal-snack-515",
     "name": {
       "en": "Kiwi with walnuts"
     },
@@ -12323,7 +13370,46 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "8 g walnuts"
   },
   {
-    "id": "meal-breakfast-469",
+    "id": "meal-dinner-516",
+    "name": {
+      "en": "Feta with pumpkin seeds & raw vegetable salad"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "feta",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "pumpkin-seeds",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes salata + 50 g feta + 1 tk. olivaolaj + 10 g tokmag",
+    "sourcePlanId": "plan-29",
+    "createdAt": "2021-01-25T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-517",
     "name": {
       "en": "Buckwheat with yogurt & mixed berries"
     },
@@ -12357,7 +13443,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-25T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-470",
+    "id": "meal-lunch-518",
     "name": {
       "en": "Pizza with mozzarella & cola"
     },
@@ -12426,7 +13512,42 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-25T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-472",
+    "id": "meal-dinner-519",
+    "name": {
+      "en": "Tuna in brine with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 14,
+    "cookMinutes": 22,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "tuna-canned",
+        "grams": 100
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes salata + 100 g tonhal sajat leveben + 1 tk. olivoalaj",
+    "sourcePlanId": "plan-29",
+    "createdAt": "2021-01-25T00:00:00.000Z",
+    "variant": "100 g tuna in brine"
+  },
+  {
+    "id": "meal-snack-522",
     "name": {
       "en": "Apple with walnuts"
     },
@@ -12456,7 +13577,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "15 g walnuts"
   },
   {
-    "id": "meal-lunch-473",
+    "id": "meal-lunch-523",
     "name": {
       "en": "Cabbage with yogurt"
     },
@@ -12486,7 +13607,51 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "100 g cabbage"
   },
   {
-    "id": "meal-breakfast-475",
+    "id": "meal-dinner-525",
+    "name": {
+      "en": "Feta with red kidney beans & raw vegetable salad"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "feta",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "beans-kidney-cooked",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "brewers-yeast",
+        "grams": 10
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes salata + 50 g feta + 50 g voros paszuly + 10 g soreleszto + 1 tk. olivaolaj",
+    "sourcePlanId": "plan-29",
+    "createdAt": "2021-01-25T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-526",
     "name": {
       "en": "Wholemeal bread with salmon & egg"
     },
@@ -12530,7 +13695,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-25T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-478",
+    "id": "meal-breakfast-530",
     "name": {
       "en": "Spinach omelette with wholemeal bread & mixed vegetables"
     },
@@ -12565,7 +13730,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "25 g wholemeal bread"
   },
   {
-    "id": "meal-lunch-479",
+    "id": "meal-lunch-531",
     "name": {
       "en": "Mozzarella with bulgur & raw vegetable salad"
     },
@@ -12599,7 +13764,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-26T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-480",
+    "id": "meal-snack-532",
     "name": {
       "en": "Apple with walnuts"
     },
@@ -12629,7 +13794,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "5 g walnuts"
   },
   {
-    "id": "meal-lunch-483",
+    "id": "meal-lunch-536",
     "name": {
       "en": "Mozzarella with bulgur, raw vegetable salad & extra virgin olive oil"
     },
@@ -12668,7 +13833,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-26T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-485",
+    "id": "meal-lunch-539",
     "name": {
       "en": "Celeriac with pumpkin seeds & broccoli"
     },
@@ -12707,7 +13872,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-26T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-486",
+    "id": "meal-snack-540",
     "name": {
       "en": "Yogurt with apple"
     },
@@ -12736,7 +13901,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-26T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-487",
+    "id": "meal-breakfast-542",
     "name": {
       "en": "Wholemeal bread with feta & mixed vegetables"
     },
@@ -12780,7 +13945,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-26T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-488",
+    "id": "meal-lunch-543",
     "name": {
       "en": "Millet with broccoli & pickles"
     },
@@ -12814,7 +13979,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-26T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-490",
+    "id": "meal-lunch-546",
     "name": {
       "en": "Trout with mixed vegetables & extra virgin olive oil"
     },
@@ -12854,7 +14019,46 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "250 g mixed vegetables"
   },
   {
-    "id": "meal-lunch-492",
+    "id": "meal-dinner-547",
+    "name": {
+      "en": "Wholemeal bread with pumpkin seeds, zucchini & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "zucchini",
+        "grams": 300
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      },
+      {
+        "kind": "food",
+        "foodId": "pumpkin-seeds",
+        "grams": 10
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 25
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "300 g cukkini krémleves, 1 tk. olíva olaj+ 10 g pirított tökmag + 25 g teljes kiőrlésű pirítós",
+    "sourcePlanId": "plan-30",
+    "createdAt": "2020-10-26T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-549",
     "name": {
       "en": "Trout with mixed vegetables & extra virgin olive oil"
     },
@@ -12889,7 +14093,42 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "200 g mixed vegetables"
   },
   {
-    "id": "meal-breakfast-493",
+    "id": "meal-dinner-550",
+    "name": {
+      "en": "Polenta with cottage cheese & yogurt"
+    },
+    "emoji": "🌽",
+    "servings": 1,
+    "prepMinutes": 10,
+    "cookMinutes": 20,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-polenta",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "cottage-cheese",
+        "grams": 80
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "200 g puliszka + 80 g tehéntúró + 1 ek. joghurt",
+    "sourcePlanId": "plan-30",
+    "createdAt": "2020-10-26T00:00:00.000Z",
+    "variant": "15 g yogurt, 80 g cottage cheese"
+  },
+  {
+    "id": "meal-breakfast-551",
     "name": {
       "en": "Rolled oats with yogurt & pumpkin seeds"
     },
@@ -12928,7 +14167,42 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2020-10-26T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-496",
+    "id": "meal-dinner-553",
+    "name": {
+      "en": "Telemea with raw vegetable salad & extra virgin olive oil"
+    },
+    "emoji": "🌙",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "salad-raw",
+        "grams": 200
+      },
+      {
+        "kind": "food",
+        "foodId": "telemea",
+        "grams": 60
+      },
+      {
+        "kind": "food",
+        "foodId": "olive-oil",
+        "grams": 5
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "vegyes saláta + 60 g telemea + 1 tk. olíva olaj",
+    "sourcePlanId": "plan-30",
+    "createdAt": "2020-10-26T00:00:00.000Z",
+    "variant": "60 g Telemea"
+  },
+  {
+    "id": "meal-snack-555",
     "name": {
       "en": "Grapefruit with cashews"
     },
@@ -12958,7 +14232,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "20 g cashews, 250 g grapefruit"
   },
   {
-    "id": "meal-snack-498",
+    "id": "meal-snack-557",
     "name": {
       "en": "Apple with walnuts"
     },
@@ -12988,7 +14262,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "20 g walnuts"
   },
   {
-    "id": "meal-dinner-499",
+    "id": "meal-dinner-558",
     "name": {
       "en": "Mozzarella with raw vegetable salad & extra virgin olive oil"
     },
@@ -13023,7 +14297,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "80 g mozzarella"
   },
   {
-    "id": "meal-breakfast-500",
+    "id": "meal-breakfast-559",
     "name": {
       "en": "Mozzarella with wholemeal bread & egg"
     },
@@ -13062,7 +14336,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-501",
+    "id": "meal-snack-560",
     "name": {
       "en": "Kiwi with cashews"
     },
@@ -13092,7 +14366,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "20 g cashews"
   },
   {
-    "id": "meal-lunch-502",
+    "id": "meal-lunch-561",
     "name": {
       "en": "Bulgur with raw vegetable salad & broccoli"
     },
@@ -13131,7 +14405,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-503",
+    "id": "meal-snack-562",
     "name": {
       "en": "Orange with walnuts"
     },
@@ -13158,39 +14432,10 @@ export const MEAL_RECIPES: Recipe[] = [
     "sourceLine": "1 narancs + 20 g dio",
     "sourcePlanId": "plan-31",
     "createdAt": "2022-01-01T00:00:00.000Z",
-    "variant": "20 g walnuts"
+    "variant": "20 g walnuts, 180 g orange"
   },
   {
-    "id": "meal-dinner-504",
-    "name": {
-      "en": "Mixed vegetables with yogurt"
-    },
-    "emoji": "🌙",
-    "servings": 1,
-    "prepMinutes": 4,
-    "cookMinutes": 0,
-    "components": [
-      {
-        "kind": "food",
-        "foodId": "vegetables-mixed",
-        "grams": 300
-      },
-      {
-        "kind": "food",
-        "foodId": "yogurt",
-        "grams": 15
-      }
-    ],
-    "steps": [],
-    "tags": [
-      "dinner"
-    ],
-    "sourceLine": "300 g zoldsegleves + 1 ek. joghurt",
-    "sourcePlanId": "plan-31",
-    "createdAt": "2022-01-01T00:00:00.000Z"
-  },
-  {
-    "id": "meal-snack-506",
+    "id": "meal-snack-564",
     "name": {
       "en": "Pomelo with almonds"
     },
@@ -13219,7 +14464,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-507",
+    "id": "meal-lunch-565",
     "name": {
       "en": "Bulgur with broccoli & bell pepper"
     },
@@ -13253,7 +14498,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-509",
+    "id": "meal-snack-567",
     "name": {
       "en": "Pomelo with walnuts"
     },
@@ -13283,7 +14528,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "20 g walnuts"
   },
   {
-    "id": "meal-lunch-510",
+    "id": "meal-lunch-568",
     "name": {
       "en": "Salmon with green peas & raw vegetable salad"
     },
@@ -13327,7 +14572,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-511",
+    "id": "meal-snack-569",
     "name": {
       "en": "Pear with cashews"
     },
@@ -13357,7 +14602,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "20 g cashews"
   },
   {
-    "id": "meal-breakfast-512",
+    "id": "meal-breakfast-570",
     "name": {
       "en": "Chia pudding with apple"
     },
@@ -13386,7 +14631,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-514",
+    "id": "meal-lunch-572",
     "name": {
       "en": "Green peas with chicken breast & bell pepper"
     },
@@ -13420,7 +14665,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-515",
+    "id": "meal-breakfast-573",
     "name": {
       "en": "Spinach omelette with mixed vegetables"
     },
@@ -13449,7 +14694,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-516",
+    "id": "meal-snack-574",
     "name": {
       "en": "Orange with almonds"
     },
@@ -13479,7 +14724,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "15 g almonds"
   },
   {
-    "id": "meal-lunch-517",
+    "id": "meal-lunch-575",
     "name": {
       "en": "Quinoa with zucchini & pickles"
     },
@@ -13518,7 +14763,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-519",
+    "id": "meal-breakfast-576",
     "name": {
       "en": "Wholemeal bread with mixed vegetables & extra virgin olive oil"
     },
@@ -13558,7 +14803,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "50 g wholemeal bread, 30 g eggplant"
   },
   {
-    "id": "meal-snack-520",
+    "id": "meal-snack-577",
     "name": {
       "en": "Pomelo with cashews"
     },
@@ -13588,7 +14833,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "20 g cashews"
   },
   {
-    "id": "meal-lunch-521",
+    "id": "meal-lunch-578",
     "name": {
       "en": "Chicken thigh with zucchini & pickles"
     },
@@ -13627,7 +14872,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-522",
+    "id": "meal-snack-579",
     "name": {
       "en": "Mango with cashews"
     },
@@ -13657,7 +14902,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "20 g cashews"
   },
   {
-    "id": "meal-breakfast-523",
+    "id": "meal-breakfast-580",
     "name": {
       "en": "Rolled oats with kefir & mixed berries"
     },
@@ -13691,7 +14936,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-524",
+    "id": "meal-snack-581",
     "name": {
       "en": "Banana with walnuts"
     },
@@ -13720,7 +14965,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-525",
+    "id": "meal-lunch-582",
     "name": {
       "en": "Celeriac purée with chicken thigh & cucumber"
     },
@@ -13754,7 +14999,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-526",
+    "id": "meal-dinner-583",
     "name": {
       "en": "Red kidney beans with raw vegetable salad & extra virgin olive oil"
     },
@@ -13789,7 +15034,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "70 g red kidney beans"
   },
   {
-    "id": "meal-lunch-528",
+    "id": "meal-lunch-585",
     "name": {
       "en": "Quinoa with extra virgin olive oil & Telemea"
     },
@@ -13833,7 +15078,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-529",
+    "id": "meal-dinner-586",
     "name": {
       "en": "Cottage cheese with bell pepper"
     },
@@ -13862,7 +15107,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-530",
+    "id": "meal-lunch-587",
     "name": {
       "en": "Baked sweet potato with trout & garlic"
     },
@@ -13901,36 +15146,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-531",
-    "name": {
-      "en": "Green bean soup with yogurt"
-    },
-    "emoji": "🍲",
-    "servings": 1,
-    "prepMinutes": 11,
-    "cookMinutes": 30,
-    "components": [
-      {
-        "kind": "recipe",
-        "recipeId": "dish-ciorba-green-bean",
-        "servings": 0.53
-      },
-      {
-        "kind": "food",
-        "foodId": "yogurt",
-        "grams": 15
-      }
-    ],
-    "steps": [],
-    "tags": [
-      "dinner"
-    ],
-    "sourceLine": "300 g zoldpaszuly leves + 1 ek. joghurt",
-    "sourcePlanId": "plan-32",
-    "createdAt": "2022-01-01T00:00:00.000Z"
-  },
-  {
-    "id": "meal-breakfast-532",
+    "id": "meal-breakfast-588",
     "name": {
       "en": "Omelette with wholemeal bread & mixed vegetables"
     },
@@ -13970,7 +15186,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "40 g wholemeal bread, 50 g zucchini"
   },
   {
-    "id": "meal-lunch-533",
+    "id": "meal-lunch-589",
     "name": {
       "en": "Baked sweet potato with Telemea & red kidney beans"
     },
@@ -14009,7 +15225,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-534",
+    "id": "meal-breakfast-590",
     "name": {
       "en": "Rolled oats with yogurt & cashews"
     },
@@ -14048,7 +15264,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-535",
+    "id": "meal-snack-591",
     "name": {
       "en": "Banana with kiwi"
     },
@@ -14077,7 +15293,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-536",
+    "id": "meal-lunch-592",
     "name": {
       "en": "Buckwheat with mozzarella & chicken breast"
     },
@@ -14116,7 +15332,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-537",
+    "id": "meal-breakfast-593",
     "name": {
       "en": "Hummus with wholemeal bread & mixed vegetables"
     },
@@ -14156,7 +15372,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "60 g hummus, 5 g extra virgin olive oil"
   },
   {
-    "id": "meal-lunch-538",
+    "id": "meal-lunch-594",
     "name": {
       "en": "Buckwheat with mozzarella, chicken breast & bell pepper"
     },
@@ -14200,7 +15416,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-539",
+    "id": "meal-dinner-595",
     "name": {
       "en": "Pumpkin seeds with zucchini & yogurt"
     },
@@ -14234,7 +15450,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-540",
+    "id": "meal-lunch-596",
     "name": {
       "en": "Celeriac purée with egg & beetroot"
     },
@@ -14268,7 +15484,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-542",
+    "id": "meal-breakfast-598",
     "name": {
       "en": "Egg spread with wholemeal bread, mixed vegetables & extra virgin olive oil"
     },
@@ -14312,7 +15528,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-544",
+    "id": "meal-lunch-600",
     "name": {
       "en": "Quinoa with extra virgin olive oil & chickpeas"
     },
@@ -14351,36 +15567,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-545",
-    "name": {
-      "en": "Raw vegetable salad with yogurt"
-    },
-    "emoji": "🌙",
-    "servings": 1,
-    "prepMinutes": 9,
-    "cookMinutes": 0,
-    "components": [
-      {
-        "kind": "food",
-        "foodId": "salad-raw",
-        "grams": 300
-      },
-      {
-        "kind": "food",
-        "foodId": "yogurt",
-        "grams": 15
-      }
-    ],
-    "steps": [],
-    "tags": [
-      "dinner"
-    ],
-    "sourceLine": "300 g salataleves + 1 ek joghurt",
-    "sourcePlanId": "plan-33",
-    "createdAt": "2022-01-01T00:00:00.000Z"
-  },
-  {
-    "id": "meal-lunch-547",
+    "id": "meal-lunch-602",
     "name": {
       "en": "Trout with mixed vegetables & garlic"
     },
@@ -14414,7 +15601,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-548",
+    "id": "meal-lunch-603",
     "name": {
       "en": "Squash stew with egg"
     },
@@ -14443,42 +15630,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-550",
-    "name": {
-      "en": "Mozzarella with raw vegetable salad & extra virgin olive oil"
-    },
-    "emoji": "🌙",
-    "servings": 1,
-    "prepMinutes": 7,
-    "cookMinutes": 0,
-    "components": [
-      {
-        "kind": "food",
-        "foodId": "salad-raw",
-        "grams": 200
-      },
-      {
-        "kind": "food",
-        "foodId": "mozzarella",
-        "grams": 65
-      },
-      {
-        "kind": "food",
-        "foodId": "olive-oil",
-        "grams": 5
-      }
-    ],
-    "steps": [],
-    "tags": [
-      "dinner"
-    ],
-    "sourceLine": "vegyes salata + 65 g mozzarella + 1 tk. Olivaolaj",
-    "sourcePlanId": "plan-33",
-    "createdAt": "2022-01-01T00:00:00.000Z",
-    "variant": "65 g mozzarella"
-  },
-  {
-    "id": "meal-breakfast-551",
+    "id": "meal-breakfast-605",
     "name": {
       "en": "Rolled oats with yogurt & mixed berries"
     },
@@ -14513,7 +15665,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "45 g rolled oats"
   },
   {
-    "id": "meal-snack-552",
+    "id": "meal-snack-606",
     "name": {
       "en": "Orange with almonds"
     },
@@ -14543,7 +15695,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "20 g almonds"
   },
   {
-    "id": "meal-lunch-553",
+    "id": "meal-lunch-607",
     "name": {
       "en": "Egg muffins with wholemeal bread & sweetcorn"
     },
@@ -14582,7 +15734,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-554",
+    "id": "meal-dinner-608",
     "name": {
       "en": "Chicken breast"
     },
@@ -14607,7 +15759,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "300 g"
   },
   {
-    "id": "meal-breakfast-555",
+    "id": "meal-breakfast-609",
     "name": {
       "en": "Cottage cheese with wholemeal bread & mixed vegetables"
     },
@@ -14642,7 +15794,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "40 g wholemeal bread"
   },
   {
-    "id": "meal-breakfast-556",
+    "id": "meal-breakfast-610",
     "name": {
       "en": "Bruschetta with telemea"
     },
@@ -14677,7 +15829,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "10 g extra virgin olive oil"
   },
   {
-    "id": "meal-lunch-557",
+    "id": "meal-lunch-611",
     "name": {
       "en": "Chicken thigh with cabbage & yogurt"
     },
@@ -14711,7 +15863,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-558",
+    "id": "meal-breakfast-612",
     "name": {
       "en": "Tuna spread with wholemeal bread & cottage cheese"
     },
@@ -14760,7 +15912,297 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-01-01T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-560",
+    "id": "meal-breakfast-614",
+    "name": {
+      "en": "Wholemeal bread with butter & mozzarella"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 8,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 80
+      },
+      {
+        "kind": "food",
+        "foodId": "butter",
+        "grams": 20
+      },
+      {
+        "kind": "food",
+        "foodId": "mozzarella",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "sandwich: 80 g paine int, 20 g unt, 50 g mozzarella, legume",
+    "sourcePlanId": "plan-34",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-615",
+    "name": {
+      "en": "Wholemeal bread with yogurt"
+    },
+    "emoji": "🍽️",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 40
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "350 g sarmalute + o lg de iaurt, 40 g paine int",
+    "sourcePlanId": "plan-34",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "40 g wholemeal bread"
+  },
+  {
+    "id": "meal-dinner-616",
+    "name": {
+      "en": "Noodle soup"
+    },
+    "emoji": "🍜",
+    "servings": 1,
+    "prepMinutes": 15,
+    "cookMinutes": 40,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-soup-noodle",
+        "servings": 0.71
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "dinner"
+    ],
+    "sourceLine": "350 g supa de taietei",
+    "sourcePlanId": "plan-34",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "350 g"
+  },
+  {
+    "id": "meal-breakfast-617",
+    "name": {
+      "en": "Egg with wholemeal bread & mixed vegetables"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 7,
+    "cookMinutes": 10,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 110
+      },
+      {
+        "kind": "food",
+        "foodId": "vegetables-mixed",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 30
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "2 oua fiert, jumatate de farfurie de legume, 30 g paine int",
+    "sourcePlanId": "plan-34",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "30 g wholemeal bread"
+  },
+  {
+    "id": "meal-lunch-618",
+    "name": {
+      "en": "Noodle soup with wholemeal bread & yogurt"
+    },
+    "emoji": "🍜",
+    "servings": 1,
+    "prepMinutes": 17,
+    "cookMinutes": 40,
+    "components": [
+      {
+        "kind": "recipe",
+        "recipeId": "dish-soup-noodle",
+        "servings": 0.61
+      },
+      {
+        "kind": "food",
+        "foodId": "yogurt",
+        "grams": 15
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 20
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "300 g supa de taietei 200 g sarmalute, o lg de iaurt, 20 g paine",
+    "sourcePlanId": "plan-34",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-620",
+    "name": {
+      "en": "Pască with sweet cheese, milk"
+    },
+    "emoji": "🌅",
+    "servings": 1,
+    "prepMinutes": 6,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "pasca-cheese",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "milk",
+        "grams": 250
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "150 g pasca cu branza, 250 ml lapte",
+    "sourcePlanId": "plan-34",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-lunch-621",
+    "name": {
+      "en": "Creamed spinach with chicken breast"
+    },
+    "emoji": "🥬",
+    "servings": 1,
+    "prepMinutes": 9,
+    "cookMinutes": 18,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "chicken-breast",
+        "grams": 100
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-creamed-spinach",
+        "servings": 0.93
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "lunch"
+    ],
+    "sourceLine": "100 g piept de pui la gratar, 250 g mancare de spanac (o lg de ulei si o lg rasa de faina / 2 portii portii)",
+    "sourcePlanId": "plan-34",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-breakfast-623",
+    "name": {
+      "en": "Carrot salad with egg & Telemea"
+    },
+    "emoji": "🥕",
+    "servings": 1,
+    "prepMinutes": 11,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "egg",
+        "grams": 110
+      },
+      {
+        "kind": "recipe",
+        "recipeId": "dish-carrot-salad",
+        "servings": 1
+      },
+      {
+        "kind": "food",
+        "foodId": "telemea",
+        "grams": 50
+      },
+      {
+        "kind": "food",
+        "foodId": "bread-wholemeal",
+        "grams": 50
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "breakfast"
+    ],
+    "sourceLine": "2 oua fierte, salata de morcovi, 50 g telemea, o lingurita de ulei de masline, 50 g paine int",
+    "sourcePlanId": "plan-34",
+    "createdAt": "2022-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "meal-snack-624",
+    "name": {
+      "en": "Orange with walnuts"
+    },
+    "emoji": "🍎",
+    "servings": 1,
+    "prepMinutes": 4,
+    "cookMinutes": 0,
+    "components": [
+      {
+        "kind": "food",
+        "foodId": "orange",
+        "grams": 150
+      },
+      {
+        "kind": "food",
+        "foodId": "walnuts",
+        "grams": 10
+      }
+    ],
+    "steps": [],
+    "tags": [
+      "snack"
+    ],
+    "sourceLine": "150 g portocale, 10 g nuci",
+    "sourcePlanId": "plan-34",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "variant": "10 g walnuts, 150 g orange"
+  },
+  {
+    "id": "meal-dinner-626",
     "name": {
       "en": "Telemea with pumpkin seeds & raw vegetable salad"
     },
@@ -14799,7 +16241,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-561",
+    "id": "meal-breakfast-627",
     "name": {
       "en": "Egg spread with wholemeal bread & pumpkin seeds"
     },
@@ -14843,7 +16285,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-563",
+    "id": "meal-dinner-629",
     "name": {
       "en": "Kohlrabi soup with yogurt"
     },
@@ -14872,7 +16314,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-565",
+    "id": "meal-lunch-631",
     "name": {
       "en": "Bulgur with chicken breast & raw vegetable salad"
     },
@@ -14911,7 +16353,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-566",
+    "id": "meal-snack-632",
     "name": {
       "en": "Yogurt with mixed berries & almonds"
     },
@@ -14945,7 +16387,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-568",
+    "id": "meal-lunch-634",
     "name": {
       "en": "Bulgur with chicken breast & pumpkin seeds"
     },
@@ -14989,41 +16431,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-569",
-    "name": {
-      "en": "Feta with raw vegetable salad & extra virgin olive oil"
-    },
-    "emoji": "🌙",
-    "servings": 1,
-    "prepMinutes": 7,
-    "cookMinutes": 0,
-    "components": [
-      {
-        "kind": "food",
-        "foodId": "salad-raw",
-        "grams": 200
-      },
-      {
-        "kind": "food",
-        "foodId": "feta",
-        "grams": 50
-      },
-      {
-        "kind": "food",
-        "foodId": "olive-oil",
-        "grams": 5
-      }
-    ],
-    "steps": [],
-    "tags": [
-      "dinner"
-    ],
-    "sourceLine": "vegyes salata + 50 g feta + 1 tk. olivaolaj",
-    "sourcePlanId": "plan-35",
-    "createdAt": "2021-01-18T00:00:00.000Z"
-  },
-  {
-    "id": "meal-breakfast-570",
+    "id": "meal-breakfast-635",
     "name": {
       "en": "Egg muffins with wholemeal bread & mixed vegetables"
     },
@@ -15057,7 +16465,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-571",
+    "id": "meal-lunch-636",
     "name": {
       "en": "Lentil stew with tofu"
     },
@@ -15086,7 +16494,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-572",
+    "id": "meal-dinner-637",
     "name": {
       "en": "Tuna in brine with raw vegetable salad & extra virgin olive oil"
     },
@@ -15121,7 +16529,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "130 g tuna in brine"
   },
   {
-    "id": "meal-dinner-576",
+    "id": "meal-dinner-641",
     "name": {
       "en": "Beef sour soup with wholemeal bread & yogurt"
     },
@@ -15155,7 +16563,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2021-01-18T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-577",
+    "id": "meal-lunch-642",
     "name": {
       "en": "Chicken with mozzarella & tomato, bulgur & pickles"
     },
@@ -15189,7 +16597,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-578",
+    "id": "meal-snack-643",
     "name": {
       "en": "Grapefruit with cashews"
     },
@@ -15219,7 +16627,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "20 g cashews, 150 g grapefruit"
   },
   {
-    "id": "meal-snack-579",
+    "id": "meal-snack-644",
     "name": {
       "en": "Banana with cashews"
     },
@@ -15248,7 +16656,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-580",
+    "id": "meal-lunch-645",
     "name": {
       "en": "Salmon with raw vegetable salad & extra virgin olive oil"
     },
@@ -15279,10 +16687,11 @@ export const MEAL_RECIPES: Recipe[] = [
     ],
     "sourceLine": "125 g somon, 200 g piure de conopida salata de cruditati, o lingurita de ulei de masline",
     "sourcePlanId": "plan-36",
-    "createdAt": "2022-05-09T00:00:00.000Z"
+    "createdAt": "2022-05-09T00:00:00.000Z",
+    "variant": "125 g salmon, no yogurt garlic sauce"
   },
   {
-    "id": "meal-lunch-582",
+    "id": "meal-lunch-647",
     "name": {
       "en": "Salmon with sweet potato & raw vegetable salad"
     },
@@ -15317,7 +16726,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "no yogurt garlic sauce"
   },
   {
-    "id": "meal-dinner-583",
+    "id": "meal-dinner-648",
     "name": {
       "en": "Tomato & mushroom bruschetta with sautéed mushrooms"
     },
@@ -15351,7 +16760,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-lunch-585",
+    "id": "meal-lunch-650",
     "name": {
       "en": "Fried eggs with creamed spinach"
     },
@@ -15380,7 +16789,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-586",
+    "id": "meal-dinner-651",
     "name": {
       "en": "Lentils with puffed rice cakes & raw vegetable salad"
     },
@@ -15419,7 +16828,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-snack-587",
+    "id": "meal-snack-652",
     "name": {
       "en": "Pear with almonds"
     },
@@ -15449,7 +16858,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "variant": "15 g almonds"
   },
   {
-    "id": "meal-lunch-588",
+    "id": "meal-lunch-653",
     "name": {
       "en": "Tabbouleh with pork loin under the lid & mixed vegetables"
     },
@@ -15483,7 +16892,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-dinner-589",
+    "id": "meal-dinner-654",
     "name": {
       "en": "Cream of asparagus soup with wholemeal bread"
     },
@@ -15512,7 +16921,7 @@ export const MEAL_RECIPES: Recipe[] = [
     "createdAt": "2022-05-09T00:00:00.000Z"
   },
   {
-    "id": "meal-breakfast-590",
+    "id": "meal-breakfast-655",
     "name": {
       "en": "Carrot salad with mozzarella & wholemeal bread"
     },

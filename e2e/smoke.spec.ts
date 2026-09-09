@@ -776,7 +776,7 @@ test.describe('the recipe library', () => {
     await page.locator('button').filter({ hasText: /kcal \/ 100 g/ }).first().click()
 
     // The numbers are derived from what went in, never typed.
-    await expect(page.getByText('Per serving')).toBeVisible()
+    await expect(page.getByText('Per serving', { exact: true })).toBeVisible()
     await page.getByRole('button', { name: 'Add recipe' }).click()
 
     // It says it saved, and offers the way back. Adding was the one action in

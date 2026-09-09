@@ -11,7 +11,7 @@ import { DISH_CATEGORIES, QUICK_FILTERS, HAND_APPLIED_FILTERS } from '../src/lib
 import { RECIPE_ALIASES } from '../src/data/generated/recipeAliases.js'
 import { TIMES_PLANNED } from '../src/data/generated/reuse.js'
 import { componentSignature, rebuildFromArchive, renderFiles } from './lib/library.js'
-import type { Recipe } from '../src/types/index.js'
+import type { MealSlot, Recipe } from '../src/types/index.js'
 
 /**
  * Data integrity checks.
@@ -323,6 +323,58 @@ for (const recipe of MEAL_RECIPES) {
 
 
 const componentCount = recipes.reduce((a, r) => a + r.components.length, 0)
+// 13. No plan is missing a whole meal of the day.
+//
+// She writes five meals a day, every day, in all thirty-six weeks. A plan with
+// no dinner in it anywhere is not a plan she wrote that way, it is a label the
+// importer did not recognise, and the importer is silent about those: a line
+// it cannot put a slot to is simply skipped.
+//
+// That is how eighty-four dinners went missing across thirteen weeks. The
+// table knew "Vacsi" and she had written "Vacsora". Nothing failed, nothing
+// was reported, and the days just had four meals in them.
+const EVERY_SLOT: MealSlot[] = ['breakfast', 'lunch', 'dinner', 'snack']
+
+for (const plan of SOURCE_PLANS) {
+  if (!plan.days.length) {
+    problems.push(`${plan.file}: read as no days at all`)
+    continue
+  }
+  const slots = new Set(plan.days.flatMap((d) => d.meals.map((m) => m.slot)))
+  const missing = EVERY_SLOT.filter((slot) => !slots.has(slot))
+  if (missing.length) {
+    problems.push(`${plan.file}: no ${missing.join(' or ')} anywhere in it, so a meal label was not recognised`)
+  }
+}
+
+// 13. Every plan flies the flag of the language it is written in.
+//
+// The archive screen puts a flag beside each week, and the language behind it
+// used to be guessed from the file's name: "AranyM" then any character then a
+// "k". That matched `AranyM_k11.01.2021_trend.docx` and not
+// `Arany-Mák-01.12.2020.pdf`, where the hyphen is one character too many, so
+// sixteen of the thirty-six weeks flew a Romanian flag over Hungarian food.
+//
+// It is read from the meal labels now, which cannot be renamed by a download.
+// This checks that against a different signal again, the words in the meals
+// themselves, so that agreeing with itself is not enough.
+const HUNGARIAN_WORDS = /\b(joghurt|zöldség|zoldseg|kenyér|kenyer|tojás|tojas|olívaolaj|olivaolaj)\b/i
+const ROMANIAN_WORDS = /\b(iaurt|legume|p[âa]ine|ulei de m[ăa]sline|br[âa]nz[ăa])\b/i
+
+for (const plan of SOURCE_PLANS) {
+  const text = plan.days.flatMap((d) => d.meals.map((m) => m.text)).join(' ')
+  const looksHungarian = HUNGARIAN_WORDS.test(text)
+  const looksRomanian = ROMANIAN_WORDS.test(text)
+  // Only where the words are decisive: a week of bare weights says nothing.
+  if (looksHungarian === looksRomanian) continue
+
+  const should = looksHungarian ? 'hu' : 'ro'
+  if (plan.language !== should) {
+    problems.push(`${plan.file}: labelled ${plan.language}, but its meals are written in ${should}`)
+  }
+}
+
+
 console.log(`foods          ${FOODS.length}`)
 console.log(`dishes         ${DISHES.length}`)
 console.log(`meal recipes   ${MEAL_RECIPES.length}`)
