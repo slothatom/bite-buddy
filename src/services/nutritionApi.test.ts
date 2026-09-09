@@ -30,11 +30,29 @@ describe('searchFoods', () => {
     expect(problems).toContainEqual({ source: 'usda', reason: 'rate-limited' })
   })
 
-  it('reports being offline', async () => {
+  it('reports being offline when the browser says the network is gone', async () => {
+    vi.stubGlobal('navigator', { onLine: false })
     mockFetch(() => { throw new TypeError('Failed to fetch') })
 
     const { problems } = await searchFoods('oats')
     expect(problems.map((p) => p.reason)).toEqual(['offline', 'offline'])
+  })
+
+  it('does not call a dead fetch "offline" while the browser is online', async () => {
+    // This put "You're offline" on a phone with a full bar of 5G, in a line
+    // sitting under results the other source had just returned. A request can
+    // fail for its own reasons; only the browser knows about your connection.
+    vi.stubGlobal('navigator', { onLine: true })
+    mockFetch((url) => {
+      if (url.includes('nal.usda.gov')) {
+        return json({ foods: [{ description: 'Oats, raw', foodNutrients: [{ nutrientId: 1008, value: 389 }] }] })
+      }
+      throw new TypeError('Failed to fetch')
+    })
+
+    const { results, problems } = await searchFoods('oats')
+    expect(results).toHaveLength(1)
+    expect(problems).toEqual([{ source: 'openfoodfacts', reason: 'unavailable' }])
   })
 
   it('distinguishes a server being down from either', async () => {
@@ -60,9 +78,54 @@ describe('searchFoods', () => {
   it('an empty answer from both sources is not a problem, just no matches', async () => {
     mockFetch((url) => (url.includes('nal.usda.gov') ? json({ foods: [] }) : json({ products: [] })))
 
-    const { results, problems } = await searchFoods('nonsense')
+    const { results, problems, unrelated } = await searchFoods('nonsense')
     expect(results).toEqual([])
     expect(problems).toEqual([])
+    expect(unrelated).toBe(0)
+  })
+})
+
+/*
+ * USDA's search is a loose full text match and it always answers something.
+ * Asked for "Ciorba de legume" it offered creme de menthe, pound cake and corn
+ * flour, and any of the three would have been stored as the numbers for a
+ * vegetable soup.
+ */
+describe('rows that have nothing to do with the question', () => {
+  const usdaRows = (...names: string[]) => json({
+    foods: names.map((description) => ({
+      description, foodNutrients: [{ nutrientId: 1008, value: 300 }],
+    })),
+  })
+
+  it('drops them, and says they were dropped rather than calling it no matches', async () => {
+    mockFetch((url) => (url.includes('nal.usda.gov')
+      ? usdaRows('Creme de menthe', 'Cake, pound, commercially prepared', 'Corn flour, whole-grain')
+      : json({ products: [] })))
+
+    const { results, unrelated, problems } = await searchFoods('Ciorba de legume')
+    expect(results).toEqual([])
+    expect(unrelated).toBe(3)
+    expect(problems).toEqual([])
+  })
+
+  it('keeps a row that answers the question, plural or not', async () => {
+    mockFetch((url) => (url.includes('nal.usda.gov')
+      ? usdaRows('Tomatoes, red, ripe, raw', 'Creme de menthe')
+      : json({ products: [] })))
+
+    const { results, unrelated } = await searchFoods('tomato')
+    expect(results.map((r) => r.name)).toEqual(['Tomatoes, red, ripe, raw'])
+    expect(unrelated).toBe(1)
+  })
+
+  it('reads through the accents on a query', async () => {
+    mockFetch((url) => (url.includes('nal.usda.gov')
+      ? usdaRows('Grapefruit, raw, pink and red')
+      : json({ products: [] })))
+
+    const { results } = await searchFoods('grápefruit')
+    expect(results).toHaveLength(1)
   })
 })
 
@@ -71,8 +134,16 @@ describe('lookupBarcode', () => {
     mockFetch(() => json({ status: 0 }))
     expect(await lookupBarcode('5901234123457')).toEqual({ found: false, reason: 'unknown-product' })
 
+    // In a shop at arm's length, no signal and Open Food Facts being down are
+    // different next moves, so the two are told apart by the browser rather
+    // than by the shape of the failure, which is identical for both.
+    vi.stubGlobal('navigator', { onLine: false })
     mockFetch(() => { throw new TypeError('Failed to fetch') })
     expect(await lookupBarcode('5901234123457')).toEqual({ found: false, reason: 'offline' })
+
+    vi.stubGlobal('navigator', { onLine: true })
+    mockFetch(() => { throw new TypeError('Failed to fetch') })
+    expect(await lookupBarcode('5901234123457')).toEqual({ found: false, reason: 'unavailable' })
   })
 
   it('returns the product when it is known', async () => {

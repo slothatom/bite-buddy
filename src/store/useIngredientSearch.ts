@@ -41,6 +41,8 @@ export interface IngredientSearch {
   searching: boolean
   /** Which sources failed and why, never silently nothing. */
   problems: LookupOutcome['problems']
+  /** How many rows came back with nothing to do with what was typed. */
+  unrelated: number
   /** True once an online search has actually been run for this query. */
   searched: boolean
 }
@@ -53,6 +55,7 @@ export function useIngredientSearch(query: string, excludeRecipeId?: string): In
   const [searching, setSearching] = useState(false)
   const [searched, setSearched] = useState(false)
   const [problems, setProblems] = useState<LookupOutcome['problems']>([])
+  const [unrelated, setUnrelated] = useState(0)
 
   const foodIndex = useMemo(() => buildFoodIndex(foods), [foods])
   const localFoods = useMemo(() => searchFoods(query, foodIndex, 20), [query, foodIndex])
@@ -92,6 +95,7 @@ export function useIngredientSearch(query: string, excludeRecipeId?: string): In
           if (controller.signal.aborted) return
           setOnline(outcome.results)
           setProblems(outcome.problems)
+          setUnrelated(outcome.unrelated)
           setSearched(true)
         })
         .catch(() => {
@@ -118,8 +122,11 @@ export function useIngredientSearch(query: string, excludeRecipeId?: string): In
   // A query too short to search online shows nothing from online, whatever is
   // still sitting in state from the last one you typed.
   if (!searchable) {
-    return { foods: localFoods, recipes: localRecipes, online: [], searching: false, problems: [], searched: false }
+    return {
+      foods: localFoods, recipes: localRecipes, online: [],
+      searching: false, problems: [], unrelated: 0, searched: false,
+    }
   }
 
-  return { foods: localFoods, recipes: localRecipes, online: fresh, searching, problems, searched }
+  return { foods: localFoods, recipes: localRecipes, online: fresh, searching, problems, unrelated, searched }
 }
