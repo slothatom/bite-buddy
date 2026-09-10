@@ -5,7 +5,15 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default tseslint.config(
-  { ignores: ['dist', 'src/data/generated', 'node_modules'] },
+  // Build output and the design-sync working tree. All generated, all
+  // gitignored, and `_ds_bundle.js` is a 3 MB bundle of everything at once,
+  // which lints as a wall of rules this config does not even load.
+  {
+    ignores: [
+      'dist', 'dist-single', 'src/data/generated', 'node_modules',
+      'ds-bundle', '.ds-sync', '.design-sync/types',
+    ],
+  },
 
   // Application code.
   {
