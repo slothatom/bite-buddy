@@ -57,3 +57,106 @@ the only change design-sync makes to a file outside `.design-sync/`.
   its card instead of escaping it.
 - `MacroBar`'s `unit` defaults to `'g'`, so a calorie figure passed through it
   comes out labelled "1800g". Calories get the ring, not a bar.
+
+## What the previews had to work around
+
+Every card in this design system is hand-authored, and four of the things that
+cost a debugging cycle are structural rather than per-component. A future run
+should read these before writing a single preview.
+
+- **A preview cannot reach the app's stores.** The preview compiler sends an
+  import that resolves to an exported component's module to the bundle global,
+  and bundles everything else from source, so
+  `import { useUndo } from '../../src/store/useUndo'` compiles a **second copy**
+  of the store. Calling `setState` on it does nothing to the component in the
+  bundle, which reads the bundle's copy. Verified: it renders a blank card.
+  Two ways in are used instead. Seed `localStorage` and call `location.reload()`
+  once, because the persisted stores read storage during `_ds_bundle.js`, which
+  runs before any preview line; the capture step does not mind the reload.
+  Or drive a component that is already in the bundle: the undo offer is made by
+  clicking a hidden `WeekTemplates`' Forget button, and the storage failure by
+  making `setItem` throw and clicking `MobileNav`'s Add a meal.
+  If a later run wants this to be ordinary rather than clever, export the
+  stores from `entry.tsx` and the import rule redirects to them.
+- **`position: fixed` resolves against the cell, not the window**, because the
+  cell wrapper carries a `transform` and so becomes the containing block. A
+  cell whose only child is fixed measures 0px tall and the overlay comes out
+  flat. Every banner, bar and sheet here sits inside a plain sized `<div>`, and
+  a `cardMode: single` override does not remove that need.
+- **The capture clock is fixed at 2024-05-15.** Anything derived from `today()`
+  is anchored there: `WhenPicker`'s window is 2024-05-06 to 2024-06-09,
+  `FillGaps` drops earlier dates, and `AddEntryModal` only reads as a record
+  when its date is on or before that day. Those three carry May 2024 fixtures;
+  everything else uses the app's own September 2026.
+- **`ALL_RECIPES` and `FOODS` ship in code**, so an empty store still returns
+  the whole library and `FillGaps` proposes real dishes with no fixture at all.
+
+## Known render warns, all triaged
+
+- `Zig` before its preview existed was flagged `[RENDER_THIN]`: an SVG mascot
+  with no text in it. Authored now, so the flag should not return.
+- `TrendsTab`'s two cells are both its empty state at two widths. That is not a
+  variants-identical failure: it is the only state reachable, see above.
+- `UndoBar` has no resting card. Its resting state is `null` by design and
+  would photograph blank, so both cells show a standing offer.
+
+## Component notes worth keeping
+
+- `CalorieRing` has no status prop: the level falls out of `value / target`
+  through `targetStatus`. Below about 116px the centre figure crowds the
+  stroke, because it is a fixed 28px whatever the `size`.
+- `StatusPill` takes the whole label as one string; the ring joins
+  `label · deltaLabel` itself.
+- `TierBadge` daily and weekly share a surface colour, separated only by the
+  symbol and the word. Keep a cell where those two sit together.
+- `EmptyState`'s `emoji` replaces the mascot entirely, so no cell can show
+  both an emoji and a mood.
+- `ChipRow`'s expanded state is internal, so a card can only show the collapsed
+  row and its toggle. Callers sort the active chip into the first `initial`
+  themselves; the component does not.
+- `Photo` renders nothing at all without the two Supabase environment
+  variables: `photoUrl` resolves null in a microtask and the component returns
+  null. Its cards show a recipe card and a shelf closing up around the gap,
+  which is what the shipped library actually looks like.
+- `BarcodeScanner` lands in its camera-denied branch, which is the same branch
+  a refused permission produces, so the card is the real thing.
+- `AddFoodModal` with `initialTab="lookup"` and a non-empty `initialName` fires
+  a live USDA and Open Food Facts request on mount, which is not deterministic
+  under a network-idle capture. Its lookup cell passes no name.
+- `FoodEditor` and `RecipeEditor` are two screens long and the parts worth
+  grading are below the fold, so their previews scroll the panel's own scroller
+  on mount.
+- `DayChart` returns null on an all-null series, so an empty series is not a
+  shippable cell; a gappy one is the honest version of that axis.
+
+## Two generated declarations that are wrong
+
+Both are harmless to the render, because esbuild does not type check, but they
+are what the design agent is handed as the contract.
+
+- `DayChart.smoothed` is typed `number[]`. The source is `(number | null)[]`
+  and `smooth()` really does return nulls.
+- `RecipeEditor.recipe` is typed `Recipe`, losing the `| null` that means
+  "write a new one".
+
+Fix either with a `dtsPropsFor` entry when it starts to matter.
+
+## Re-sync risks
+
+- **Nothing has ever been uploaded.** `DesignSync` needs an authorisation this
+  session could not obtain, so there is no project, no `projectId` in the
+  config, and no `_ds_sync.json` anchor anywhere but on disk. The next run with
+  authorisation creates the project and uploads everything; it will re-verify
+  from scratch, which is correct rather than a failure.
+- **`entry.tsx` and `componentSrcMap` are hand-maintained.** A component added
+  to `src/components/` appears in neither until somebody adds it, and nothing
+  fails to tell you.
+- **The previews are tied to component internals**, not just to props: the
+  storage keys and their shapes, `WeekTemplates`' Forget button, `MobileNav`'s
+  Add a meal, the section labels the editors scroll to. Renaming any of those
+  breaks a card silently, and the card still renders, just wrong.
+- **Playwright is pinned by the container, not by the repo.** `playwright@1.56.0`
+  in `.ds-sync/` matches this machine's cached chromium 1194. On a machine with
+  a different cache, find the version whose `browsers.json` pins what is there.
+- **The compiled CSS comes from `npm run build`.** Run `buildCmd` before the
+  converter or the design system ships whatever stylesheet was staged last.

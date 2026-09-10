@@ -14,22 +14,31 @@ const nothing = () => {}
  * button is how a refused permission usually ends; this says what happened in
  * two lines and offers Go back, which returns to typing the numbers off the
  * label by hand.
+ *
+ * The box with a height on it is what the sheet fills: it is `position: fixed`
+ * and the card wrapper each story renders into carries a transform, so a cell
+ * whose only child is fixed is 0px tall and photographs flat.
  */
 export function NoCameraHere() {
-  return <BarcodeScanner onDetected={nothing} onClose={nothing} />
+  return (
+    <div style={{ height: 760 }}>
+      <BarcodeScanner onDetected={nothing} onClose={nothing} />
+    </div>
+  )
 }
 
 /**
  * The same screen at the size it is actually used at.
  *
- * The scanner is full-bleed and fixed, so at 1100 px wide the corner marks and
+ * The scanner is full-bleed, so across the width of a card the corner marks and
  * the two lines of text sit in the middle of a lot of black and read as
  * under-designed. A barcode is scanned with a phone in one hand, and this is
  * the frame that shape was drawn for.
  *
- * The transform on the wrapper is what confines it: a transformed ancestor
- * becomes the containing block for `position: fixed` children, so the sheet
- * fills the phone rather than the card. Nothing in the component changes.
+ * The transform on the wrapper is what confines it: the nearest transformed
+ * ancestor is the containing block for a `fixed` child, so putting one here
+ * takes that job off the card and the sheet fills the phone instead. Nothing in
+ * the component changes.
  */
 export function AtPhoneSize() {
   return (
