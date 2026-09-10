@@ -381,9 +381,20 @@ function cleanTerm(text: string): string {
 export function stripDiacritics(s: string): string {
   return s
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[șş]/g, 's')
-    .replace(/[țţ]/g, 't')
+    /*
+     * Escapes, not the characters themselves.
+     *
+     * Written literally, the combining-mark range is two raw bytes either side
+     * of the dash, and a regex literal is parsed before anything runs. Served
+     * anywhere that does not say utf-8, those bytes are read as Latin-1, the
+     * range comes out reversed, and the whole file fails to parse: not this
+     * function returning something odd, the module never loading at all. The
+     * app's own page declares utf-8; a bundle of these components handed to
+     * something else cannot assume that.
+     */
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u0219\u015f]/g, 's')
+    .replace(/[\u021b\u0163]/g, 't')
     .toLowerCase()
 }
 
