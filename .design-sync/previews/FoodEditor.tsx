@@ -1,6 +1,19 @@
+import type { ReactNode } from 'react'
 import { FoodEditor } from 'bite-buddy'
 
 const nothing = () => {}
+
+/*
+ * Every cell here sits in a box with a height on it.
+ *
+ * The sheet is `position: fixed`, and the card wrapper each story renders into
+ * carries a transform, which makes that wrapper the containing block rather
+ * than the window. A cell whose only child is fixed is therefore 0px tall and
+ * photographs flat, so the height is what gives the overlay something to fill.
+ */
+function Sheet({ children }: { children?: ReactNode }) {
+  return <div style={{ height: 760 }}>{children}</div>
+}
 
 /** One of the 122 foods that ship in code, opened from the Foods screen. */
 const telemea = {
@@ -60,7 +73,11 @@ const bakeryBread = {
  * Delete is its own button rather than a corner of Save.
  */
 export function ACuratedFood() {
-  return <FoodEditor food={telemea} onClose={nothing} />
+  return (
+    <Sheet>
+      <FoodEditor food={telemea} onClose={nothing} />
+    </Sheet>
+  )
 }
 
 /**
@@ -71,7 +88,11 @@ export function ACuratedFood() {
  * date the numbers were fetched, because nutrition data gets revised.
  */
 export function FromABarcode() {
-  return <FoodEditor food={scannedYogurt} onClose={nothing} />
+  return (
+    <Sheet>
+      <FoodEditor food={scannedYogurt} onClose={nothing} />
+    </Sheet>
+  )
 }
 
 /**
@@ -82,5 +103,9 @@ export function FromABarcode() {
  * different claims and the editor has to keep them apart.
  */
 export function FiguresNobodyStated() {
-  return <FoodEditor food={bakeryBread} onClose={nothing} />
+  return (
+    <Sheet>
+      <FoodEditor food={bakeryBread} onClose={nothing} />
+    </Sheet>
+  )
 }

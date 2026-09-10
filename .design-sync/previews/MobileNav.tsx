@@ -2,22 +2,9 @@ import { useEffect, useRef, type ReactNode } from 'react'
 import { MobileNav } from 'bite-buddy'
 
 /**
- * A phone, on a card that is 900px wide.
- *
- * Everything in this component is behind `md:hidden`, so at the width these
- * previews are photographed at the whole thing is display:none and the card
- * comes out blank. The rules below put the phone's breakpoint back inside the
- * frame and pin the drawer's `fixed` overlay to the frame rather than to the
- * window, so the menu covers the screen it belongs to.
+ * What is under the bar, so the sticky header has something to sit on and the
+ * drawer has something to cover.
  */
-const PHONE = `
-.ds-phone { position: relative; width: 390px; height: 620px; overflow: hidden;
-            border-radius: 20px; border: 1px solid #e5e0d5; background: #fff }
-.ds-phone .md\\:hidden { display: flex !important }
-.ds-phone .fixed { position: absolute !important }
-`
-
-/** What is under the bar, so the sticky header has something to sit on. */
 function Screen() {
   return (
     <div className="px-4 py-4">
@@ -32,15 +19,32 @@ function Screen() {
         <p className="text-sm text-ink-900">Lunch</p>
         <p className="text-xs text-ink-500 mt-0.5">Ciorba de legume, 300 g. 240 kcal</p>
       </div>
+      <div className="card p-4 mt-3">
+        <p className="text-sm text-ink-900">Dinner</p>
+        <p className="text-xs text-ink-500 mt-0.5">Telemea de capra, ardei copti. 380 kcal</p>
+      </div>
     </div>
   )
+}
+
+/**
+ * The screen this component belongs to, given a height of its own.
+ *
+ * The card is photographed at a phone's width, so nothing here needs help to
+ * be visible. The height does: the drawer is `fixed`, the card wraps each cell
+ * in a `transform`, and a transform makes that wrapper the containing block
+ * for anything fixed inside it. Without a box to cover, the drawer would open
+ * onto nothing.
+ */
+function Phone({ children }: { children: ReactNode }) {
+  return <div data-phone="" style={{ height: 740 }}>{children}</div>
 }
 
 /**
  * Presses buttons inside the frame once it is mounted.
  *
  * The menu only exists after a tap, and a still picture cannot tap, so each
- * label in `steps` is pressed in turn a frame apart.
+ * selector in `steps` is pressed in turn a frame apart.
  */
 function Tap({ steps, children }: { steps: string[]; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -49,23 +53,13 @@ function Tap({ steps, children }: { steps: string[]; children: ReactNode }) {
     const timers: ReturnType<typeof setTimeout>[] = []
     for (const step of steps) {
       timers.push(setTimeout(() => {
-        const root = ref.current?.closest('.ds-phone') ?? ref.current
-        const el = root?.querySelector<HTMLElement>(step)
-        el?.click()
+        const root = ref.current?.closest('[data-phone]') ?? document
+        root.querySelector<HTMLElement>(step)?.click()
       }, (i += 1) * 40))
     }
     return () => timers.forEach(clearTimeout)
   }, [steps])
   return <div ref={ref}>{children}</div>
-}
-
-function Phone({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <style>{PHONE}</style>
-      <div className="ds-phone">{children}</div>
-    </>
-  )
 }
 
 /**

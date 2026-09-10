@@ -1,6 +1,19 @@
+import type { ReactNode } from 'react'
 import { RecipeEditor } from 'bite-buddy'
 
 const nothing = () => {}
+
+/*
+ * Every cell here sits in a box with a height on it.
+ *
+ * The sheet is `position: fixed`, and the card wrapper each story renders into
+ * carries a transform, which makes that wrapper the containing block rather
+ * than the window. A cell whose only child is fixed is therefore 0px tall and
+ * photographs flat, so the height is what gives the overlay something to fill.
+ */
+function Sheet({ children }: { children?: ReactNode }) {
+  return <div style={{ height: 760 }}>{children}</div>
+}
 
 /** One of the shipped dishes, as the importer built it from a plan. */
 const ciorba = {
@@ -63,7 +76,11 @@ const porridge = {
  * planner uses, so the recipe cannot disagree with its own totals.
  */
 export function EditingAPlanRecipe() {
-  return <RecipeEditor recipe={ciorba} onClose={nothing} onSaved={nothing} />
+  return (
+    <Sheet>
+      <RecipeEditor recipe={ciorba} onClose={nothing} onSaved={nothing} />
+    </Sheet>
+  )
 }
 
 /**
@@ -74,7 +91,11 @@ export function EditingAPlanRecipe() {
  * numbers below fill themselves in, and Add recipe refused until it has a name.
  */
 export function ANewOne() {
-  return <RecipeEditor recipe={null} onClose={nothing} onSaved={nothing} />
+  return (
+    <Sheet>
+      <RecipeEditor recipe={null} onClose={nothing} onSaved={nothing} />
+    </Sheet>
+  )
 }
 
 /**
@@ -86,5 +107,9 @@ export function ANewOne() {
  * says out loud rather than leaving as an empty box.
  */
 export function NoMethodYet() {
-  return <RecipeEditor recipe={porridge} onClose={nothing} onSaved={nothing} />
+  return (
+    <Sheet>
+      <RecipeEditor recipe={porridge} onClose={nothing} onSaved={nothing} />
+    </Sheet>
+  )
 }
