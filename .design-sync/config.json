@@ -1,0 +1,83 @@
+{
+  "pkg": "bite-buddy",
+  "globalName": "BiteBuddy",
+  "shape": "package",
+  "srcDir": "src/components",
+  "tsconfig": "tsconfig.json",
+  "buildCmd": "npm run build && node .design-sync/prepare-css.mjs && node .design-sync/build-types.mjs",
+  "cssEntry": ".design-sync/.cache/css/styles.css",
+  "guidelinesGlob": [
+    "docs/DESIGN-SYSTEM.md"
+  ],
+  "componentSrcMap": {
+    "AddEntryModal": "src/components/planner/AddEntryModal.tsx",
+    "AddFoodModal": "src/components/foods/AddFoodModal.tsx",
+    "BarcodeScanner": "src/components/recipes/BarcodeScanner.tsx",
+    "BodyChart": "src/components/body/BodyChart.tsx",
+    "CalorieRing": "src/components/ui/index.tsx",
+    "ChipRow": "src/components/ui/index.tsx",
+    "DayChart": "src/components/trends/Chart.tsx",
+    "EmptyState": "src/components/ui/index.tsx",
+    "ErrorBoundary": "src/components/layout/ErrorBoundary.tsx",
+    "FillGaps": "src/components/planner/FillGaps.tsx",
+    "FoodEditor": "src/components/foods/FoodEditor.tsx",
+    "Legend": "src/components/trends/Chart.tsx",
+    "MacroBar": "src/components/ui/index.tsx",
+    "MobileNav": "src/components/layout/MobileNav.tsx",
+    "NutrientSummary": "src/components/ui/index.tsx",
+    "Photo": "src/components/recipes/Photo.tsx",
+    "PlanArchive": "src/components/settings/PlanArchive.tsx",
+    "PreviewShell": null,
+    "RecipeEditor": "src/components/recipes/RecipeEditor.tsx",
+    "SectionHeading": "src/components/ui/index.tsx",
+    "Sidebar": "src/components/layout/Sidebar.tsx",
+    "SourceLine": "src/components/ui/index.tsx",
+    "StatusPill": "src/components/ui/index.tsx",
+    "StorageBanner": "src/components/layout/StorageBanner.tsx",
+    "TierBadge": "src/components/ui/index.tsx",
+    "TrendsTab": "src/components/trends/TrendsTab.tsx",
+    "UndoBar": "src/components/layout/UndoBar.tsx",
+    "WeekTemplates": "src/components/planner/WeekTemplates.tsx",
+    "WhenPicker": "src/components/planner/WhenPicker.tsx",
+    "Wordmark": "src/components/brand/Mascot.tsx",
+    "Zig": "src/components/brand/Mascot.tsx"
+  },
+  "entry": ".design-sync/entry.tsx",
+  "provider": {
+    "component": "PreviewShell"
+  },
+  "overrides": {
+    "AddFoodModal": {
+      "cardMode": "single",
+      "viewport": "1100x820"
+    },
+    "AddEntryModal": {
+      "cardMode": "single",
+      "viewport": "1100x820"
+    },
+    "FoodEditor": {
+      "cardMode": "single",
+      "viewport": "1100x820"
+    },
+    "RecipeEditor": {
+      "cardMode": "single",
+      "viewport": "1100x820"
+    },
+    "FillGaps": {
+      "cardMode": "single",
+      "viewport": "1100x820"
+    },
+    "WeekTemplates": {
+      "cardMode": "single",
+      "viewport": "1100x820"
+    },
+    "WhenPicker": {
+      "cardMode": "single",
+      "viewport": "1100x820"
+    },
+    "BarcodeScanner": {
+      "cardMode": "single",
+      "viewport": "1100x820"
+    }
+  }
+}

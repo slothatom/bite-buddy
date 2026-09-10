@@ -2,6 +2,7 @@
   "name": "bite-buddy",
   "private": true,
   "version": "0.1.0",
+  "types": ".design-sync/types/.design-sync/entry.d.ts",
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"
   },
