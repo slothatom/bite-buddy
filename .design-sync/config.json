@@ -47,11 +47,19 @@
     "component": "PreviewShell"
   },
   "overrides": {
+    "AddEntryModal": {
+      "cardMode": "single",
+      "viewport": "1100x820"
+    },
     "AddFoodModal": {
       "cardMode": "single",
       "viewport": "1100x820"
     },
-    "AddEntryModal": {
+    "BarcodeScanner": {
+      "cardMode": "single",
+      "viewport": "1100x820"
+    },
+    "FillGaps": {
       "cardMode": "single",
       "viewport": "1100x820"
     },
@@ -59,11 +67,11 @@
       "cardMode": "single",
       "viewport": "1100x820"
     },
-    "RecipeEditor": {
+    "MobileNav": {
       "cardMode": "single",
-      "viewport": "1100x820"
+      "viewport": "420x820"
     },
-    "FillGaps": {
+    "RecipeEditor": {
       "cardMode": "single",
       "viewport": "1100x820"
     },
@@ -72,10 +80,6 @@
       "viewport": "1100x820"
     },
     "WhenPicker": {
-      "cardMode": "single",
-      "viewport": "1100x820"
-    },
-    "BarcodeScanner": {
       "cardMode": "single",
       "viewport": "1100x820"
     }
