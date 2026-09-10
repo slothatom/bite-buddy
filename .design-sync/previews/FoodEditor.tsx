@@ -1,18 +1,33 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { FoodEditor } from 'bite-buddy'
 
 const nothing = () => {}
 
 /*
- * Every cell here sits in a box with a height on it.
+ * Every cell here sits in a box with a height on it, and one of them starts
+ * part-way down the sheet.
  *
- * The sheet is `position: fixed`, and the card wrapper each story renders into
- * carries a transform, which makes that wrapper the containing block rather
- * than the window. A cell whose only child is fixed is therefore 0px tall and
- * photographs flat, so the height is what gives the overlay something to fill.
+ * The height first: the sheet is `position: fixed`, and the card wrapper each
+ * story renders into carries a transform, which makes that wrapper the
+ * containing block rather than the window. A cell whose only child is fixed is
+ * 0px tall and photographs flat.
+ *
+ * The scroll second: the editor is taller than the card, so `show` puts a named
+ * section at the top of the panel's own scroller, which is what a finger does
+ * on the way to the numbers. Nothing else about the component is arranged.
  */
-function Sheet({ children }: { children?: ReactNode }) {
-  return <div style={{ height: 760 }}>{children}</div>
+function Sheet({ children, show }: { children?: ReactNode; show?: string }) {
+  const held = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!show) return
+    const body = held.current?.querySelector<HTMLElement>('[role="dialog"] .overflow-y-auto')
+    if (!body) return
+    const heading = Array.from(body.querySelectorAll<HTMLElement>('p'))
+      .find((el) => el.textContent?.trim() === show)
+    if (!heading) return
+    body.scrollTop += heading.getBoundingClientRect().top - body.getBoundingClientRect().top - 12
+  }, [show])
+  return <div ref={held} style={{ height: 760 }}>{children}</div>
 }
 
 /** One of the 122 foods that ship in code, opened from the Foods screen. */
@@ -81,15 +96,16 @@ export function ACuratedFood() {
 }
 
 /**
- * A food that came off a barcode, with its provenance card showing.
+ * A food that came off a barcode, scrolled to its numbers.
  *
- * The card is the only cell here that has one, and it is what stops a wrong
- * figure being untraceable: the source, the barcode it was read from, and the
- * date the numbers were fetched, because nutrition data gets revised.
+ * The provenance card under them is the only one on this sheet, and it is what
+ * stops a wrong figure being untraceable: the source, the barcode it was read
+ * from, and the date the numbers were fetched, because nutrition data gets
+ * revised. Delete sits below it, well away from Save changes.
  */
 export function FromABarcode() {
   return (
-    <Sheet>
+    <Sheet show="Per 100 g">
       <FoodEditor food={scannedYogurt} onClose={nothing} />
     </Sheet>
   )

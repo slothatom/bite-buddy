@@ -1,18 +1,34 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { RecipeEditor } from 'bite-buddy'
 
 const nothing = () => {}
 
 /*
- * Every cell here sits in a box with a height on it.
+ * Every cell here sits in a box with a height on it, and some of them start
+ * part-way down the sheet.
  *
- * The sheet is `position: fixed`, and the card wrapper each story renders into
- * carries a transform, which makes that wrapper the containing block rather
- * than the window. A cell whose only child is fixed is therefore 0px tall and
- * photographs flat, so the height is what gives the overlay something to fill.
+ * The height first: the sheet is `position: fixed`, and the card wrapper each
+ * story renders into carries a transform, which makes that wrapper the
+ * containing block rather than the window. A cell whose only child is fixed is
+ * 0px tall and photographs flat.
+ *
+ * The scroll second: this editor is about two and a half screens long and the
+ * card only ever shows the first one. `show` puts a named section at the top of
+ * the panel's own scroller, which is what a finger does on the way to the
+ * ingredients. Nothing else about the component is arranged.
  */
-function Sheet({ children }: { children?: ReactNode }) {
-  return <div style={{ height: 760 }}>{children}</div>
+function Sheet({ children, show }: { children?: ReactNode; show?: string }) {
+  const held = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (!show) return
+    const body = held.current?.querySelector<HTMLElement>('[role="dialog"] .overflow-y-auto')
+    if (!body) return
+    const heading = Array.from(body.querySelectorAll<HTMLElement>('p'))
+      .find((el) => el.textContent?.trim() === show)
+    if (!heading) return
+    body.scrollTop += heading.getBoundingClientRect().top - body.getBoundingClientRect().top - 12
+  }, [show])
+  return <div ref={held} style={{ height: 760 }}>{children}</div>
 }
 
 /** One of the shipped dishes, as the importer built it from a plan. */
@@ -69,26 +85,27 @@ const porridge = {
 }
 
 /**
- * Editing a recipe that came from the dietician.
+ * The ingredients of a recipe that came from the dietician.
  *
- * Everything is filled in and nothing here types a calorie: the figures at the
- * bottom are derived from the four weighed ingredients, the same derivation the
- * planner uses, so the recipe cannot disagree with its own totals.
+ * Nothing in this editor types a calorie. Every line is a weighed food or
+ * another recipe, each carrying what it costs, and the amount can be entered in
+ * whatever unit suits while the recipe stores grams. Water is in the list
+ * because the soup is sold by the bowl and the weight has to add up.
  */
 export function EditingAPlanRecipe() {
   return (
-    <Sheet>
+    <Sheet show="What goes in">
       <RecipeEditor recipe={ciorba} onClose={nothing} onSaved={nothing} />
     </Sheet>
   )
 }
 
 /**
- * Writing one from scratch.
+ * Writing one from scratch, at the top of the sheet.
  *
- * Worth looking at for how much of the sheet is empty and how it says so: no
- * meal times chosen, no category, an ingredient list that explains that the
- * numbers below fill themselves in, and Add recipe refused until it has a name.
+ * Worth looking at for how much is empty and how it says so: no meal times
+ * chosen so it has fallen back to Dishes and explained what that means, no
+ * category picked, and Add recipe refused until it has a name.
  */
 export function ANewOne() {
   return (
@@ -99,16 +116,32 @@ export function ANewOne() {
 }
 
 /**
- * A breakfast the importer built from one line of a Hungarian plan.
+ * The end of the same soup: what it comes to, and how to get rid of it.
  *
- * A different shape of recipe to the first cell: one serving rather than a
- * batch, a variant label carrying the portion that tells it apart from the
- * other rolled-oats mornings, and no steps at all, which the method section
- * says out loud rather than leaving as an empty box.
+ * The per-serving figures are derived from the four ingredients above, by the
+ * same code the planner uses, so a recipe cannot disagree with its own totals.
+ * Delete sits under a border and away from Save changes because they are
+ * different intentions.
+ */
+export function WhatItComesTo() {
+  return (
+    <Sheet show="Per serving">
+      <RecipeEditor recipe={ciorba} onClose={nothing} onSaved={nothing} />
+    </Sheet>
+  )
+}
+
+/**
+ * A breakfast the importer built from one line of a Hungarian plan, at the
+ * method.
+ *
+ * It has ingredients and totals but has never had a method, because the plan
+ * was a line of text rather than a recipe. The editor says that in words under
+ * the empty step list instead of leaving a box nobody can explain.
  */
 export function NoMethodYet() {
   return (
-    <Sheet>
+    <Sheet show="How to make it">
       <RecipeEditor recipe={porridge} onClose={nothing} onSaved={nothing} />
     </Sheet>
   )

@@ -59,6 +59,24 @@
       "cardMode": "single",
       "viewport": "1100x820"
     },
+    "BodyChart": {
+      "cardMode": "column"
+    },
+    "CalorieRing": {
+      "cardMode": "column"
+    },
+    "ChipRow": {
+      "cardMode": "column"
+    },
+    "DayChart": {
+      "cardMode": "column"
+    },
+    "EmptyState": {
+      "cardMode": "column"
+    },
+    "ErrorBoundary": {
+      "cardMode": "column"
+    },
     "FillGaps": {
       "cardMode": "single",
       "viewport": "1100x820"
@@ -67,13 +85,51 @@
       "cardMode": "single",
       "viewport": "1100x820"
     },
+    "Legend": {
+      "cardMode": "column"
+    },
+    "MacroBar": {
+      "cardMode": "column"
+    },
     "MobileNav": {
       "cardMode": "single",
       "viewport": "420x820"
     },
+    "NutrientSummary": {
+      "cardMode": "column"
+    },
+    "Photo": {
+      "cardMode": "column"
+    },
+    "PlanArchive": {
+      "cardMode": "column"
+    },
     "RecipeEditor": {
       "cardMode": "single",
       "viewport": "1100x820"
+    },
+    "SectionHeading": {
+      "cardMode": "column"
+    },
+    "SourceLine": {
+      "cardMode": "column"
+    },
+    "StatusPill": {
+      "cardMode": "column"
+    },
+    "StorageBanner": {
+      "cardMode": "single",
+      "primaryStory": "StorageIsFull"
+    },
+    "TierBadge": {
+      "cardMode": "column"
+    },
+    "TrendsTab": {
+      "cardMode": "column"
+    },
+    "UndoBar": {
+      "cardMode": "single",
+      "primaryStory": "AnOfferStanding"
     },
     "WeekTemplates": {
       "cardMode": "single",
@@ -82,6 +138,13 @@
     "WhenPicker": {
       "cardMode": "single",
       "viewport": "1100x820"
+    },
+    "Wordmark": {
+      "cardMode": "column"
+    },
+    "Zig": {
+      "cardMode": "column"
     }
-  }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
 }
