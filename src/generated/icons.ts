@@ -21,7 +21,7 @@ export interface LaunchScreen {
 }
 
 /** The tab icon, as vector. */
-export const FAVICON = 'favicon.753490d2.svg'
+export const FAVICON = 'favicon.62cf5574.svg'
 
 /** What iOS puts on the home screen, read once when the app is added. */
 export const APPLE_TOUCH_ICON = 'icon-192.0b5c1d84.png'
