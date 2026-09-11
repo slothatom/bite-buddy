@@ -144,6 +144,32 @@ are what the design agent is handed as the contract.
 
 Fix either with a `dtsPropsFor` entry when it starts to matter.
 
+## Conventions header drift, found 11 September 2026
+
+`conventions.md` was validated against a fresh build this run. Three names in it
+do not verify. The file is hand-owned, so nothing was rewritten; these are the
+proposed edits.
+
+- **`teal` is named as a state colour and does not exist.** The header lists
+  "`coral`, `mustard`, `leaf` and `teal` for state". There is no
+  `--color-teal-*` in `@theme`, and `src/index.css:65` says the green was
+  deliberately named `leaf` **rather than** `teal`, "because a token called teal
+  holding a green would be confusing". A design agent writing `text-teal-600`
+  gets Tailwind's own default teal, not a brand colour. Proposed: drop `teal`
+  from that sentence.
+- **"twenty-one component utilities" is off by one.** `src/index.css` defines
+  exactly 22 `@utility` rules and the header's own table lists all 22. The table
+  is right; the sentence above it is wrong. Proposed: say twenty-two.
+- **The ramp sentence promises more than the stylesheet ships.** `@theme`
+  defines `bite`, `coral`, `leaf` and `mustard` at 50 to 900, but Tailwind v4
+  only compiles the utilities the app actually uses, so the shipped
+  `_ds_bundle.css` carries about forty-five of them. `bg-bite-900`,
+  `bg-bite-600` and `text-coral-900` are all defined as tokens and all resolve
+  to nothing in the CSS a design receives. This is the one that fails silently.
+  Proposed: say that the ramps exist as `var(--color-*)` tokens, and that the
+  utility classes which ship are the subset the app uses - so an unused step
+  needs `style={{color: 'var(--color-bite-900)'}}` rather than a utility class.
+
 ## Re-sync risks
 
 - **Nothing has ever been uploaded.** `DesignSync` needs an authorisation this
