@@ -49,8 +49,15 @@ const BLUSH = '#ff8888'
  *
  * `scale` shrinks the face towards the middle for the maskable icon, whose
  * corners Android is entitled to cut away.
+ *
+ * `ground` draws the cream tile behind him. The PNGs need it: iOS composites
+ * a transparent icon onto black rather than honouring it, and a maskable icon
+ * has to bleed to its own edges or the platform's crop shows through. The tab
+ * icon is the opposite case - it is drawn onto chrome whose colour is not ours
+ * to guess, so a tile there is a cream box sitting on somebody's dark title
+ * bar.
  */
-function face(scale: number): string {
+function face(scale: number, ground = true): string {
   const t = `translate(32 32) scale(${scale}) translate(-32 -32)`
   /*
    * One ear, drawn on the left and mirrored for the right.
@@ -66,8 +73,7 @@ function face(scale: number): string {
       <path d="M13.8 18.4 C12 14 13 10.2 15.6 9.6 C18.3 9 20.6 11.4 21.2 13.8 Z" fill="${INK}"/>
     </g>`
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" fill="${CREAM}"/>
-  <g transform="${t}">
+${ground ? `  <rect width="64" height="64" fill="${CREAM}"/>\n` : ''}  <g transform="${t}">
     ${ear}
     <g transform="translate(64 0) scale(-1 1)">${ear}</g>
 
@@ -162,8 +168,9 @@ for (const { stem, size, scale, purpose } of ICONS) {
 }
 
 // The tab icon is the same face, as vector, so it stays sharp wherever a
-// browser decides to draw it.
-const svg = `${face(1)}\n`
+// browser decides to draw it, and without the cream tile so it sits on the
+// tab or title bar's own colour instead of on a box.
+const svg = `${face(1, false)}\n`
 const favicon = `favicon.${stamp(svg)}.svg`
 writeFileSync(resolve(OUT, favicon), svg)
 console.log(`${favicon.padEnd(34)} vector`)
