@@ -1597,25 +1597,43 @@ test.describe('asking the recipe list a question', () => {
 test.describe('a laptop is not a large phone', () => {
   test.use({ viewport: { width: 1512, height: 950 } })
 
-  test('a whole day fits on the planner without scrolling', async ({ page }, testInfo) => {
+  test('the day reads down the page, in the order it is eaten', async ({ page }, testInfo) => {
     // A laptop assertion, and only that. The phone viewport is 844px tall, so
     // a 950px ceiling sits below its fold and never asserted anything there:
     // on a phone you scroll a day, which is what a phone is for.
-    test.skip(testInfo.project.name !== 'desktop', 'this fold belongs to a laptop')
+    test.skip(testInfo.project.name !== 'desktop', 'this layout belongs to a laptop')
 
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await planDay(page)
 
-    // All five slots, in the viewport, at once. Stacked full width a laptop
-    // showed two and put the rest below the fold, which is the one thing a big
-    // screen should never do to a day.
-    // Four now, not five: the two numbered snack slots became one.
+    /*
+     * This used to assert that all four slots fitted above the fold, which is
+     * what the two- and three-column grid bought. The grid was dropped: with
+     * four slots flowing across it, Snacks landed beside Breakfast under a
+     * column and a half of nothing, and the order you read the day in stopped
+     * matching the order you eat it in.
+     *
+     * So the guarantee changed rather than went away. A day is a sequence, and
+     * what is worth holding is that it reads as one: every slot present, each
+     * strictly below the last, none of them sharing a row. A full day now runs
+     * past the fold on a laptop and is scrolled, which is the trade that was
+     * made deliberately.
+     */
+    const tops: number[] = []
     for (const slot of ['Breakfast', 'Lunch', 'Dinner', 'Snacks']) {
       const box = await page.getByText(slot, { exact: true }).first().boundingBox()
       expect(box, `${slot} is missing`).not.toBeNull()
-      expect(box!.y, `${slot} is below the fold`).toBeLessThan(950)
+      tops.push(box!.y)
     }
+    for (let i = 1; i < tops.length; i++) {
+      expect(tops[i], 'each slot sits below the one before it, never beside it')
+        .toBeGreaterThan(tops[i - 1])
+    }
+
+    // The day still opens on the day: its summary and its first meal are there
+    // without scrolling, which is what a big screen owes you.
+    expect(tops[0], 'the first slot is above the fold').toBeLessThan(950)
   })
 
   test('the shopping list uses both halves of the screen', async ({ page }) => {
