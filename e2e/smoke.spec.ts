@@ -552,7 +552,7 @@ test.describe('the planner', () => {
 })
 
 test.describe('the recipe library', () => {
-  test('opens on one shelf rather than all 228', async ({ page }) => {
+  test('opens on one shelf rather than the whole library', async ({ page }) => {
     // The screen this replaced showed every recipe at once, sorted
     // alphabetically, a wall you had to scroll past to reach anything.
     await goto(page, '/recipes')
@@ -562,8 +562,14 @@ test.describe('the recipe library', () => {
     // size it had, the race started going the other way.
     await expect(page.locator('.card').first()).toBeVisible()
     const shown = await page.locator('.card').count()
-    expect(shown, 'the whole library is on screen again').toBeLessThan(150)
     expect(shown, 'the opening shelf is empty').toBeGreaterThan(5)
+
+    // There used to be a ceiling here, "fewer than 150 of the 228", and it
+    // went off on a Friday afternoon without anything regressing: the dinner
+    // shelf had grown to 162 and the shelf you land on depends on the hour.
+    // The count against the tab below is the real check and cannot rot. A
+    // screen that stopped filtering would show the whole library against one
+    // shelf's number, which is exactly what that comparison catches.
 
     // The number on a tab is the number of cards you then see, not the number
     // of recipes behind them. Read off whichever tab is open, which shelf that
@@ -1258,8 +1264,14 @@ test.describe('finding an ingredient', () => {
     await page.getByRole('button', { name: /Add ingredient/ }).click()
     await page.getByPlaceholder(/Anything: yours/).fill('zzzznotafood')
 
-    await expect(page.getByText(/no signal|rate-limiting|unreachable|Nothing anywhere matches/i))
-      .toBeVisible({ timeout: 15_000 })
+    // Every branch of the message, because which one you get depends on where
+    // the run is: a sandbox reaches neither database, a machine with a network
+    // reaches both and they answer with nothing, or with rows about something
+    // else entirely. The claim being tested is the same in all of them, that
+    // the screen says why rather than going quiet.
+    await expect(page.getByText(
+      /no signal|rate-limiting|unreachable|not responding|looked like|Nothing anywhere matches/i,
+    )).toBeVisible({ timeout: 15_000 })
   })
 })
 
