@@ -117,7 +117,10 @@ should read these before writing a single preview.
 - `Photo` renders nothing at all without the two Supabase environment
   variables: `photoUrl` resolves null in a microtask and the component returns
   null. Its cards show a recipe card and a shelf closing up around the gap,
-  which is what the shipped library actually looks like.
+  which is what the shipped library actually looks like. The card is about the
+  environment the previews run in, not about the project: the `recipe-photos`
+  bucket does exist and `photos.sql` has been run, contrary to a note that
+  stood here through several sessions.
 - `BarcodeScanner` lands in its camera-denied branch, which is the same branch
   a refused permission produces, so the card is the real thing.
 - `AddFoodModal` with `initialTab="lookup"` and a non-empty `initialName` fires

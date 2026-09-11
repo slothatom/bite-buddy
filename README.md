@@ -635,6 +635,7 @@ not the code, and the code says which mistake it was:
 | `UNAUTHORIZED_NO_AUTH_HEADER` | No `Authorization` header at all. The dashboard's cron builder writes `headers := '{}'` unless you fill it in. |
 | `UNAUTHORIZED_INVALID_JWT_FORMAT` | A header, but the token is not a JWT. Nearly always a key truncated or line-broken on the way through a paste. Use the copy button on the API keys page rather than selecting it by hand. |
 | `200` with `"pushing": false` | The function is running. The VAPID secrets are not set on it. |
+| `status_code` null, `timed_out` true | The reply never arrived inside pg_net's five-second default, which a cold Edge Function will exceed. Whether that run did its work is unknowable, which is the reason to fix it: re-schedule with `timeout_milliseconds := 20000`. Select `timed_out` and `error_msg` to see it, they are null in the columns above. |
 
 Use the **anon** key, never the service role key. Anon is enough to get past the
 gateway, it is in the app's bundle already and authorises nothing on its own;
