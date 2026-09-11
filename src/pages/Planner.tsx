@@ -48,6 +48,7 @@ export default function Planner() {
   const {
     weekDates, plan, goToWeek, addEntry, removeMeal, clearDay, copyDay,
     moveMeal, duplicateMeal, setMealOutcome, setEntryOutcome, updateEntry, restoreMeals,
+    removeEntryFromMeal, restoreEntryAt,
   } = useMealPlanStore()
   const ctx = useNutritionContext()
 
@@ -115,6 +116,32 @@ export default function Planner() {
         restoreMeals(date, [meal])
       })
     }
+  }
+
+  /**
+   * The same bookkeeping as removing a meal, for one line of it.
+   *
+   * Undo has two shapes here and both are needed. Take a line out of a meal
+   * that has others and the meal survives, so putting it back means putting it
+   * back at its index, which is what `restoreEntryAt` is for. Take out the
+   * last line and the meal itself stops existing, and only `restoreMeals` can
+   * bring that back with its id and its ticks intact. Offering the wrong one
+   * silently does nothing, which is the worst way for an undo to fail.
+   */
+  const removeEntryReturningPortions = (date: string, mealId: string, index: number) => {
+    const meal = byDate.get(date)?.meals.find((m) => m.id === mealId)
+    const entry = meal?.entries[index]
+    if (!meal || !entry) return
+    const wasLast = meal.entries.length === 1
+
+    for (const p of portionEntries([entry])) returnTo(p.portionId, p.servings)
+    removeEntryFromMeal(date, mealId, index)
+
+    offerUndo(`Removed ${entriesName([entry], ctx)}`, () => {
+      for (const p of portionEntries([entry])) takeFrom(p.portionId, p.servings)
+      if (wasLast) restoreMeals(date, [meal])
+      else restoreEntryAt(date, mealId, index, entry)
+    })
   }
 
   /**
@@ -490,10 +517,16 @@ export default function Planner() {
               </span>
             )}
           </SectionHeading>
-          {/* Two columns from lg. Five slots stacked full width meant a laptop
-              showed two of them and the rest below the fold, which is the one
-              thing a big screen should never do to a day. */}
-          <div className="space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-2 lg:items-start">
+          {/* One slot under the next, at every width.
+
+              This was two columns from lg and three from xl, to keep a laptop
+              from pushing the later meals below the fold. It bought that at a
+              cost that showed up the moment a day was mostly empty: four slots
+              across an auto-flowing grid put Snacks under Breakfast with a
+              column and a half of nothing beside it, and the order you read
+              them in stopped matching the order you eat them in. A day is a
+              sequence, so it is drawn as one. */}
+          <div className="space-y-2">
             {MEAL_SLOTS.map((slot) => (
               <SlotRow
                 key={slot}
@@ -506,6 +539,8 @@ export default function Planner() {
                 onEntryOutcome={(mealId, i, outcome) =>
                   setEntryOutcome(selected, mealId, i, outcome)}
                 onAmount={(mealId, index) => setAmount({ date: selected, mealId, index })}
+                onRemoveEntry={(mealId, index) =>
+                  removeEntryReturningPortions(selected, mealId, index)}
               />
             ))}
           </div>
@@ -593,6 +628,8 @@ export default function Planner() {
           onOutcome={(mealId, outcome) => setMealOutcome(sheet.date, mealId, outcome)}
           onEntryOutcome={(mealId, i, outcome) => setEntryOutcome(sheet.date, mealId, i, outcome)}
           onAmount={(mealId, index) => { setAmount({ date: sheet.date, mealId, index }); setSheet(null) }}
+          onRemoveEntry={(mealId, index) =>
+            removeEntryReturningPortions(sheet.date, mealId, index)}
         />
       )}
 
@@ -869,6 +906,7 @@ function shortName(name: string): string {
  */
 function MealSheet({
   date, slot, day, onClose, onAdd, onRemove, onMove, onOutcome, onEntryOutcome, onAmount,
+  onRemoveEntry,
 }: {
   date: string
   slot: MealSlot
@@ -880,6 +918,7 @@ function MealSheet({
   onOutcome: (mealId: string, outcome: MealOutcome | undefined) => void
   onEntryOutcome: (mealId: string, index: number, outcome: MealOutcome | undefined) => void
   onAmount: (mealId: string, index: number) => void
+  onRemoveEntry: (mealId: string, index: number) => void
 }) {
   const panel = useDialog<HTMLDivElement>(onClose)
 
@@ -913,6 +952,7 @@ function MealSheet({
           onOutcome={onOutcome}
           onEntryOutcome={onEntryOutcome}
           onAmount={onAmount}
+          onRemoveEntry={onRemoveEntry}
         />
       </div>
     </div>
@@ -920,7 +960,7 @@ function MealSheet({
 }
 
 function SlotRow({
-  slot, day, onAdd, onRemove, onMove, onOutcome, onEntryOutcome, onAmount,
+  slot, day, onAdd, onRemove, onMove, onOutcome, onEntryOutcome, onAmount, onRemoveEntry,
 }: {
   slot: MealSlot
   day: DayPlan
@@ -930,6 +970,7 @@ function SlotRow({
   onOutcome: (mealId: string, outcome: MealOutcome | undefined) => void
   onEntryOutcome: (mealId: string, index: number, outcome: MealOutcome | undefined) => void
   onAmount: (mealId: string, index: number) => void
+  onRemoveEntry: (mealId: string, index: number) => void
 }) {
   const ctx = useNutritionContext()
   const meals = day.meals.filter((m) => m.slot === slot)
@@ -999,6 +1040,21 @@ function SlotRow({
                           onAmount={() => onAmount(meal.id, i)}
                         />
                       </div>
+                      {/* A line of a meal you can take out on its own.
+                          Offered only where it means something different from
+                          the meal's own X to the right: with one line in the
+                          meal the two would do exactly the same thing, and two
+                          crosses on one row is a question the reader has to
+                          stop and answer. */}
+                      {meal.entries.length > 1 && (
+                        <button
+                          className="btn-ghost btn-icon shrink-0 text-ink-300 hover:text-coral-600"
+                          onClick={() => onRemoveEntry(meal.id, i)}
+                          aria-label={`Remove ${entryName(entry, ctx)}`}
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
                     </div>
                   )
                 })}

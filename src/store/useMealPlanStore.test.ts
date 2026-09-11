@@ -677,3 +677,88 @@ describe('a day written when there were two snack slots', () => {
     expect(carried.templates[0].days[0].meals[0].slot).toBe('snack')
   })
 })
+
+/**
+ * Taking one line out of a meal, which is what the planner's per-line delete
+ * does. The meal-level remove has always worked; these are about the case
+ * where a meal has several lines and only one of them should go.
+ */
+describe('removing a single entry', () => {
+  const DATE = '2026-08-12'
+
+  /** A lunch of three things, and a second lunch beside it. */
+  function twoLunches() {
+    useMealPlanStore.setState({ plan: [] })
+    const store = useMealPlanStore.getState()
+    store.goToWeek(new Date('2026-08-10T12:00:00'), 1)
+    store.setMeal(DATE, 'lunch', [
+      { kind: 'food', foodId: 'bread-wholemeal', grams: 50 },
+      { kind: 'food', foodId: 'oats', grams: 60 },
+      { kind: 'food', foodId: 'rice-cakes', grams: 30 },
+    ])
+    /*
+     * The second lunch is injected rather than added, because `addEntry`
+     * appends to whatever meal already holds the slot: it would give one meal
+     * of four lines, which is the opposite of what these tests need.
+     */
+    store.restoreMeals(DATE, [{
+      id: 'second-lunch',
+      slot: 'lunch',
+      entries: [{ kind: 'food', foodId: 'flatbread-wholemeal', grams: 80 }],
+    }])
+    return mealsOnDay()
+  }
+
+  function mealsOnDay() {
+    return useMealPlanStore.getState().plan.find((d) => d.date === DATE)?.meals ?? []
+  }
+
+  it('removes the named line and leaves the rest of the meal', () => {
+    const [meal] = twoLunches()
+    useMealPlanStore.getState().removeEntryFromMeal(DATE, meal.id, 1)
+
+    const after = mealsOnDay().find((m) => m.id === meal.id)!
+    expect(after.entries).toHaveLength(2)
+    expect(after.entries.map((e) => (e.kind === 'food' ? e.foodId : '')))
+      .toEqual(['bread-wholemeal', 'rice-cakes'])
+  })
+
+  /*
+   * The reason this action exists rather than reusing `removeEntry`, which
+   * addresses a line by slot and index and so cannot tell two meals in the
+   * same slot apart.
+   */
+  it('leaves the other meal in the slot untouched', () => {
+    const [first, second] = twoLunches()
+    const before = second.entries.length
+    useMealPlanStore.getState().removeEntryFromMeal(DATE, first.id, 0)
+
+    expect(mealsOnDay().find((m) => m.id === second.id)!.entries).toHaveLength(before)
+  })
+
+  it('takes the meal away when its last line goes', () => {
+    const [, second] = twoLunches()
+    expect(second.entries).toHaveLength(1)
+    useMealPlanStore.getState().removeEntryFromMeal(DATE, second.id, 0)
+
+    expect(mealsOnDay().find((m) => m.id === second.id)).toBeUndefined()
+  })
+
+  it('puts a line back where it was, for undo', () => {
+    const [meal] = twoLunches()
+    const entry = meal.entries[1]
+    useMealPlanStore.getState().removeEntryFromMeal(DATE, meal.id, 1)
+    useMealPlanStore.getState().restoreEntryAt(DATE, meal.id, 1, entry)
+
+    const after = mealsOnDay().find((m) => m.id === meal.id)!
+    expect(after.entries.map((e) => (e.kind === 'food' ? e.foodId : '')))
+      .toEqual(['bread-wholemeal', 'oats', 'rice-cakes'])
+  })
+
+  it('ignores an index that is not there', () => {
+    const [meal] = twoLunches()
+    useMealPlanStore.getState().removeEntryFromMeal(DATE, meal.id, 9)
+
+    expect(mealsOnDay().find((m) => m.id === meal.id)!.entries).toHaveLength(3)
+  })
+})
