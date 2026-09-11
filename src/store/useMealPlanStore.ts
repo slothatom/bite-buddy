@@ -196,6 +196,29 @@ interface MealPlanStore {
    */
   removeEntry: (date: string, slot: MealSlot, index: number) => void
   /**
+   * Takes one line out of one meal.
+   *
+   * `removeEntry` above addresses an entry by slot and index, which cannot
+   * say which meal it means: it filters that index out of EVERY meal in the
+   * slot, so on a lunch holding two meals it removes a line from both. That
+   * was survivable while the only callers were screens that write a slot they
+   * have just built, and is not survivable for a delete button sitting beside
+   * an individual line in the planner. This one names the meal.
+   *
+   * A meal whose last line goes stops existing, the same rule `removeEntry`
+   * follows: an empty slot is a meal that was never there, not a meal you
+   * skipped.
+   */
+  removeEntryFromMeal: (date: string, mealId: string, index: number) => void
+  /**
+   * Puts one line back where it was, for undo.
+   *
+   * `restoreMeals` is no help when the meal survived the removal: it only
+   * puts back meals that are missing entirely, so undoing a single deleted
+   * line through it would do nothing at all.
+   */
+  restoreEntryAt: (date: string, mealId: string, index: number, entry: Component) => void
+  /**
    * Puts meals back on a day exactly as they were, ids and outcomes included.
    *
    * What undo needs and what `setMeal` cannot give it. `setMeal` writes a slot
@@ -402,6 +425,37 @@ export const useMealPlanStore = create<MealPlanStore>()(
                   // a meal that was never there. The planner draws the empty
                   // slots it needs.
                   return entries.length ? [{ ...m, entries }] : []
+                }),
+              })
+            }),
+          })),
+
+        removeEntryFromMeal: (date, mealId, index) =>
+          set((s) => ({
+            plan: s.plan.map((day) => {
+              if (day.date !== date) return day
+              return touch({
+                ...day,
+                meals: day.meals.flatMap((m) => {
+                  if (m.id !== mealId) return [m]
+                  const entries = m.entries.filter((_, at) => at !== index)
+                  return entries.length ? [{ ...m, entries }] : []
+                }),
+              })
+            }),
+          })),
+
+        restoreEntryAt: (date, mealId, index, entry) =>
+          set((s) => ({
+            plan: s.plan.map((day) => {
+              if (day.date !== date) return day
+              return touch({
+                ...day,
+                meals: day.meals.map((m) => {
+                  if (m.id !== mealId) return m
+                  const entries = [...m.entries]
+                  entries.splice(Math.min(index, entries.length), 0, entry)
+                  return { ...m, entries }
                 }),
               })
             }),
