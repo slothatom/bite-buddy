@@ -33,10 +33,18 @@ const GENERATED = resolve(import.meta.dirname, '../src/generated/icons.ts')
 /** The brand, as literals. These files are read outside the document, where
  *  a CSS variable means nothing. */
 const CREAM = '#faf7f0'
-const BRAND = '#14b8a6'
-const INK = '#2d2320'
+/* bite-400 rather than bite-500: the only brand on the icon is the inner ear,
+   and at 16px the lighter step is the one that still reads as turquoise
+   against the dark ear rim around it. */
+const BRAND = '#2dd4bf'
 const PAPER = '#fffdf9'
 const BLUSH = '#ff8888'
+/* The fur, copied from --color-fur-* in index.css. These are literals on both
+   sides on purpose: the tokens do not invert, and a file rendered outside the
+   document cannot read a variable anyway. Change one, change the other. */
+const FUR_PALE = '#e9e6e1'
+const FUR = '#9c9791'
+const FUR_DARK = '#2f2b28'
 
 /**
  * Bandit's face, filling a tile.
@@ -44,8 +52,10 @@ const BLUSH = '#ff8888'
  * His head rather than the whole of him: a standing figure in a square leaves
  * air above and below and reads as a speck on a home screen, while a face
  * fills the space and is still recognisable at the 16 pixels a browser tab
- * gives it. The ink mask is what does the work small, being the one shape
- * large enough to survive.
+ * gives it. The dark band across a pale face is what does the work small: it
+ * is the one shape large enough to survive, and it is also what keeps him a
+ * raccoon rather than a panda at 16px. It matches Mascot.tsx, which carries
+ * the reasoning in full.
  *
  * `scale` shrinks the face towards the middle for the maskable icon, whose
  * corners Android is entitled to cut away.
@@ -67,33 +77,36 @@ function face(scale: number, ground = true): string {
    * raccoon's are stubby and rounded. Mirroring rather than writing the
    * second one out keeps them the same shape as the numbers get nudged.
    */
-  const ear = `<g>
-      <path d="M8 24 C4 15.5 6 5.5 13 4.2 C19.6 3 25.2 8.4 26.4 13 Z" fill="${INK}"/>
-      <path d="M10.8 21.4 C7.9 14.6 9.5 7.8 14 7 C18.6 6.2 22.6 10.2 23.5 13.8 Z" fill="${BRAND}"/>
-      <path d="M13.8 18.4 C12 14 13 10.2 15.6 9.6 C18.3 9 20.6 11.4 21.2 13.8 Z" fill="${INK}"/>
+  const ear = (cx: number) => `<g>
+      <circle cx="${cx}" cy="14" r="10" fill="${FUR_DARK}"/>
+      <circle cx="${cx}" cy="14" r="7.6" fill="${FUR}"/>
+      <circle cx="${cx}" cy="14.6" r="3.4" fill="${BRAND}"/>
     </g>`
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
 ${ground ? `  <rect width="64" height="64" fill="${CREAM}"/>\n` : ''}  <g transform="${t}">
-    ${ear}
-    <g transform="translate(64 0) scale(-1 1)">${ear}</g>
+    ${ear(15)}
+    ${ear(49)}
 
-    <ellipse cx="32" cy="33" rx="26" ry="23" fill="${INK}"/>
-    <ellipse cx="32" cy="33" rx="24" ry="21" fill="${BRAND}"/>
+    <ellipse cx="32" cy="33" rx="27" ry="24" fill="${FUR_DARK}"/>
+    <ellipse cx="32" cy="33" rx="25" ry="22" fill="${FUR}"/>
 
-    <path d="M7.6 28 q24.4 -11 48.8 0 q-4 12.6 -13.4 12.6 q-11.9 -5.4 -23.8 0 q-7.9 0 -11.6 -12.6 Z" fill="${INK}"/>
+    <ellipse cx="32" cy="37" rx="21" ry="17.6" fill="${FUR_PALE}"/>
+    <path d="M8.6 31 Q17.4 21.4 32 27.4 Q46.6 21.4 55.4 31 Q52.8 43.2 43.2 43.4 Q32 37.8 20.8 43.4 Q11.2 43.2 8.6 31 Z" fill="${FUR_DARK}"/>
 
-    <circle cx="20.5" cy="31.5" r="5" fill="${PAPER}"/>
-    <circle cx="43.5" cy="31.5" r="5" fill="${PAPER}"/>
-    <circle cx="21.4" cy="32.3" r="2.7" fill="${INK}"/>
-    <circle cx="44.4" cy="32.3" r="2.7" fill="${INK}"/>
+    <circle cx="20.6" cy="32.6" r="6.6" fill="${PAPER}"/>
+    <circle cx="43.4" cy="32.6" r="6.6" fill="${PAPER}"/>
+    <circle cx="21.4" cy="33.2" r="3.8" fill="${FUR_DARK}"/>
+    <circle cx="44.2" cy="33.2" r="3.8" fill="${FUR_DARK}"/>
+    <circle cx="19.8" cy="31.6" r="1.6" fill="${PAPER}"/>
+    <circle cx="42.6" cy="31.6" r="1.6" fill="${PAPER}"/>
 
-    <ellipse cx="12.5" cy="42" rx="4" ry="3" fill="${BLUSH}"/>
-    <ellipse cx="51.5" cy="42" rx="4" ry="3" fill="${BLUSH}"/>
-    <ellipse cx="32" cy="44.5" rx="11.6" ry="8.4" fill="${PAPER}"/>
-    <path d="M27.4 41.8 q4.6 -3.5 9.2 0 q-4.6 4.6 -9.2 0 Z" fill="${INK}"/>
-    <path d="M32 45.6 v2.2" stroke="${INK}" stroke-width="2" stroke-linecap="round"/>
-    <path d="M32 47.4 q-2.6 2.6 -5.2 0" stroke="${INK}" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <path d="M32 47.4 q2.6 2.6 5.2 0" stroke="${INK}" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <ellipse cx="14.6" cy="46.6" rx="4.2" ry="3" fill="${BLUSH}"/>
+    <ellipse cx="49.4" cy="46.6" rx="4.2" ry="3" fill="${BLUSH}"/>
+    <ellipse cx="32" cy="46.6" rx="10.8" ry="7.8" fill="${PAPER}"/>
+    <path d="M28 43.4 q4 -3 8 0 q-4 4 -8 0 Z" fill="${FUR_DARK}"/>
+    <path d="M32 47.4 v2.2" stroke="${FUR_DARK}" stroke-width="2" stroke-linecap="round"/>
+    <path d="M32 49.2 q-2.6 2.6 -5.2 0" stroke="${FUR_DARK}" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <path d="M32 49.2 q2.6 2.6 5.2 0" stroke="${FUR_DARK}" stroke-width="2" stroke-linecap="round" fill="none"/>
   </g>
 </svg>`
 }

@@ -2,7 +2,8 @@
 
 A meal planner built from one dietician's real plans, for two people. Warm
 paper, one turquoise brand colour, a heavy display face for headings, and a
-frog called Zig. The guide it implements is in `guidelines/docs/DESIGN-SYSTEM.md`,
+raccoon called Bandit (exported as `Zig`, which is the older name the API kept
+when the animal changed). The guide it implements is in `guidelines/docs/DESIGN-SYSTEM.md`,
 which is worth reading before designing a screen.
 
 ## Setup
@@ -53,6 +54,9 @@ unstyled with no error. Reach for those as
   a cream ground, use `bite-700`.
 - `ink` 300/500/700/900 for text, `paper` and `cream-50` for grounds,
   `border-100`/`border-200` for rules.
+- `fur-100`/`fur-400`/`fur-800` are Bandit's, and the only tokens here that
+  do **not** invert in dark mode - a raccoon whose mask lightens is a bear.
+  They are illustration fills; do not use them for text or surfaces.
 - `coral`, `mustard` and `leaf` for state. Roughly: leaf on track, mustard
   slightly over, coral over. There is no `teal` token: the green is called
   `leaf` precisely so that a token named teal never holds one.

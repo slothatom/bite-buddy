@@ -41,6 +41,24 @@
      it stays a literal in the dark block below by not appearing there. */
   --color-on-brand: #12312c;
 
+  /* ─── Bandit ──────────────────────────────────────────────────────────────
+     The mascot's fur, and the one ramp in this file that does NOT invert.
+
+     He used to be drawn in `bite-500` over an `ink-900` outline, which made
+     his mask flip to near-white in dark mode: a raccoon whose mask is lighter
+     than his face is a bear. Fur is a literal in both themes for the same
+     reason `on-brand` is, and the silhouette is carried by the grey body
+     rather than by an outline that changes colour under it. Grey on cream is
+     2.4:1 and grey on the dark ground is 5.9:1, so he is findable either way
+     without the outline having to do it.
+
+     These are illustration fills, named as variables so the contrast check
+     leaves them alone - it measures words on surfaces, and none of this is
+     either. */
+  --color-fur-100: #e9e6e1;  /* blaze and belly */
+  --color-fur-400: #9c9791;  /* the fur itself */
+  --color-fur-800: #2f2b28;  /* mask, tail rings, paws, outline */
+
   /* Warm accent. */
   --color-coral-50: #fff3f3;
   --color-coral-100: #ffe3e3;
