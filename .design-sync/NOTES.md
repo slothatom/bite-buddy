@@ -170,8 +170,55 @@ proposed edits.
   utility classes which ship are the subset the app uses - so an unused step
   needs `style={{color: 'var(--color-bite-900)'}}` rather than a utility class.
 
+## The mascot redraw, 11 September 2026
+
+Bandit was redrawn from a turquoise figure to a grey raccoon with turquoise
+accents, in `src/components/brand/Mascot.tsx` and again in `face()` in
+`scripts/make-icons.ts`. Both drawings are hand-maintained and must be changed
+together or the app and the home screen drift apart.
+
+- **He read as a panda twice before he read as a raccoon.** The fix was not
+  outline but arrangement: isolated dark patches on uniform grey fur are a
+  panda at any shape. A raccoon is one dark band crossing a *pale* face, so the
+  head carries a `fur-100` field with a single continuous band over it. A broad
+  white forehead blaze pushed him back towards badger and had to be narrowed to
+  a wedge.
+- **`--color-fur-*` does not invert.** Every other colour in `index.css` has a
+  dark-mode value; these three deliberately do not, because the mask has to
+  stay darker than the face in both themes. The silhouette is carried by the
+  grey body rather than by an outline, which is what lets the outline stay dark
+  on a dark ground.
+- **The icon literals are a copy of the tokens.** `FUR_PALE`, `FUR` and
+  `FUR_DARK` in `make-icons.ts` duplicate `--color-fur-*` by hand, because that
+  file renders outside the document where a variable means nothing. Change one,
+  change the other.
+
+## A grade trap this run walked into
+
+`package-capture.mjs` carries grades forward from the preview's render hash,
+which is computed from the preview HTML. Changing a **component** changes the
+bundle, not the HTML, so every card showing the mascot kept a grade earned by
+the old artwork and the tool reported "carried forward" as if nothing had
+happened. Deleting `<Name>.grade.json` does not help; nor does deleting its
+`<Name>.json` sidecar.
+
+`--force` is the only thing that re-captures. After any change to component
+art, re-grade the components that render it:
+
+```sh
+node .ds-sync/package-capture.mjs --out ./ds-bundle --force \
+  --components Zig,Wordmark,EmptyState,ErrorBoundary,MobileNav,Sidebar,TrendsTab,FillGaps
+```
+
+That list is every component that draws Bandit, directly or through
+`EmptyState`. Keep it up to date when a new card starts showing him.
+
 ## Re-sync risks
 
+- **The mascot is drawn twice**, in `Mascot.tsx` and in `make-icons.ts`, with
+  the fur colours written as tokens in one and as literals in the other. There
+  is no check that the two drawings still agree; only a person looking at them
+  will notice if they diverge.
 - **Nothing has ever been uploaded.** `DesignSync` needs an authorisation this
   session could not obtain, so there is no project, no `projectId` in the
   config, and no `_ds_sync.json` anchor anywhere but on disk. The next run with
