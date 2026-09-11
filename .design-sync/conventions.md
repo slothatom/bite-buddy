@@ -25,7 +25,7 @@ not.
 ## The styling idiom
 
 Tailwind v4 utilities, generated from the tokens in `@theme`. Alongside them
-sit twenty-one component utilities the app defines, and those carry the design
+sit twenty-two component utilities the app defines, and those carry the design
 language: reach for one before composing the same thing out of primitives.
 
 | Family | Names |
@@ -39,7 +39,13 @@ language: reach for one before composing the same thing out of primitives.
 | Type | `display` (Bungee, for headings and the wordmark) |
 
 Colours are ramps, used as ordinary Tailwind utilities (`bg-bite-500`,
-`text-ink-700`, `border-border-200`):
+`text-ink-700`, `border-border-200`). The ramps are defined in `@theme` as
+`var(--color-*)` tokens from 50 to 900, but Tailwind v4 compiles only the
+utilities the app itself uses, so the stylesheet that ships carries about
+forty-five of them. A step nothing uses yet - `bg-bite-900`, `text-coral-900` -
+is a real token whose utility class does not exist, and writing it renders
+unstyled with no error. Reach for those as
+`style={{ color: 'var(--color-bite-900)' }}`:
 
 - `bite` 50 to 900, the single brand turquoise. **`bite-500` carries ink, not
   white**: white on it reads at 2.49:1 and fails, the app's own ink reads at
@@ -47,8 +53,9 @@ Colours are ramps, used as ordinary Tailwind utilities (`bg-bite-500`,
   a cream ground, use `bite-700`.
 - `ink` 300/500/700/900 for text, `paper` and `cream-50` for grounds,
   `border-100`/`border-200` for rules.
-- `coral`, `mustard`, `leaf` and `teal` for state. Roughly: leaf on track,
-  mustard slightly over, coral over.
+- `coral`, `mustard` and `leaf` for state. Roughly: leaf on track, mustard
+  slightly over, coral over. There is no `teal` token: the green is called
+  `leaf` precisely so that a token named teal never holds one.
 - Type tokens: `--font-display` (Bungee), `--font-sans` (Plus Jakarta Sans),
   `--font-mono` for figures.
 
