@@ -304,6 +304,14 @@ on conflict (email) do nothing;
 -- its own. The service role key bypasses every policy in this file and has no
 -- business in a scheduled job, a repository, or a chat window.
 --
+-- The timeout is not decoration either. pg_net waits five seconds by default,
+-- and an Edge Function that has gone cold takes longer than that to answer, so
+-- the job times out before the reply lands: seven runs in ten, measured on a
+-- project where everything else was correct. What that costs is not certain and
+-- that is the problem with it, since a request the caller abandoned may or may
+-- not have finished at the other end. Twenty seconds is far longer than a warm
+-- run needs and still well inside the five-minute gap to the next one.
+--
 -- Replace the two placeholders before running: the project ref and the anon key.
 -- ─────────────────────────────────────────────────────────────────────────────
 
@@ -317,7 +325,8 @@ on conflict (email) do nothing;
 --       'Content-Type', 'application/json',
 --       'Authorization', 'Bearer YOUR-ANON-KEY'
 --     ),
---     body := '{}'::jsonb
+--     body := '{}'::jsonb,
+--     timeout_milliseconds := 20000
 --   );
 --   $$
 -- );
