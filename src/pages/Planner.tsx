@@ -1267,8 +1267,17 @@ function Name({
   if (!to) {
     return <span title={title} data-entry-name className={className}>{children}</span>
   }
+  /*
+   * Padded to a thumb, then pulled back out of the layout.
+   *
+   * A meal name is one line of text, so the link around it was 20px tall: half
+   * the 40px this app holds itself to, and a real miss on a phone rather than
+   * a rule being observed. The negative margin cancels the padding for layout,
+   * so the row keeps its height and only the target grows. It went unnoticed
+   * because the day view used to be two taps in; it is the landing view now.
+   */
   return (
-    <Link to={to} title={title} data-entry-name className={className}>
+    <Link to={to} title={title} data-entry-name className={`${className} inline-block py-2.5 -my-2.5`}>
       {children}
     </Link>
   )
