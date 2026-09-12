@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { readAmount, MOST } from './amounts'
+import { readAmount, MOST, formatAmount} from './amounts'
 
 /**
  * `min` on a number input is a hint to the browser, not a rule: it colours the
@@ -47,5 +47,47 @@ describe('reading a number somebody typed', () => {
     // 140 g of protein per 100 g of food is not a food.
     expect(readAmount('140', { max: MOST.gramsPer100g })).toBe(100)
     expect(readAmount('9999', { max: MOST.caloriesPer100g })).toBe(1000)
+  })
+})
+
+describe('amounts in the unit a person would say', () => {
+  const coffee = { category: 'beverages' }
+  const milk = { category: 'dairy', liquid: true }
+  const bread = { category: 'grains' }
+
+  it('weighs what is eaten', () => {
+    expect(formatAmount(90, bread)).toBe('90 g')
+  })
+
+  it('pours what is drunk', () => {
+    expect(formatAmount(250, coffee)).toBe('250 ml')
+  })
+
+  /*
+   * The case the category alone gets wrong. Milk is dairy because that is what
+   * it is, and "200 g of milk" is not how anybody says it.
+   */
+  it('pours the liquids filed under something else', () => {
+    expect(formatAmount(200, milk)).toBe('200 ml')
+  })
+
+  it('turns to litres once millilitres stop being readable', () => {
+    expect(formatAmount(1500, coffee)).toBe('1.5 l')
+    expect(formatAmount(1000, coffee)).toBe('1 l')
+    expect(formatAmount(2000, coffee)).toBe('2 l')
+    // And not a moment before.
+    expect(formatAmount(999, coffee)).toBe('999 ml')
+  })
+
+  it('says grams for a food it has never heard of', () => {
+    expect(formatAmount(50, undefined)).toBe('50 g')
+  })
+
+  it('lets a food overrule its category either way', () => {
+    expect(formatAmount(30, { category: 'beverages', liquid: false })).toBe('30 g')
+  })
+
+  it('rounds before choosing the unit', () => {
+    expect(formatAmount(249.6, coffee)).toBe('250 ml')
   })
 })

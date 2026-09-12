@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useDialog } from '../../lib/useDialog'
-import { readAmount, MOST } from '../../lib/amounts'
+import { readAmount, MOST, isDrunk } from '../../lib/amounts'
 import { X, Trash2, Undo2, Combine } from 'lucide-react'
 import type { Food, MedCategory, MedTier, FoodState } from '../../types'
 import { useFoodStore, useFoodsMergedInto, isCuratedFood } from '../../store/useFoodStore'
@@ -155,7 +155,13 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
             </p>
           </div>
 
-          <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">Per 100 g</p>
+          {/* Per 100 ml for a drink. The figures underneath are the same
+              numbers either way - the catalogue treats millilitres as grams -
+              but a coffee stating its calories "per 100 g" is telling the
+              reader something nobody means. */}
+          <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">
+            Per 100 {isDrunk(draft) ? 'ml' : 'g'}
+          </p>
           <div className="grid grid-cols-4 gap-2">
             {([['calories', 'kcal'], ['protein', 'Protein'], ['carbs', 'Carbs'], ['fat', 'Fat']] as const).map(([key, label]) => (
               <div key={key}>
