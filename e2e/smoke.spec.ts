@@ -2232,6 +2232,39 @@ test.describe('what actually happened', () => {
     await expect(page.locator('[data-entry-name]').first()).not.toHaveClass(/line-through/)
   })
 
+  test('one item can leave a meal without taking the rest with it', async ({ page }) => {
+    await aPlannedDay(page)
+
+    // Again a slot with more than one line, because the per-line controls only
+    // appear where they would mean something the meal's own do not.
+    await page.getByRole('button', { name: /^Add another$|^\+ Add another$/ }).first().click()
+    const sheet = page.getByRole('dialog').first()
+    await sheet.getByRole('button', { name: 'foods', exact: true }).click()
+    await sheet.getByPlaceholder(/What are we having|What did you have/).fill('coffee')
+    await sheet.getByRole('button', { name: 'Add', exact: true }).first().click()
+    await expect(page.getByRole('button', { name: /^Had Coffee$/ })).toBeVisible()
+
+    const namesNow = async () => page.locator('[data-entry-name]').allInnerTexts()
+    const before = await namesNow()
+    expect(before.join(' '), 'the coffee is in the day to begin with').toMatch(/coffee/i)
+
+    // Send just the coffee to another slot.
+    await page.getByRole('button', { name: /^Move Coffee$/ }).click()
+    const mover = page.getByRole('dialog', { name: /Move this item/ })
+    await expect(mover).toBeVisible()
+    await mover.getByRole('button', { name: 'Dinner', exact: true }).click()
+    await mover.getByRole('button', { name: 'Move it' }).click()
+
+    // It is still in the day, once, and the meal it came from kept its own
+    // lines: moving one item is not a way to lose the other three.
+    const after = await namesNow()
+    expect(after.join(' '), 'the coffee survived the move').toMatch(/coffee/i)
+    expect(after.filter((n) => /coffee/i.test(n)), 'exactly one coffee').toHaveLength(1)
+    for (const name of before.filter((n) => !/coffee/i.test(n))) {
+      expect(after, `${name} stayed`).toContain(name)
+    }
+  })
+
   test('a whole slot can still be ticked in one tap', async ({ page }) => {
     await aPlannedDay(page)
 

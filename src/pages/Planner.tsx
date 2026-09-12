@@ -83,7 +83,7 @@ export default function Planner() {
   const [expandedDay, setExpandedDay] = useState<string | null>(null)
   /** The meal opened from the grid, edited over the week rather than in it. */
   const [sheet, setSheet] = useState<{ date: string; slot: MealSlot } | null>(null)
-  const [moving, setMoving] = useState<{ date: string; mealId: string } | null>(null)
+  const [moving, setMoving] = useState<{ date: string; mealId: string; index?: number } | null>(null)
   const [filling, setFilling] = useState<string[] | null>(null)
   const { quickAdd, clearQuickAdd } = useUiStore()
   const { takeFrom, returnTo } = usePortionStore()
@@ -142,6 +142,28 @@ export default function Planner() {
       if (wasLast) restoreMeals(date, [meal])
       else restoreEntryAt(date, mealId, index, entry)
     })
+  }
+
+  /**
+   * One line, to another day or another slot.
+   *
+   * Taking it out and putting it back in is the whole operation: the entry is
+   * the same object either side, so a portion's bookkeeping nets to zero and
+   * neither `takeFrom` nor `returnTo` belongs here. `addEntry` appends to
+   * whatever meal already holds the destination slot and makes one when there
+   * is none, which is exactly what a line arriving somewhere should do.
+   *
+   * No undo, because moving a whole meal has none either and the move is
+   * visible where it landed. Removing is the destructive one, and that offers
+   * it.
+   */
+  const moveEntryToSlot = (
+    date: string, mealId: string, index: number, toDate: string, toSlot: MealSlot,
+  ) => {
+    const entry = byDate.get(date)?.meals.find((m) => m.id === mealId)?.entries[index]
+    if (!entry) return
+    removeEntryFromMeal(date, mealId, index)
+    addEntry(toDate, toSlot, entry)
   }
 
   /**
@@ -541,6 +563,7 @@ export default function Planner() {
                 onAmount={(mealId, index) => setAmount({ date: selected, mealId, index })}
                 onRemoveEntry={(mealId, index) =>
                   removeEntryReturningPortions(selected, mealId, index)}
+                onMoveEntry={(mealId, index) => setMoving({ date: selected, mealId, index })}
               />
             ))}
           </div>
@@ -594,8 +617,14 @@ export default function Planner() {
         <MoveMealDialog
           from={moving}
           onClose={() => setMoving(null)}
-          onMove={(date, slot) => { moveMeal(moving.date, moving.mealId, date, slot); setMoving(null) }}
-          onCopy={(date, slot) => { duplicateMeal(moving.date, moving.mealId, date, slot); setMoving(null) }}
+          onMove={(date, slot) => {
+            if (moving.index === undefined) moveMeal(moving.date, moving.mealId, date, slot)
+            else moveEntryToSlot(moving.date, moving.mealId, moving.index, date, slot)
+            setMoving(null)
+          }}
+          onCopy={moving.index === undefined
+            ? (date, slot) => { duplicateMeal(moving.date, moving.mealId, date, slot); setMoving(null) }
+            : undefined}
         />
       )}
 
@@ -630,6 +659,9 @@ export default function Planner() {
           onAmount={(mealId, index) => { setAmount({ date: sheet.date, mealId, index }); setSheet(null) }}
           onRemoveEntry={(mealId, index) =>
             removeEntryReturningPortions(sheet.date, mealId, index)}
+          onMoveEntry={(mealId, index) => {
+            setMoving({ date: sheet.date, mealId, index }); setSheet(null)
+          }}
         />
       )}
 
@@ -906,7 +938,7 @@ function shortName(name: string): string {
  */
 function MealSheet({
   date, slot, day, onClose, onAdd, onRemove, onMove, onOutcome, onEntryOutcome, onAmount,
-  onRemoveEntry,
+  onRemoveEntry, onMoveEntry,
 }: {
   date: string
   slot: MealSlot
@@ -919,6 +951,7 @@ function MealSheet({
   onEntryOutcome: (mealId: string, index: number, outcome: MealOutcome | undefined) => void
   onAmount: (mealId: string, index: number) => void
   onRemoveEntry: (mealId: string, index: number) => void
+  onMoveEntry: (mealId: string, index: number) => void
 }) {
   const panel = useDialog<HTMLDivElement>(onClose)
 
@@ -953,6 +986,7 @@ function MealSheet({
           onEntryOutcome={onEntryOutcome}
           onAmount={onAmount}
           onRemoveEntry={onRemoveEntry}
+          onMoveEntry={onMoveEntry}
         />
       </div>
     </div>
@@ -961,6 +995,7 @@ function MealSheet({
 
 function SlotRow({
   slot, day, onAdd, onRemove, onMove, onOutcome, onEntryOutcome, onAmount, onRemoveEntry,
+  onMoveEntry,
 }: {
   slot: MealSlot
   day: DayPlan
@@ -971,6 +1006,7 @@ function SlotRow({
   onEntryOutcome: (mealId: string, index: number, outcome: MealOutcome | undefined) => void
   onAmount: (mealId: string, index: number) => void
   onRemoveEntry: (mealId: string, index: number) => void
+  onMoveEntry: (mealId: string, index: number) => void
 }) {
   const ctx = useNutritionContext()
   const meals = day.meals.filter((m) => m.slot === slot)
@@ -1047,13 +1083,22 @@ function SlotRow({
                           crosses on one row is a question the reader has to
                           stop and answer. */}
                       {meal.entries.length > 1 && (
-                        <button
-                          className="btn-ghost btn-icon shrink-0 text-ink-300 hover:text-coral-600"
-                          onClick={() => onRemoveEntry(meal.id, i)}
-                          aria-label={`Remove ${entryName(entry, ctx)}`}
-                        >
-                          <X size={14} />
-                        </button>
+                        <>
+                          <button
+                            className="btn-ghost btn-icon shrink-0 text-ink-300 hover:text-bite-700"
+                            onClick={() => onMoveEntry(meal.id, i)}
+                            aria-label={`Move ${entryName(entry, ctx)}`}
+                          >
+                            <MoveRight size={14} />
+                          </button>
+                          <button
+                            className="btn-ghost btn-icon shrink-0 text-ink-300 hover:text-coral-600"
+                            onClick={() => onRemoveEntry(meal.id, i)}
+                            aria-label={`Remove ${entryName(entry, ctx)}`}
+                          >
+                            <X size={14} />
+                          </button>
+                        </>
                       )}
                     </div>
                   )
@@ -1065,7 +1110,13 @@ function SlotRow({
                 ) : null}
                 <ShoppingState entries={meal.entries} />
               </div>
-              <div className="flex shrink-0">
+              {/* The meal's own controls, fenced off from the per-line ones.
+                  Once every line carried a move and a remove of its own, the
+                  first row of a meal read as four icons in two identical
+                  pairs, and nothing said that the right-hand pair meant the
+                  whole meal. The rule stays, the grouping is what tells you:
+                  a hairline, and these sit outside the line that owns them. */}
+              <div className="flex shrink-0 self-start ml-1 pl-1 border-l border-border-100">
                 <button
                   className="btn-ghost btn-icon text-ink-300 hover:text-bite-700"
                   onClick={() => onMove(meal.id)}
@@ -1473,14 +1524,19 @@ function EntryLine({
 function MoveMealDialog({
   from, onClose, onMove, onCopy,
 }: {
-  from: { date: string; mealId: string }
+  from: { date: string; mealId: string; index?: number }
   onClose: () => void
   onMove: (date: string, slot: MealSlot) => void
-  onCopy: (date: string, slot: MealSlot) => void
+  /* Absent for a single line. Copying one is a coherent thing to want and a
+     separate decision; a button that silently did something else would not be.
+     A whole meal still copies. */
+  onCopy?: (date: string, slot: MealSlot) => void
 }) {
   const plan = useMealPlanStore((s) => s.plan)
   const panel = useDialog<HTMLDivElement>(onClose)
+  const ctx = useNutritionContext()
   const meal = plan.find((d) => d.date === from.date)?.meals.find((m) => m.id === from.mealId)
+  const one = from.index === undefined ? undefined : meal?.entries[from.index]
   const [date, setDate] = useState(from.date)
   const [slot, setSlot] = useState<MealSlot>(meal?.slot ?? 'lunch')
   const busy = useMemo(
@@ -1497,12 +1553,18 @@ function MoveMealDialog({
         ref={panel}
         role="dialog"
         aria-modal="true"
-        aria-label="Move or copy this meal"
+        aria-label={one ? 'Move this item' : 'Move or copy this meal'}
         className="bg-paper rounded-2xl p-5 w-full max-w-sm shadow-xl max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="font-bold text-ink-900 mb-1">Move or copy this meal</h3>
-        <p className="text-sm text-ink-700 mb-4">Pick where it should go.</p>
+        <h3 className="font-bold text-ink-900 mb-1">
+          {one ? `Move ${entryName(one, ctx)}` : 'Move or copy this meal'}
+        </h3>
+        <p className="text-sm text-ink-700 mb-4">
+          {one
+            ? 'It leaves this meal and joins whatever is there.'
+            : 'Pick where it should go.'}
+        </p>
 
         <div className="mb-5">
           <WhenPicker date={date} onDate={setDate} slot={slot} onSlot={setSlot} busy={busy} />
@@ -1515,9 +1577,11 @@ function MoveMealDialog({
           {/* Disabled for the source slot too. It used to stay enabled there,
               and tapping it appended a second identical copy to the same slot
               with nothing said: Snack 1 went from 294 to 588 kcal. */}
-          <button className="btn-secondary flex-1" disabled={unchanged} onClick={() => onCopy(date, slot)}>
-            Copy it
-          </button>
+          {onCopy && (
+            <button className="btn-secondary flex-1" disabled={unchanged} onClick={() => onCopy(date, slot)}>
+              Copy it
+            </button>
+          )}
         </div>
         <button className="btn-ghost w-full mt-2" onClick={onClose}>Cancel</button>
       </div>
