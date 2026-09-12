@@ -143,6 +143,16 @@ export interface Food {
   /** Nutrients per 100 g (or per 100 ml for liquids). */
   per100g: Nutrients
   /**
+   * What kind of dish this is, when it is one.
+   *
+   * Only meaningful alongside `category: 'dishes'`, and drawn from the same
+   * vocabulary recipes use, so a soup is a soup whether it was cooked from a
+   * recipe or typed in as a food. It is a label rather than a food group: the
+   * serving goals, the trends and the shopping aisles all still read
+   * `category`, and a dish counts towards no group whatever kind it is.
+   */
+  dishType?: DishCategory
+  /**
    * Drunk rather than eaten, so amounts read in millilitres.
    *
    * Only needed for the liquids that are not filed under Drinks: milk and

@@ -2,9 +2,11 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { X, Search, Loader2 } from 'lucide-react'
 import { isDrunk, readAmount, MOST } from '../../lib/amounts'
 import { useDialog } from '../../lib/useDialog'
-import type { Food, MedCategory, MedTier } from '../../types'
+import type { DishCategory, Food, MedCategory, MedTier } from '../../types'
 import { useFoodStore } from '../../store/useFoodStore'
-import { CATEGORY_LABELS, CATEGORY_ORDER } from '../../lib/categories'
+import {
+  CATEGORY_LABELS, INGREDIENT_GROUPS, DISH_CHOICES, categoryValue, parseCategoryValue,
+} from '../../lib/categories'
 import { saltFromSodium } from '../../lib/nutrition'
 import {
   searchFoods as lookupOnline, lookupBarcode,
@@ -73,6 +75,9 @@ export default function AddFoodModal({
     // fills the name and the macros and knows nothing about the category, so
     // scanning a barcode used to be the fastest way to mis-file something.
     category: null as MedCategory | null,
+    // Set only alongside the dishes group, by the same select: a dish that is
+    // a soup says so, and anything else leaves it alone.
+    dishType: undefined as DishCategory | undefined,
     medTier: 'daily' as MedTier,
     calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0,
   })
@@ -142,6 +147,7 @@ export default function AddFoodModal({
       names: { en: draft.en.trim(), ro: draft.ro.trim() || undefined, hu: draft.hu.trim() || undefined },
       aliases: [draft.ro, draft.hu].filter(Boolean).map((s) => s.trim()),
       category: draft.category,
+      dishType: draft.dishType,
       medTier: draft.medTier,
       state: 'as-sold',
       per100g: {
@@ -272,12 +278,22 @@ export default function AddFoodModal({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="label" htmlFor="food-category">Category</label>
-                  <select id="food-category" className="input" value={draft.category ?? ''}
-                    onChange={(e) => setDraft({
-                      ...draft, category: (e.target.value || null) as MedCategory | null,
-                    })}>
+                  <select
+                    id="food-category"
+                    className="input"
+                    value={draft.category ? categoryValue({ category: draft.category, dishType: draft.dishType }) : ''}
+                    onChange={(e) => setDraft(e.target.value
+                      ? { ...draft, ...parseCategoryValue(e.target.value) }
+                      : { ...draft, category: null, dishType: undefined })}
+                  >
                     <option value="">Choose one</option>
-                    {CATEGORY_ORDER.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
+                    {INGREDIENT_GROUPS.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
+                    {/* Named dishes rather than one "Cooked dishes" shrug. The
+                        group underneath is still `dishes`; see
+                        `parseCategoryValue`. */}
+                    <optgroup label="Cooked dishes">
+                      {DISH_CHOICES.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+                    </optgroup>
                   </select>
                   {/* These are the guide's food groups, so they are all
                       ingredients, and there was nowhere to put a bowl of soup.

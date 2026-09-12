@@ -1,4 +1,4 @@
-import type { Food, MedCategory, MedTier } from '../types'
+import type { DishCategory, Food, MedCategory, MedTier } from '../types'
 import type { NutritionResult } from '../services/nutritionApi'
 
 /**
@@ -74,6 +74,8 @@ export function importedFood(result: NutritionResult, id = `custom-${Date.now().
     names: { en: result.name },
     aliases: [],
     category,
+    // Only ever set on a dish, and only when the name says which kind.
+    dishType: category === 'dishes' ? guessDishType(result.name) : undefined,
     medTier: TIER_BY_CATEGORY[category] ?? 'moderate',
     state: 'as-sold',
     // Everything the source knew, not just the fields a form shows. A
@@ -107,4 +109,35 @@ export function alreadyHave(foods: Food[], result: NutritionResult): Food | unde
   }
   const name = result.name.trim().toLowerCase()
   return foods.find((f) => f.names.en.trim().toLowerCase() === name)
+}
+
+/**
+ * Which kind of dish a name suggests, when it suggests one at all.
+ *
+ * `guessCategory` already reads these words to decide that a chicken soup is a
+ * dish rather than poultry. Having got that far it knows what kind of dish it
+ * is looking at, and throwing that away meant every imported soup arrived as
+ * an unnamed "cooked dish". Silent when nothing matches: a wrong label on a
+ * food nobody chose it for is worse than none, which is why the category guess
+ * has no default either.
+ */
+const DISH_HINTS: [RegExp, DishCategory][] = [
+  [/\b(soup|ciorba|ciorbă|supa|supă)/i, 'soup'],
+  [/leves/i, 'soup'],
+  [/\b(stew|tocana|tocană|goulash|gulyas|gulyás|casserole)/i, 'stew'],
+  [/\bcurry/i, 'curry'],
+  [/\b(salad|salata|salată|saláta)/i, 'salad'],
+  [/\b(lasagne|lasagna|pasta|spaghetti|paste)/i, 'pasta'],
+  [/\b(risotto|pilaf)/i, 'rice'],
+  [/\bpizza/i, 'pizza'],
+  [/\bsandwich/i, 'sandwich'],
+  [/\b(pastry|patiserie|paté|strudel|croissant|pite)/i, 'pastry'],
+  [/\b(cake|tort|prajitura|prăjitură|sütemény)/i, 'cake'],
+]
+
+export function guessDishType(name: string): DishCategory | undefined {
+  for (const [pattern, dish] of DISH_HINTS) {
+    if (pattern.test(name)) return dish
+  }
+  return undefined
 }
