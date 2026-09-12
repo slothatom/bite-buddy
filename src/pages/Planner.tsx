@@ -1360,9 +1360,9 @@ function EntryLine({
   // silently dropping it would rewrite it.
   const isDeleted = entry.kind === 'recipe' && deleted.has(entry.recipeId)
 
-  // Which tub it is, for the emoji and the fridge-or-freezer tag. The name
-  // itself comes from the shared helper, which already knows that a portion
-  // says where it came from rather than what it is made of.
+  // Which tub it is, for the fridge-or-freezer tag and the recipe it points
+  // at. The name itself comes from the shared helper, which already knows that
+  // a portion says where it came from rather than what it is made of.
   const portion = entry.kind === 'portion' ? ctx.portions?.get(entry.portionId) : undefined
 
   // A portion points at one too: the tub is a batch of something, and what
@@ -1388,12 +1388,6 @@ function EntryLine({
     ? `${Math.round(entry.grams)} g`
     : entry.servings === 1 ? '' : `${entry.servings}×`
 
-  const emoji = entry.kind === 'recipe'
-    ? ctx.recipes.get(entry.recipeId)?.emoji ?? '🍽️'
-    : entry.kind === 'portion'
-      ? (portion?.storage === 'freezer' ? '🧊' : '🥡')
-      : '·'
-
   // The names are long, 46 characters at the median, 77 at the longest, and in
   // a three-column day on a laptop this row gets about 320px, which the tick,
   // the two meal buttons, the amount and the calories take 250 of. The name
@@ -1408,10 +1402,19 @@ function EntryLine({
   // the column is wide enough, which is what a phone gives it.
   return (
     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm">
-      {/* Emoji and name in one box, so the name wraps underneath its own first
-          line rather than underneath the emoji. */}
+      {/* The name in its own box, so it wraps against the row's edge rather
+          than against whatever sits beside it.
+
+          A glyph used to lead every line: the recipe's own emoji, a tub for a
+          portion, and a bare interpunct for a weighed food, because foods have
+          no emoji of their own. That last case is why this went: three lines
+          of one meal read "🍲 soup, · bread, · mozzarella", so the column was
+          decorated on some rows and punctuated on others. Giving foods their
+          category's emoji instead would have made the column uniform and made
+          it lie, since a category emoji describes the food group rather than
+          the food: 🧀 for yogurt, 🍫 for banana bread. The names are what the
+          row is for, and they now start in one place. */}
       <span className="flex-auto min-w-28 flex items-baseline gap-2">
-      <span className="text-base leading-none shrink-0">{emoji}</span>
       {/* Through to the recipe, which the planner could not do at all. You
           read "Cabbage soup with wholemeal bread" on Tuesday, wondered what
           went in it, and had to go to Recipes and search for it by name. Only
