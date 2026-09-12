@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { photosAvailable, removePhoto, uploadPhoto } from '../../lib/photos'
 import Photo from './Photo'
 import { useDialog } from '../../lib/useDialog'
-import { readAmount } from '../../lib/amounts'
+import { readAmount, formatAmount } from '../../lib/amounts'
 import {
   Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download, ImagePlus,
 } from 'lucide-react'
@@ -502,7 +502,9 @@ function ComponentRow({
           <span className="block text-sm text-ink-900 truncate">{name}</span>
           <span className="block text-xs font-mono text-ink-500">
             {kcal} kcal
-            {component.kind === 'food' && unit !== 'g' ? ` · ${Math.round(component.grams)} g` : ''}
+            {component.kind === 'food' && unit !== 'g'
+              ? ` · ${formatAmount(component.grams, food)}`
+              : ''}
           </span>
         </span>
         <span className="flex items-center gap-2 shrink-0 ml-auto">

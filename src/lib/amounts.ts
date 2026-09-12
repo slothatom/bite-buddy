@@ -55,3 +55,42 @@ export const MOST = {
   /** Milligrams of sodium per 100 g. Salt itself is about 39,000. */
   sodiumPer100g: 40_000,
 } as const
+
+/**
+ * Whether a food is drunk rather than eaten.
+ *
+ * The catalogue stores every amount in grams and says so plainly: millilitres
+ * are treated as grams, which is right for water, milk and stock and close
+ * enough for oil. That is sound arithmetic and a poor thing to read. "250 g of
+ * coffee" is not how anybody says it, and the drinks in this list carry their
+ * figures per 100 ml already.
+ *
+ * The category is the signal, with an override for the liquids filed
+ * elsewhere: milk and kefir are dairy, because that is what they are, and a
+ * food somebody adds under Drinks should be treated as a drink without having
+ * to be told twice.
+ */
+export function isDrunk(food: { category: string; liquid?: boolean } | undefined): boolean {
+  if (!food) return false
+  return food.liquid ?? food.category === 'beverages'
+}
+
+/**
+ * An amount of a food, in the unit a person would say it in.
+ *
+ * Grams for what is eaten, millilitres for what is drunk, and litres once
+ * there are enough of them that millilitres stop being readable: a 1.5 l
+ * bottle is a bottle, not 1500 ml. The threshold is the same one the eye
+ * uses, and below it nothing changes.
+ */
+export function formatAmount(
+  grams: number,
+  food: { category: string; liquid?: boolean } | undefined,
+): string {
+  const n = Math.round(grams)
+  if (!isDrunk(food)) return `${n} g`
+  if (n < 1000) return `${n} ml`
+  const litres = n / 1000
+  // One decimal, and no trailing ".0": 1.5 l, but 2 l rather than 2.0 l.
+  return `${litres.toFixed(1).replace(/\.0$/, '')} l`
+}

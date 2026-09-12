@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { X, Search, Loader2 } from 'lucide-react'
-import { readAmount, MOST } from '../../lib/amounts'
+import { isDrunk, readAmount, MOST } from '../../lib/amounts'
 import { useDialog } from '../../lib/useDialog'
 import type { Food, MedCategory, MedTier } from '../../types'
 import { useFoodStore } from '../../store/useFoodStore'
@@ -302,7 +302,12 @@ export default function AddFoodModal({
                 </div>
               </div>
 
-              <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">Per 100 g</p>
+              {/* Follows the category as it is chosen: pick Drinks and the
+                  heading says millilitres, because that is what the figures
+                  underneath will mean. */}
+              <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">
+                Per 100 {draft.category && isDrunk({ category: draft.category }) ? 'ml' : 'g'}
+              </p>
               <div className="grid grid-cols-4 gap-2">
                 {([
                   ['calories', 'kcal'], ['protein', 'Protein'], ['carbs', 'Carbs'], ['fat', 'Fat'],

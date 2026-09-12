@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useDialog } from '../lib/useDialog'
-import { readAmount, MOST } from '../lib/amounts'
+import { readAmount, MOST, formatAmount } from '../lib/amounts'
 import { offerUndo } from '../store/useUndo'
 import { usePortionStore } from '../store/usePortionStore'
 import { surplusLine, surplusOf } from '../lib/cookExtra'
@@ -1073,7 +1073,7 @@ function RecipeDetail({
                   ? ctx.foods.get(c.foodId)?.names.en ?? c.foodId
                   : ctx.recipes.get(c.recipeId)?.name.en ?? c.recipeId
                 const qty = c.kind === 'food'
-                  ? `${Math.round(c.grams * scale)} g`
+                  ? formatAmount(c.grams * scale, ctx.foods.get(c.foodId))
                   // Half a batch of a nested dish is a real answer, so this one
                   // keeps a decimal rather than rounding 0.5 away to nothing.
                   : `${Math.round(c.servings * scale * 100) / 100}×`

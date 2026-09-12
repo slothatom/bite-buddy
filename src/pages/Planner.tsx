@@ -20,6 +20,7 @@ import {
 } from '../lib/nutrition'
 import { CalorieRing, NutrientSummary, SectionHeading, SourceLine } from '../components/ui'
 import { useUiStore } from '../store/useUiStore'
+import { formatAmount } from '../lib/amounts'
 import AddEntryModal from '../components/planner/AddEntryModal'
 import { usePortionStore } from '../store/usePortionStore'
 import { portionEntries } from '../lib/portionsUse'
@@ -1289,7 +1290,7 @@ function AmountDialog({
   const capped = inTheTub !== null && value >= inTheTub
 
   const shown = isFood
-    ? `${Math.round(value)} g`
+    ? formatAmount(value, entry.kind === 'food' ? ctx.foods.get(entry.foodId) : undefined)
     : `${value === Math.round(value) ? value : value.toFixed(2).replace(/0+$/, '')} ${
       value === 1 ? 'serving' : 'servings'}`
 
@@ -1436,7 +1437,7 @@ function EntryLine({
   const label = baseName(full)
 
   const detail = entry.kind === 'food'
-    ? `${Math.round(entry.grams)} g`
+    ? formatAmount(entry.grams, ctx.foods.get(entry.foodId))
     : entry.servings === 1 ? '' : `${entry.servings}×`
 
   // The names are long, 46 characters at the median, 77 at the longest, and in
@@ -1504,7 +1505,9 @@ function EntryLine({
         onClick={onAmount}
         aria-label={`Change how much: ${label}`}
       >
-        {detail || (entry.kind === 'food' ? '0 g' : '1×')}
+        {detail || (entry.kind === 'food'
+          ? formatAmount(0, ctx.foods.get(entry.foodId))
+          : '1×')}
       </button>
       <span className="text-xs text-ink-700 font-mono shrink-0 tabular-nums w-10 sm:w-14 text-right">
         {Math.round(kcal)}

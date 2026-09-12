@@ -142,6 +142,16 @@ export interface Food {
   state: FoodState
   /** Nutrients per 100 g (or per 100 ml for liquids). */
   per100g: Nutrients
+  /**
+   * Drunk rather than eaten, so amounts read in millilitres.
+   *
+   * Only needed for the liquids that are not filed under Drinks: milk and
+   * kefir are dairy, because that is what they are. Everything in `beverages`
+   * is treated as a drink without saying so, which also means a food somebody
+   * adds under Drinks behaves correctly with nothing to tick. Nothing stored
+   * changes either way; grams remain the unit on disk and in the arithmetic.
+   */
+  liquid?: boolean
   /** Named portions, beyond plain grams. */
   units: FoodUnit[]
   source: 'curated' | 'usda' | 'off' | 'custom'
