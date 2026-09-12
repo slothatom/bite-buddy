@@ -2202,7 +2202,23 @@ test.describe('what actually happened', () => {
     await sheet.getByRole('button', { name: /Write one down|^Add “/ }).click()
 
     const adding = page.getByRole('dialog').last()
-    await expect(adding.getByLabel('Category')).toContainText('Cooked dishes')
+    const category = adding.getByLabel('Category')
+
+    // "Cooked dish" is the unspecified one, for a dish that is no particular
+    // kind. Asserted on the option rather than on the "Cooked dishes" group
+    // heading above it, because an optgroup's label is not part of a select's
+    // text content and never matches here.
+    await expect(category).toContainText('Cooked dish')
+
+    // And the dishes are named, rather than being one shrug at the bottom of
+    // the list. Picking one files the food under the dishes group and records
+    // what kind of dish it is; the group is what the serving goals read, so
+    // naming them changes what you can say and not what anything counts.
+    await expect(category).toContainText('Soup')
+    await expect(category).toContainText('Salad')
+    await expect(category).toContainText('Pastry')
+    await category.selectOption({ label: 'Soup' })
+    await expect(category).toHaveValue('dish:soup')
   })
 
   test('one item can be left without leaving the whole meal', async ({ page }) => {

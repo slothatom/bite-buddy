@@ -2,12 +2,14 @@ import { useMemo, useState } from 'react'
 import { useDialog } from '../../lib/useDialog'
 import { readAmount, MOST, isDrunk } from '../../lib/amounts'
 import { X, Trash2, Undo2, Combine } from 'lucide-react'
-import type { Food, MedCategory, MedTier, FoodState } from '../../types'
+import type { Food, MedTier, FoodState } from '../../types'
 import { useFoodStore, useFoodsMergedInto, isCuratedFood } from '../../store/useFoodStore'
 import { useRecipes } from '../../store/useRecipeStore'
 import { useMealPlanStore } from '../../store/useMealPlanStore'
 import { saltFromSodium } from '../../lib/nutrition'
-import { CATEGORY_LABELS, CATEGORY_ORDER } from '../../lib/categories'
+import {
+  CATEGORY_LABELS, INGREDIENT_GROUPS, DISH_CHOICES, categoryValue, parseCategoryValue,
+} from '../../lib/categories'
 
 /**
  * The ceiling for one of a food's own figures, all of them per 100 g.
@@ -123,9 +125,14 @@ export default function FoodEditor({ food, onClose }: { food: Food; onClose: () 
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="label">Category</label>
-              <select className="input" value={draft.category} aria-label="Category"
-                onChange={(e) => patch({ category: e.target.value as MedCategory })}>
-                {CATEGORY_ORDER.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
+              <select className="input" value={categoryValue(draft)} aria-label="Category"
+                onChange={(e) => patch(parseCategoryValue(e.target.value))}>
+                {INGREDIENT_GROUPS.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
+                {/* The dishes, by name. One control, two fields: see
+                    `parseCategoryValue`. */}
+                <optgroup label="Cooked dishes">
+                  {DISH_CHOICES.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
+                </optgroup>
               </select>
             </div>
             <div>

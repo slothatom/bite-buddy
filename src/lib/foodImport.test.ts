@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { guessCategory } from './foodImport'
+import { guessCategory, guessDishType } from './foodImport'
 
 describe('guessing a food group from its name', () => {
   it('puts the obvious ones where they belong', () => {
@@ -34,5 +34,26 @@ describe('guessing a food group from its name', () => {
     // A wrong shelf is a small problem; a confident wrong shelf is worse,
     // because the audit reads this and would report a real group as an error.
     expect(guessCategory('Mamaliga')).toBe('pantry')
+  })
+})
+
+describe('guessing what kind of dish a name names', () => {
+  it('reads the dish out of the words it already matched on', () => {
+    expect(guessDishType('Chicken soup')).toBe('soup')
+    expect(guessDishType('Ciorbă de fasole')).toBe('soup')
+    expect(guessDishType('Beef stew')).toBe('stew')
+    expect(guessDishType('Vegetable curry')).toBe('curry')
+    expect(guessDishType('Greek salad')).toBe('salad')
+  })
+
+  /* Hungarian builds the word up rather than out, the same case the group
+     guesser has to handle: "leves" is a soup's ending, not its beginning. */
+  it('reads a Hungarian soup, which ends rather than begins with it', () => {
+    expect(guessDishType('Zoldsegleves')).toBe('soup')
+  })
+
+  it('says nothing when the name says nothing', () => {
+    expect(guessDishType('Leftovers')).toBeUndefined()
+    expect(guessDishType('Greek yogurt')).toBeUndefined()
   })
 })
