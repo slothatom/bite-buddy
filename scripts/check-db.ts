@@ -9,6 +9,7 @@ import { useBodyStore } from '../src/store/useBodyStore.js'
 import { useMealPlanStore } from '../src/store/useMealPlanStore.js'
 import { useRecipeStore } from '../src/store/useRecipeStore.js'
 import { JOURNAL_SCHEMA, migrate, readMigrations, type MigrationDb } from './lib/migrations.js'
+import { as, checkEmptyProject, checkHouseholds } from './lib/check-households.js'
 
 /**
  * Runs the real schema, in a real Postgres, against the real sync code.
@@ -136,8 +137,6 @@ async function checkPush() {
   const orphans = await fresh.query<{ n: number }>(
     'select count(*)::int n from public.push_subscriptions')
   check('and leaving the household takes your devices with you', orphans.rows[0].n === 0)
-
-  await everyTableTheFunctionUses(fresh)
 
   await fresh.close()
 }
@@ -372,6 +371,15 @@ await checkMigrations()
 await checkJoining()
 await checkPush()
 
+const ALL_MIGRATIONS = readMigrations(resolve(ROOT, 'supabase/migrations'))
+const live = await checkHouseholds(ALL_MIGRATIONS, check)
+await checkEmptyProject(ALL_MIGRATIONS, check)
+
+// On the whole schema, every migration applied, since the function now reads
+// the households tables too.
+console.log('\nwhat the scheduled function reads')
+await everyTableTheFunctionUses(live)
+
 const db = await new PGlite()
 
 /**
@@ -444,8 +452,28 @@ check('a planned meal became a row',
 check('a weight became a row',
   (await db.query<{ n: number }>(`select count(*)::int n from weights where id = 'old-w'`)).rows[0].n === 1)
 
-/** Just enough of the Supabase client to run the real engine over real SQL. */
-function client() {
+/**
+ * The phones, on the fully migrated database, each signed in as itself.
+ *
+ * Their own household, so the counts below are about what they did and not
+ * about the rows the households check left behind, and so every read and
+ * write goes through row-level security exactly as it does in production.
+ */
+const PHONE_A = '77777777-7777-4777-8777-777777777777'
+const PHONE_B = '88888888-8888-4888-8888-888888888888'
+await live.query(`insert into auth.users (id, email) values ($1, 'phone-a@example.com'), ($2, 'phone-b@example.com')`,
+  [PHONE_A, PHONE_B])
+const HOME = (await as(live, PHONE_A, () =>
+  live.query<{ h: string }>(`select public.create_household('Phones') h`))).rows[0].h
+await as(live, PHONE_A, () => live.query(`select public.invite_member('phone-b@example.com', 'editor')`))
+await as(live, PHONE_B, () => live.query('select public.accept_invite()'))
+
+/** Counts in the phones' household only, read as the owner. */
+const inHome = async (sql: string) =>
+  (await live.query<{ n: number }>(`${sql} and household_id = $1`, [HOME])).rows[0].n
+
+/** Just enough of the Supabase client to run the real engine over real SQL, as one account. */
+function client(userId: string) {
   return {
     from: (table: string) => ({
       select: () => {
@@ -470,31 +498,34 @@ function client() {
           then: (fn: (r: unknown) => unknown, reject?: (e: unknown) => unknown) =>
             (async () => {
               try {
-                const r = await db.query(
+                const r = await as(live, userId, () => live.query(
                   `select * from public.${table} ${where.length ? `where ${where.join(' and ')}` : ''}
-                   order by updated_at, id ${limit}`, params)
+                   order by updated_at, id ${limit}`, params))
                 return { data: r.rows, error: null }
               } catch (e) { return { data: null, error: { message: (e as Error).message } } }
             })().then(fn, reject),
         }
         return q
       },
-      upsert: async (rows: Record<string, unknown>[]) => {
+      upsert: async (rows: Record<string, unknown>[], options?: { onConflict?: string }) => {
         try {
-          for (const row of rows) {
-            const cols = Object.keys(row).filter((c) => row[c] !== undefined)
-            const values = cols.map((c) => {
-              const v = row[c]
-              return typeof v === 'object' && v !== null ? JSON.stringify(v) : v
-            })
-            await db.query(
-              `insert into public.${table} (${cols.map((c) => `"${c}"`).join(',')})
-               values (${cols.map((_, i) => `$${i + 1}`).join(',')})
-               on conflict (id) do update set ${cols.filter((c) => c !== 'id')
-                 .map((c) => `"${c}" = excluded."${c}"`).join(',')}`,
-              values,
-            )
-          }
+          await as(live, userId, async () => {
+            for (const row of rows) {
+              const cols = Object.keys(row).filter((c) => row[c] !== undefined)
+              const values = cols.map((c) => {
+                const v = row[c]
+                return typeof v === 'object' && v !== null ? JSON.stringify(v) : v
+              })
+              const key = (options?.onConflict ?? 'id').split(',')
+              await live.query(
+                `insert into public.${table} (${cols.map((c) => `"${c}"`).join(',')})
+                 values (${cols.map((_, i) => `$${i + 1}`).join(',')})
+                 on conflict (${key.join(',')}) do update set ${cols.filter((c) => !key.includes(c))
+                   .map((c) => `"${c}" = excluded."${c}"`).join(',')}`,
+                values,
+              )
+            }
+          })
           return { error: null }
         } catch (e) { return { error: { message: (e as Error).message } } }
       },
@@ -519,18 +550,19 @@ function beArany() {
 }
 
 console.log('\none phone')
+useSyncState.setState({ tables: {} })
 beArany()
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const arany = new RowSync(client() as any, ROW_TABLES, ARANY, { onError: refused('Arany') })
+const arany = new RowSync(client(PHONE_A) as any, ROW_TABLES, PHONE_A, { onError: refused('Arany') }, HOME)
 await arany.round()
 
-check('a weight is saved',
-  (await db.query<{ n: number }>(`select count(*)::int n from weights where id = 'w1'`)).rows[0].n === 1)
-check('a planned meal is saved',
-  (await db.query<{ n: number }>(`select count(*)::int n from plan_meals where id = 'm1'`)).rows[0].n === 1)
+check('a weight is saved', await inHome(`select count(*)::int n from weights where id = 'w1'`) === 1)
+check('a planned meal is saved', await inHome(`select count(*)::int n from plan_meals where id = 'm1'`) === 1)
+check('into the household the app named',
+  (await live.query<{ n: number }>(`select count(*)::int n from weights where id = 'w1'`)).rows[0].n === 1)
 
 const stamp = async () =>
-  String((await db.query<{ t: string }>('select max(updated_at) t from weights')).rows[0].t)
+  String((await live.query<{ t: string }>('select max(updated_at) t from weights where household_id = $1', [HOME])).rows[0].t)
 const before = await stamp()
 await arany.round()
 check('a round with nothing new writes nothing', before === await stamp())
@@ -543,11 +575,14 @@ useBodyStore.setState({ weightEntries: [], measurements: [] })
 useMealPlanStore.setState({ plan: [], groceryItems: [] })
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const oli = new RowSync(client() as any, ROW_TABLES, OLI, { onError: refused('Oli') })
+const oli = new RowSync(client(PHONE_B) as any, ROW_TABLES, PHONE_B, { onError: refused('Oli') }, HOME)
 await oli.round()
 
 check('receives the weight', useBodyStore.getState().weightEntries.some((w) => w.id === 'w1'))
 check('receives the week', useMealPlanStore.getState().plan.length > 0)
+check('and nothing from any other household',
+  useBodyStore.getState().weightEntries.length === 1,
+  useBodyStore.getState().weightEntries.map((w) => w.id).join(', '))
 
 // Nothing changed here, so nothing should be written back. Two phones that
 // answer each other's rows never stop talking.
@@ -558,12 +593,12 @@ check('does not answer a row it has only just received', quiet === await stamp()
 useBodyStore.setState({ weightEntries: [...useBodyStore.getState().weightEntries, oliWeight] })
 await oli.round()
 check('both peoples weights are kept',
-  (await db.query<{ n: number }>('select count(*)::int n from weights where deleted_at is null')).rows[0].n === 3)
+  await inHome('select count(*)::int n from weights where deleted_at is null') === 2)
 
 useMealPlanStore.setState({ plan: [] })
 await oli.round()
 check('a deletion is recorded rather than forgotten',
-  (await db.query<{ d: boolean }>(`select deleted_at is not null d from plan_meals where id = 'm1'`)).rows[0]?.d === true)
+  await inHome(`select count(*)::int n from plan_meals where id = 'm1' and deleted_at is not null`) === 1)
 
 console.log('\nback on the first phone')
 useSyncState.setState({ tables: aranyKnows as never })
