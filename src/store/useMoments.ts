@@ -1,5 +1,5 @@
 /**
- * Watching for the things Zig notices.
+ * Watching for the things the app notices.
  *
  * Mounted once, on the welcome screen. It derives everything from state that
  * already exists rather than being called from all over the app, a moment is

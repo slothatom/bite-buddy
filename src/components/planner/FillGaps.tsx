@@ -104,20 +104,20 @@ export default function FillGaps({
 
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           {!proposals.length && nothing === 'full' && (
-            <EmptyState title="Nothing to fill" mood="thinking">
+            <EmptyState title="Nothing to fill">
               Every meal on the days still ahead already has something in it.
             </EmptyState>
           )}
 
           {!proposals.length && nothing === 'past' && (
-            <EmptyState title="These days have gone" mood="thinking">
+            <EmptyState title="These days have gone">
               Every day in this range is in the past, so there is nothing left to plan.
               Step forward a week and try again.
             </EmptyState>
           )}
 
           {!proposals.length && nothing === 'nothing-to-offer' && (
-            <EmptyState title="Nothing to suggest" mood="thinking">
+            <EmptyState title="Nothing to suggest">
               There are empty slots here, but nothing in your library fits them right now.
               Add a few more recipes and this will have more to work with.
             </EmptyState>

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { AlertTriangle, Home, LogOut, RefreshCw } from 'lucide-react'
 import { useAuthStore } from '../store/useAuth'
 import { useHousehold } from '../store/useHousehold'
-import Zig from '../components/brand/Mascot'
+import Logo from '../components/brand/Logo'
 
 /**
  * First run for an account that belongs to no household.
@@ -41,7 +41,7 @@ export default function HouseholdSetup() {
     <div className="min-h-dvh flex items-center justify-center bg-cream-50 px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center text-center mb-7">
-          <Zig mood="happy" size={84} />
+          <Logo variant="mark" size={56} />
           <h1 className="display text-2xl text-ink-900 mt-3">Start a household</h1>
           <p className="text-sm text-ink-700 mt-1">
             Signed in as <strong className="break-all">{user?.email}</strong>.

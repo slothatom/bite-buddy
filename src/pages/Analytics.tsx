@@ -684,7 +684,7 @@ function BodyTab() {
       </div>
 
       {measurements.length === 0 ? (
-        <EmptyState title="Nothing measured yet" mood="thinking">
+        <EmptyState title="Nothing measured yet">
           Waist, hips, chest, arms and thighs, each one its own line, because they move at
           different times and an average of the five says nothing.
         </EmptyState>

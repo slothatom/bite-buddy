@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Mail, Check, AlertTriangle, SlidersHorizontal } from 'lucide-react'
 import { useAuthStore } from '../store/useAuth'
-import Zig from '../components/brand/Mascot'
 import Logo from '../components/brand/Logo'
 
 /**
@@ -32,12 +31,9 @@ export default function SignIn() {
         <div className="flex flex-col items-center text-center mb-7">
           {/* The logo is the first thing you see, and the heading, so it is the
               one logo in the app with an accessible name. In the header and the
-              menu it is decoration and stays silent. Bandit only turns up once
-              the link is on its way, to celebrate: before that a raccoon above
-              the logo read as the old logo. */}
-          {linkSentTo && <Zig mood="celebrate" size={84} />}
-          <h1 className={linkSentTo ? 'mt-4' : ''}>
-            <Logo size={linkSentTo ? 34 : 48} title="Bite Buddy" />
+              menu it is decoration and stays silent. */}
+          <h1>
+            <Logo size={48} title="Bite Buddy" />
           </h1>
           <p className="text-sm text-ink-700 mt-1">Plan your week. Eat well. Feel good.</p>
         </div>

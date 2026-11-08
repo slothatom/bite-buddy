@@ -1,7 +1,6 @@
-import type { ZigMood } from '../components/brand/Mascot'
 
 /**
- * Little things Zig notices.
+ * Little things the app notices.
  *
  * This replaces XP, levels, streaks and achievements, machinery that was built
  * here, then hidden behind a Settings toggle because it fought everything else
@@ -22,7 +21,7 @@ import type { ZigMood } from '../components/brand/Mascot'
  *  - **Nothing resets.** Every moment, once noticed, is kept. Going quiet for a
  *    month costs you none of them.
  *  - **Each is noticed once, ever.** These are firsts, not rewards you farm.
- *  - **It runs out.** Once you have settled in, Zig stops commenting. An app
+ *  - **It runs out.** Once you have settled in, the app stops commenting. An app
  *    that congratulates you forever is managing you.
  *  - **One at a time, always dismissible, never in the way.**
  */
@@ -39,7 +38,6 @@ export type MomentKind =
 
 export interface MomentDefinition {
   kind: MomentKind
-  mood: ZigMood
   title: string
   note: string
 }
@@ -48,47 +46,46 @@ export interface MomentDefinition {
  * Eight, and that is the whole list.
  *
  * Written as observations rather than praise, "look at that" rather than
- * "great job!". Zig is a creature who lives in the app and noticed something,
- * not a coach with a clipboard.
+ * "great job!": something noticed in passing, not a coach with a clipboard.
  */
 export const MOMENTS: Record<MomentKind, MomentDefinition> = {
   'first-day': {
-    kind: 'first-day', mood: 'happy',
+    kind: 'first-day',
     title: 'A day, planned',
     note: 'That is the whole idea, really. Everything else here is in service of this bit.',
   },
   'full-week': {
-    kind: 'full-week', mood: 'celebrate',
+    kind: 'full-week',
     title: 'A whole week',
-    note: 'Seven days, all filled in. Zig is quietly delighted and will not make a fuss about it.',
+    note: 'Seven days, all filled in. Quietly delightful, and no fuss about it.',
   },
   'from-the-archive': {
-    kind: 'from-the-archive', mood: 'thinking',
+    kind: 'from-the-archive',
     title: 'Straight from the archive',
     note: 'One of the 14 weeks your dietician actually wrote, loaded in one tap.',
   },
   cooked: {
-    kind: 'cooked', mood: 'chef',
+    kind: 'cooked',
     title: 'Something got cooked',
     note: 'Weighed out, made, eaten. The part the app cannot do for you.',
   },
   'own-recipe': {
-    kind: 'own-recipe', mood: 'chef',
+    kind: 'own-recipe',
     title: 'Your own recipe',
     note: 'The library is not just the dietician’s any more.',
   },
   'own-food': {
-    kind: 'own-food', mood: 'happy',
+    kind: 'own-food',
     title: 'A food of your own',
     note: 'One more thing the app knows the numbers for.',
   },
   'plenty-of-veg': {
-    kind: 'plenty-of-veg', mood: 'happy',
+    kind: 'plenty-of-veg',
     title: 'Plenty of vegetables',
     note: 'The Mediterranean guide asks for three servings a day. This week has them.',
   },
   'good-fibre': {
-    kind: 'good-fibre', mood: 'celebrate',
+    kind: 'good-fibre',
     title: 'Fibre, sorted',
     note: 'A day at your fibre target. The least glamorous number and the one most worth hitting.',
   },

@@ -18,7 +18,7 @@ import { useMealPlanStore } from './store/useMealPlanStore'
 import { useUserStore } from './store/useUserStore'
 import { followOtherTabs } from './store/registry'
 import { isConfigured } from './lib/supabase'
-import Zig from './components/brand/Mascot'
+import Logo from './components/brand/Logo'
 import { lazyRoute } from './lib/lazyRoute'
 import { applyTheme } from './lib/theme'
 
@@ -223,7 +223,7 @@ function Gate() {
     return (
       <div className="min-h-dvh grid place-items-center bg-cream-50">
         <div className="text-center">
-          <Zig mood="thinking" size={64} />
+          <Logo variant="mark" size={56} className="mx-auto" />
           <p className="mt-3 text-sm text-ink-500">One moment…</p>
         </div>
       </div>

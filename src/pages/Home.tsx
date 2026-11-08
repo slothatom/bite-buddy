@@ -25,8 +25,8 @@ import { slotNow } from '../lib/whenDates'
 import { CalorieRing, KnownHint, SectionHeading } from '../components/ui'
 import { dayCompleteness } from '../lib/completeness'
 import { isConfigured } from '../lib/supabase'
-import Zig from '../components/brand/Mascot'
 import { MOMENTS } from '../lib/moments'
+import Logo from '../components/brand/Logo'
 import { useWatchForMoments } from '../store/useMoments'
 import { useRecipes } from '../store/useRecipeStore'
 import { useCookStore } from '../store/useCookStore'
@@ -61,12 +61,6 @@ export default function Home() {
   const recipes = useRecipes()
   const sessions = useCookStore((s) => s.sessions)
   const { profile } = useUserStore()
-  // One Bandit per view. When a moment note is up he is in it, so the
-  // greeting goes without him rather than putting two raccoons on one screen.
-  const hasMoment = useUserStore((s) => {
-    const moment = s.unseenMoment()
-    return Boolean(moment && MOMENTS[moment.kind])
-  })
   const viewingAs = useResolvedPerson(useUiStore((s) => s.viewingAs))
   const targets = profile.targets
   const portions = useAvailablePortions()
@@ -202,7 +196,6 @@ export default function Home() {
         <MomentNote />
 
         <header className="flex items-start gap-4">
-          {!hasMoment && <Zig mood={plannedDays ? 'happy' : 'thinking'} size={58} />}
           <div className="min-w-0">
             <h1 className="display text-xl sm:text-2xl text-ink-900">{greeting()}{profile.name ? `, ${profile.name}` : ''}</h1>
             <p className="text-sm text-ink-700">
@@ -615,7 +608,7 @@ function WeightTile() {
 }
 
 /**
- * One thing Zig noticed, shown once.
+ * One thing the app noticed, shown once.
  *
  * Above the greeting so it is the first thing you see, and gone the moment you
  * acknowledge it. There is no history to browse and no total to admire, see
@@ -631,7 +624,7 @@ function MomentNote() {
 
   return (
     <div className="card p-4 flex items-start gap-3 border-bite-200 bg-bite-50">
-      <Zig mood={definition.mood} size={44} />
+      <Logo variant="mark" size={32} className="shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="font-bold text-ink-900 text-sm">{definition.title}</p>
         <p className="text-sm text-ink-700 mt-0.5">{definition.note}</p>

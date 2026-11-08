@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import Zig from '../brand/Mascot'
+import Logo from '../brand/Logo'
 import { backupFilename, createBackup } from '../../lib/backup'
 import { saveTextFile } from '../../lib/download'
 
@@ -74,7 +74,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     return (
       <div className="min-h-screen grid place-items-center bg-cream-50 px-6 py-10">
         <div className="card p-6 max-w-md w-full text-center">
-          <Zig size={80} mood="oops" className="mx-auto mb-3" />
+          <Logo variant="mark" size={56} className="mx-auto mb-3" />
           <h1 className="display text-lg text-ink-900">
             {stale ? 'There is a newer version' : 'Oops, something spilled'}
           </h1>

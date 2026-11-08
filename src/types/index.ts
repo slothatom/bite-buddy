@@ -716,7 +716,7 @@ export interface UserProfile {
    * blindly makes it unsayable.
    */
   theme?: Theme
-  /** Little things Zig has noticed. See lib/moments.ts for why these are not points. */
+  /** Little things the app has noticed. See lib/moments.ts for why these are not points. */
   moments: Moment[]
   /**
    * When this profile last changed, so two devices can tell whose copy is
@@ -726,7 +726,7 @@ export interface UserProfile {
   updatedAt?: string
 }
 
-/** One thing Zig noticed, once. */
+/** One thing the app noticed, once. */
 export interface Moment {
   kind: MomentKind
   at: string

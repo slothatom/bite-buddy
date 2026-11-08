@@ -5,7 +5,7 @@ import { STATUS_STYLES, targetStatus, type StatusLevel } from '../../lib/status'
 import { saltFromSodium } from '../../lib/nutrition'
 import { completenessLine } from '../../lib/completeness'
 import { ESTIMATES_NOTE } from '../../lib/estimates'
-import Zig, { type ZigMood } from '../brand/Mascot'
+import Logo from '../brand/Logo'
 import { useEnglish } from '../../store/useEnglish'
 
 /** Shared display pieces. Kept together because each is a handful of lines. */
@@ -367,19 +367,18 @@ export function SourceLine({
 }
 
 export function EmptyState({
-  emoji, title, children, mood = 'sleepy',
+  emoji, title, children,
 }: {
-  /** Kept for callers that want a specific food icon rather than Zig. */
+  /** Kept for callers that want a specific food icon rather than the mark. */
   emoji?: string
   title: string
   children?: ReactNode
-  mood?: ZigMood
 }) {
   return (
     <div className="card p-10 text-center">
       {emoji
         ? <div className="text-4xl mb-3">{emoji}</div>
-        : <Zig size={84} mood={mood} className="mx-auto mb-4" />}
+        : <Logo variant="mark" size={56} className="mx-auto mb-4" />}
       <p className="display text-lg text-ink-900">{title}</p>
       {children ? <div className="text-sm text-ink-700 mt-2 max-w-sm mx-auto">{children}</div> : null}
     </div>

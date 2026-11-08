@@ -44,7 +44,7 @@ export function EmptyShelf({
 
   if (tab === 'mine') {
     return (
-      <EmptyState title="Nothing of your own yet" mood="thinking">
+      <EmptyState title="Nothing of your own yet">
         <p>Every recipe here can be edited. Change one and your version lands on this shelf, with the original safe underneath.</p>
         <button className="btn-primary mt-4" onClick={onNew}><Plus size={16} /> Write one</button>
       </EmptyState>
@@ -56,7 +56,7 @@ export function EmptyShelf({
   // the emptiness.
 
   return (
-    <EmptyState title={`Nothing on the ${GROUP_LABELS[tab].toLowerCase()} shelf`} mood="thinking">
+    <EmptyState title={`Nothing on the ${GROUP_LABELS[tab].toLowerCase()} shelf`}>
       <button className="btn-primary mt-2" onClick={onNew}><Plus size={16} /> Write one</button>
     </EmptyState>
   )
