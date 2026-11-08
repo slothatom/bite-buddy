@@ -282,9 +282,9 @@ test.describe('the main flow', () => {
   test('a recipe opens and shows its provenance', async ({ page }) => {
     await goto(page, '/recipes')
     await page.getByPlaceholder(/Search in English/).fill('telemea')
-    // Searching a Romanian word finds meals written in Romanian.
-    const first = page.locator('.card button').nth(1)
-    await first.click()
+    // Searching a Romanian word finds meals written in Romanian. Pick the
+    // dietician's meal by name: a dish with the same cheese can sort first.
+    await page.getByRole('button', { name: /^🌙 Telemea with wholemeal bread/ }).click()
     await expect(page.getByText('How your dietician wrote it')).toBeVisible()
   })
 
