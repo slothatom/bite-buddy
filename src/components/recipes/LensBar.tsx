@@ -1,58 +1,24 @@
 import { Link } from 'react-router-dom'
-import {
-  lensReady, lensBlocker, LENSES, LENS_ORDER, type Lens, type LensInput,
-} from '../../lib/discovery'
+import { lensReady, lensBlocker, LENSES, type Lens, type LensInput } from '../../lib/discovery'
 
 /**
- * The questions you can ask the library, one at a time, with the rule printed
- * underneath the one that is on.
+ * The rule behind the lens that is on, printed under the chips, or what it
+ * would need when the app cannot answer it yet. The chips themselves live in
+ * FilterChips, with every other way of narrowing the list.
  */
-export function LensBar({
-  lens, lensInput, onLens,
-}: {
-  lens: Lens | null
-  lensInput: LensInput
-  onLens: (lens: Lens | null) => void
-}) {
-  return (
-    <>
-      {/* One question at a time, and the rule underneath it. A filter
-          nobody can explain is a filter nobody trusts. */}
-      <div className="-mx-4 sm:mx-0 px-4 sm:px-0 overflow-x-auto">
-        <div className="flex gap-1.5 w-max pb-0.5">
-          {LENS_ORDER.map((l) => {
-            const ready = lensReady(l, lensInput)
-            const on = lens === l
-            return (
-              <button
-                key={l}
-                onClick={() => onLens(on ? null : l)}
-                aria-pressed={on}
-                title={ready ? LENSES[l].rule : lensBlocker(l).why}
-                className={`shrink-0 whitespace-nowrap ${
-                  on ? 'chip bg-leaf-800 text-white border border-leaf-800'
-                    : ready ? 'chip-off' : 'chip-off text-ink-500'
-                }`}
-              >
-                {LENSES[l].emoji} {LENSES[l].label}
-              </button>
-            )
-          })}
-        </div>
-      </div>
+export function LensRule({ lens, lensInput }: { lens: Lens | null; lensInput: LensInput }) {
+  if (!lens) return null
+  if (lensReady(lens, lensInput)) return <p className="text-xs text-ink-700">{LENSES[lens].rule}</p>
 
-      {lens && (lensReady(lens, lensInput) ? (
-        <p className="text-xs text-ink-500">{LENSES[lens].rule}</p>
-      ) : (
-        <p className="text-xs text-ink-500">
-          {lensBlocker(lens).why}{' '}
-          {lensBlocker(lens).to && (
-            <Link to={lensBlocker(lens).to!} className="text-bite-700 font-semibold underline">
-              {lensBlocker(lens).label}
-            </Link>
-          )}
-        </p>
-      ))}
-    </>
+  const blocker = lensBlocker(lens)
+  return (
+    <p className="text-xs text-ink-700">
+      {blocker.why}{' '}
+      {blocker.to && (
+        <Link to={blocker.to} className="text-bite-700 font-semibold underline">
+          {blocker.label}
+        </Link>
+      )}
+    </p>
   )
 }

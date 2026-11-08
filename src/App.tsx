@@ -230,7 +230,8 @@ function Shell() {
                 <Route path="cooking" element={<Schedule />} />
               </Route>
 
-              <Route path="/recipes" element={<SectionLayout section="recipes" />}>
+              {/* Recipes and Foods put their tabs in their own headers. */}
+              <Route path="/recipes">
                 <Route index        element={<Recipes />} />
                 <Route path="foods" element={<Foods />} />
               </Route>
