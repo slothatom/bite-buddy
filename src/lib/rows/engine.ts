@@ -22,7 +22,11 @@ export interface EngineHooks {
   onError?: (message: string) => void
   /** A table whose changes the server has just accepted. */
   onDelivered?: (table: string) => void
-  /** Rows both of you changed. Theirs was kept; this is how yours is not lost quietly. */
+  /**
+   * Rows both of you changed. This device's version is kept and sent (diff.ts
+   * is local-first); these are the other person's versions, handed over so
+   * they can be kept and restored rather than lost quietly.
+   */
   onContested?: (table: string, rows: SyncRow[]) => void
   /**
    * A wholesale deletion this device refused to publish, and the two numbers
