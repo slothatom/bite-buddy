@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Mail, Check, AlertTriangle, SlidersHorizontal } from 'lucide-react'
 import { useAuthStore } from '../store/useAuth'
 import Zig from '../components/brand/Mascot'
+import Logo from '../components/brand/Logo'
 
 /**
  * The one screen you see when signed out.
@@ -29,10 +30,14 @@ export default function SignIn() {
     <div className="min-h-dvh flex items-center justify-center bg-cream-50 px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center text-center mb-7">
-          {/* Zig alone here, Wordmark carries its own small mascot, and two of
-              him on one screen reads as a mistake. */}
+          {/* Bandit reacts (he celebrates once the link is on its way), and the
+              logo underneath is the name. It is the heading, so it is the one
+              logo in the app with an accessible name. In the header and the
+              menu it is decoration and stays silent. */}
           <Zig mood={linkSentTo ? 'celebrate' : 'happy'} size={84} />
-          <h1 className="display text-2xl text-ink-900 mt-3">Bite Buddy</h1>
+          <h1 className="mt-4">
+            <Logo size={34} title="Bite Buddy" />
+          </h1>
           <p className="text-sm text-ink-700 mt-1">Plan your week. Eat well. Feel good.</p>
         </div>
 
