@@ -314,8 +314,118 @@ function audit(name: string, palette: Map<string, string>): string[] {
   return failures
 }
 
+/**
+ * The marks that are not words, and the fills that are not in a className.
+ *
+ * The scan above reads `text-*` against `bg-*` in components, so three things
+ * that decide whether the app is usable were never measured: the focus ring,
+ * which lives in a base rule in index.css; the danger button, whose colours
+ * live in an `@utility`; and the calorie ring, whose stroke lives in a table
+ * in lib/status.ts. Each shipped below the bar at least once: the ring was
+ * bite-500 at 2.33:1, the danger fill coral-500 under white at 2.83:1, and the
+ * slightly-over ring mustard-500 at 1.35:1. They are read from where they are
+ * defined, not restated here, so changing one there is what gets measured.
+ *
+ * A mark (ring, focus outline, control border) needs 3:1 on what it sits on.
+ * The danger button's label is small bold text, so it needs 4.5:1.
+ */
+function utility(css: string, name: string): string {
+  const match = css.match(new RegExp(`@utility ${name} \\{([^}]*)\\}`))
+  if (!match) throw new Error(`${CSS} has no @utility ${name}`)
+  return match[1]
+}
+
+function token(source: string, pattern: RegExp, what: string): string {
+  const match = source.match(pattern)
+  if (!match) throw new Error(`could not find ${what}`)
+  return match[1]
+}
+
+interface Mark { what: string; fg: string; bg: string; need: number }
+
+function marks(): Mark[] {
+  const css = readFileSync(CSS, 'utf8')
+  const status = readFileSync('src/lib/status.ts', 'utf8')
+  const found: Mark[] = []
+
+  // Focus: the one outline every control gets.
+  const ring = token(css, /:focus-visible\s*\{[^}]*outline:\s*\d+px\s+solid\s+var\(--color-([\w-]+)\)/, 'the focus outline colour')
+  for (const bg of SURFACES) found.push({ what: 'focus ring', fg: ring, bg, need: 3 })
+
+  // An input's own focus border, which is what a select shows on a click.
+  const input = utility(css, 'input')
+  const border = token(input, /focus:border-([\w-]+)/, 'the input focus border')
+  for (const bg of SURFACES) found.push({ what: 'input focus border', fg: border, bg, need: 3 })
+
+  // Danger: the label on the fill, at rest and under the pointer.
+  const danger = utility(css, 'btn-danger')
+  const label = token(danger, /\btext-([\w-]+)/, 'the danger label colour')
+  for (const [, fill] of danger.matchAll(/(?:^|\s)(?:hover:|active:)?bg-([\w-]+)/g)) {
+    found.push({ what: 'danger button', fg: label, bg: fill, need: 4.5 })
+  }
+
+  // The calorie ring's stroke per status. 'none' is a track, not a reading.
+  for (const [, level, stroke] of status.matchAll(/'([\w-]+)':\s*\{[^}]*ring:\s*'stroke-([\w-]+)'/g)) {
+    if (level === 'none') continue
+    for (const bg of SURFACES) found.push({ what: `${level} ring`, fg: stroke, bg, need: 3 })
+  }
+
+  return found
+}
+
+/**
+ * Below the bar before this check existed, and still there, so reported but
+ * not failed. The over-target ring is coral-500, 2.64:1 on cream; the state
+ * never rests on it, since the pill under the ring says "Over target" with an
+ * alert icon. Remove an entry when it is fixed; the check then holds it.
+ */
+const KNOWN = new Set(['over ring: coral-500 on cream-50', 'over ring: coral-500 on paper'])
+
+function auditMarks(name: string, palette: Map<string, string>): string[] {
+  const failures: string[] = []
+  const all = marks()
+  for (const { what, fg, bg, need } of all) {
+    if (!palette.has(fg) || !palette.has(bg)) {
+      failures.push(`  ${name}: ${what}: unknown token ${palette.has(fg) ? bg : fg}`)
+      continue
+    }
+    const ratio = contrast(palette.get(fg)!, palette.get(bg)!)
+    const key = `${what}: ${fg} on ${bg}`
+    if (ratio >= need) continue
+    const line = `  ${name}: ${key.padEnd(40)} ${ratio.toFixed(2)}:1  needs ${need}:1`
+    if (KNOWN.has(key)) console.log(`${name}: known, not yet fixed: ${key} ${ratio.toFixed(2)}:1`)
+    else failures.push(line)
+  }
+  console.log(`${name}: checked ${all.length} marks and fills (focus, danger, calorie ring)`)
+  return failures
+}
+
+/**
+ * The dark palette is written twice: once for a chosen dark theme and once
+ * for a device that prefers dark. Only the first is measured above, so the
+ * two must say the same thing or the second ships unmeasured.
+ */
+function darkTwins(): string[] {
+  const css = readFileSync(CSS, 'utf8')
+  const media = block(css, '@media (prefers-color-scheme: dark)')
+  const chosen = colours(block(css, DARK_BLOCK), new Map())
+  const device = colours(media, new Map())
+  const out: string[] = []
+  for (const name of new Set([...chosen.keys(), ...device.keys()])) {
+    if (chosen.get(name) !== device.get(name)) {
+      out.push(`  dark: --color-${name} is ${chosen.get(name) ?? 'missing'} when chosen but ${
+        device.get(name) ?? 'missing'} when following the device`)
+    }
+  }
+  return out
+}
+
 const { light, dark } = palettes()
-const failures = [...audit('light', light), ...audit('dark', dark)]
+const failures = [
+  ...audit('light', light), ...audit('dark', dark),
+  ...auditMarks('light', light), ...auditMarks('dark', dark),
+  ...darkTwins(),
+]
 
 if (failures.length) {
   console.error(`\n${failures.length} below WCAG AA:\n`)
