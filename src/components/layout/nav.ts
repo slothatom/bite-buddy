@@ -23,6 +23,20 @@ export const NAV = [
   { to: '/settings',   label: 'Settings',  icon: SettingsIcon },
 ]
 
+/**
+ * The phone's tab bar: the three screens most visits go to, in bar order.
+ * Adding a meal sits between the second and third, and More holds the rest.
+ * The bar's labels are shorter than the sidebar's because five slots share
+ * 390px, but they point at the same routes.
+ */
+const TAB_ROUTES: Record<string, string> = { '/': 'Home', '/plan': 'Plan', '/recipes': 'Recipes' }
+
+export const TABS = NAV.filter(({ to }) => to in TAB_ROUTES)
+  .map((item) => ({ ...item, label: TAB_ROUTES[item.to] }))
+
+/** Everything that is not on the bar, behind More, in sidebar order. */
+export const MORE = NAV.filter(({ to }) => !(to in TAB_ROUTES))
+
 /** Whether a path is the screen you are on. Home matches only itself. */
 export function isCurrent(to: string, pathname: string): boolean {
   return to === '/' ? pathname === '/' : pathname.startsWith(to)
