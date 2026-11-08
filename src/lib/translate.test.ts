@@ -73,5 +73,7 @@ describe('reading the dietician in English', () => {
      * be the app deciding what she meant.
      */
     expect(untranslated.length).toBeLessThanOrEqual(4)
-  })
+    // Translates the whole archive: about 1.5s alone, but well past the
+    // default 5s when the full suite runs in parallel on a busy machine.
+  }, 30_000)
 })
