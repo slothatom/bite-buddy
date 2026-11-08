@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { throughLens, lensReady, LENSES, LENS_ORDER } from './discovery'
 import { buildContext } from './nutrition'
 import { ALL_RECIPES, FOODS as LIBRARY, TIMES_PLANNED } from '../data'
+import { pick } from '../test/archive'
 import type { DayPlan, Food, PantryItem, Recipe, Targets } from '../types'
 
 const now = '2026-08-21T10:00:00.000Z'
@@ -167,7 +168,7 @@ describe('the shipped library, through the batch lens', () => {
     // Seven of the 481 meals are built on them, which is more than any soup in
     // the library. Repetition on its own is not the question: nobody cooks a
     // batch of fried eggs on Sunday and eats them on Wednesday.
-    expect(TIMES_PLANNED['dish-fried-eggs']).toBeGreaterThanOrEqual(5)
+    expect(TIMES_PLANNED['dish-fried-eggs']).toBeGreaterThanOrEqual(pick(5, 2))
     expect(ids(shipped)).not.toContain('dish-fried-eggs')
   })
 
@@ -180,7 +181,8 @@ describe('the shipped library, through the batch lens', () => {
   })
 
   it('still has plenty to say', () => {
-    expect(shipped.length).toBeGreaterThan(10)
+    // The made-up archive is a few weeks rather than thirty-six.
+    expect(shipped.length).toBeGreaterThan(pick(10, 2))
   })
 })
 

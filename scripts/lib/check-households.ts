@@ -146,7 +146,9 @@ export async function checkHouseholds(migrations: Migration[], check: Check): Pr
 
   const result = await migrate(asMigrationDb(db), migrations, { log: () => {} })
     .then((r) => r.applied.join(','), (e: Error) => `refused: ${e.message}`)
-  check('the households migration applies on top of live data', result === migrations[index].name, result)
+  // The households migration and whatever came after it, in order.
+  const expected = migrations.slice(index).map((m) => m.name).join(',')
+  check('the households migration applies on top of live data', result === expected, result)
   await grantLikeSupabase(db)
 
   // ─── the backfill ──────────────────────────────────────────────────────────
@@ -199,7 +201,7 @@ export async function checkHouseholds(migrations: Migration[], check: Check): Pr
   // ─── an outsider ───────────────────────────────────────────────────────────
   console.log('\nhouseholds: who gets in')
   const strangerRead = await as(db, STRANGER, async () => {
-    const tables = await Promise.all([...ROW_TABLES, 'households', 'household_members', 'household_invites', 'reminder_log']
+    const tables = await Promise.all([...ROW_TABLES, 'households', 'household_members', 'household_invites', 'reminder_log', 'plan_archive']
       .map((t) => count(db, `select count(*)::int n from public.${t}`)))
     return tables.reduce((a, b) => a + b, 0)
   })

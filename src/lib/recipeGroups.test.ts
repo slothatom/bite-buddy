@@ -6,6 +6,10 @@ import {
 } from './recipeGroups'
 import type { Recipe } from '../types'
 import { ALL_RECIPES } from '../data'
+import { pick } from '../test/archive'
+
+/** One dish both archives write at three portions of oats. */
+const OATS = 'Rolled oats with yogurt & mixed berries'
 
 const tagged = (...tags: RecipeTag[]) => ({ tags })
 
@@ -109,7 +113,7 @@ describe('the same dish written at different portions', () => {
     // left to group is genuinely different portions of a dish: 30, 40 and 45 g
     // of oats under the same yogurt and berries.
     const oats = groupVariants(ALL_RECIPES)
-      .find((g) => g.name === 'Rolled oats with yogurt & mixed berries')!
+      .find((g) => g.name === OATS)!
     expect(oats.variants).toHaveLength(3)
   })
 
@@ -133,14 +137,14 @@ describe('the same dish written at different portions', () => {
     // that each one carries its portion in its own field, so asserting the
     // count would only mean re-editing this line every time she writes another
     // plan.
-    const grapefruit = ALL_RECIPES.filter((r) => r.name.en === 'Grapefruit with cashews')
-    expect(grapefruit.length).toBeGreaterThan(1)
-    expect(grapefruit.every((r) => r.variant)).toBe(true)
-    expect(grapefruit.map((r) => r.variant)).toContain('20 g cashews, 150 g grapefruit')
+    const portions = ALL_RECIPES.filter((r) => r.name.en === pick('Grapefruit with cashews', OATS))
+    expect(portions.length).toBeGreaterThan(1)
+    expect(portions.every((r) => r.variant)).toBe(true)
+    expect(portions.map((r) => r.variant)).toContain(pick('20 g cashews, 150 g grapefruit', '45 g rolled oats'))
   })
 
   it('labels a version by what it is, not by where it sits', () => {
-    const oats = ALL_RECIPES.filter((r) => r.name.en === 'Rolled oats with yogurt & mixed berries')
+    const oats = ALL_RECIPES.filter((r) => r.name.en === OATS)
     expect(oats.map((r, i) => variantLabel(r, i)).sort())
       .toEqual(['30 g rolled oats', '40 g rolled oats', '45 g rolled oats'])
   })
@@ -174,7 +178,7 @@ describe('the shelf that used to have nothing on it', () => {
   const snacks = ALL_RECIPES.filter((r) => r.tags.includes('snack'))
 
   it('has snacks on it', () => {
-    expect(snacks.length).toBeGreaterThan(20)
+    expect(snacks.length).toBeGreaterThan(pick(20, 3))
   })
 
   it('holds combinations, not a mirror of the food library', () => {

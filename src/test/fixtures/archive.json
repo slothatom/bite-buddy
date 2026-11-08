@@ -1,0 +1,3581 @@
+{
+  "version": 1,
+  "sourcePlans": [
+    {
+      "id": "plan-01",
+      "file": "fixture-week-1.docx",
+      "label": "Week of 6 Jan 2025",
+      "language": "ro",
+      "issuedOn": "2025-01-06",
+      "subject": "self",
+      "days": [
+        {
+          "dayName": "Luni",
+          "weekday": 1,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "170 g iaurt, 30 g fulgi de ovaz, 90 g fructe de padure",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-001",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "220 g mere, 15 g migdale",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-002",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "1 banana",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "banana",
+                  "grams": 120
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "320 g ciorba de legume, 30 g paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-003",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "salata cu feta, 20 g orez expandat",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-004",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Marti",
+          "weekday": 2,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "2 felii de paine int, 70 g branza de vaci, rosii, castraveti",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-005",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "180 g chefir",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "kefir",
+                  "grams": 180
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "160 g capsuni",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "strawberries",
+                  "grams": 160
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "130 g somon, 220 g legume la cuptor, 40 g sos de usturoi cu iaurt",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-006",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "bruschete cu telemea",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-bruschetta",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Miercuri",
+          "weekday": 3,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "terci de ovaz, 120 g pere",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-008",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "260 g grapefruit, 12 g nuci",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-009",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "220 g mere, 15 g migdale",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-002",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "110 g piept de pui, 60 g bulgur nefiert, salata de cruditati",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-010",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "160 g branza de vaci, 1 felie de paine int, ardei",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-011",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Joi",
+          "weekday": 4,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "omleta cu spanac, 1 felie de paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-012",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "1 banana",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "banana",
+                  "grams": 120
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "30 g ciocolata neagra",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "dark-chocolate",
+                  "grams": 30
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "mancare de linte, 30 g paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-013",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "cod cu sos de salsa, 55 g orez brun nefiert",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-014",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Vineri",
+          "weekday": 5,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "budinca de chia cu mango",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-chia-pudding-mango",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "160 g capsuni",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "strawberries",
+                  "grams": 160
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "220 g mere, 15 g migdale",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-002",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "chili con carne, 55 g bulgur nefiert, muraturi",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-016",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "320 g supa crema de conopida, 30 g paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-017",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Sambata",
+          "weekday": 6,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "170 g iaurt, 45 g fulgi de ovaz, 90 g fructe de padure",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-018",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "220 g mere, 15 g migdale",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-002",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "180 g chefir",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "kefir",
+                  "grams": 180
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "320 g supa crema de dovleac, 30 g paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-019",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "pasta de ton, 2 felii de paine int, castraveti",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-020",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Duminica",
+          "weekday": 0,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "fulgi de ovaz la cuptor",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-baked-oats",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "30 g ciocolata neagra",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "dark-chocolate",
+                  "grams": 30
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "260 g grapefruit, 12 g nuci",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-009",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "tigaie picanta",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-spicy-pan-chicken",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "300 g ciorba de pui, 1 felie de paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-023",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plan-02",
+      "file": "fixture-week-2.docx",
+      "label": "Week of 13 Jan 2025",
+      "language": "ro",
+      "issuedOn": "2025-01-13",
+      "subject": "self",
+      "days": [
+        {
+          "dayName": "Luni",
+          "weekday": 1,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "170 g iaurt, 40 g fulgi de ovaz, 90 g fructe de padure",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-024",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "180 g chefir",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "kefir",
+                  "grams": 180
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "130 g somon, 220 g legume la cuptor, 40 g sos de usturoy cu iaurt",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-025",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "bruschete cu telemea",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-bruschetta",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Marti",
+          "weekday": 2,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "omleta cu ciuperci, 1 felie de paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-026",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "260 g grapefruit, 12 g nuci",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-009",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "320 g ciorba de varza, 30 g paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-027",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "salata cu feta, 20 g orez expandat",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-004",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Miercuri",
+          "weekday": 3,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "terci de ovaz, 120 g pere",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-008",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "1 banana",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "banana",
+                  "grams": 120
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "mancare de linte, 30 g paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-013",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "60 g telemea, 1 felie de paine int, rosii",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-028",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Joi",
+          "weekday": 4,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "170 g iaurt, 30 g fulgi de ovaz, 90 g fructe de padure",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-001",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "160 g capsuni",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "strawberries",
+                  "grams": 160
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "110 g piept de pui, 60 g bulgur nefiert, salata de cruditati",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-010",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "160 g branza de vaci, 1 felie de paine int, ardei",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-011",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Vineri",
+          "weekday": 5,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "2 felii de paine int, 70 g branza de vaci, rosii, castraveti",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-005",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "220 g mere, 15 g migdale",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-002",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "chili con carne, 55 g bulgur nefiert, muraturi",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-016",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "320 g supa crema de conopida, 30 g paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-017",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Sambata",
+          "weekday": 6,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "budinca de chia",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-chia-pudding",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "30 g ciocolata neagra",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "dark-chocolate",
+                  "grams": 30
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "tigaie picanta",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-spicy-pan-chicken",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "cod cu sos de salsa, 55 g orez brun nefiert",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-014",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Duminica",
+          "weekday": 0,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "fulgi de ovaz la cuptor",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-baked-oats",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "220 g mere, 15 g migdale",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-002",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "320 g ciorba de legume, 30 g paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-003",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "pasta de ton, 2 felii de paine int, castraveti",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-020",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plan-03",
+      "file": "fixture-week-3.docx",
+      "label": "Week of 4 Nov 2024",
+      "language": "hu",
+      "issuedOn": "2024-11-04",
+      "subject": "self",
+      "days": [
+        {
+          "dayName": "Hétfő",
+          "weekday": 1,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "zabkása, 150 g áfonya",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-030",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "1 alma, 10 g dió",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-031",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "gombakrémleves, 30 g teljes kiőrlésű kenyér",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-032",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "130 g csirkemell, 180 g sült zöldségek",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-033",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Kedd",
+          "weekday": 2,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "2 szelet teljes kiőrlésű kenyér, 50 g túró, paprika",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-034",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "170 g joghurt, 70 g málna",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-035",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "lencsefőzelék, 1 tojás",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-036",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "körözött, 2 szelet teljes kiőrlésű kenyér, uborka",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-037",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Szerda",
+          "weekday": 3,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "spenótos rántotta, 1 szelet teljes kiőrlésű kenyér",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-012",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "1 körte, 12 g mandula",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-039",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "zöldbableves, 30 g teljes kiőrlésű kenyér",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-040",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "puliszka, 120 g túró, 150 g joghurt",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-041",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Csütörtök",
+          "weekday": 4,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "zabkása, 150 g áfonya",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-030",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "1 alma, 10 g dió",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-031",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "130 g lazac, 180 g sült zöldségek",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-042",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "tonhalkrém, 2 szelet teljes kiőrlésű kenyér, paradicsom",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-dinner-043",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Péntek",
+          "weekday": 5,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "chiamagos puding",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-chia-pudding",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "170 g joghurt, 70 g málna",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-snack-035",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "tökfőzelék, 120 g csirkemell",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-045",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "gombás quinoa",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-mushroom-quinoa",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plan-04",
+      "file": "fixture-week-4.docx",
+      "label": "Week of 2 Sept 2024 (Sam)",
+      "language": "ro",
+      "issuedOn": "2024-09-02",
+      "subject": "other",
+      "days": [
+        {
+          "dayName": "Luni",
+          "weekday": 1,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "terci de ovaz, 120 g pere",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-008",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "200 g struguri",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "grapes",
+                  "grams": 200
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "supa crema de rosii, 30 g paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-047",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "salata cu ton",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-tuna-salad",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Marti",
+          "weekday": 2,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "2 ochiuri, 1 felie de paine int",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-049",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "1 banana",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "banana",
+                  "grams": 120
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "mancare de spanac, 2 ochiuri",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-050",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "bruschete cu telemea",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-bruschetta",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "dayName": "Miercuri",
+          "weekday": 3,
+          "meals": [
+            {
+              "slot": "breakfast",
+              "text": "170 g iaurt, 40 g fulgi de ovaz, 90 g fructe de padure",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-breakfast-024",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "snack",
+              "text": "180 g chefir",
+              "entries": [
+                {
+                  "kind": "food",
+                  "foodId": "kefir",
+                  "grams": 180
+                }
+              ]
+            },
+            {
+              "slot": "lunch",
+              "text": "tocanita de porc, mamaliga",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "meal-lunch-051",
+                  "servings": 1
+                }
+              ]
+            },
+            {
+              "slot": "dinner",
+              "text": "salata de mozzarella",
+              "entries": [
+                {
+                  "kind": "recipe",
+                  "recipeId": "dish-mozzarella-salad",
+                  "servings": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "mealRecipes": [
+    {
+      "id": "meal-breakfast-001",
+      "name": {
+        "en": "Rolled oats with yogurt & mixed berries"
+      },
+      "emoji": "🌅",
+      "servings": 1,
+      "prepMinutes": 5,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "yogurt",
+          "grams": 170
+        },
+        {
+          "kind": "food",
+          "foodId": "oats",
+          "grams": 30
+        },
+        {
+          "kind": "food",
+          "foodId": "berries-mixed",
+          "grams": 90
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "breakfast"
+      ],
+      "sourceLine": "170 g iaurt, 30 g fulgi de ovaz, 90 g fructe de padure",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z",
+      "variant": "30 g rolled oats"
+    },
+    {
+      "id": "meal-snack-002",
+      "name": {
+        "en": "Apple with almonds"
+      },
+      "emoji": "🍎",
+      "servings": 1,
+      "prepMinutes": 4,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "apple",
+          "grams": 220
+        },
+        {
+          "kind": "food",
+          "foodId": "almonds",
+          "grams": 15
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "snack"
+      ],
+      "sourceLine": "220 g mere, 15 g migdale",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-003",
+      "name": {
+        "en": "Vegetable sour soup with wholemeal bread"
+      },
+      "emoji": "🍲",
+      "servings": 1,
+      "prepMinutes": 13,
+      "cookMinutes": 30,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-ciorba-vegetable",
+          "servings": 0.58
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "320 g ciorba de legume, 30 g paine int",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-004",
+      "name": {
+        "en": "Feta salad with puffed rice cakes"
+      },
+      "emoji": "🥗",
+      "servings": 1,
+      "prepMinutes": 9,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-feta-salad",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "rice-cakes",
+          "grams": 20
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "salata cu feta, 20 g orez expandat",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-breakfast-005",
+      "name": {
+        "en": "Wholemeal bread with cottage cheese & tomatoes"
+      },
+      "emoji": "🌅",
+      "servings": 1,
+      "prepMinutes": 11,
+      "cookMinutes": 18,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 60
+        },
+        {
+          "kind": "food",
+          "foodId": "cottage-cheese",
+          "grams": 70
+        },
+        {
+          "kind": "food",
+          "foodId": "tomatoes",
+          "grams": 120
+        },
+        {
+          "kind": "food",
+          "foodId": "cucumber",
+          "grams": 100
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "breakfast"
+      ],
+      "sourceLine": "2 felii de paine int, 70 g branza de vaci, rosii, castraveti",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-006",
+      "name": {
+        "en": "Roasted vegetables with salmon & yogurt garlic sauce"
+      },
+      "emoji": "🍠",
+      "servings": 1,
+      "prepMinutes": 14,
+      "cookMinutes": 35,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "salmon",
+          "grams": 130
+        },
+        {
+          "kind": "recipe",
+          "recipeId": "dish-roasted-vegetables",
+          "servings": 0.72
+        },
+        {
+          "kind": "food",
+          "foodId": "yogurt-garlic-sauce",
+          "grams": 40
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "130 g somon, 220 g legume la cuptor, 40 g sos de usturoi cu iaurt",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-breakfast-008",
+      "name": {
+        "en": "Oat porridge with pear"
+      },
+      "emoji": "🥣",
+      "servings": 1,
+      "prepMinutes": 5,
+      "cookMinutes": 8,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-porridge",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "pear",
+          "grams": 120
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "breakfast"
+      ],
+      "sourceLine": "terci de ovaz, 120 g pere",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-snack-009",
+      "name": {
+        "en": "Grapefruit with walnuts"
+      },
+      "emoji": "🍎",
+      "servings": 1,
+      "prepMinutes": 4,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "grapefruit",
+          "grams": 260
+        },
+        {
+          "kind": "food",
+          "foodId": "walnuts",
+          "grams": 12
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "snack"
+      ],
+      "sourceLine": "260 g grapefruit, 12 g nuci",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-010",
+      "name": {
+        "en": "Bulgur with chicken breast & raw vegetable salad"
+      },
+      "emoji": "🍽️",
+      "servings": 1,
+      "prepMinutes": 10,
+      "cookMinutes": 20,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "chicken-breast",
+          "grams": 110
+        },
+        {
+          "kind": "food",
+          "foodId": "bulgur",
+          "grams": 60
+        },
+        {
+          "kind": "food",
+          "foodId": "salad-raw",
+          "grams": 200
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "110 g piept de pui, 60 g bulgur nefiert, salata de cruditati",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-011",
+      "name": {
+        "en": "Cottage cheese with wholemeal bread & bell pepper"
+      },
+      "emoji": "🌙",
+      "servings": 1,
+      "prepMinutes": 7,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "cottage-cheese",
+          "grams": 160
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        },
+        {
+          "kind": "food",
+          "foodId": "bell-pepper",
+          "grams": 120
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "160 g branza de vaci, 1 felie de paine int, ardei",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-breakfast-012",
+      "name": {
+        "en": "Spinach omelette with wholemeal bread"
+      },
+      "emoji": "🍳",
+      "servings": 1,
+      "prepMinutes": 4,
+      "cookMinutes": 8,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-omelette-spinach",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "breakfast"
+      ],
+      "sourceLine": "omleta cu spanac, 1 felie de paine int",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-013",
+      "name": {
+        "en": "Lentil stew with wholemeal bread"
+      },
+      "emoji": "🫘",
+      "servings": 1,
+      "prepMinutes": 11,
+      "cookMinutes": 30,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-lentil-stew",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "mancare de linte, 30 g paine int",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-014",
+      "name": {
+        "en": "Cod with mango salsa, brown rice"
+      },
+      "emoji": "🐟",
+      "servings": 1,
+      "prepMinutes": 13,
+      "cookMinutes": 22,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-cod-salsa",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "rice-brown",
+          "grams": 55
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "cod cu sos de salsa, 55 g orez brun nefiert",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-016",
+      "name": {
+        "en": "Chili con carne with bulgur & pickles"
+      },
+      "emoji": "🌶️",
+      "servings": 1,
+      "prepMinutes": 12,
+      "cookMinutes": 30,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-chili-con-carne",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bulgur",
+          "grams": 55
+        },
+        {
+          "kind": "food",
+          "foodId": "pickles",
+          "grams": 100
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "chili con carne, 55 g bulgur nefiert, muraturi",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-017",
+      "name": {
+        "en": "Cream of cauliflower soup with wholemeal bread"
+      },
+      "emoji": "🥣",
+      "servings": 1,
+      "prepMinutes": 11,
+      "cookMinutes": 25,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-soup-cauliflower-cream",
+          "servings": 0.56
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "320 g supa crema de conopida, 30 g paine int",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-breakfast-018",
+      "name": {
+        "en": "Rolled oats with yogurt & mixed berries"
+      },
+      "emoji": "🌅",
+      "servings": 1,
+      "prepMinutes": 5,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "yogurt",
+          "grams": 170
+        },
+        {
+          "kind": "food",
+          "foodId": "oats",
+          "grams": 45
+        },
+        {
+          "kind": "food",
+          "foodId": "berries-mixed",
+          "grams": 90
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "breakfast"
+      ],
+      "sourceLine": "170 g iaurt, 45 g fulgi de ovaz, 90 g fructe de padure",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z",
+      "variant": "45 g rolled oats"
+    },
+    {
+      "id": "meal-lunch-019",
+      "name": {
+        "en": "Cream of pumpkin soup with wholemeal bread"
+      },
+      "emoji": "🎃",
+      "servings": 1,
+      "prepMinutes": 13,
+      "cookMinutes": 25,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-soup-pumpkin-cream",
+          "servings": 0.51
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "320 g supa crema de dovleac, 30 g paine int",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-020",
+      "name": {
+        "en": "Tuna spread with wholemeal bread & cucumber"
+      },
+      "emoji": "🐟",
+      "servings": 1,
+      "prepMinutes": 12,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-tuna-spread",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 60
+        },
+        {
+          "kind": "food",
+          "foodId": "cucumber",
+          "grams": 100
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "pasta de ton, 2 felii de paine int, castraveti",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-023",
+      "name": {
+        "en": "Chicken sour soup with wholemeal bread"
+      },
+      "emoji": "🍲",
+      "servings": 1,
+      "prepMinutes": 16,
+      "cookMinutes": 30,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-ciorba-chicken",
+          "servings": 0.64
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "300 g ciorba de pui, 1 felie de paine int",
+      "sourcePlanId": "plan-01",
+      "createdAt": "2025-01-06T00:00:00.000Z"
+    },
+    {
+      "id": "meal-breakfast-024",
+      "name": {
+        "en": "Rolled oats with yogurt & mixed berries"
+      },
+      "emoji": "🌅",
+      "servings": 1,
+      "prepMinutes": 5,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "yogurt",
+          "grams": 170
+        },
+        {
+          "kind": "food",
+          "foodId": "oats",
+          "grams": 40
+        },
+        {
+          "kind": "food",
+          "foodId": "berries-mixed",
+          "grams": 90
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "breakfast"
+      ],
+      "sourceLine": "170 g iaurt, 40 g fulgi de ovaz, 90 g fructe de padure",
+      "sourcePlanId": "plan-02",
+      "createdAt": "2025-01-13T00:00:00.000Z",
+      "variant": "40 g rolled oats"
+    },
+    {
+      "id": "meal-lunch-025",
+      "name": {
+        "en": "Roasted vegetables with salmon & yogurt"
+      },
+      "emoji": "🍠",
+      "servings": 1,
+      "prepMinutes": 14,
+      "cookMinutes": 35,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "salmon",
+          "grams": 130
+        },
+        {
+          "kind": "recipe",
+          "recipeId": "dish-roasted-vegetables",
+          "servings": 0.72
+        },
+        {
+          "kind": "food",
+          "foodId": "yogurt",
+          "grams": 40
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "130 g somon, 220 g legume la cuptor, 40 g sos de usturoy cu iaurt",
+      "sourcePlanId": "plan-02",
+      "createdAt": "2025-01-13T00:00:00.000Z"
+    },
+    {
+      "id": "meal-breakfast-026",
+      "name": {
+        "en": "Mushroom omelette with wholemeal bread"
+      },
+      "emoji": "🍳",
+      "servings": 1,
+      "prepMinutes": 4,
+      "cookMinutes": 9,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-omelette-mushroom",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "breakfast"
+      ],
+      "sourceLine": "omleta cu ciuperci, 1 felie de paine int",
+      "sourcePlanId": "plan-02",
+      "createdAt": "2025-01-13T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-027",
+      "name": {
+        "en": "Cabbage soup with wholemeal bread"
+      },
+      "emoji": "🍲",
+      "servings": 1,
+      "prepMinutes": 11,
+      "cookMinutes": 35,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-ciorba-cabbage",
+          "servings": 0.52
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "320 g ciorba de varza, 30 g paine int",
+      "sourcePlanId": "plan-02",
+      "createdAt": "2025-01-13T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-028",
+      "name": {
+        "en": "Telemea with wholemeal bread & tomatoes"
+      },
+      "emoji": "🌙",
+      "servings": 1,
+      "prepMinutes": 10,
+      "cookMinutes": 18,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "telemea",
+          "grams": 60
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        },
+        {
+          "kind": "food",
+          "foodId": "tomatoes",
+          "grams": 120
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "60 g telemea, 1 felie de paine int, rosii",
+      "sourcePlanId": "plan-02",
+      "createdAt": "2025-01-13T00:00:00.000Z"
+    },
+    {
+      "id": "meal-breakfast-030",
+      "name": {
+        "en": "Oat porridge with blueberries"
+      },
+      "emoji": "🥣",
+      "servings": 1,
+      "prepMinutes": 5,
+      "cookMinutes": 8,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-porridge",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "blueberries",
+          "grams": 150
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "breakfast"
+      ],
+      "sourceLine": "zabkása, 150 g áfonya",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-snack-031",
+      "name": {
+        "en": "Apple with walnuts"
+      },
+      "emoji": "🍎",
+      "servings": 1,
+      "prepMinutes": 4,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "apple",
+          "grams": 150
+        },
+        {
+          "kind": "food",
+          "foodId": "walnuts",
+          "grams": 10
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "snack"
+      ],
+      "sourceLine": "1 alma, 10 g dió",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-032",
+      "name": {
+        "en": "Cream of mushroom soup with wholemeal bread"
+      },
+      "emoji": "🍄",
+      "servings": 1,
+      "prepMinutes": 11,
+      "cookMinutes": 25,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-soup-mushroom-cream",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "gombakrémleves, 30 g teljes kiőrlésű kenyér",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-033",
+      "name": {
+        "en": "Chicken breast with mixed vegetables"
+      },
+      "emoji": "🌙",
+      "servings": 1,
+      "prepMinutes": 9,
+      "cookMinutes": 25,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "chicken-breast",
+          "grams": 130
+        },
+        {
+          "kind": "food",
+          "foodId": "vegetables-mixed",
+          "grams": 180
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "130 g csirkemell, 180 g sült zöldségek",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-breakfast-034",
+      "name": {
+        "en": "Wholemeal bread with cottage cheese & bell pepper"
+      },
+      "emoji": "🌅",
+      "servings": 1,
+      "prepMinutes": 10,
+      "cookMinutes": 18,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 60
+        },
+        {
+          "kind": "food",
+          "foodId": "cottage-cheese",
+          "grams": 50
+        },
+        {
+          "kind": "food",
+          "foodId": "bell-pepper",
+          "grams": 120
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "breakfast"
+      ],
+      "sourceLine": "2 szelet teljes kiőrlésű kenyér, 50 g túró, paprika",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-snack-035",
+      "name": {
+        "en": "Yogurt with raspberries"
+      },
+      "emoji": "🍎",
+      "servings": 1,
+      "prepMinutes": 4,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "yogurt",
+          "grams": 170
+        },
+        {
+          "kind": "food",
+          "foodId": "raspberries",
+          "grams": 70
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "snack"
+      ],
+      "sourceLine": "170 g joghurt, 70 g málna",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-036",
+      "name": {
+        "en": "Lentil stew with egg"
+      },
+      "emoji": "🫘",
+      "servings": 1,
+      "prepMinutes": 11,
+      "cookMinutes": 30,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-lentil-stew",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "egg",
+          "grams": 55
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "lencsefőzelék, 1 tojás",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-037",
+      "name": {
+        "en": "Hungarian cheese spread with wholemeal bread & cucumber"
+      },
+      "emoji": "🧀",
+      "servings": 1,
+      "prepMinutes": 10,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-korozott",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 60
+        },
+        {
+          "kind": "food",
+          "foodId": "cucumber",
+          "grams": 100
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "körözött, 2 szelet teljes kiőrlésű kenyér, uborka",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-snack-039",
+      "name": {
+        "en": "Pear with almonds"
+      },
+      "emoji": "🍎",
+      "servings": 1,
+      "prepMinutes": 4,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "pear",
+          "grams": 170
+        },
+        {
+          "kind": "food",
+          "foodId": "almonds",
+          "grams": 12
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "snack"
+      ],
+      "sourceLine": "1 körte, 12 g mandula",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-040",
+      "name": {
+        "en": "Green bean soup with wholemeal bread"
+      },
+      "emoji": "🍲",
+      "servings": 1,
+      "prepMinutes": 11,
+      "cookMinutes": 30,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-ciorba-green-bean",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "zöldbableves, 30 g teljes kiőrlésű kenyér",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-041",
+      "name": {
+        "en": "Polenta with cottage cheese & yogurt"
+      },
+      "emoji": "🌽",
+      "servings": 1,
+      "prepMinutes": 10,
+      "cookMinutes": 20,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-polenta",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "cottage-cheese",
+          "grams": 120
+        },
+        {
+          "kind": "food",
+          "foodId": "yogurt",
+          "grams": 150
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "puliszka, 120 g túró, 150 g joghurt",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-042",
+      "name": {
+        "en": "Salmon with mixed vegetables"
+      },
+      "emoji": "🍽️",
+      "servings": 1,
+      "prepMinutes": 13,
+      "cookMinutes": 22,
+      "components": [
+        {
+          "kind": "food",
+          "foodId": "salmon",
+          "grams": 130
+        },
+        {
+          "kind": "food",
+          "foodId": "vegetables-mixed",
+          "grams": 180
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "130 g lazac, 180 g sült zöldségek",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-dinner-043",
+      "name": {
+        "en": "Tuna spread with wholemeal bread & tomatoes"
+      },
+      "emoji": "🐟",
+      "servings": 1,
+      "prepMinutes": 12,
+      "cookMinutes": 0,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-tuna-spread",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 60
+        },
+        {
+          "kind": "food",
+          "foodId": "tomatoes",
+          "grams": 120
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "dinner"
+      ],
+      "sourceLine": "tonhalkrém, 2 szelet teljes kiőrlésű kenyér, paradicsom",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-045",
+      "name": {
+        "en": "Squash stew with chicken breast"
+      },
+      "emoji": "🥘",
+      "servings": 1,
+      "prepMinutes": 11,
+      "cookMinutes": 30,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-squash-stew",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "chicken-breast",
+          "grams": 120
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "tökfőzelék, 120 g csirkemell",
+      "sourcePlanId": "plan-03",
+      "createdAt": "2024-11-04T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-047",
+      "name": {
+        "en": "Cream of tomato soup with wholemeal bread"
+      },
+      "emoji": "🍅",
+      "servings": 1,
+      "prepMinutes": 11,
+      "cookMinutes": 25,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-soup-tomato-cream",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "supa crema de rosii, 30 g paine int",
+      "sourcePlanId": "plan-04",
+      "createdAt": "2024-09-02T00:00:00.000Z"
+    },
+    {
+      "id": "meal-breakfast-049",
+      "name": {
+        "en": "Fried eggs with wholemeal bread"
+      },
+      "emoji": "🍳",
+      "servings": 1,
+      "prepMinutes": 4,
+      "cookMinutes": 8,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-fried-eggs",
+          "servings": 1
+        },
+        {
+          "kind": "food",
+          "foodId": "bread-wholemeal",
+          "grams": 30
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "breakfast"
+      ],
+      "sourceLine": "2 ochiuri, 1 felie de paine int",
+      "sourcePlanId": "plan-04",
+      "createdAt": "2024-09-02T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-050",
+      "name": {
+        "en": "Fried eggs with creamed spinach"
+      },
+      "emoji": "🥬",
+      "servings": 1,
+      "prepMinutes": 6,
+      "cookMinutes": 15,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-creamed-spinach",
+          "servings": 1
+        },
+        {
+          "kind": "recipe",
+          "recipeId": "dish-fried-eggs",
+          "servings": 1
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "mancare de spanac, 2 ochiuri",
+      "sourcePlanId": "plan-04",
+      "createdAt": "2024-09-02T00:00:00.000Z"
+    },
+    {
+      "id": "meal-lunch-051",
+      "name": {
+        "en": "Pork stew with polenta"
+      },
+      "emoji": "🍲",
+      "servings": 1,
+      "prepMinutes": 11,
+      "cookMinutes": 50,
+      "components": [
+        {
+          "kind": "recipe",
+          "recipeId": "dish-pork-stew",
+          "servings": 1
+        },
+        {
+          "kind": "recipe",
+          "recipeId": "dish-polenta",
+          "servings": 1
+        }
+      ],
+      "steps": [],
+      "tags": [
+        "lunch"
+      ],
+      "sourceLine": "tocanita de porc, mamaliga",
+      "sourcePlanId": "plan-04",
+      "createdAt": "2024-09-02T00:00:00.000Z"
+    }
+  ],
+  "classification": {
+    "dish-tuna-spread": {
+      "category": "dip",
+      "quickFilters": [
+        "quick",
+        "meal-prep",
+        "light",
+        "pantry"
+      ]
+    },
+    "dish-tuna-spread-ricotta": {
+      "category": "dip",
+      "quickFilters": [
+        "quick",
+        "meal-prep",
+        "light",
+        "pantry"
+      ]
+    },
+    "dish-cheese-spread": {
+      "category": "dip",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "dish-egg-spread": {
+      "category": "dip",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "dish-avocado-spread": {
+      "category": "dip",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "dish-omelette": {
+      "category": "omelette",
+      "quickFilters": [
+        "quick",
+        "light",
+        "one-pan"
+      ]
+    },
+    "dish-omelette-spinach": {
+      "category": "omelette",
+      "quickFilters": [
+        "quick",
+        "light",
+        "one-pan"
+      ]
+    },
+    "dish-omelette-mushroom": {
+      "category": "omelette",
+      "quickFilters": [
+        "quick",
+        "light",
+        "one-pan"
+      ]
+    },
+    "dish-fried-eggs": {
+      "category": "omelette",
+      "quickFilters": [
+        "quick",
+        "light",
+        "one-pan"
+      ]
+    },
+    "dish-egg-muffins": {
+      "category": "egg",
+      "quickFilters": [
+        "meal-prep",
+        "light"
+      ]
+    },
+    "dish-potato-egg": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-shakshuka-chickpea": {
+      "category": "omelette",
+      "quickFilters": [
+        "meal-prep",
+        "light",
+        "one-pan"
+      ]
+    },
+    "dish-porridge": {
+      "category": "porridge",
+      "quickFilters": [
+        "quick",
+        "cozy"
+      ]
+    },
+    "dish-porridge-apple": {
+      "category": "porridge",
+      "quickFilters": [
+        "quick",
+        "cozy"
+      ]
+    },
+    "dish-baked-oats": {
+      "category": "porridge",
+      "quickFilters": [
+        "cozy"
+      ]
+    },
+    "dish-chia-pudding": {
+      "category": "dessert",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "dish-chia-pudding-mango": {
+      "category": "dessert",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "dish-polenta": {
+      "category": "grain",
+      "quickFilters": [
+        "quick",
+        "light",
+        "one-pan"
+      ]
+    },
+    "dish-celeriac-puree": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-parsnip-puree": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-cauliflower-puree": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-creamed-spinach": {
+      "category": "vegetable",
+      "quickFilters": [
+        "quick",
+        "meal-prep",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-zucchini-stew": {
+      "category": "stew",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "veggie-packed",
+        "one-pan"
+      ]
+    },
+    "dish-lentil-stew": {
+      "category": "stew",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-spinach-lentils": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-braised-cabbage": {
+      "category": "vegetable",
+      "quickFilters": [
+        "meal-prep",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-wok-vegetables": {
+      "category": "vegetable",
+      "quickFilters": [
+        "quick",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-sauteed-mushrooms": {
+      "category": "vegetable",
+      "quickFilters": [
+        "quick",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-beetroot-salad": {
+      "category": "salad",
+      "quickFilters": [
+        "quick",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-carrot-salad": {
+      "category": "salad",
+      "quickFilters": [
+        "quick",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-cabbage-salad": {
+      "category": "salad",
+      "quickFilters": [
+        "quick",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-roasted-vegetables": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-ciorba-greek": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-ciorba-vegetable": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-ciorba-cabbage": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-ciorba-green-bean": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-soup-noodle": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-ciorba-chicken": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-ciorba-beef": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-soup-mushroom-cream": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-soup-vegetable-cream": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "veggie-packed",
+        "one-pan"
+      ]
+    },
+    "dish-soup-cauliflower-cream": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-soup-tomato-cream": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "veggie-packed",
+        "one-pan"
+      ]
+    },
+    "dish-soup-spinach-cream": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-soup-asparagus-cream": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-soup-kohlrabi": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-soup-pumpkin-cream": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "veggie-packed",
+        "one-pan"
+      ]
+    },
+    "dish-squash-stew": {
+      "category": "stew",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "veggie-packed",
+        "one-pan"
+      ]
+    },
+    "dish-ciorba-meatball": {
+      "category": "soup",
+      "quickFilters": [
+        "meal-prep",
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-pumpkin-muffins": {
+      "category": "vegetable",
+      "quickFilters": [
+        "meal-prep",
+        "light"
+      ]
+    },
+    "dish-chicken-patties": {
+      "category": "vegetable",
+      "quickFilters": [
+        "meal-prep",
+        "light",
+        "one-pan"
+      ]
+    },
+    "dish-korozott": {
+      "category": "dip",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "dish-baked-sweet-potato": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-baked-pumpkin": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-banana-oat-muffins": {
+      "category": "vegetable",
+      "quickFilters": [
+        "meal-prep",
+        "light"
+      ]
+    },
+    "dish-botos-chicken": {
+      "category": "meat",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-spicy-pan-chicken": {
+      "category": "meat",
+      "quickFilters": [
+        "high-protein",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-chili-con-carne": {
+      "category": "stew",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "high-protein",
+        "one-pan"
+      ]
+    },
+    "dish-broccoli-patties": {
+      "category": "vegetable",
+      "quickFilters": [
+        "meal-prep",
+        "light",
+        "veggie-packed",
+        "one-pan"
+      ]
+    },
+    "dish-zucchini-patties": {
+      "category": "vegetable",
+      "quickFilters": [
+        "meal-prep",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-pork-under-lid": {
+      "category": "meat",
+      "quickFilters": [
+        "light"
+      ]
+    },
+    "dish-pork-stew": {
+      "category": "stew",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-beef-braised": {
+      "category": "meat",
+      "quickFilters": [
+        "light"
+      ]
+    },
+    "dish-cod-salsa": {
+      "category": "fish",
+      "quickFilters": [
+        "high-protein",
+        "light",
+        "one-pan"
+      ]
+    },
+    "dish-salmon-sweet-potato": {
+      "category": "vegetable",
+      "quickFilters": [
+        "veggie-packed"
+      ]
+    },
+    "dish-trout-baked": {
+      "category": "fish",
+      "quickFilters": [
+        "high-protein",
+        "light"
+      ]
+    },
+    "dish-chicken-mozzarella": {
+      "category": "meat",
+      "quickFilters": [
+        "high-protein",
+        "light"
+      ]
+    },
+    "dish-pesto-pasta": {
+      "category": "pasta",
+      "quickFilters": [
+        "quick",
+        "pantry"
+      ]
+    },
+    "dish-mushroom-quinoa": {
+      "category": "grain",
+      "quickFilters": [
+        "veggie-packed"
+      ]
+    },
+    "dish-shaorma": {
+      "category": "wrap",
+      "quickFilters": [
+        "high-protein"
+      ]
+    },
+    "dish-flatbread-pizza": {
+      "category": "pizza",
+      "quickFilters": [
+        "quick"
+      ]
+    },
+    "dish-eggplant-mini-pizza": {
+      "category": "pizza",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-eggplant-rolls": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-bruschetta": {
+      "category": "vegetable",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "dish-bruschetta-mushroom": {
+      "category": "vegetable",
+      "quickFilters": [
+        "quick",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-tabbouleh": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-tabbouleh-chickpea": {
+      "category": "stew",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "dish-quinoa-salad": {
+      "category": "salad",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-caesar-turkey": {
+      "category": "salad",
+      "quickFilters": [
+        "high-protein",
+        "light"
+      ]
+    },
+    "dish-shrimp-salad": {
+      "category": "salad",
+      "quickFilters": [
+        "quick",
+        "high-protein",
+        "light"
+      ]
+    },
+    "dish-tuna-salad": {
+      "category": "salad",
+      "quickFilters": [
+        "quick",
+        "high-protein",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-feta-salad": {
+      "category": "salad",
+      "quickFilters": [
+        "quick",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "dish-mozzarella-salad": {
+      "category": "salad",
+      "quickFilters": [
+        "quick",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "meal-breakfast-001": {
+      "category": "cereal",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "meal-snack-002": {
+      "category": "fruit",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "meal-lunch-003": {
+      "category": "soup",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "meal-dinner-004": {
+      "category": "salad",
+      "quickFilters": [
+        "quick",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "meal-breakfast-005": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "meal-lunch-006": {
+      "category": "fish",
+      "quickFilters": [
+        "high-protein",
+        "veggie-packed"
+      ]
+    },
+    "meal-breakfast-008": {
+      "category": "porridge",
+      "quickFilters": [
+        "quick",
+        "cozy"
+      ]
+    },
+    "meal-snack-009": {
+      "category": "fruit",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "meal-lunch-010": {
+      "category": "grain",
+      "quickFilters": [
+        "high-protein",
+        "veggie-packed"
+      ]
+    },
+    "meal-dinner-011": {
+      "category": "cheese",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "meal-breakfast-012": {
+      "category": "omelette",
+      "quickFilters": [
+        "quick",
+        "light",
+        "one-pan"
+      ]
+    },
+    "meal-lunch-013": {
+      "category": "stew",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "meal-dinner-014": {
+      "category": "fish",
+      "quickFilters": [
+        "high-protein"
+      ]
+    },
+    "meal-lunch-016": {
+      "category": "stew",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "high-protein",
+        "one-pan"
+      ]
+    },
+    "meal-dinner-017": {
+      "category": "soup",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "meal-breakfast-018": {
+      "category": "cereal",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "meal-lunch-019": {
+      "category": "soup",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "veggie-packed",
+        "one-pan"
+      ]
+    },
+    "meal-dinner-020": {
+      "category": "dip",
+      "quickFilters": [
+        "quick",
+        "high-protein",
+        "light"
+      ]
+    },
+    "meal-dinner-023": {
+      "category": "soup",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "meal-breakfast-024": {
+      "category": "cereal",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "meal-lunch-025": {
+      "category": "fish",
+      "quickFilters": [
+        "high-protein",
+        "veggie-packed"
+      ]
+    },
+    "meal-breakfast-026": {
+      "category": "omelette",
+      "quickFilters": [
+        "quick",
+        "light",
+        "one-pan"
+      ]
+    },
+    "meal-lunch-027": {
+      "category": "soup",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "meal-dinner-028": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "meal-breakfast-030": {
+      "category": "porridge",
+      "quickFilters": [
+        "quick",
+        "cozy"
+      ]
+    },
+    "meal-snack-031": {
+      "category": "fruit",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "meal-lunch-032": {
+      "category": "soup",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "meal-dinner-033": {
+      "category": "meat",
+      "quickFilters": [
+        "high-protein",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "meal-breakfast-034": {
+      "category": "vegetable",
+      "quickFilters": [
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "meal-snack-035": {
+      "category": "yogurt",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "meal-lunch-036": {
+      "category": "stew",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "meal-dinner-037": {
+      "category": "dip",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "meal-snack-039": {
+      "category": "fruit",
+      "quickFilters": [
+        "quick",
+        "light"
+      ]
+    },
+    "meal-lunch-040": {
+      "category": "soup",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    },
+    "meal-dinner-041": {
+      "category": "grain",
+      "quickFilters": []
+    },
+    "meal-lunch-042": {
+      "category": "fish",
+      "quickFilters": [
+        "high-protein",
+        "light",
+        "veggie-packed"
+      ]
+    },
+    "meal-dinner-043": {
+      "category": "dip",
+      "quickFilters": [
+        "quick",
+        "high-protein",
+        "light"
+      ]
+    },
+    "meal-lunch-045": {
+      "category": "stew",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "high-protein",
+        "veggie-packed",
+        "one-pan"
+      ]
+    },
+    "meal-lunch-047": {
+      "category": "soup",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "veggie-packed",
+        "one-pan"
+      ]
+    },
+    "meal-breakfast-049": {
+      "category": "omelette",
+      "quickFilters": [
+        "quick",
+        "light",
+        "one-pan"
+      ]
+    },
+    "meal-lunch-050": {
+      "category": "omelette",
+      "quickFilters": [
+        "veggie-packed",
+        "one-pan"
+      ]
+    },
+    "meal-lunch-051": {
+      "category": "stew",
+      "quickFilters": [
+        "cozy",
+        "freezer",
+        "one-pan"
+      ]
+    }
+  },
+  "recipeAliases": {
+    "meal-dinner-007": "dish-bruschetta",
+    "meal-breakfast-015": "dish-chia-pudding-mango",
+    "meal-breakfast-021": "dish-baked-oats",
+    "meal-lunch-022": "dish-spicy-pan-chicken",
+    "meal-breakfast-029": "dish-chia-pudding",
+    "meal-breakfast-038": "meal-breakfast-012",
+    "meal-breakfast-044": "dish-chia-pudding",
+    "meal-dinner-046": "dish-mushroom-quinoa",
+    "meal-dinner-048": "dish-tuna-salad",
+    "meal-dinner-052": "dish-mozzarella-salad"
+  },
+  "timesPlanned": {
+    "meal-snack-002": 6,
+    "dish-porridge": 5,
+    "dish-bruschetta": 3,
+    "dish-lentil-stew": 3,
+    "dish-tuna-spread": 3,
+    "meal-breakfast-008": 3,
+    "meal-snack-009": 3,
+    "dish-baked-oats": 2,
+    "dish-chia-pudding": 2,
+    "dish-chili-con-carne": 2,
+    "dish-ciorba-vegetable": 2,
+    "dish-cod-salsa": 2,
+    "dish-feta-salad": 2,
+    "dish-fried-eggs": 2,
+    "dish-omelette-spinach": 2,
+    "dish-polenta": 2,
+    "dish-roasted-vegetables": 2,
+    "dish-soup-cauliflower-cream": 2,
+    "dish-spicy-pan-chicken": 2,
+    "meal-breakfast-001": 2,
+    "meal-breakfast-005": 2,
+    "meal-breakfast-012": 2,
+    "meal-breakfast-024": 2,
+    "meal-breakfast-030": 2,
+    "meal-dinner-004": 2,
+    "meal-dinner-011": 2,
+    "meal-dinner-014": 2,
+    "meal-dinner-017": 2,
+    "meal-dinner-020": 2,
+    "meal-lunch-003": 2,
+    "meal-lunch-010": 2,
+    "meal-lunch-013": 2,
+    "meal-lunch-016": 2,
+    "meal-snack-031": 2,
+    "meal-snack-035": 2,
+    "dish-chia-pudding-mango": 1,
+    "dish-ciorba-cabbage": 1,
+    "dish-ciorba-chicken": 1,
+    "dish-ciorba-green-bean": 1,
+    "dish-creamed-spinach": 1,
+    "dish-korozott": 1,
+    "dish-mozzarella-salad": 1,
+    "dish-mushroom-quinoa": 1,
+    "dish-omelette-mushroom": 1,
+    "dish-pork-stew": 1,
+    "dish-soup-mushroom-cream": 1,
+    "dish-soup-pumpkin-cream": 1,
+    "dish-soup-tomato-cream": 1,
+    "dish-squash-stew": 1,
+    "dish-tuna-salad": 1,
+    "meal-breakfast-018": 1,
+    "meal-breakfast-026": 1,
+    "meal-breakfast-034": 1,
+    "meal-breakfast-049": 1,
+    "meal-dinner-023": 1,
+    "meal-dinner-028": 1,
+    "meal-dinner-033": 1,
+    "meal-dinner-037": 1,
+    "meal-dinner-041": 1,
+    "meal-dinner-043": 1,
+    "meal-lunch-006": 1,
+    "meal-lunch-019": 1,
+    "meal-lunch-025": 1,
+    "meal-lunch-027": 1,
+    "meal-lunch-032": 1,
+    "meal-lunch-036": 1,
+    "meal-lunch-040": 1,
+    "meal-lunch-042": 1,
+    "meal-lunch-045": 1,
+    "meal-lunch-047": 1,
+    "meal-lunch-050": 1,
+    "meal-lunch-051": 1,
+    "meal-snack-039": 1
+  }
+}

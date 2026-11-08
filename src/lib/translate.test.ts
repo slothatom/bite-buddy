@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { buildDictionary, toEnglish, coverage } from './translate'
 import { FOODS } from '../data/foods'
-import { SOURCE_PLANS } from '../data/generated/sourcePlans'
+import { SOURCE_PLANS } from '../data'
+import { REAL_ARCHIVE } from '../test/archive'
 
 const dict = buildDictionary(FOODS)
 const say = (line: string) => toEnglish(line, dict)
@@ -9,12 +10,12 @@ const say = (line: string) => toEnglish(line, dict)
 describe('reading the dietician in English', () => {
   it('translates a plain weighed line', () => {
     expect(say('200 g capsuni')).toBe('200 g strawberries')
-    expect(say('[removed plan text]')).toBe('150 g apple, 10 g cashews')
+    expect(say('180 g mere, 15 g caju')).toBe('180 g apple, 15 g cashews')
   })
 
   it('keeps the numbers and the punctuation exactly where they were', () => {
-    expect(say('[removed plan text]'))
-      .toBe('50 g wholemeal bread, 100 g hummus, vegetables')
+    expect(say('40 g paine int, 80 g humus, legume'))
+      .toBe('40 g wholemeal bread, 80 g hummus, vegetables')
   })
 
   it('reads a dish name as a dish rather than word by word', () => {
@@ -37,11 +38,11 @@ describe('reading the dietician in English', () => {
   })
 
   it('reads Hungarian as well as Romanian', () => {
-    expect(say('[removed plan text]')).toBe('1 apple + 10 g walnuts')
+    expect(say('1 alma + 15 g dio')).toBe('1 apple + 15 g walnuts')
     // The food database's own name for it, gloss and all, because that is what
     // the food is called on every other screen in the app.
-    expect(say('[removed plan text]'))
-      .toBe('Mixed salad + 50 g telemea (brined cheese) + a teaspoon of olive oil')
+    expect(say('vegyes salata + 60 g telemea + 1 tk. olivaolaj'))
+      .toBe('Mixed salad + 60 g telemea (brined cheese) + a teaspoon of olive oil')
   })
 
   it('leaves a word it does not know exactly as it was written', () => {
@@ -50,7 +51,8 @@ describe('reading the dietician in English', () => {
     expect(say('150 g qwertyuiop')).toBe('150 g qwertyuiop')
   })
 
-  it('reads almost all of the archive', () => {
+  // About the real plans, so only where they are: see src/test/archive.ts.
+  it.skipIf(!REAL_ARCHIVE)('reads almost all of the archive', () => {
     const seen = new Set<string>()
     const lines: string[] = []
     for (const plan of SOURCE_PLANS) {

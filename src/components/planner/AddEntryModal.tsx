@@ -101,7 +101,7 @@ export default function AddEntryModal({
   const panel = useDialog<HTMLDivElement>(onClose, !writing)
   const [query, setQuery] = useState('')
   // Snacks open on foods. The plans write them as lines rather than dishes
-  // ("[removed plan text]"), so the recipe tab for a snack slot was reliably
+  // ("200 g pere, 15 g migdale"), so the recipe tab for a snack slot was reliably
   // empty, an empty list is a worse answer than the right list.
   const isSnack = slot === 'snack'
   const available = useAvailablePortions()

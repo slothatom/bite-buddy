@@ -15,8 +15,13 @@ Bite Buddy isn't seeded with invented recipes. Its library comes from two real s
 
 **36 dietician plan documents** (October 2020 to November 2022, 18 in Hungarian and
 18 in Romanian), **254 days, 1,255 meal lines**. These are parsed into **493 meal
-recipes** and **83 underlying dishes**, every one traceable back to the line the
+recipes**, on top of **83 underlying dishes**, every one traceable back to the line the
 dietician wrote.
+
+The plans are private medical correspondence, so **they are not in this repository and
+not in the site's code**. They live in Supabase, one archive per household, readable only
+by its signed-in members (see [The plan archive](#the-plan-archive)). The dishes, the
+foods and the importer's rules are public; the plans and the meals made from them are not.
 
 **An 89-page Mediterranean Diet guide**: its 17 food categories, allowed-lists and
 serving goals become the food database's structure, the tier badges in the food
@@ -24,10 +29,10 @@ library, and the weekly serving scoring on the Progress screen.
 
 Three things about that source data shape the whole app:
 
-- **The unit of planning is a weighed portion, not a recipe.** `50 g paine int + 100 g humus,
-  jumatate de farfurie de legume`. So a planned meal is a list of entries, and a snack is
-  two food lines, not a fabricated recipe.
-- **Weights are stated raw.** `50 g bulgur nefiert`, `100 g piept de pui crud`. Dry bulgur is
+- **The unit of planning is a weighed portion, not a recipe.** A line reads like
+  `40 g paine int + 80 g humus, castraveti`. So a planned meal is a list of entries, and a
+  snack is two food lines, not a fabricated recipe.
+- **Weights are stated raw.** `60 g bulgur nefiert`, `120 g piept de pui crud`. Dry bulgur is
   roughly three times the calories of cooked, so the state a food is weighed in is part of its
   identity (`raw` / `dry` / `cooked` / `as-sold`).
 - **The dietician's weeks mostly ran Wednesday to Tuesday.** The app's week is Monday to
@@ -236,7 +241,8 @@ Targets, exercise, week start, appearance, weight unit, **Your data** (backup an
 as one JSON file; a backup from a different `SCHEMA_VERSION` is refused), deleted recipes
 and foods, the weekly food check, and when signed in: account, **Household**, sync and
 notifications. A second tab holds the **Plan history**: every original plan, with its own
-wording, loadable into the planner. Settings works signed out.
+wording, loadable into the planner, and the household's plan archive (an admin uploads it;
+everyone else sees what is loaded). Settings works signed out.
 
 ---
 
@@ -413,32 +419,69 @@ VITE_USDA_API_KEY=your_key    # https://fdc.nal.usda.gov/api-guide.html
 
 ## The data pipeline
 
-The plan data is generated, not hand-typed, so it stays reproducible and auditable.
+The plan data is generated, not hand-typed, so it stays reproducible and auditable. None
+of it is committed.
 
 ```bash
-npm run data:build -- <dir-with-the-.docx-plans>   # regenerate src/data/generated/
-npm run data:build                                 # or from the committed archive
-npm run data:check                                 # integrity checks
+npm run data:build -- <dir-with-the-plans>   # read the documents, write data/archive.json
+npm run data:build                           # or rebuild data/archive.json from itself
+npm run data:check                           # integrity checks (the plans only if present)
 ```
 
-`scripts/build-data.ts` reads the `.docx` files directly and hands each meal line to
-`scripts/lib/library.ts`, which resolves each fragment to a food or a dish. Without the
-originals it rebuilds from the committed archive, which stores every line verbatim.
+`scripts/build-data.ts` reads the `.docx` and `.pdf` files directly and hands each meal
+line to `scripts/lib/library.ts`, which resolves each fragment to a food or a dish. Without
+the originals it rebuilds from the existing `data/archive.json`, which stores every line
+verbatim. The documents go in `data/source/` and the result in `data/archive.json`; both
+are gitignored. One week in the archive was written for somebody else, and only its file
+name says so: put `{ "otherPerson": { "match": "<pattern>", "name": "<first name>" } }` in
+`data/source/plans.json` to mark it.
 
 Judgement calls live in the data or the rules rather than the parser:
 
 - `DISH_BY_WEIGHT` in `src/data/dishes.ts` marks dishes portioned by weight
-  (`350 g ciorba a la grec`); elsewhere a stated weight names an *ingredient*.
+  (`300 g ciorba de legume`); elsewhere a stated weight names an *ingredient*.
 - A food a dish in the same meal already contains is not added twice; where the
   dietician asked for more than the dish assumes, the difference is kept.
 - Two lines with the same ingredients in the same amounts are one recipe, and the others
-  become aliases in `recipeAliases.ts` so planned days still resolve.
+  become aliases (`recipeAliases` in the archive) so planned days still resolve.
 - A duplicate name is settled by saying what differs, never by a number.
 
 `scripts/check-data.ts` verifies every reference resolves, no recipe nests itself, every
 source line maps to something, names are unique, no two recipes are identical, merged ids
 still resolve, and each food's calories agree with its macros (fibre-aware Atwater). It
-also rebuilds the library from the archive and compares it with what is committed.
+also rebuilds the library from the archive and compares the two. Without
+`data/archive.json` it checks the foods and dishes and says the rest was skipped; pass a
+path to check another archive, as CI does with the made-up one.
+
+### The plan archive
+
+One JSON file, `{ version: 1, sourcePlans, mealRecipes, classification, recipeAliases,
+timesPlanned }`, checked on the way in by `src/data/archiveFormat.ts`.
+
+- **Where it lives.** `public.plan_archive`, one row per household
+  (`supabase/migrations/20261110000100_plan_archive`). Members read it, viewers
+  included; only admins insert, replace or delete it. `npm run db:check` proves both,
+  including that a stranger and another household read nothing.
+- **Getting it there.** Run `npm run data:build`, then as an admin open
+  **Settings, Plan history** and choose **Upload plan archive**. It replaces the
+  household's archive for everyone.
+- **In the app.** After sign-in the app puts the copy kept on the device (IndexedDB) in
+  place before the first paint, then asks the database whether there is a newer one and
+  downloads it only if so. `src/data/archive.ts` holds it as live bindings and the screens
+  remount on a new one. With no archive the app still works: the library is the 83
+  dishes and Plan history says nothing has been uploaded. **Signing out forgets it**, on
+  the device as well as in memory.
+- **A local copy** with no Supabase has no household to read from, so Plan history offers
+  **Load plan archive** instead and keeps the file on that device only.
+- **Tests.** CI never has the real archive. Unit tests and the end-to-end build use a
+  made-up one, `src/test/fixtures/archive.json`, built by `npm run data:fixture` from
+  invented lines (`scripts/build-fixture.ts`). Where `data/archive.json` exists the unit
+  tests use it instead (`BITE_BUDDY_TEST_ARCHIVE=fixture` forces the made-up one), and
+  `E2E_ARCHIVE=real npm run test:e2e` builds the browser tests against it.
+- **The guard.** `npm run bundle:check`, after every build in CI and before every
+  deploy, fails if the built site contains anything shaped like plan data (recipe and plan
+  ids, document names, any line of the archive when one is present) or if the plans are
+  tracked in git again.
 
 ---
 
@@ -500,15 +543,13 @@ the source's id, what the figures are per, and when they were fetched.
 personal data is body, exercise and sleep.
 
 **Your data is never served publicly.** The site is public; no plan, recipe of yours or
-measurement is readable without signing in to the household.
+measurement is readable without signing in to the household. That includes the
+dietician's plans, which are in neither the repository nor the site's code.
 
 ## Not done yet
 
-- **Push reminders on the new Supabase project**: function, VAPID keys, public key row
-  and cron are not set up yet ([steps](docs/DEPLOY.md#7-reminders-optional-push-notifications)).
 - **Recipe photos across households**: the storage policies check "is a member of some
   household", so a member of another household could read a photo if they knew its path.
 - **One household per account**, enforced by a unique constraint.
-- **The dietician plans are public**: they ship in the site's JavaScript bundle and sit
-  in this public repo (`src/data/generated/`). Moving them into Supabase behind the login,
-  and the repo to private, is a decision still pending.
+- **The plans are still in this repository's history.** They are out of the current tree
+  and the site, but older commits hold them until the history is rewritten.

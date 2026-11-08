@@ -75,7 +75,7 @@ function readObjects(buf: Buffer): { objects: Objects; pages: string[] } {
      * object, so the stream's own dictionary says only its two lengths. Read
      * as page content, six hundred kilobytes of glyph outlines produced a run
      * of bytes that the line joiner then stuck onto the end of the last meal
-     * of the document: "Vacsora: [removed plan text]"
+     * of the document: "Vacsora: vegyes saláta + 60 g túró + 1 tk. olívaolaj"
      * and then a paragraph of rubbish.
      */
     if (dict.includes('FontFile') || dict.includes('/Length1')) continue

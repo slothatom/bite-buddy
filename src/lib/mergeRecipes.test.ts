@@ -6,6 +6,7 @@ import {
 import { buildContext } from './nutrition'
 import { groupVariants } from './recipeGroups'
 import { ALL_RECIPES, FOODS, RECIPE_ALIASES } from '../data'
+import { pick } from '../test/archive'
 
 const ctx = buildContext(FOODS, ALL_RECIPES)
 
@@ -14,18 +15,19 @@ describe('which repeats are safe to merge without asking', () => {
     // "supă de fasole verde" and "ciorbă de fasole verde" are one dinner
     // written two ways. The importer folds them together on the way in, so the
     // library ships one of them and the other resolves to it.
+    // (The made-up archive has an omelette written in both languages instead.)
     const soup = ALL_RECIPES.filter((r) =>
-      r.name.en === 'Green bean soup with wholemeal bread & yogurt')
+      r.name.en === pick('Green bean soup with wholemeal bread & yogurt', 'Spinach omelette with wholemeal bread'))
     expect(soup).toHaveLength(1)
     const folded = Object.entries(RECIPE_ALIASES).filter(([, to]) => to === soup[0].id)
-    expect(folded.length).toBeGreaterThan(1)
+    expect(folded.length).toBeGreaterThan(pick(1, 0))
   })
 
   it('leaves alone a dish written at genuinely different portions', () => {
     // 250 g and 300 g of vegetables are a real choice, not a duplicate, so
     // these stay two recipes and neither offers to swallow the other.
     const pan = groupVariants(ALL_RECIPES)
-      .find((g) => g.name === 'Spicy chicken & vegetable pan')!
+      .find((g) => g.name === pick('Spicy chicken & vegetable pan', 'Rolled oats with yogurt & mixed berries'))!
     expect(pan.variants.length).toBeGreaterThan(1)
     expect(interchangeableGroups([pan], ctx)).toHaveLength(0)
   })

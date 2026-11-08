@@ -5,6 +5,7 @@ import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import { planMerge, planUnmerge, foldedInto } from '../lib/mergeRecipes'
 import type { Recipe } from '../types'
 import { ALL_RECIPES } from '../data'
+import { useArchiveVersion } from './useArchive'
 
 interface RecipeStore {
   /** Recipes the user created or edited; the imported library stays in code. */
@@ -35,7 +36,7 @@ interface RecipeStore {
   restoreRecipe: (id: string) => void
 }
 
-/** True for the 228 recipes that ship with the app, as opposed to your own. */
+/** True for the recipes the app provides (the dishes and the plan archive), as opposed to your own. */
 export function isBuiltIn(id: string): boolean {
   return ALL_RECIPES.some((r) => r.id === id)
 }
@@ -160,10 +161,13 @@ export function useRecipes(): Recipe[] {
   const custom = useRecipeStore((s) => s.custom)
   const hidden = useRecipeStore((s) => s.hidden)
   const mergedInto = useRecipeStore((s) => s.mergedInto)
+  // The library underneath is the plan archive's, which can change under you.
+  const archive = useArchiveVersion()
 
   // Deleted and merged-away recipes both leave the library and both keep
   // resolving, see useResolvableRecipes.
-  return useMemo(() => visibleRecipes({ custom, hidden, mergedInto }), [custom, hidden, mergedInto])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => visibleRecipes({ custom, hidden, mergedInto }), [custom, hidden, mergedInto, archive])
 }
 
 /**
@@ -176,7 +180,9 @@ export function useRecipes(): Recipe[] {
  */
 export function useResolvableRecipes(): Recipe[] {
   const custom = useRecipeStore((s) => s.custom)
-  return useMemo(() => libraryWith(custom), [custom])
+  const archive = useArchiveVersion()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => libraryWith(custom), [custom, archive])
 }
 
 /** The ids of recipes you deleted, for marking them where they still appear. */
@@ -189,10 +195,12 @@ export function useDeletedIds(): Set<string> {
 export function useDeletedRecipes(): Recipe[] {
   const custom = useRecipeStore((s) => s.custom)
   const hidden = useRecipeStore((s) => s.hidden)
+  const archive = useArchiveVersion()
   return useMemo(() => {
     const hiddenSet = new Set(hidden)
     return libraryWith(custom).filter((r) => hiddenSet.has(r.id))
-  }, [custom, hidden])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [custom, hidden, archive])
 }
 
 /** What was folded into this recipe, for showing an undo next to it. */

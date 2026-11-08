@@ -5,10 +5,12 @@ import { PlanArchive } from 'bite-buddy'
  * The archive as Settings shows it: every week she wrote, newest first, nothing
  * open.
  *
- * It takes no props at all, it reads the plans out of the app's own data, so
- * every card here is a real week the dietician wrote. The average beside each
- * one is this app's reading of her lines rather than a figure she gave, which
- * is why it sits in the quiet second line and not next to the label.
+ * It takes no props at all, it reads the household's plan archive. Here that
+ * is the made-up archive the tests use (see .design-sync/entry.tsx), in the
+ * shape of hers: the real one is private and never leaves the household. The
+ * average beside each week is this app's reading of the lines rather than a
+ * figure the dietician gave, which is why it sits in the quiet second line and
+ * not next to the label.
  */
 export function TheArchive() {
   return (

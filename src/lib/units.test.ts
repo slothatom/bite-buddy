@@ -114,11 +114,12 @@ describe('normaliseTerm', () => {
 
 describe('a joining word between two foods', () => {
   it('separates two things that each carry a weight', () => {
-    // The line that cost a lunch 1200 calories. "150 g tofu with a teaspoon of
-    // olive oil" was one fragment carrying one weight, and the resolver gave
-    // that weight to the oil, because its name is longer than "tofu".
-    expect(splitComponents('150 g tofu cu o lingurita de ulei de masline'))
-      .toEqual(['150 g tofu', 'o lingurita de ulei de masline'])
+    // The shape of line that cost a lunch 1200 calories. "130 g tofu with a
+    // teaspoon of olive oil" was one fragment carrying one weight, and the
+    // resolver gave that weight to the oil, because its name is longer than
+    // "tofu".
+    expect(splitComponents('130 g tofu cu o lingurita de ulei de masline'))
+      .toEqual(['130 g tofu', 'o lingurita de ulei de masline'])
   })
 
   it('leaves a dish name alone, however many joining words it has', () => {
@@ -127,22 +128,22 @@ describe('a joining word between two foods', () => {
     // The colon does separate, deliberately: a name on the left and what it is
     // made of on the right. What this asserts is that the joining word inside
     // the name survives it, which is the thing the splitter used to get wrong.
-    expect(splitComponents('terci de ovaz cu mere: 100 ml lapte'))
-      .toEqual(['terci de ovaz cu mere', '100 ml lapte'])
+    expect(splitComponents('terci de ovaz cu mere: 120 ml lapte'))
+      .toEqual(['terci de ovaz cu mere', '120 ml lapte'])
   })
 
   it('does not let a later ingredient vouch for an earlier dish name', () => {
-    // "[removed plan text]". Testing the whole rest of
+    // A cake with a two-part name, then a yogurt. Testing the whole rest of
     // the line for a weight let the yogurt justify splitting the cake's name,
     // and the cake was lost entirely.
-    expect(splitComponents('[removed plan text]'))
-      .toEqual(['150 g chec cu branza si afine', '150 g iaurt'])
+    expect(splitComponents('120 g chec cu branza si afine, 170 g iaurt'))
+      .toEqual(['120 g chec cu branza si afine', '170 g iaurt'])
   })
 
   it('does not count an amount that belongs to a parenthetical', () => {
     // The teaspoon is the spread's, not the peppers'.
-    expect(splitComponents('150 g pasta de vinete cu ardei copti ( o lingurita de ulei)'))
-      .toEqual(['150 g pasta de vinete cu ardei copti ( o lingurita de ulei)'])
+    expect(splitComponents('120 g pasta de vinete cu ardei copti ( o lingurita de ulei)'))
+      .toEqual(['120 g pasta de vinete cu ardei copti ( o lingurita de ulei)'])
   })
 
   it('never matches inside a longer word', () => {

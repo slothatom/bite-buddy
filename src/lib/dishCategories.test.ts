@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import type { DishCategory, QuickFilter, RecipeTag } from '../types'
+import type { DishCategory, QuickFilter, Recipe, RecipeTag } from '../types'
 import {
   DISH_CATEGORIES, CATEGORY_LABELS, CATEGORY_MEAL_TIMES,
   QUICK_FILTERS, QUICK_FILTER_DEFINITIONS, HAND_APPLIED_FILTERS,
@@ -8,6 +8,7 @@ import {
 import { categorise, deriveQuickFilters, headOfName } from './classify'
 import { buildContext } from './nutrition'
 import { ALL_RECIPES, FOODS } from '../data'
+import { pick } from '../test/archive'
 
 const ctx = buildContext(FOODS, ALL_RECIPES)
 
@@ -121,8 +122,20 @@ describe('reading a category off a recipe', () => {
     // The category the brief was missing. It means "the grain is the dish" -
     // "Bulgur with chicken breast" is one; "Zucchini patties with bulgur" is
     // not, and stays a vegetable dish.
-    expect(categorise(find('Bulgur with chicken breast & avocado'), ctx)).toBe('grain')
-    expect(categorise(find('Zucchini patties with bulgur & raw vegetable salad'), ctx)).toBe('vegetable')
+    expect(categorise(find(pick('Bulgur with chicken breast & avocado', 'Bulgur with chicken breast & raw vegetable salad')), ctx))
+      .toBe('grain')
+    // Written out rather than looked up, so it holds whichever archive is loaded.
+    const patties: Recipe = {
+      ...find('Zucchini patties'),
+      id: 'patties-with-bulgur',
+      name: { en: 'Zucchini patties with bulgur & raw vegetable salad' },
+      components: [
+        { kind: 'recipe', recipeId: 'dish-zucchini-patties', servings: 1 },
+        { kind: 'food', foodId: 'bulgur', grams: 40 },
+        { kind: 'food', foodId: 'salad-raw', grams: 200 },
+      ],
+    }
+    expect(categorise(patties, ctx)).toBe('vegetable')
   })
 
   it('keeps mămăligă apart from a bowl of oats', () => {

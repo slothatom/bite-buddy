@@ -75,7 +75,7 @@ export function AlreadyHadIt() {
 /**
  * A snack, which opens on foods rather than recipes.
  *
- * The plans write snacks as lines ("[removed plan text]") rather than as
+ * The plans write snacks as lines ("200 g pere, 15 g migdale") rather than as
  * dishes, so the recipe tab for a snack was reliably empty. The two ways out of
  * a library that does not have it sit above the list instead of under forty
  * foods, and each row carries its named portions so a slice does not have to be

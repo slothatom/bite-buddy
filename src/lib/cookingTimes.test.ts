@@ -3,7 +3,8 @@ import { CATEGORY_TIMES, MEASURED, deriveTimes } from './cookingTimes'
 import { buildContext } from './nutrition'
 import { categorise } from './classify'
 import { ALL_RECIPES, DISHES, MEAL_RECIPES, FOODS } from '../data'
-import { RECIPE_CLASSIFICATION } from '../data/generated/classification'
+import { RECIPE_CLASSIFICATION } from '../data'
+import { REAL_ARCHIVE, pick } from '../test/archive'
 import { DISH_CATEGORIES } from './dishCategories'
 import type { DishCategory } from '../types'
 
@@ -103,7 +104,8 @@ describe('the library it produces', () => {
     expect(MEAL_RECIPES.every((r) => r.prepMinutes > 0)).toBe(true)
   })
 
-  it('gives the same bowl the same time, whichever way it was named', () => {
+  // Needs a particular pair from the real plans: the same bowl, named twice.
+  it.skipIf(!REAL_ARCHIVE)('gives the same bowl the same time, whichever way it was named', () => {
     // These two have identical ingredients and differ only in which of them
     // the generated name leads with. That sent one to Porridge and the other
     // to Yogurt, and charged the first eight minutes on a hob it never sees.
@@ -120,7 +122,7 @@ describe('the library it produces', () => {
   })
 
   it('still simmers the porridge that is actually porridge', () => {
-    const r = ALL_RECIPES.find((x) => x.name.en === 'Oat porridge with kefir')!
+    const r = ALL_RECIPES.find((x) => x.name.en === pick('Oat porridge with kefir', 'Oat porridge with pear'))!
     expect(r.cookMinutes).toBeGreaterThan(0)
   })
 
@@ -131,6 +133,6 @@ describe('the library it produces', () => {
     }
 
     expect(time('Rolled oats with yogurt & mixed berries'))
-      .toBeLessThan(time('Cabbage soup with wholemeal bread & yogurt'))
+      .toBeLessThan(time(pick('Cabbage soup with wholemeal bread & yogurt', 'Cabbage soup with wholemeal bread')))
   })
 })

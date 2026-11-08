@@ -5,6 +5,7 @@ import { useFoods, useFoodStore, useResolvableFoods } from './useFoodStore'
 import { useResolvableRecipes, useRecipeStore } from './useRecipeStore'
 import { useAllPortions } from './usePortionStore'
 import { RECIPE_ALIASES } from '../data'
+import { useArchiveVersion } from './useArchive'
 
 /**
  * The lookup tables every nutrition calculation needs.
@@ -33,9 +34,13 @@ export function useNutritionContext(): NutritionContext {
   // The library does its own merging: fourteen documents describe the same
   // meal in a dozen ways, and the importer keeps one of each. A day planned
   // against one of the others, before or after that merge, still resolves.
+  // RECIPE_ALIASES is a live binding into the plan archive, so the version
+  // stands in for it here.
+  const archive = useArchiveVersion()
   const mergedInto = useMemo(
     () => ({ ...RECIPE_ALIASES, ...yourMerges }),
-    [yourMerges],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [yourMerges, archive],
   )
 
   return useMemo(

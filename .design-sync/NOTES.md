@@ -91,8 +91,12 @@ should read these before writing a single preview.
   `FillGaps` drops earlier dates, and `AddEntryModal` only reads as a record
   when its date is on or before that day. Those three carry May 2024 fixtures;
   everything else uses the app's own September 2026.
-- **`ALL_RECIPES` and `FOODS` ship in code**, so an empty store still returns
-  the whole library and `FillGaps` proposes real dishes with no fixture at all.
+- **`FOODS` and the hand-written dishes ship in code**, so an empty store still
+  returns a library and `FillGaps` proposes real dishes with no fixture at all.
+  The dietician's plans and the meals made from them do not: they are private
+  and arrive at runtime from the household's archive, so a preview that needs
+  them has to put a made-up archive in place itself (`setArchive`, with
+  `src/test/fixtures/archive.json`).
 
 ## Known render warns, all triaged
 

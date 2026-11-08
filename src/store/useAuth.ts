@@ -10,8 +10,10 @@ import { create } from 'zustand'
 import type { Session, User } from '@supabase/supabase-js'
 import { isConfigured, redirectUrl, supabase } from '../lib/supabase'
 import { connectHousehold, useHousehold } from './useHousehold'
+import { connectArchive, useArchive } from './useArchive'
 
 connectHousehold(supabase, isConfigured)
+connectArchive(supabase, isConfigured)
 
 export interface Member {
   id: string
@@ -64,8 +66,10 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     await supabase.auth.signOut()
     set({ session: null, user: null, members: [], linkSentTo: null })
     // Other people's names and roles: not something to leave on a device
-    // nobody is signed in to.
+    // nobody is signed in to. Nor the dietician's plans, which are the most
+    // private thing the app holds.
     useHousehold.getState().clear()
+    await useArchive.getState().clear()
   },
 
   setDisplayName: async (name) => {
@@ -142,6 +146,9 @@ if (supabase) {
     // being stored goes out without a token, which the database sees as nobody
     // at all.
     if (session?.user) setTimeout(() => void recordPresence(session.user), 0)
+    // Signed out, here or anywhere else (another tab, an expired session):
+    // the plans kept on this device go with the session.
+    else void useArchive.getState().clear()
   }
   void supabase.auth.getSession().then(({ data }) => apply(data.session))
   supabase.auth.onAuthStateChange((_event, session) => apply(session))

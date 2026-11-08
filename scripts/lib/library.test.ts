@@ -6,12 +6,14 @@ import { buildContext, componentsNutrients } from '../../src/lib/nutrition.js'
 import type { MealSlot } from '../../src/types/index.js'
 
 /**
- * The import rules, on lines taken from the real plans.
+ * The import rules, on lines in the shape the real plans are written in.
  *
- * Every case here was found in the shipped data rather than imagined: a
+ * Every case here was found in the real data rather than imagined: a
  * bruschetta that listed its own ingredients and so was made twice over, a
  * bowl of soup whose "g" had been lost in the typing, and five weeks of meals
- * that were the same meal spelt differently.
+ * that were the same meal spelt differently. The plans themselves are private
+ * and not in this repository, so each line below is made up, with the same
+ * shape and the same fault as the one that was found.
  */
 
 let n = 0
@@ -32,6 +34,9 @@ function plan(...lines: [MealSlot, string][]): PlanInput {
   }
 }
 
+const SPICY_PAN = 'tigaie picanta: 100 g piept de pui, 320 g legume , o lingurita de ulei'
+const CABBAGE_SOUP = '320 g ciorba de varza ( o lingurita de ulei / portie), 30 g paine int, 1 rosie'
+
 const names = (plans: PlanInput[]) => buildLibrary(plans).recipes.map((r) => r.name.en)
 /** Name and portion as the library holds them: two fields, not one string. */
 const titles = (plans: PlanInput[]) =>
@@ -40,11 +45,12 @@ const titles = (plans: PlanInput[]) =>
 describe('a dish that lists its own ingredients', () => {
   it('does not serve them twice', () => {
     const { plans } = buildLibrary([plan(['dinner',
-      '[removed plan text]',
+      'bruschete cu telemea: 50 g telemea, 50 g paine int, rosii, busuioc',
     ])])
 
     // Read literally this line is a bruschetta plus a second helping of
-    // everything on it, which is where 189 kcal of food nobody ate came from.
+    // everything on it, which is where a couple of hundred kcal of food nobody
+    // ate came from.
     // Once the helpings are counted once, the line is simply the dish.
     expect(plans[0].days[0].meals[0].entries).toEqual([
       { kind: 'recipe', recipeId: 'dish-bruschetta', servings: 1 },
@@ -52,14 +58,12 @@ describe('a dish that lists its own ingredients', () => {
   })
 
   it('keeps the difference when more is asked for than the dish assumes', () => {
-    // The spicy pan is defined with 250 g of vegetables. She wrote 300, so the
-    // extra 50 is real and stays; her teaspoon of oil is already in the dish.
-    const { recipes } = buildLibrary([plan(['lunch',
-      'tigaie picanta: 120 g piept de pui, 300 g legume , o lingurita de ulei',
-    ])])
+    // The spicy pan is defined with 250 g of vegetables. This says 320, so the
+    // extra 70 is real and stays; the teaspoon of oil is already in the dish.
+    const { recipes } = buildLibrary([plan(['lunch', SPICY_PAN])])
 
     expect(recipes[0].components).toContainEqual(
-      { kind: 'food', foodId: 'vegetables-mixed', grams: 50 })
+      { kind: 'food', foodId: 'vegetables-mixed', grams: 70 })
     expect(recipes[0].components.filter((c) => c.kind === 'food' && c.foodId === 'olive-oil'))
       .toHaveLength(0)
   })
@@ -67,19 +71,19 @@ describe('a dish that lists its own ingredients', () => {
   it('leaves a genuine extra alone', () => {
     // Chocolate is not in the porridge, so it is not a duplicate of anything.
     const { recipes } = buildLibrary([plan(['breakfast',
-      'terci de ovaz ( 100 ml apa, 100 ml lapte, 40 g fulgi de ovaz, scortisoara) + 15 g ciocolata neagra',
+      'terci de ovaz ( 120 ml apa, 80 ml lapte, 35 g fulgi de ovaz) + 20 g ciocolata neagra',
     ])])
 
     expect(recipes[0].components).toContainEqual(
-      { kind: 'food', foodId: 'dark-chocolate', grams: 15 })
+      { kind: 'food', foodId: 'dark-chocolate', grams: 20 })
   })
 })
 
 describe('a weight that lost its unit', () => {
   it('still portions a soup by weight', () => {
-    // "300 gombakremleves" is 300 g of mushroom soup. Without this it imported
+    // "250 gombakremleves" is 250 g of mushroom soup. Without this it imported
     // as the whole two-serving pot, at more than twice the calories.
-    const { recipes } = buildLibrary([plan(['dinner', '[removed plan text]'])])
+    const { recipes } = buildLibrary([plan(['dinner', '250 gombakremleves (1 tk. olivaolaj)'])])
     const component = recipes[0].components[0]
 
     expect(component).toMatchObject({ kind: 'recipe', recipeId: 'dish-soup-mushroom-cream' })
@@ -89,7 +93,7 @@ describe('a weight that lost its unit', () => {
   it('does not read a count as grams', () => {
     // "2 oua" is two eggs, not two grams of anything.
     const { recipes } = buildLibrary([plan(['breakfast',
-      '50 g paine int, omleta ( din 2 oua) + jumatate de farfurie de legume',
+      '40 g paine int, omleta ( din 2 oua) + 150 g rosii',
     ])])
     const omelette = recipes[0].components.find((c) => c.kind === 'recipe')
 
@@ -100,8 +104,8 @@ describe('a weight that lost its unit', () => {
 describe('the same meal, written twice', () => {
   it('becomes one recipe, with the other resolving to it', () => {
     const { recipes, aliases } = buildLibrary([
-      plan(['lunch', '125 g somon, 250 g legume la cuptor , 50 g sos de usrutoi']),
-      plan(['lunch', '125 g somon, 250 g legume la cuptor , 50 g sos de usturoi']),
+      plan(['lunch', '140 g somon, 200 g legume la cuptor , 40 g sos de usrutoi']),
+      plan(['lunch', '140 g somon, 200 g legume la cuptor , 40 g sos de usturoi']),
     ])
 
     expect(recipes).toHaveLength(1)
@@ -110,8 +114,8 @@ describe('the same meal, written twice', () => {
 
   it('sends the plan days to the one that survived', () => {
     const { plans, recipes } = buildLibrary([
-      plan(['lunch', '125 g somon, 250 g legume la cuptor , 50 g sos de usrutoi']),
-      plan(['lunch', '125 g somon, 250 g legume la cuptor , 50 g sos de usturoi']),
+      plan(['lunch', '140 g somon, 200 g legume la cuptor , 40 g sos de usrutoi']),
+      plan(['lunch', '140 g somon, 200 g legume la cuptor , 40 g sos de usturoi']),
     ])
 
     for (const p of plans) {
@@ -125,28 +129,28 @@ describe('the same meal, written twice', () => {
     // The recipe is shared; the line is not. The archive shows the day's own
     // wording, so nothing is lost by folding the recipes together.
     const { plans } = buildLibrary([
-      plan(['lunch', '125 g somon, 250 g legume la cuptor , 50 g sos de usrutoi']),
-      plan(['lunch', '125 g somon, 250 g legume la cuptor , 50 g sos de usturoi']),
+      plan(['lunch', '140 g somon, 200 g legume la cuptor , 40 g sos de usrutoi']),
+      plan(['lunch', '140 g somon, 200 g legume la cuptor , 40 g sos de usturoi']),
     ])
 
     // The stray space before the comma goes, and both spellings stay,
     // including the typed-in-a-hurry one. Whitespace is not wording.
     expect(plans.map((p) => p.days[0].meals[0].text)).toEqual([
-      '[removed plan text]',
-      '[removed plan text]',
+      '140 g somon, 200 g legume la cuptor, 40 g sos de usrutoi',
+      '140 g somon, 200 g legume la cuptor, 40 g sos de usturoi',
     ])
   })
 
   it('tidies the typing without touching a word, a number or a unit', () => {
-    // Fourteen .docx files typed by a person over fourteen weeks carry what
+    // Documents typed by a person over months of weeks carry what
     // that always carries. The app shows these verbatim under "How your
     // dietician wrote it", so they are read, and they read as broken.
     const { plans } = buildLibrary([
-      plan(['lunch', ': 300 g ciorba de legume ( o lingurita de ulei ),  25 g paine int ']),
+      plan(['lunch', ': 320 g ciorba de fasole verde ( o lingurita de ulei ),  30 g paine int ']),
     ])
 
     expect(plans[0].days[0].meals[0].text)
-      .toBe('300 g ciorba de legume (o lingurita de ulei), 25 g paine int')
+      .toBe('320 g ciorba de fasole verde (o lingurita de ulei), 30 g paine int')
   })
 
   it('is the dish itself when that is all it is', () => {
@@ -162,8 +166,8 @@ describe('the same meal, written twice', () => {
 describe('two recipes that need telling apart', () => {
   it('never settles for a bare number, and leaves no two the same', () => {
     const built = titles([
-      plan(['breakfast', '150 g iaurt , 30 g fulgi de ovaz, 100 g fructe de padure']),
-      plan(['breakfast', '150 g iaurt , 45 g fulgi de ovaz, 100 g fructe de padure']),
+      plan(['breakfast', '170 g iaurt , 30 g fulgi de ovaz, 90 g fructe de padure']),
+      plan(['breakfast', '170 g iaurt , 45 g fulgi de ovaz, 90 g fructe de padure']),
     ])
 
     expect(built.some(([, portion]) => /^\d+$/.test(portion ?? ''))).toBe(false)
@@ -172,8 +176,8 @@ describe('two recipes that need telling apart', () => {
 
   it('says the weight that differs beside the name, not inside it', () => {
     const built = titles([
-      plan(['breakfast', '150 g iaurt , 30 g fulgi de ovaz, 100 g fructe de padure']),
-      plan(['breakfast', '150 g iaurt , 45 g fulgi de ovaz, 100 g fructe de padure']),
+      plan(['breakfast', '170 g iaurt , 30 g fulgi de ovaz, 90 g fructe de padure']),
+      plan(['breakfast', '170 g iaurt , 45 g fulgi de ovaz, 90 g fructe de padure']),
     ])
 
     expect(built).toContainEqual(['Rolled oats with yogurt & mixed berries', '30 g rolled oats'])
@@ -182,18 +186,18 @@ describe('two recipes that need telling apart', () => {
 
   it('leaves the quantity out of every name it writes', () => {
     // The whole point of holding the portion in its own field. A weight in the
-    // name made "Grapefruit with cashews (10 g cashews, 250 g grapefruit)" a
+    // name made "Grapefruit with cashews (15 g cashews, 200 g grapefruit)" a
     // headline three lines deep on a phone, and left every screen that wanted
     // the dish stripping the bracket back off with a regular expression.
-    for (const [name] of titles(REAL_WEEK)) {
+    for (const [name] of titles(A_WEEK)) {
       expect(name).not.toMatch(/\(/)
     }
   })
 
   it('folds an ingredient one of them has into its name', () => {
     const built = names([
-      plan(['dinner', '[removed plan text]']),
-      plan(['dinner', '[removed plan text]']),
+      plan(['dinner', 'salata de cruditati, 60 g feta, 20 g orez expandat']),
+      plan(['dinner', 'salata de cruditati, 60 g feta, o lingurita de ulei de masline, 20 g orez expandat']),
     ])
 
     expect(built).toContain('Feta with puffed rice cakes & raw vegetable salad')
@@ -203,31 +207,31 @@ describe('two recipes that need telling apart', () => {
   it('does not let a meal shadow the dish it is named after', () => {
     // Same name as the hand-written dish, which is right: it is that soup.
     // What stops them being the same card is the portion beside it.
-    const built = titles([plan(['dinner', '[removed plan text]'])])
+    const built = titles([plan(['dinner', '250 gombakremleves (1 tk. olivaolaj)'])])
 
-    expect(built).toEqual([['Cream of mushroom soup', '300 g']])
+    expect(built).toEqual([['Cream of mushroom soup', '250 g']])
     expect(DISHES.map((d) => d.name.en)).toContain('Cream of mushroom soup')
   })
 
   it('would rather name an ingredient than a pinch of seasoning', () => {
     const built = titles([
-      plan(['lunch', 'mini pizza de vinete: ½ vinete , o lingurita de ulei, rosii, 65 g mozzarella in apa , busuioc + 50 g bulgur nefiert']),
-      plan(['lunch', 'mini pizza de vinete: ½ vinete , o lingurita de ulei, rosii, 60 g mozzarella in apa + 40 g bulgur nefiert']),
+      plan(['lunch', 'mini pizza de vinete: ½ vinete , o lingurita de ulei, rosii, 70 g mozzarella in apa , busuioc + 55 g bulgur nefiert']),
+      plan(['lunch', 'mini pizza de vinete: ½ vinete , o lingurita de ulei, rosii, 65 g mozzarella in apa + 35 g bulgur nefiert']),
     ])
 
     // One of these has a few leaves of basil and the other does not, but they
-    // also carry 50 g and 40 g of bulgur, which is the difference worth saying.
+    // also carry 55 g and 35 g of bulgur, which is the difference worth saying.
     expect(built.some(([name, portion]) => /basil/i.test(`${name} ${portion ?? ''}`))).toBe(false)
-    expect(built).toContainEqual(['Eggplant mini pizzas with bulgur & tomatoes', '50 g bulgur'])
-    expect(built).toContainEqual(['Eggplant mini pizzas with bulgur & tomatoes', '40 g bulgur'])
+    expect(built).toContainEqual(['Eggplant mini pizzas with bulgur & tomatoes', '55 g bulgur'])
+    expect(built).toContainEqual(['Eggplant mini pizzas with bulgur & tomatoes', '35 g bulgur'])
   })
 })
 
-describe('the whole archive', () => {
+describe('a whole day', () => {
   it("costs a day what the dietician's own numbers cost", () => {
     // A day of these plans is a little over a thousand calories by design. The
     // double counting had pushed the average up by about a tenth.
-    const { plans, recipes, aliases } = buildLibrary(REAL_WEEK)
+    const { plans, recipes, aliases } = buildLibrary(A_WEEK)
     const ctx = buildContext(FOODS, [...DISHES, ...recipes], aliases)
     const day = plans[0].days[0].meals
       .reduce((sum, m) => sum + componentsNutrients(m.entries, ctx).calories, 0)
@@ -237,19 +241,20 @@ describe('the whole archive', () => {
   })
 })
 
-const REAL_WEEK: PlanInput[] = [plan(
-  ['breakfast', '50 g paine int, pasta de branza ( 100 g branza de vaci, 2 lg de iaurt, ceapa), legume'],
-  ['snack', '200 g capsuni'],
-  ['lunch', 'tigaie picanta: 120 g piept de pui, 300 g legume , o lingurita de ulei'],
-  ['snack', '150 g grapefruit'],
-  ['dinner', '350 g ciorba de varza ( o lingurita de ulei / portie), o lg de iaurt , 25 g paine int'],
+/** A made-up day, written the way hers are. */
+const A_WEEK: PlanInput[] = [plan(
+  ['breakfast', '40 g paine int, pasta de branza ( 90 g branza de vaci, 1 lg de iaurt, ceapa), castraveti'],
+  ['snack', '180 g capsuni'],
+  ['lunch', 'tigaie picanta: 100 g piept de pui, 320 g legume , o lingurita de ulei'],
+  ['snack', '200 g grapefruit'],
+  ['dinner', CABBAGE_SOUP],
 )]
 
 describe('a seasoning is worth naming when nothing else differs', () => {
   it('says which porridge has the vanilla in it', () => {
     const built = names([
-      plan(['breakfast', '[removed plan text]']),
-      plan(['breakfast', '[removed plan text]']),
+      plan(['breakfast', 'terci de ovaz cu mere: 120 ml lapte, 80 ml apa, 120 g mere, 35 g fulgi de ovaz, scortisoara']),
+      plan(['breakfast', 'terci de ovaz cu mar razuit: 100 ml lapte, 100 ml apa, 90 g mar razuit, scortisoara, esenta de vanilie']),
     ])
 
     // The first of these is a plain porridge with apples added to it and keeps
@@ -266,19 +271,17 @@ describe('a seasoning is worth naming when nothing else differs', () => {
 
 describe('what a meal takes, and how often it was made', () => {
   it('gives every imported meal a time', () => {
-    // The plans are portions, not methods: not one of the 481 lines says how
+    // The plans are portions, not methods: not one of their lines says how
     // long anything takes, so all 157 recipes used to arrive at zero and
     // "Quick tonight" could only ever see the hand-written dishes.
-    const { recipes } = buildLibrary(REAL_WEEK)
+    const { recipes } = buildLibrary(A_WEEK)
 
     expect(recipes.length).toBeGreaterThan(0)
     expect(recipes.every((r) => r.prepMinutes > 0)).toBe(true)
   })
 
   it('takes its cooking from the dish it contains, not from the estimate', () => {
-    const { recipes } = buildLibrary([plan(['dinner',
-      '350 g ciorba de varza ( o lingurita de ulei / portie), o lg de iaurt , 25 g paine int',
-    ])])
+    const { recipes } = buildLibrary([plan(['dinner', CABBAGE_SOUP])])
     const soup = DISHES.find((d) => d.id === 'dish-ciorba-cabbage')!
 
     expect(recipes[0].cookMinutes).toBe(soup.cookMinutes)
@@ -286,8 +289,8 @@ describe('what a meal takes, and how often it was made', () => {
 
   it('counts the dish inside a meal every time the meal is eaten', () => {
     const { timesPlanned } = buildLibrary([plan(
-      ['dinner', '350 g ciorba de varza ( o lingurita de ulei / portie), o lg de iaurt , 25 g paine int'],
-      ['lunch', '350 g ciorba de varza , 50 g paine int'],
+      ['dinner', CABBAGE_SOUP],
+      ['lunch', '320 g ciorba de varza , 40 g paine int'],
     )])
 
     // Two different meals, one pot of soup, which is exactly the thing worth

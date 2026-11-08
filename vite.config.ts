@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -28,6 +30,31 @@ function artworkLinks(): Plugin {
   }
 }
 
+/**
+ * The made-up plan archive the end-to-end build carries, and nothing else does.
+ *
+ * The real archive is private and lives in Supabase; a test build has no
+ * database to read it from. src/main.tsx imports this module only when the
+ * build is run with VITE_E2E_ARCHIVE set, so in a production build the import
+ * is dead code and nothing below is ever asked for. `E2E_ARCHIVE_PATH` points
+ * it at another file, for a local run against the real archive.
+ */
+function e2eArchive(): Plugin {
+  const id = 'virtual:e2e-archive'
+  return {
+    name: 'bite-buddy-e2e-archive',
+    resolveId: (source) => (source === id ? `\0${id}` : undefined),
+    load(loaded) {
+      if (loaded !== `\0${id}`) return undefined
+      if (!process.env.VITE_E2E_ARCHIVE) {
+        this.error('The test archive was asked for in a build without VITE_E2E_ARCHIVE.')
+      }
+      const path = process.env.E2E_ARCHIVE_PATH ?? resolve(import.meta.dirname, 'src/test/fixtures/archive.json')
+      return `export default ${readFileSync(path, 'utf8')}`
+    },
+  }
+}
+
 export default defineConfig({
   // Relative, so the built app runs from wherever it is put (a local server,
   // a folder on a phone, a USB stick) without being told its own address.
@@ -42,6 +69,7 @@ export default defineConfig({
   plugins: [
     react(),
     artworkLinks(),
+    e2eArchive(),
     VitePWA({
       // Hand written rather than generated, because a push arrives at the
       // worker and a generated file has nowhere to put the handler. The

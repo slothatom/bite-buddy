@@ -35,10 +35,10 @@ export function buildFoodIndex(foods: Food[]): FoodIndex {
  * the plans' habit of appending preparation to the ingredient
  * ("halloumi la gratar", "cartofi dulci cantariti cruzi").
  *
- * Preferring the alias nearest the front was tried, to stop "150 g tofu cu o
+ * Preferring the alias nearest the front was tried, to stop "130 g tofu cu o
  * lingurita de ulei de masline" binding its weight to the oil. It fixed thirty
- * lines and broke ten others: "salata cezar : 120 g piept de curcan" then gave
- * its 120 g to the salad. Position is not a better guess than length, only a
+ * lines and broke ten others: "salata cezar : 110 g piept de curcan" then gave
+ * its 110 g to the salad. Position is not a better guess than length, only a
  * different one. The fix belongs where the ambiguity is created, in the
  * splitter, not here where it is already too late.
  */

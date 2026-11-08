@@ -1,4 +1,4 @@
-import { readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { readDocxParagraphs } from './docx.js'
 import { readPdfLines } from './pdf.js'
@@ -97,12 +97,11 @@ function linesOf(path: string): string[] {
 /**
  * Which language a plan is written in, read from the plan.
  *
- * This used to be a guess at the file's name: `_trend` at the end, or the
- * letters "person-a-plan" then any character then a "k". That held while the
- * Hungarian ones were called `person-a-plan`, and stopped the
- * day the rest of the archive arrived as `[removed plan text]`, where the
- * hyphen is one character too many for the pattern. Sixteen of the thirty-six
- * weeks flew a Romanian flag over Hungarian food.
+ * This used to be a guess at the file's name: `_trend` at the end, or a
+ * pattern for one spelling of the client's name. That held until a batch of
+ * files arrived with the name spelt with a hyphen, one character too many for
+ * the pattern, and sixteen of the thirty-six weeks flew a Romanian flag over
+ * Hungarian food.
  *
  * The meal labels say it outright and cannot be renamed by a download: a
  * Hungarian plan writes Reggeli, Uzsi1, Ebéd, Uzsi2 and Vacsi, a Romanian one
@@ -113,12 +112,32 @@ function languageOf(keys: string[]): PlanLanguage {
   return hungarian * 2 > keys.length ? 'hu' : 'ro'
 }
 
-function describeFile(file: string): Omit<RawPlan, 'days' | 'id' | 'file' | 'language'> {
+/**
+ * What the importer is told about the documents beside them.
+ *
+ * One week in the archive was written for somebody else, and only its file
+ * name says so. Matching that name used to be written out here, which put a
+ * real person's name in a public repository. It lives in `plans.json` next to
+ * the documents now (gitignored with them):
+ *
+ *   { "otherPerson": { "match": "a regular expression for their file names", "name": "First name" } }
+ */
+interface SourceConfig {
+  otherPerson?: { match: string; name: string }
+}
+
+function readConfig(sourceDir: string): SourceConfig {
+  const path = join(sourceDir, 'plans.json')
+  return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) as SourceConfig : {}
+}
+
+function describeFile(file: string, config: SourceConfig): Omit<RawPlan, 'days' | 'id' | 'file' | 'language'> {
   const name = basename(file, '.docx').replace(/\.pdf$/i, '')
   // Uploaded files carry an 8-hex prefix; strip it before matching.
   const stem = name.replace(/^[0-9a-f]{8}-/, '')
 
-  const other = /person-b|Oli/i.test(stem)
+  const person = config.otherPerson
+  const other = person ? new RegExp(person.match, 'i').test(stem) : false
 
   const date = stem.match(/(\d{2})\.(\d{2})\.(\d{4})/)
   const issuedOn = date ? `${date[3]}-${date[2]}-${date[1]}` : undefined
@@ -127,17 +146,17 @@ function describeFile(file: string): Omit<RawPlan, 'days' | 'id' | 'file' | 'lan
     ? `Week of ${new Date(issuedOn + 'T12:00:00').toLocaleDateString('en-GB', {
         day: 'numeric', month: 'short', year: 'numeric',
       })}`
-    : other ? 'Oli, week 1' : 'Undated week'
+    : other ? `${person!.name}, week 1` : 'Undated week'
 
   return {
-    label: other ? `${label} (Oli)` : label,
+    label: other ? `${label} (${person!.name})` : label,
     issuedOn,
     subject: other ? 'other' : 'self',
   }
 }
 
-function parseDocument(path: string, id: string): RawPlan {
-  const meta = describeFile(path)
+function parseDocument(path: string, id: string, config: SourceConfig): RawPlan {
+  const meta = describeFile(path, config)
   const days: RawDay[] = []
   const slotKeys: string[] = []
   let current: RawDay | undefined
@@ -197,9 +216,9 @@ function bare(text: string): Omit<RawFragment, 'inner' | 'innerFragments'> {
 /**
  * A meal line, split into the things it names.
  *
- * Exported because the committed archive stores each line verbatim, so the
- * whole library can be rebuilt from `sourcePlans.ts` alone when the .docx
- * originals are not to hand. Both paths must parse a line identically, so
+ * Exported because the archive stores each line verbatim, so the whole
+ * library can be rebuilt from `data/archive.json` alone when the original
+ * documents are not to hand. Both paths must parse a line identically, so
  * there is one function and `parseDocument` uses it too.
  */
 export function fragmentsOf(text: string): RawFragment[] {
@@ -235,5 +254,6 @@ export function loadPlans(sourceDir: string): RawPlan[] {
     .filter((f) => /\.(docx|pdf)$/i.test(f) && !f.startsWith('~$'))
     .sort()
 
-  return files.map((f, i) => parseDocument(join(sourceDir, f), `plan-${String(i + 1).padStart(2, '0')}`))
+  const config = readConfig(sourceDir)
+  return files.map((f, i) => parseDocument(join(sourceDir, f), `plan-${String(i + 1).padStart(2, '0')}`, config))
 }

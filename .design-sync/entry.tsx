@@ -14,6 +14,17 @@
 
 import type React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { setArchive } from '../src/data/archive'
+import { parseArchive } from '../src/data/archiveFormat'
+import sample from '../src/test/fixtures/archive.json'
+
+/*
+ * The dietician's plans are private and no longer in the app's code: a
+ * household's archive arrives at runtime (src/data/archive.ts). The previews
+ * get the made-up archive the tests use instead, so Plan history, the recipe
+ * cards and the planner have weeks and meals to show without any of hers.
+ */
+setArchive(parseArchive(sample))
 
 export {
   MacroBar, CalorieRing, StatusPill, NutrientSummary, TierBadge,
