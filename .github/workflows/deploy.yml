@@ -17,7 +17,46 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # The whole of CI, end-to-end tests included. Before this the deploy ran its
+  # own copy of the fast checks and never waited for the browser tests, so main
+  # could publish with them failing.
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  # The database moves before the site does, so the code being published never
+  # talks to an older schema. Migrations should therefore keep working with the
+  # previous site for the minute between the two (add, then remove later).
+  migrate:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - run: npm ci
+
+      - name: Fail if there is no database to migrate
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::SUPABASE_DB_URL is not set. Add the session pooler connection string"
+            echo "::error::from Supabase (Project Settings, Database) as a repository secret."
+            echo "::error::See docs/DEPLOY.md, Migrations."
+            exit 1
+          fi
+
+      - name: Apply migrations
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: npm run db:migrate
+
   build:
+    needs: migrate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,20 +69,42 @@ jobs:
 
       - run: npm ci
 
-      # The same gates as CI. A broken build should never reach the site.
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run data:check
-      - run: npm run text:check
-      - run: npm run check:contrast
-      - run: npm run function:check
-      - run: npm run db:check
+      # Everything named VITE_* is baked into the public JavaScript. A database
+      # connection string pasted into the wrong secret would publish the
+      # database password to anyone who opens the site, so check the shape of
+      # both before building. The values are never printed.
+      - name: Refuse public secrets that look private
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          ok=1
+          if ! printf '%s' "$VITE_SUPABASE_URL" | grep -Eq '^https://[a-z0-9]+\.supabase\.co/?$'; then
+            echo "::error::VITE_SUPABASE_URL should be the Project URL, like https://abcd.supabase.co."
+            echo "::error::It is something else. If it starts with postgresql://, the database"
+            echo "::error::connection string went into the wrong secret: move it to SUPABASE_DB_URL."
+            ok=0
+          fi
+          if ! printf '%s' "$VITE_SUPABASE_ANON_KEY" | grep -Eq '^(sb_publishable_|eyJ)'; then
+            echo "::error::VITE_SUPABASE_ANON_KEY should be the publishable key (sb_publishable_...)"
+            echo "::error::or the legacy anon key (eyJ...). Never a secret or service_role key."
+            ok=0
+          fi
+          # A legacy key is a JWT, and service_role looks just like anon from the
+          # outside, so read the role from its payload.
+          if printf '%s' "$VITE_SUPABASE_ANON_KEY" | grep -q '^eyJ'; then
+            role=$(node -e 'const p=process.argv[1].split(".")[1]||"";try{console.log(JSON.parse(Buffer.from(p,"base64url")).role||"")}catch{console.log("")}' "$VITE_SUPABASE_ANON_KEY")
+            if [ "$role" != "anon" ]; then
+              echo "::error::VITE_SUPABASE_ANON_KEY is a JWT for role '$role', not anon. Replace it and rotate that key."
+              ok=0
+            fi
+          fi
+          [ "$ok" = 1 ]
 
       - name: Build
         env:
           # Public by design: the anon key grants nothing without a session, and
-          # every table is behind row-level security. See supabase/schema.sql.
+          # every table is behind row-level security. See supabase/migrations/20261108000100_schema/migration.sql.
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npm run build

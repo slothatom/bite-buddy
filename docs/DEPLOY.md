@@ -36,10 +36,13 @@ Pick the region closest to you, it's the round trip on every save.
 
 ## 3. Set up the database
 
-Open **SQL Editor** in the Supabase dashboard, paste in all of
-[`supabase/schema.sql`](../supabase/schema.sql), and run it.
+The schema lives in [`supabase/migrations/`](../supabase/migrations/), one
+folder per change, and the deploy applies whatever the database has not seen
+yet (`npm run db:migrate`, see [Migrations](#migrations) below). Nothing is
+pasted by hand any more, except the guest list.
 
-Before you run it, change the two addresses at the bottom:
+Once the first deploy has run, open **SQL Editor** in the Supabase dashboard
+and put the two of you on the guest list:
 
 ```sql
 insert into public.allowed_emails (email, note) values
@@ -48,34 +51,56 @@ insert into public.allowed_emails (email, note) values
 on conflict (email) do nothing;
 ```
 
-Change them in the SQL editor, not in the repository, this repo is public, and
-an address committed to it is an address published.
+Do this in the SQL editor, not in the repository: this repo is public, and an
+address committed to it is an address published.
 
-**Run the whole file, not just that block.** The insert needs the tables, and
-the tables are created by everything above it. Running the last few lines on
-their own gives `relation "public.allowed_emails" does not exist`.
+That list is the whole security model for who gets in, and it is checked in
+two places. A database trigger rejects a signup from anyone not on it, when
+the project lets that trigger be created (newer projects may not; the file
+carries on with a notice). And every read and write checks it again:
+`is_member()` requires the account's email to be on the list, so an account
+that got past signup still sees nothing, and removing an email from the list
+revokes access straight away.
 
-That list is the whole security model for who gets in. Anyone not on it cannot
-create an account, even knowing the URL and the key, a database trigger
-rejects the signup itself.
+**Also turn off open signups:** Authentication → Sign In / Providers → untick
+"Allow new users to sign up", then invite the two of you from Authentication →
+Users. With that off, nobody else can create an account at all.
 
-> **If the editor shows a red error, read which statement it was.** Some of this
-> file touches `auth.users`, which belongs to Supabase rather than to you, and
-> newer projects refuse to let anything else put a trigger on it. Those parts are
-> wrapped so the rest of the file still runs, but if you see an error and are not
-> sure how much applied, run
-> [`supabase/fix-membership.sql`](../supabase/fix-membership.sql) afterwards. It
-> is short, it is only about who is allowed to read and write, and it ends by
-> printing who is in the household so you can see it worked.
+If the database was set up before this check existed, paste
+`supabase/fix-membership.sql` into the SQL editor to apply it. Its last query
+lists every member with an `on_guest_list` column; anyone showing `false` has
+no access, and you can delete their account from Authentication → Users.
 
-Then paste in all of [`supabase/rows.sql`](../supabase/rows.sql) and run that
-too. It creates the tables the app actually stores your data in, one row per
-meal, weight, recipe or shopping line, with the policies and indexes each of
-them needs. Nothing to edit in this one.
+The rows migration creates the tables the app stores your data in, one row per
+meal, weight, recipe or shopping line. It ends by reading whatever the older
+`app_state` documents hold and writing them out as rows, so a project that has
+been in use keeps everything it had.
 
-It ends by reading whatever the older `app_state` documents hold and writing
-them out as rows, so a project that has been in use keeps everything it had.
-Running it a second time changes nothing.
+### Migrations
+
+Ported from rebelMerch. Each migration is
+`supabase/migrations/<timestamp>_<name>/migration.sql` and runs once, in its
+own transaction, recorded with a checksum in the `bite_migrations.journal`
+table (a private schema, so it is not served by the API). The runner refuses
+to go on, rather than guessing, when:
+
+- a migration that already ran has been edited since. Write a new one instead.
+- the database has a migration this commit does not, meaning an older commit is
+  being deployed over a newer one.
+- an earlier run started a migration and never finished it.
+
+To change the schema, add a folder with a later timestamp. `npm run db:check`
+runs every migration against a real Postgres (PGlite) on each push, and the
+deploy applies them before the site is published:
+
+```sh
+SUPABASE_DB_URL=postgres://... npm run db:migrate -- --dry-run   # what would run
+SUPABASE_DB_URL=postgres://... npm run db:migrate                # apply
+```
+
+The four baseline migrations are the files that used to be pasted in by hand,
+and they are safe to repeat, so a database set up the old way simply adopts
+them on the first deploy.
 
 Then two settings in the dashboard:
 
@@ -87,10 +112,11 @@ Then two settings in the dashboard:
 A magic link that comes back to an address not on that list is rejected, which
 looks exactly like a broken link. It's the most common thing to get wrong.
 
-## 4. Add the two repository secrets
+## 4. Add the three repository secrets
 
 From Supabase, **Project Settings → API**, copy the Project URL and the
-`anon` `public` key. Then in GitHub:
+`anon` `public` key, and from **Project Settings → Database** the connection
+string for the **session pooler** (port 5432). Then in GitHub:
 
 > **Settings → Secrets and variables → Actions → New repository secret**
 
@@ -98,6 +124,12 @@ From Supabase, **Project Settings → API**, copy the Project URL and the
 |---|---|
 | `VITE_SUPABASE_URL` | `https://xxxxxxxx.supabase.co` |
 | `VITE_SUPABASE_ANON_KEY` | the long `anon` key |
+| `SUPABASE_DB_URL` | `postgresql://postgres.xxxx:<password>@...pooler.supabase.com:5432/postgres` |
+
+**`SUPABASE_DB_URL` is a real secret**, unlike the anon key: it is the database
+password. It is only ever read by the deploy's migrate job. Use the session
+pooler, not the transaction pooler on 6543, which cannot hold the lock the
+runner takes.
 
 **The anon key is meant to be public.** It ships in the JavaScript bundle and
 anyone can read it out. It grants nothing on its own: every table requires a

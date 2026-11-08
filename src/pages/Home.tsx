@@ -12,7 +12,8 @@ import { useNutritionContext } from '../store/useNutrition'
 import { useAuthStore } from '../store/useAuth'
 import { useSyncStatus } from '../store/useSync'
 import { useAvailablePortions } from '../store/usePortionStore'
-import { acknowledgeConflicts } from '../lib/sync'
+import { keepMine, takeTheirs } from '../lib/sync'
+import { useConflicts } from '../lib/rows/conflicts'
 import {
   dayNutrients, dayEaten, dayStanding, entryOutcome, weekEaten, componentsNutrients,
 } from '../lib/nutrition'
@@ -633,17 +634,55 @@ function MomentNote() {
   )
 }
 
+/**
+ * Edits that clashed: both of you changed the same thing before your copies
+ * met. This device's version was kept and sent; the other person's is held
+ * here so it can be brought back, one at a time or not at all.
+ */
+function ConflictList() {
+  const conflicts = useConflicts((s) => s.items)
+  if (!conflicts.length) return null
+
+  const one = conflicts.length === 1
+  return (
+    <div className="mt-2 px-1 text-xs text-mustard-700" role="status">
+      <p className="flex items-start gap-2">
+        <AlertTriangle size={14} className="shrink-0 mt-px" aria-hidden="true" />
+        <span>
+          {one
+            ? `You and someone else both changed ${conflicts[0].label}. Your version was kept; theirs is saved here.`
+            : `You and someone else both changed ${conflicts.length} things. Your versions were kept; theirs are saved here.`}
+        </span>
+      </p>
+      <ul className="mt-1 ml-6 flex flex-col gap-1">
+        {conflicts.map((c) => (
+          <li key={c.key} className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            {!one && <span className="text-ink-700">{c.label}</span>}
+            <button className="underline" onClick={() => takeTheirs(c.key)}>
+              Use theirs{one ? '' : <span className="sr-only"> for {c.label}</span>}
+            </button>
+            <button className="underline" onClick={() => keepMine(c.key)}>
+              Keep mine{one ? '' : <span className="sr-only"> for {c.label}</span>}
+            </button>
+          </li>
+        ))}
+      </ul>
+      {!one && (
+        <button className="underline ml-6 mt-1" onClick={() => keepMine()}>
+          Keep all of mine
+        </button>
+      )}
+    </div>
+  )
+}
+
 function SyncLine() {
-  const { state, at, unsaved, conflicts, lastError } = useSyncStatus()
+  const { state, at, unsaved, lastError } = useSyncStatus()
 
   // Unsaved changes outrank everything else: it is the only state where what
   // you are looking at is not what the other person will see.
   const [Icon, text, tone] =
-    conflicts.length
-      ? [AlertTriangle,
-         `You and someone else both changed ${conflicts.length === 1 ? formatDay(conflicts[0]) : `${conflicts.length} days`}. The later edit was kept. Worth a look.`,
-         'text-mustard-700']
-    : unsaved
+    unsaved
       ? [CloudOff,
          `${unsaved} ${unsaved === 1 ? 'change' : 'changes'} not saved yet, kept on this device and retried automatically.`,
          'text-mustard-700']
@@ -660,19 +699,13 @@ function SyncLine() {
     : [CloudOff, 'Working offline on this device only.', 'text-ink-500']
 
   return (
-    <p className={`flex items-start gap-2 mt-2 px-1 text-xs ${tone}`}>
-      <Icon size={14} className="shrink-0 mt-px" /> {text}
-      {conflicts.length > 0 && (
-        <button className="underline shrink-0" onClick={() => acknowledgeConflicts()}>
-          Dismiss
-        </button>
-      )}
-    </p>
+    <>
+      <ConflictList />
+      <p className={`flex items-start gap-2 mt-2 px-1 text-xs ${tone}`}>
+        <Icon size={14} className="shrink-0 mt-px" /> {text}
+      </p>
+    </>
   )
-}
-
-function formatDay(date: string): string {
-  return new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long' })
 }
 
 function greeting(now = new Date()): string {

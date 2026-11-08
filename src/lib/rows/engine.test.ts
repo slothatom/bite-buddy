@@ -21,28 +21,46 @@ function fakeTable(name: string, state: { rows: SyncRow[] }): RowTable {
   }
 }
 
+/**
+ * The part of a PostgREST query the engine uses: gte, the keyset `or`, order
+ * by (updated_at, id), and a row limit like the server's own cap.
+ */
+function fakeQuery(all: () => SyncRow[], refuse?: string) {
+  const preds: ((r: SyncRow) => boolean)[] = []
+  let cap = Infinity
+  const q = {
+    gte: (_col: string, value: string) => { preds.push((r) => (r.updated_at ?? '') >= value); return q },
+    or: (filter: string) => {
+      const m = /^updated_at\.gt\.(".*?"),and\(updated_at\.eq\.".*?",id\.gt\.(".*?")\)$/.exec(filter)
+      if (!m) throw new Error(`unexpected filter ${filter}`)
+      const at = JSON.parse(m[1]) as string
+      const id = JSON.parse(m[2]) as string
+      preds.push((r) => (r.updated_at ?? '') > at || ((r.updated_at ?? '') === at && r.id > id))
+      return q
+    },
+    order: () => q,
+    limit: (n: number) => { cap = n; return q },
+    then: (fn: (r: unknown) => unknown) => {
+      const data = all()
+        .filter((r) => preds.every((p) => p(r)))
+        .sort((a, b) => (a.updated_at ?? '').localeCompare(b.updated_at ?? '') || a.id.localeCompare(b.id))
+        .slice(0, cap)
+      return Promise.resolve(fn({ data, error: refuse ? { message: refuse } : null }))
+    },
+  }
+  return q
+}
+
 /** A database that holds rows and can be made to refuse. */
 function fakeDb(server: Map<string, SyncRow>, opts: { refuse?: string } = {}) {
   const upserted: SyncRow[][] = []
   const db = {
     upserted,
+    selects: 0,
     from: () => ({
       select: () => {
-        const result = {
-          gt: (_col: string, value: string) => ({
-            then: (fn: (r: unknown) => unknown) =>
-              Promise.resolve(fn({
-                data: [...server.values()].filter((r) => (r.updated_at ?? '') > value),
-                error: opts.refuse ? { message: opts.refuse } : null,
-              })),
-          }),
-          then: (fn: (r: unknown) => unknown) =>
-            Promise.resolve(fn({
-              data: [...server.values()],
-              error: opts.refuse ? { message: opts.refuse } : null,
-            })),
-        }
-        return result
+        db.selects++
+        return fakeQuery(() => [...server.values()], opts.refuse)
       },
       upsert: async (rows: SyncRow[]) => {
         if (opts.refuse) return { error: { message: opts.refuse } }
@@ -156,6 +174,57 @@ describe('the watermark', () => {
 
     await sync.round()
     expect(useSyncState.getState().snapshotFor('t').watermark).toBe('2026-08-21T10:00:00.000Z')
+  })
+
+  it('reads every page, not just the first thousand rows', async () => {
+    // 2,500 rows, many sharing a stamp, as one bulk write produces.
+    const server = new Map<string, SyncRow>(
+      Array.from({ length: 2500 }, (_, i) => {
+        const id = `w${String(i).padStart(4, '0')}`
+        const at = `2026-08-21T10:${String(Math.floor(i / 100)).padStart(2, '0')}:00.000Z`
+        return [id, { id, data: { v: i }, updated_at: at }] as const
+      }),
+    )
+    const state = { rows: [] as SyncRow[] }
+    const db = fakeDb(server)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sync = new RowSync(db as any, [fakeTable('t', state)], 'me')
+
+    await sync.round()
+
+    expect(state.rows).toHaveLength(2500)
+    expect(db.selects).toBe(3)
+    expect(useSyncState.getState().snapshotFor('t').watermark).toBe('2026-08-21T10:24:00.000Z')
+  })
+
+  it('still finds a row that committed with a stamp older than the watermark', async () => {
+    const server = new Map<string, SyncRow>([
+      ['a', { id: 'a', data: { v: 1 }, updated_at: '2026-08-21T10:00:30.000Z' }],
+    ])
+    const state = { rows: [] as SyncRow[] }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sync = new RowSync(fakeDb(server) as any, [fakeTable('t', state)], 'me')
+    await sync.round()
+
+    // A slow transaction stamped before `a` but committed after the pull.
+    server.set('late', { id: 'late', data: { v: 2 }, updated_at: '2026-08-21T10:00:10.000Z' })
+    await sync.round()
+
+    expect(state.rows.map((r) => r.id).sort()).toEqual(['a', 'late'])
+  })
+
+  it('does not report rows it already had as news', async () => {
+    const server = new Map<string, SyncRow>([
+      ['a', { id: 'a', data: { v: 1 }, updated_at: '2026-08-21T10:00:00.000Z' }],
+    ])
+    const state = { rows: [] as SyncRow[] }
+    const applied = vi.fn()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sync = new RowSync(fakeDb(server) as any, [fakeTable('t', state)], 'me', { onApplied: applied })
+    await sync.round()
+    await sync.round()
+
+    expect(applied).toHaveBeenCalledTimes(1)
   })
 })
 

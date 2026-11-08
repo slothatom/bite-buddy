@@ -5,7 +5,7 @@ import { RowSync, type HeldDeletion } from './rows/engine'
 import { ROW_TABLES } from './rows/tables'
 import { localChanges } from './rows/diff'
 import { useSyncState } from './rows/store'
-import type { SyncRow } from './rows/types'
+import { restoreTheirs, useConflicts } from './rows/conflicts'
 
 /**
  * Keeping the two of you looking at the same week.
@@ -40,11 +40,6 @@ export interface SyncSnapshot {
   /** Rows changed here that the server has not accepted yet. */
   unsaved: number
   /**
-   * Things both of you changed since your copies last agreed. One version won;
-   * this is how the other person's loss becomes visible rather than silent.
-   */
-  conflicts: string[]
-  /**
    * What the server said when it last refused something, verbatim.
    *
    * "Can't reach the server" covers a train tunnel and a row-level security
@@ -68,14 +63,14 @@ const listeners = new Set<() => void>()
 // useSyncExternalStore compares snapshots by identity, so returning a fresh
 // object per read would re-render forever.
 let snapshot: SyncSnapshot = {
-  state: 'off', at: null, unsaved: 0, conflicts: [], lastError: null, heldBack: [],
+  state: 'off', at: null, unsaved: 0, lastError: null, heldBack: [],
 }
 
 function announce(next: Partial<SyncSnapshot>) {
   const merged = { ...snapshot, ...next }
   if (
     merged.state === snapshot.state && merged.at === snapshot.at &&
-    merged.unsaved === snapshot.unsaved && merged.conflicts.join() === snapshot.conflicts.join() &&
+    merged.unsaved === snapshot.unsaved &&
     merged.lastError === snapshot.lastError &&
     merged.heldBack.map((h) => h.table).join() === snapshot.heldBack.map((h) => h.table).join()
   ) return
@@ -92,10 +87,6 @@ export function onSyncChange(fn: () => void): () => void {
   return () => listeners.delete(fn)
 }
 
-/** Dismisses the notice once you have looked at what it points to. */
-export function acknowledgeConflicts(): void {
-  announce({ conflicts: [] })
-}
 
 /** How much this device is holding that the server has not accepted. */
 export function owedRows(): number {
@@ -146,16 +137,24 @@ function heldBackMessage({ table, deletions, known }: HeldDeletion): string {
     + 'there instead.'
 }
 
-/** What to call a contested row on screen, without leaking table names. */
-function describe(table: string, row: SyncRow): string {
-  const what = table === 'plan_meals' ? 'a meal'
-    : table === 'recipes' ? 'a recipe'
-    : table === 'foods' ? 'a food'
-    : table === 'grocery_items' ? 'a shopping list line'
-    : table === 'cook_sessions' ? 'a cook session'
-    : table === 'settings' ? 'your targets'
-    : 'an entry'
-  return row.day ? `${what} on ${row.day}` : what
+/**
+ * "Use theirs" for one clash: puts the other person's version back here, and
+ * the next round sends it on so both devices agree on it.
+ */
+export function takeTheirs(key: string): void {
+  const conflicts = useConflicts.getState()
+  const conflict = conflicts.items.find((c) => c.key === key)
+  if (!conflict) return
+  const table = ROW_TABLES.find((t) => t.table === conflict.table)
+  if (table) restoreTheirs(table, conflict)
+  conflicts.remove(key)
+  void retry()
+}
+
+/** "Keep mine" for one clash, or for all of them with no key. */
+export function keepMine(key?: string): void {
+  if (key) useConflicts.getState().remove(key)
+  else useConflicts.getState().clear()
 }
 
 /**
@@ -213,10 +212,9 @@ export function startSync(userId: string): () => void {
       lastError: heldBackMessage(held),
       heldBack: [...snapshot.heldBack.filter((h) => h.table !== held.table), held],
     }),
-    onContested: (table, rows) =>
-      announce({
-        conflicts: [...new Set([...snapshot.conflicts, ...rows.map((r) => describe(table, r))])],
-      }),
+    // This device's version was kept and is being sent; theirs is kept here
+    // so it can be brought back rather than vanishing.
+    onContested: (table, rows) => useConflicts.getState().add(table, rows),
   })
 
   // Delivery, retries and "what is still unsaved" live in the queue, which

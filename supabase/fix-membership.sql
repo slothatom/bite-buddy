@@ -30,15 +30,54 @@ create policy "members are visible to the household"
   on public.members for select
   using (public.is_member() or id = auth.uid());
 
--- 2. Add everybody who already has an account. This is what actually puts the
---    two of you back in the household right now.
+-- 2. Check the guest list at the point of access, not only at signup. The
+--    signup trigger is the part most likely to be missing (see above), and
+--    without it anybody who can sign up has an account. Membership now also
+--    requires the account's email to be on `allowed_emails`.
+create or replace function public.is_allowed()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from auth.users u
+    join public.allowed_emails a on lower(a.email) = lower(u.email)
+    where u.id = auth.uid()
+  );
+$$;
+
+create or replace function public.is_member()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.members where id = auth.uid())
+     and public.is_allowed();
+$$;
+
+drop policy if exists "you may create your own member row" on public.members;
+create policy "you may create your own member row"
+  on public.members for insert
+  with check (id = auth.uid() and public.is_allowed());
+
+-- 3. Add everybody on the guest list who already has an account. This is what
+--    actually puts the two of you back in the household right now.
 insert into public.members (id, email)
-select id, coalesce(email, '') from auth.users
+select u.id, coalesce(u.email, '') from auth.users u
+where exists (
+  select 1 from public.allowed_emails a where lower(a.email) = lower(u.email)
+)
 on conflict (id) do nothing;
 
--- 3. A way in that depends on no policy at all, for the app to call when it
+-- 4. A way in that depends on no policy at all, for the app to call when it
 --    finds itself signed in and unable to do anything. It runs as its owner and
---    can add exactly one row: yours, for whoever is making the call.
+--    can add exactly one row: yours, for whoever is making the call, and only
+--    if your email is on the guest list.
 create or replace function public.join_household()
 returns void
 language plpgsql
@@ -49,6 +88,10 @@ begin
   if auth.uid() is null then
     raise exception 'Not signed in.' using errcode = 'insufficient_privilege';
   end if;
+  if not public.is_allowed() then
+    raise exception 'This app is private. Your email is not on the guest list.'
+      using errcode = 'insufficient_privilege';
+  end if;
 
   insert into public.members (id, email)
   select auth.uid(), coalesce((select email from auth.users where id = auth.uid()), '')
@@ -58,5 +101,12 @@ $$;
 
 grant execute on function public.join_household() to authenticated;
 
--- 4. Say who is in, so you can see this worked before going back to the app.
-select id, email, created_at from public.members order by created_at;
+-- 5. Say who is in, so you can see this worked before going back to the app.
+--    Anybody listed here whose email is not on the guest list can no longer
+--    read or write anything; delete their row and their account to tidy up.
+select m.id, m.email, m.created_at,
+       exists (select 1 from public.allowed_emails a
+               join auth.users u on lower(a.email) = lower(u.email)
+               where u.id = m.id) as on_guest_list
+from public.members m
+order by m.created_at;

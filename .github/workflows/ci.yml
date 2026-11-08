@@ -1,10 +1,14 @@
 name: CI
 
 on:
+  # main is checked by deploy.yml, which calls this workflow and publishes
+  # only if every job here passes. Running it here as well would race that
+  # call for the same concurrency group and cancel it.
   push:
-    branches: ['**']
+    branches-ignore: [main]
   pull_request:
   workflow_dispatch:
+  workflow_call:
 
 concurrency:
   group: ci-${{ github.ref }}
