@@ -4,7 +4,7 @@ import Photo from './Photo'
 import { useDialog } from '../../lib/useDialog'
 import { readAmount, formatAmount } from '../../lib/amounts'
 import {
-  Search, X, Trash2, Plus, Undo2, GripVertical, Loader2, Download, ImagePlus,
+  X, Trash2, Plus, Undo2, GripVertical, Download, ImagePlus,
 } from 'lucide-react'
 import type {
   Difficulty, DishCategory, RecipeComponent, PortionUnit, QuickFilter, Recipe, RecipeTag,
@@ -26,7 +26,7 @@ import {
   DISH_CATEGORIES, CATEGORY_LABELS, CATEGORY_MEAL_TIMES,
   QUICK_FILTERS, QUICK_FILTER_DEFINITIONS, hasQuickFilter, withQuickFilter,
 } from '../../lib/dishCategories'
-import { NutrientSummary } from '../ui'
+import { NutrientSummary, ChipCheck, SearchField } from '../ui'
 import { UNIT_LABELS, unitsFor, toGrams, fromGrams, defaultUnit, APPROXIMATE_UNITS } from '../../lib/portions'
 
 /**
@@ -204,8 +204,10 @@ export default function RecipeEditor({
                 <button
                   key={g}
                   onClick={() => toggleGroup(g)}
+                  aria-pressed={groups.includes(g)}
                   className={groups.includes(g) ? 'chip-on' : 'chip-off'}
                 >
+                  <ChipCheck on={groups.includes(g)} />
                   {GROUP_LABELS[g]}
                 </button>
               ))}
@@ -240,9 +242,11 @@ export default function RecipeEditor({
                 <button
                   key={f}
                   onClick={() => toggleFilter(f)}
+                  aria-pressed={hasQuickFilter(draft, f)}
                   className={hasQuickFilter(draft, f) ? 'chip-on' : 'chip-off'}
                   title={QUICK_FILTER_DEFINITIONS[f].note}
                 >
+                  <ChipCheck on={hasQuickFilter(draft, f)} />
                   {QUICK_FILTER_DEFINITIONS[f].emoji} {QUICK_FILTER_DEFINITIONS[f].label}
                 </button>
               ))}
@@ -292,6 +296,7 @@ export default function RecipeEditor({
                   aria-pressed={draft.difficulty === d}
                   className={draft.difficulty === d ? 'chip-on' : 'chip-off'}
                 >
+                  <ChipCheck on={draft.difficulty === d} />
                   {DIFFICULTY_LABELS[d]}
                 </button>
               ))}
@@ -375,7 +380,7 @@ export default function RecipeEditor({
 
           {/* ─── What it comes to ───────────────────────────────────────── */}
           <div className="card-soft p-4">
-            <p className="text-[10px] font-bold uppercase tracking-wide text-ink-500 mb-1">Per serving</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-1">Per serving</p>
             <p className="text-2xl font-extrabold font-mono text-ink-900 mb-3">
               {Math.round(perServing.calories)}
               <span className="text-sm font-semibold text-ink-500 ml-1">kcal</span>
@@ -536,7 +541,7 @@ function ComponentRow({
         </span>
       </div>
       {component.kind === 'food' && APPROXIMATE_UNITS.includes(unit) && (
-        <p className="text-[11px] text-ink-500 pl-6">
+        <p className="text-xs text-ink-500 pl-6">
           {unit === 'piece' ? 'A piece of this is taken as its usual size.' : 'A rough measure. Weigh it if it matters.'}
         </p>
       )}
@@ -595,17 +600,12 @@ function IngredientPicker({
         </header>
 
         <div className="px-5 pt-4">
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
-            <input
-              className="input pl-9 pr-9" autoFocus
-              placeholder="Anything: yours, USDA, Open Food Facts…"
-              value={query} onChange={(e) => setQuery(e.target.value)}
-            />
-            {searching && (
-              <Loader2 size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-500 animate-spin" />
-            )}
-          </div>
+          <SearchField
+            autoFocus
+            placeholder="Anything: yours, USDA, Open Food Facts…"
+            value={query} onChange={setQuery}
+            busy={searching}
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-3 space-y-0.5">
@@ -704,7 +704,7 @@ function IngredientPicker({
 
 function ResultHeading({ children }: { children: ReactNode }) {
   return (
-    <p className="text-[10px] font-bold uppercase tracking-wide text-ink-500 px-3 pt-3 pb-1">
+    <p className="text-xs font-bold uppercase tracking-wide text-ink-500 px-3 pt-3 pb-1">
       {children}
     </p>
   )
@@ -780,7 +780,7 @@ function NumberField({
       {/* "Makes 1 servings" was on screen for as long as this field has
           existed, because the unit was a fixed string beside a variable
           number. */}
-      <span className="block text-[11px] text-ink-500 mt-0.5 text-right">
+      <span className="block text-xs text-ink-500 mt-0.5 text-right">
         {value === 1 ? unit : `${unit}s`}
       </span>
     </label>

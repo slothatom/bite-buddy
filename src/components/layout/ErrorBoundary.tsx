@@ -107,7 +107,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 
           {showing !== 'nothing' && (
             <div className="mt-3 space-y-3 text-left">
-              <pre className="text-[11px] font-mono text-ink-700 bg-cream-50 rounded-xl p-3 overflow-x-auto max-h-32">
+              <pre className="text-xs font-mono text-ink-700 bg-cream-50 rounded-xl p-3 overflow-x-auto max-h-32">
                 {error.message}
               </pre>
 

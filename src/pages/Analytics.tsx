@@ -14,7 +14,7 @@ import { today } from '../store/useMealPlanStore'
 import { weekEaten } from '../lib/nutrition'
 import { scoreWeek, scoreGaps, servingCount, IMPLAUSIBLE_RATIO } from '../lib/mediterranean'
 import { STATUS_STYLES, targetStatus } from '../lib/status'
-import { EmptyState, SectionHeading } from '../components/ui'
+import { EmptyState, SectionHeading, ChipCheck } from '../components/ui'
 import BodyChart from '../components/body/BodyChart'
 import {
   BODY_SPANS, BODY_SPAN_LABELS, changeOver, spanStart, withinSpan,
@@ -161,7 +161,7 @@ function WeekTab() {
                       a symbol precisely so a bar does not have to be red to
                       mean something. The symbol rides above the bar. */}
                   <span
-                    className={`text-[11px] font-bold leading-none h-3 ${STATUS_STYLES[status.level].text}`}
+                    className={`text-xs font-bold leading-none h-3 ${STATUS_STYLES[status.level].text}`}
                     aria-hidden="true"
                   >
                     {status.symbol}
@@ -170,14 +170,14 @@ function WeekTab() {
                     className={`w-full rounded-t-lg transition-all duration-500 ${STATUS_STYLES[status.level].fill}`}
                     style={{ height: `${Math.max(height, kcal > 0 ? 4 : 0)}%` }}
                   />
-                  <span className="text-[11px] font-mono text-ink-900 tabular-nums leading-none">
+                  <span className="text-xs font-mono text-ink-900 tabular-nums leading-none">
                     {kcal > 0 ? Math.round(kcal) : ''}
                   </span>
                   {/* A recorded day and a planned one are different claims, so
                       the difference is a mark under the day rather than a shade
                       of the same bar. */}
                   <span
-                    className="text-[11px] text-ink-500 leading-none"
+                    className="text-xs text-ink-500 leading-none"
                     title={d.any ? (d.recorded ? 'recorded' : 'planned') : undefined}
                   >
                     {new Date(d.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'narrow' })}
@@ -247,7 +247,7 @@ function MovementWeek({ moved }: { moved: { date: string; movement: DayMovement 
             )
           })}
         </div>
-        <div className="flex gap-1 text-[10px] font-bold uppercase text-ink-500">
+        <div className="flex gap-1 text-xs font-bold uppercase text-ink-500">
           {moved.map(({ date, movement }) => (
             <span key={date} className="flex-1 text-center">
               {movement.minutes > 0 ? `${movement.minutes}m` : '·'}
@@ -492,6 +492,7 @@ function BodyTab() {
             aria-pressed={span === s}
             className={span === s ? 'chip-on' : 'chip-off'}
           >
+            <ChipCheck on={span === s} />
             {BODY_SPAN_LABELS[s]}
           </button>
         ))}
@@ -722,6 +723,7 @@ function BodyTab() {
                     aria-pressed={measuring === key}
                     className={measuring === key ? 'chip-on' : 'chip-off'}
                   >
+                    <ChipCheck on={measuring === key} />
                     {MEASUREMENT_LABELS[key]}
                   </button>
                 ))}

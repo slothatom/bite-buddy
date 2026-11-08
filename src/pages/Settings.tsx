@@ -247,7 +247,7 @@ function SettingsPanels() {
                             </li>
                           ))}
                         </ol>
-                        <p className="text-[11px] text-ink-500 mt-3">
+                        <p className="text-xs text-ink-500 mt-3">
                           Mifflin-St Jeor (1990) for the resting rate, its published activity
                           multipliers, a 20% cut as the usual sustainable rate of loss, protein at
                           1.6 g per kg to hold onto muscle while losing, fat at 30% of energy, and

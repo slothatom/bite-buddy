@@ -1,5 +1,5 @@
-import { Children, useState, type ReactNode } from 'react'
-import { AlertTriangle, Check } from 'lucide-react'
+import { Children, useRef, useState, type InputHTMLAttributes, type ReactNode } from 'react'
+import { AlertTriangle, Check, Loader2, Search, X } from 'lucide-react'
 import type { Macros, MedTier, Nutrients } from '../../types'
 import { STATUS_STYLES, targetStatus, type StatusLevel } from '../../lib/status'
 import { saltFromSodium } from '../../lib/nutrition'
@@ -76,7 +76,7 @@ export function MacroBar({
       </div>
 
       {status.deltaLabel && (
-        <p className={`mt-1 text-[11px] font-bold ${styles.text}`}>
+        <p className={`mt-1 text-xs font-bold ${styles.text}`}>
           <span aria-hidden className="font-extrabold">{status.symbol}</span>{' '}
           {status.label} · {status.deltaLabel}
         </p>
@@ -92,13 +92,19 @@ export function CalorieRing({ value, target, size = 132 }: { value: number; targ
 
   const r = size / 2 - 10
   const circumference = 2 * Math.PI * r
-  const pct = target > 0 ? Math.min(1, value / target) : 0
+  const ratio = target > 0 ? value / target : 0
+  const pct = Math.min(1, ratio)
+  // What lies past the target, drawn as a second lap from the top rather than
+  // clamped at a full ring. A full ring at 101% and at 160% looked the same,
+  // which hid exactly the thing the status pill below is there to say. Capped
+  // at one extra lap: past double the target the words carry it.
+  const overflow = Math.min(1, Math.max(0, ratio - 1))
   const remaining = Math.round(target - value)
 
   return (
     <div className="flex flex-col items-center gap-2 shrink-0">
       <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="-rotate-90">
+        <svg width={size} height={size} className="-rotate-90" aria-hidden="true">
           <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={10} className="stroke-border-100" />
           <circle
             cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={10} strokeLinecap="round"
@@ -107,12 +113,32 @@ export function CalorieRing({ value, target, size = 132 }: { value: number; targ
             strokeDashoffset={circumference * (1 - pct)}
             style={{ transition: 'stroke-dashoffset 600ms ease-out' }}
           />
+          {overflow > 0 && (
+            <>
+              {/* A paper-coloured halo under the second lap, so where it starts
+                  and stops reads against the full ring beneath it. */}
+              <circle
+                data-ring-overflow
+                cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={14} strokeLinecap="round"
+                className="stroke-paper"
+                strokeDasharray={circumference}
+                strokeDashoffset={circumference * (1 - overflow)}
+              />
+              <circle
+                cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={10} strokeLinecap="round"
+                className={styles.ring}
+                strokeDasharray={circumference}
+                strokeDashoffset={circumference * (1 - overflow)}
+                style={{ transition: 'stroke-dashoffset 600ms ease-out' }}
+              />
+            </>
+          )}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span data-day-kcal className="text-[28px] font-extrabold leading-none text-ink-900">
             {Math.round(value).toLocaleString()}
           </span>
-          <span className="text-[11px] font-bold text-ink-500 mt-1">of {target.toLocaleString()} kcal</span>
+          <span className="text-xs font-bold text-ink-500 mt-1">of {target.toLocaleString()} kcal</span>
         </div>
       </div>
 
@@ -325,7 +351,7 @@ export function SourceLine({
     return (
       <span className="block min-w-0">
         <span className={`text-[13px] text-ink-900 min-w-0 ${wrap}`} lang={lang}>{text}</span>
-        <span className={`text-[13px] text-ink-500 min-w-0 italic ${wrap}`}>{english}</span>
+        <span className={`text-[13px] text-ink-500 min-w-0 ${wrap}`}>{english}</span>
       </span>
     )
   }
@@ -333,7 +359,7 @@ export function SourceLine({
   return (
     <span className="block min-w-0">
       <span className={`text-[13px] text-ink-700 min-w-0 ${wrap}`}>{english}</span>
-      <span className={`text-[13px] text-ink-500 min-w-0 italic ${wrap}`} lang={lang}>{text}</span>
+      <span className={`text-[13px] text-ink-500 min-w-0 ${wrap}`} lang={lang}>{text}</span>
     </span>
   )
 }
@@ -363,6 +389,73 @@ export function SectionHeading({ children, action }: { children: ReactNode; acti
     <div className="flex items-center justify-between gap-3 mb-3">
       <h2 className="text-lg font-extrabold text-ink-900">{children}</h2>
       {action}
+    </div>
+  )
+}
+
+/**
+ * The mark a selected chip carries, so selection is a shape as well as a fill.
+ *
+ * A chip that is on was told apart from one that is off by its turquoise
+ * alone, which is exactly what the design system says never to do. Hidden from
+ * screen readers: they hear the state from `aria-pressed` on the chip.
+ */
+export function ChipCheck({ on }: { on?: boolean }) {
+  return on ? <Check size={14} strokeWidth={3} aria-hidden="true" className="shrink-0 -ml-0.5" /> : null
+}
+
+/**
+ * A search box with a way to empty it.
+ *
+ * Clearing a query on a phone meant holding backspace through "pâine
+ * integrală". The cross appears only once there is something to clear, is a
+ * full 44px target on a coarse pointer, and puts focus back in the box so the
+ * next search can be typed straight away.
+ */
+export function SearchField({
+  value, onChange, busy = false, icon = true, className = '', ...rest
+}: {
+  value: string
+  onChange: (value: string) => void
+  /** A lookup in flight: a spinner where the cross would be. */
+  busy?: boolean
+  /** The magnifier inside the box. Off where a search button sits beside it. */
+  icon?: boolean
+} & Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'>) {
+  const input = useRef<HTMLInputElement>(null)
+
+  return (
+    <div className={`relative flex-1 min-w-0 ${className}`}>
+      {icon && (
+        <Search
+          size={16}
+          aria-hidden="true"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500 pointer-events-none"
+        />
+      )}
+      <input
+        ref={input}
+        className={`input ${icon ? 'pl-9' : ''} pr-11`}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        {...rest}
+      />
+      {busy ? (
+        <Loader2
+          size={16}
+          aria-hidden="true"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-500 animate-spin"
+        />
+      ) : value ? (
+        <button
+          type="button"
+          aria-label="Clear search"
+          onClick={() => { onChange(''); input.current?.focus() }}
+          className="btn-ghost btn-icon absolute right-0.5 top-1/2 -translate-y-1/2 text-ink-700"
+        >
+          <X size={16} aria-hidden="true" />
+        </button>
+      ) : null}
     </div>
   )
 }

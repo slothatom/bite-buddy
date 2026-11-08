@@ -100,7 +100,11 @@ async function openADayWithFood(page: Page) {
   const row = page.locator('[data-day-row]')
     .filter({ has: page.locator('[data-planned]') })
     .first()
-  await row.getByRole('button', { name: /the full names/ }).click()
+  // A wide screen folds a day into a row of columns, opened from its date. A
+  // phone lists every day open already, so there is nothing to unfold.
+  if ((page.viewportSize()?.width ?? 0) >= 640) {
+    await row.getByRole('button', { name: /the full names/ }).click()
+  }
   await row.getByRole('button', { name: /^Open / }).click()
 }
 
@@ -486,7 +490,7 @@ test.describe('the planner', () => {
     // It is a grid now: a row a day, a column a slot, a cell a meal.
     await planWeek(page)
 
-    const rows = page.getByRole('button', { name: /Show the full names/ })
+    const rows = page.locator('[data-day-row]')
     await expect(rows).toHaveCount(7)
 
     await page.getByRole('tab', { name: '2 weeks' }).click()
@@ -498,7 +502,8 @@ test.describe('the planner', () => {
     await expect(page.getByRole('tab', { name: '1 month' })).toHaveCount(0)
   })
 
-  test('a day opens to its full names, and lets you into itself', async ({ page }) => {
+  test('a day opens to its full names, and lets you into itself', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'a phone lists every day open; see the next test')
     // The columns are sixty pixels on a phone, so a cell holds the front of a
     // name. The whole thing is one tap away on the date rather than hidden.
     await planWeek(page)
@@ -511,6 +516,34 @@ test.describe('the planner', () => {
     await row.click()
     await expect(row).toHaveAttribute('aria-expanded', 'true')
     await expect(page.getByRole('button', { name: /^Open / })).toBeVisible()
+  })
+
+  test('on a phone the week is a list of days, every name in full at 12px or more', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'mobile', 'the list is the phone layout')
+    // Six columns at 390px left about fifty pixels a cell, which held names at
+    // 9 and 10px. At the 12px floor a column holds three letters, so a phone
+    // gets one day a row and one slot a line instead.
+    await planWeek(page)
+    await page.getByRole('button', { name: 'Fill the gaps' }).click()
+    await page.getByRole('button', { name: /^Add these/ }).click()
+
+    const rows = page.locator('[data-day-row]')
+    await expect(rows).toHaveCount(7)
+    // Nothing to unfold: every day already shows its names and its way in.
+    await expect(page.getByRole('button', { name: /the full names/ })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /^Open / })).toHaveCount(7)
+
+    const smallest = await page.evaluate(() => {
+      let min = Infinity
+      for (const el of document.querySelectorAll('[data-day-row] *')) {
+        if (!(el instanceof HTMLElement) || !el.innerText?.trim()) continue
+        const box = el.getBoundingClientRect()
+        if (!box.width || !box.height) continue
+        min = Math.min(min, parseFloat(getComputedStyle(el).fontSize))
+      }
+      return min
+    })
+    expect(smallest).toBeGreaterThanOrEqual(12)
   })
 
   test('a meal opens over the week rather than instead of it', async ({ page }) => {
@@ -527,7 +560,7 @@ test.describe('the planner', () => {
 
     // And the week is still behind it when you close.
     await sheet.getByRole('button', { name: 'Close' }).click()
-    await expect(page.getByRole('button', { name: /Show the full names/ })).toHaveCount(7)
+    await expect(page.locator('[data-day-row]')).toHaveCount(7)
   })
 
   test('keeps what you planned when the window moves', async ({ page }) => {
@@ -2166,6 +2199,37 @@ test.describe('what actually happened', () => {
     // what you planned is a Tuesday, not a failure.
     const struck = page.locator('[data-entry-name].line-through')
     await expect(struck.first()).toBeVisible()
+
+    // Said in a word as well, and quieter by colour token rather than by
+    // fading: opacity on text took the muted ink under 3:1.
+    await expect(struck.first().getByText('skipped', { exact: true })).toBeVisible()
+    const faded = await struck.first().evaluate((el) => {
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        if (Number(getComputedStyle(n).opacity) < 1) return true
+      }
+      return false
+    })
+    expect(faded).toBe(false)
+  })
+
+  test('a search can be cleared with one tap', async ({ page }) => {
+    await goto(page, '/foods')
+    const search = page.getByLabel('Search foods')
+    await expect(page.getByRole('button', { name: 'Clear search' })).toHaveCount(0)
+
+    await search.fill('olive')
+    await page.getByRole('button', { name: 'Clear search' }).click()
+    await expect(search).toHaveValue('')
+    await expect(search).toBeFocused()
+  })
+
+  test('selected chips carry a check and say they are pressed', async ({ page }) => {
+    await goto(page, '/foods')
+    const chip = page.locator('.chip-off').first()
+    await chip.click()
+    const on = page.locator('.chip-on').first()
+    await expect(on).toHaveAttribute('aria-pressed', 'true')
+    await expect(on.locator('svg.lucide-check')).toBeVisible()
   })
 
   test('the food databases are reachable without scrolling past the library', async ({ page }) => {
@@ -3084,37 +3148,60 @@ test.describe('weight and measurements over time', () => {
 /**
  * The phone's navigation.
  *
- * Five slots along the bottom, four destinations and a "More" button opening a
- * grid of six icons, put nine screens in two places by nothing more principled
- * than how many fitted on a bar. Grocery was two taps and three levels deep
- * while Recipes was one, and the split had already drifted from the sidebar's
- * own list.
+ * A tab bar along the bottom, in reach of the thumb: Home, Plan, Add a meal,
+ * Recipes and More, with More holding every other screen. Nothing may go
+ * missing between the bar and the sheet: together they are the same nine
+ * screens the sidebar lists.
  */
-test.describe('the menu on a phone', () => {
+test.describe('the tab bar on a phone', () => {
   test.beforeEach(({ }, testInfo) => {
-    test.skip(testInfo.project.name !== 'mobile', 'the menu is a phone thing')
+    test.skip(testInfo.project.name !== 'mobile', 'the tab bar is a phone thing')
   })
 
-  test('holds every screen, with no second tier', async ({ page }) => {
+  test('holds every screen between the bar and More, with no third tier', async ({ page }) => {
     await goto(page, '/')
-    await page.getByRole('button', { name: 'Menu' }).click()
+    const bar = page.getByRole('navigation', { name: 'Main' })
+    for (const label of ['Home', 'Plan', 'Recipes']) {
+      await expect(bar.getByRole('link', { name: label })).toBeVisible()
+    }
+    await expect(bar.getByRole('button', { name: 'Add a meal' })).toBeVisible()
 
-    const menu = page.getByRole('dialog', { name: 'Menu' })
-    // The same nine the sidebar lists, from the same array, so they cannot
+    await bar.getByRole('button', { name: 'More' }).click()
+    const more = page.getByRole('dialog', { name: 'More' })
+    // The other six, from the same array the sidebar reads, so they cannot
     // drift apart again.
-    await expect(menu.getByRole('link')).toHaveCount(9)
-    for (const label of ['Home', 'Planner', 'Recipes', 'Foods', 'Grocery',
-      'Schedule', 'Movement', 'Progress', 'Settings']) {
-      await expect(menu.getByRole('link', { name: label })).toBeVisible()
+    await expect(more.getByRole('link')).toHaveCount(6)
+    for (const label of ['Foods', 'Grocery', 'Schedule', 'Movement', 'Progress', 'Settings']) {
+      await expect(more.getByRole('link', { name: label })).toBeVisible()
+    }
+  })
+
+  test('every slot on the bar is at least 44px, at the bottom of the screen', async ({ page }) => {
+    await goto(page, '/')
+    const bar = page.getByRole('navigation', { name: 'Main' })
+    const viewport = page.viewportSize()!
+    const box = (await bar.boundingBox())!
+    expect(box.y + box.height).toBeGreaterThanOrEqual(viewport.height - 1)
+
+    for (const target of [
+      bar.getByRole('link', { name: 'Home' }),
+      bar.getByRole('link', { name: 'Plan' }),
+      bar.getByRole('button', { name: 'Add a meal' }),
+      bar.getByRole('link', { name: 'Recipes' }),
+      bar.getByRole('button', { name: 'More' }),
+    ]) {
+      const b = (await target.boundingBox())!
+      expect(b.height).toBeGreaterThanOrEqual(44)
+      expect(b.width).toBeGreaterThanOrEqual(44)
     }
   })
 
   test('takes you somewhere and gets out of the way', async ({ page }) => {
     await goto(page, '/')
-    await page.getByRole('button', { name: 'Menu' }).click()
-    await page.getByRole('dialog', { name: 'Menu' }).getByRole('link', { name: 'Grocery' }).click()
+    await page.getByRole('button', { name: 'More' }).click()
+    await page.getByRole('dialog', { name: 'More' }).getByRole('link', { name: 'Grocery' }).click()
 
-    await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
+    await expect(page.getByRole('dialog', { name: 'More' })).toHaveCount(0)
     await expect(page.getByRole('heading', { name: 'Shopping list' })).toBeVisible()
   })
 
@@ -3128,12 +3215,12 @@ test.describe('the menu on a phone', () => {
 
   test('can be escaped, and gives focus back to the button that opened it', async ({ page }) => {
     await goto(page, '/')
-    const button = page.getByRole('button', { name: 'Menu' })
+    const button = page.getByRole('button', { name: 'More' })
     await button.click()
-    await expect(page.getByRole('dialog', { name: 'Menu' })).toBeVisible()
+    await expect(page.getByRole('dialog', { name: 'More' })).toBeVisible()
 
     await page.keyboard.press('Escape')
-    await expect(page.getByRole('dialog', { name: 'Menu' })).toHaveCount(0)
+    await expect(page.getByRole('dialog', { name: 'More' })).toHaveCount(0)
     await expect(button).toBeFocused()
   })
 })

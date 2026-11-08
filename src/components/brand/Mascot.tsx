@@ -68,10 +68,19 @@ export default function Zig({
   size = 64,
   mood = 'happy',
   className = '',
+  label,
 }: {
   size?: number
   mood?: ZigMood
   className?: string
+  /**
+   * An accessible name, only where Bandit is the one thing on screen that
+   * carries meaning. Everywhere else he sits beside a title that already says
+   * what the state is, so he is decorative and hidden from screen readers:
+   * hearing "Bandit, the Bite Buddy" before every empty state told nobody
+   * anything.
+   */
+  label?: string
 }) {
   const asleep = mood === 'sleepy'
   const armsUp = mood === 'celebrate'
@@ -87,8 +96,9 @@ export default function Zig({
       viewBox="0 0 64 64"
       fill="none"
       className={className}
-      role="img"
-      aria-label="Bandit, the Bite Buddy"
+      role={label ? 'img' : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
     >
       {/* The tail, behind everything. One curve stroked three times: the dark
           rim, the fur, then the same path again with a dash pattern, which is

@@ -268,9 +268,13 @@
 
   h1, h2, h3 { text-wrap: balance; }
 
-  /* One visible focus treatment everywhere, rather than the browser default. */
+  /* One visible focus treatment everywhere, rather than the browser default.
+     bite-700 rather than the brand face: bite-500 is a fill, and as a 3px line
+     on cream it measured 2.33:1, under the 3:1 a focus indicator needs.
+     bite-700 is 5.12:1 on cream-50 and 12.49:1 after dark, where it lightens.
+     `npm run check:contrast` measures it in both themes. */
   :focus-visible {
-    outline: 3px solid var(--color-bite-500);
+    outline: 3px solid var(--color-bite-700);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }
@@ -312,8 +316,12 @@
   @apply btn text-ink-700 hover:bg-bite-50 hover:text-bite-700;
 }
 
+/** Destructive. coral-800 under white is 6.66:1, and coral-800 is a fill
+    that does not lighten after dark, so it is 6.66:1 in both themes. coral-500
+    under white was 2.83:1. coral-700 would pass in daylight but is one of the
+    shades that lightens after dark, which would leave white on pink. */
 @utility btn-danger {
-  @apply btn bg-coral-500 text-white hover:bg-coral-800 active:bg-coral-900 shadow-e1;
+  @apply btn bg-coral-800 text-white hover:bg-coral-900 active:bg-coral-900 shadow-e1;
 }
 
 @utility btn-icon {
@@ -364,8 +372,10 @@
 @utility input {
   @apply w-full px-3.5 py-2.5 rounded-lg border-2 border-border-200 bg-paper
          text-sm font-semibold text-ink-900 placeholder-ink-500
-         focus:outline-none focus:border-bite-400 focus:ring-4 focus:ring-bite-100
-         transition-all;
+         focus:border-bite-700 transition-all;
+  /* No `outline-none`: an input takes the same 3px bite-700 ring as every
+     other control. The soft bite-100 halo it used to wear instead was 1.14:1
+     on paper, which is to say invisible. */
 }
 
 @utility label {

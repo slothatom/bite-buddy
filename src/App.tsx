@@ -144,7 +144,9 @@ function Shell() {
       <StorageBanner />
       <div className="flex min-h-screen bg-cream-50">
         <Sidebar />
-        <main className="flex-1 flex flex-col min-w-0">
+        {/* Room under the content for the phone's tab bar, so the last row of a
+            screen is never hidden behind it. */}
+        <main className="flex-1 flex flex-col min-w-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
           <MobileNav />
           <Suspense fallback={<ScreenLoading />}>
             <Routes>

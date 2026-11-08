@@ -33,6 +33,7 @@ import { baseName } from '../lib/recipeGroups'
 import { entriesName, entryName } from '../lib/entryLabel'
 import { slotNow } from '../lib/whenDates'
 import { useDialog } from '../lib/useDialog'
+import { useMediaQuery } from '../lib/useMediaQuery'
 import WhenPicker from '../components/planner/WhenPicker'
 import { offerUndo } from '../store/useUndo'
 
@@ -535,7 +536,7 @@ export default function Planner() {
           <SectionHeading>
             {formatDate(selected)}
             {dayLabel(progress) && (
-              <span className="ml-2 text-[11px] font-bold uppercase tracking-wide text-ink-500">
+              <span className="ml-2 text-xs font-bold uppercase tracking-wide text-ink-500">
                 {dayLabel(progress)}
               </span>
             )}
@@ -707,25 +708,63 @@ function WeekGrid({
 }) {
   const ctx = useNutritionContext()
   const now = today()
+  // Six columns hold 12px text from the small breakpoint up. Below it a
+  // column is about fifty pixels, which is three letters of a name at the
+  // caption size, so a phone gets the week as a list instead: one day a row,
+  // its slots one under the next with their full names.
+  const wide = useMediaQuery('(min-width: 640px)')
 
   return (
     <div className="space-y-1.5">
       {/* The slot names once, at the top. Hidden from a screen reader because
           every cell below already says which slot it is in its own label; a
           visual header row is for eyes following a column. */}
-      <div className="grid gap-1 sm:gap-1.5 px-0.5" style={{ gridTemplateColumns: DAY_COLUMNS }} aria-hidden="true">
-        <span />
-        {MEAL_SLOTS.map((slot) => (
-          <span key={slot} className="text-center text-[9px] sm:text-[10px] font-bold uppercase tracking-wide text-ink-500 truncate">
-            {SLOT_LABELS[slot]}
-          </span>
-        ))}
-      </div>
+      {wide && (
+        <div className="grid gap-1.5 px-0.5" style={{ gridTemplateColumns: DAY_COLUMNS }} aria-hidden="true">
+          <span />
+          {MEAL_SLOTS.map((slot) => (
+            <span key={slot} className="text-center text-xs font-bold uppercase tracking-wide text-ink-500 truncate">
+              {SLOT_LABELS[slot]}
+            </span>
+          ))}
+        </div>
+      )}
 
       {dates.map((date) => {
         const day = byDate.get(date)
-        const open = expanded === date
+        const open = !wide || expanded === date
         const past = date < now
+        const isToday = date === now
+        const weekday = new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })
+        const kcal = Math.round(kcalByDate.get(date) ?? 0)
+
+        // A past day is quieter by surface and by word, not by fading its
+        // text: opacity took ink-500 to about 2.4:1. Today carries the brand.
+        const dateTone = isToday
+          ? 'bg-bite-500 text-on-brand'
+          : past ? 'bg-transparent text-ink-500' : 'bg-cream-50 text-ink-900'
+
+        const dateLabel = (
+          <>
+            {/* Today inherits the button's own colour rather than naming
+                one. A colour named here has its ground on the parent, so
+                nothing can tell what it sits on. */}
+            <span className={`text-xs font-bold uppercase tracking-wide ${isToday ? '' : 'text-ink-500'}`}>
+              {weekday}
+            </span>
+            <span className="text-sm font-extrabold leading-none">
+              {new Date(date + 'T12:00:00').getDate()}
+            </span>
+            {past && !isToday && (
+              <span data-past className="text-xs font-bold text-ink-500">Past</span>
+            )}
+            {open && (
+              <span className={`ml-auto text-xs font-mono ${isToday ? '' : 'text-ink-500'}`}>
+                {kcal} kcal
+              </span>
+            )}
+          </>
+        )
 
         return (
           <div
@@ -735,36 +774,30 @@ function WeekGrid({
                         ${date === selected ? 'bg-bite-50' : ''}`}
             style={{ gridTemplateColumns: open ? '1fr' : DAY_COLUMNS }}
           >
-            {/* The date, and the handle that opens the row. */}
-            <button
-              type="button"
-              onClick={() => onExpand(open ? null : date)}
-              aria-expanded={open}
-              aria-label={`${formatDate(date)}, ${Math.round(kcalByDate.get(date) ?? 0)} kcal. ${
-                open ? 'Hide the full names' : 'Show the full names'}`}
-              className={`flex rounded-lg px-1 py-1.5 text-left
-                          ${open ? 'items-baseline gap-2' : 'flex-col justify-center'}
-                          ${date === now ? 'bg-bite-500 text-on-brand' : 'bg-cream-50 text-ink-900'}
-                          ${past && date !== now ? 'opacity-60' : ''}`}
-            >
-              {/* Today inherits the button's own colour rather than naming
-                  one. A colour named here has its ground on the parent, so
-                  nothing can tell what it sits on, and `bite-100` on the app's
-                  dark ground is 1.34:1 if anything ever reads it that way. */}
-              <span className={`text-[9px] font-bold uppercase tracking-wide
-                                ${date === now ? 'opacity-80' : 'text-ink-500'}`}>
-                {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' })}
-              </span>
-              <span className="text-sm font-extrabold leading-none">
-                {new Date(date + 'T12:00:00').getDate()}
-              </span>
-              {open && (
-                <span className={`ml-auto text-[10px] font-mono
-                                  ${date === now ? 'opacity-80' : 'text-ink-500'}`}>
-                  {Math.round(kcalByDate.get(date) ?? 0)} kcal
-                </span>
-              )}
-            </button>
+            {/* The date, and on a wide screen the handle that opens the row.
+                A phone already shows every name in full, so there it is a
+                heading for the row rather than a toggle. */}
+            {wide ? (
+              <button
+                type="button"
+                onClick={() => onExpand(open ? null : date)}
+                aria-expanded={open}
+                aria-label={`${formatDate(date)}${past && !isToday ? ', past' : ''}, ${kcal} kcal. ${
+                  open ? 'Hide the full names' : 'Show the full names'}`}
+                className={`flex rounded-lg px-1 py-1.5 text-left
+                            ${open ? 'items-baseline gap-2' : 'flex-col justify-center'}
+                            ${dateTone}`}
+              >
+                {dateLabel}
+              </button>
+            ) : (
+              <h3
+                aria-label={`${formatDate(date)}${past && !isToday ? ', past' : ''}, ${kcal} kcal`}
+                className={`flex items-baseline gap-2 rounded-lg px-2 py-1.5 ${dateTone}`}
+              >
+                {dateLabel}
+              </h3>
+            )}
 
             {open ? (
               // Opened: one slot a line, full names, and a way into the day.
@@ -804,7 +837,7 @@ function WeekGrid({
 }
 
 /** The day column, then the five slots. Narrow enough for a phone. */
-const DAY_COLUMNS = '2.5rem repeat(5, minmax(0, 1fr))'
+const DAY_COLUMNS = '3rem repeat(5, minmax(0, 1fr))'
 
 /**
  * One day's one slot, as the grid draws it.
@@ -838,7 +871,7 @@ function MealCell({
         aria-label={`Add something to ${SLOT_LABELS[slot]} on ${formatDate(date)}`}
         className={`rounded-lg border border-dashed border-border-200 text-ink-300
                     hover:border-bite-400 hover:text-bite-700 flex items-center justify-center
-                    ${full ? 'w-full py-1.5 text-xs gap-1' : 'min-h-11 text-xs'}`}
+                    ${full ? 'w-full min-h-11 py-1.5 text-xs gap-1' : 'min-h-11 text-xs'}`}
       >
         <Plus size={13} />{full && <span className="text-ink-500">{SLOT_LABELS[slot]}</span>}
       </button>
@@ -872,11 +905,23 @@ function MealCell({
             : part ? `, ${outcomes.filter((o) => o === 'eaten').length} of ${outcomes.length} eaten`
               : ', planned'}`}
       className={`relative rounded-lg px-1 py-1 text-left leading-tight border
-                  ${eaten ? 'bg-leaf-50 border-leaf-200' : 'bg-cream-50 border-transparent'}
-                  ${skipped ? 'opacity-55' : ''}
+                  ${eaten ? 'bg-leaf-50 border-leaf-200'
+                    : skipped ? 'bg-transparent border-border-200' : 'bg-cream-50 border-transparent'}
                   hover:border-bite-400
-                  ${full ? 'w-full flex items-center gap-1.5' : 'min-h-11 block'}`}
+                  ${full ? 'w-full min-h-11 flex items-center gap-1.5' : 'min-h-11 block'}`}
     >
+      {/* Skipped says so in a word, on a quieter surface. It used to be the
+          same cell at 55% opacity, which was colour alone and took the name
+          under 3:1. */}
+      {skipped && !full && (
+        <span className="block text-xs font-bold text-ink-500">Skipped</span>
+      )}
+      {/* A full line has no column header above it, so it names its slot. */}
+      {full && (
+        <span className="shrink-0 w-20 text-xs font-bold uppercase tracking-wide text-ink-500">
+          {SLOT_LABELS[slot]}
+        </span>
+      )}
       {/* Out of the text's way in the narrow view. A column is sixty pixels
           and the tick was taking fifteen of them, which left "Chicken" too
           little room to sit on a line and had it breaking mid-word. */}
@@ -899,9 +944,9 @@ function MealCell({
         )
       )}
       <span
-        className={`block min-w-0 text-[10px] sm:text-[11px] text-ink-900
-                    ${skipped ? 'line-through' : ''}
-                    ${full ? 'flex-1 truncate' : 'line-clamp-3 break-words'}
+        className={`block min-w-0 text-xs
+                    ${skipped ? 'line-through text-ink-500' : 'text-ink-900'}
+                    ${full ? 'flex-1 truncate' : `${skipped ? 'line-clamp-2' : 'line-clamp-3'} break-words`}
                     ${!full && eaten ? 'pr-2.5' : ''}`}
       >
         {full ? name : shortName(name)}
@@ -912,6 +957,9 @@ function MealCell({
           <span className="text-ink-500"> +{meals.length - 1}</span>
         )}
       </span>
+      {skipped && full && (
+        <span className="shrink-0 text-xs font-bold text-ink-500">Skipped</span>
+      )}
     </button>
   )
 }
@@ -1070,7 +1118,7 @@ function SlotRow({
                         what={entryName(entry, ctx)}
                         onChange={(next) => onEntryOutcome(meal.id, i, next)}
                       />
-                      <div className={`flex-1 min-w-0 ${outcome === 'skipped' ? 'opacity-55' : ''}`}>
+                      <div className="flex-1 min-w-0">
                         <EntryLine
                           entry={entry}
                           struck={outcome === 'skipped'}
@@ -1475,18 +1523,25 @@ function EntryLine({
       <Name
         to={opensTo}
         title={full === label ? undefined : full}
-        className={`min-w-0 ${isDeleted ? 'text-ink-500' : 'text-ink-900'} ${
+        className={`min-w-0 ${isDeleted || struck ? 'text-ink-500' : 'text-ink-900'} ${
           struck ? 'line-through' : ''} ${opensTo ? 'hover:text-bite-700 hover:underline' : ''}`}
       >
         {label}
         {entry.kind === 'portion' && (
-          <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-leaf-700">
+          <span className="ml-1.5 text-xs font-bold uppercase tracking-wide text-leaf-700">
             {portion?.storage === 'freezer' ? 'freezer' : 'fridge'}
           </span>
         )}
         {isDeleted && (
-          <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-ink-500">
+          <span className="ml-1.5 text-xs font-bold uppercase tracking-wide text-ink-500">
             deleted
+          </span>
+        )}
+        {/* Skipped in a word as well as struck through, so it is not carried
+            by a line and a grey alone. */}
+        {struck && (
+          <span className="inline-block ml-1.5 text-xs font-bold uppercase tracking-wide text-ink-500">
+            skipped
           </span>
         )}
       </Name>

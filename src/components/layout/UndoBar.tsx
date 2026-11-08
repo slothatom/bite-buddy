@@ -30,7 +30,7 @@ export default function UndoBar() {
     <div
       role="status"
       className="fixed inset-x-0 z-40 px-4 pointer-events-none
-                 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] md:bottom-6 md:inset-x-auto md:right-6"
+                 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] md:bottom-6 md:inset-x-auto md:right-6"
     >
       {/* An inverted slab, which is what a transient message should be: it has
           to read as not-the-page. `text-white` was wrong on a token that

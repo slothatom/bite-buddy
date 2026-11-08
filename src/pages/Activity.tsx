@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useDialog } from '../lib/useDialog'
-import { Plus, Trash2, Upload, X, Search, Moon, Footprints } from 'lucide-react'
+import { Plus, Trash2, Upload, X, Moon, Footprints } from 'lucide-react'
 import type { ExerciseKind, SleepEntry, StepEntry, Workout, WorkoutEntry } from '../types'
 import { PEOPLE, type PersonId } from '../lib/people'
 import { today as todayDate } from '../store/useMealPlanStore'
@@ -11,7 +11,7 @@ import { useBodyStore } from '../store/useBodyStore'
 import { EXERCISE_BY_ID, searchExercises, workoutCalories, workoutMinutes } from '../lib/exercise'
 import { EXERCISE_GROUP_LABELS } from '../data/exercises'
 import { parseGarminCsv, parseGarminJson, type ImportedActivity } from '../lib/garminImport'
-import { EmptyState, SectionHeading } from '../components/ui'
+import { EmptyState, SectionHeading, SearchField } from '../components/ui'
 
 /**
  * Training and sleep, one person at a time.
@@ -221,16 +221,12 @@ function SessionBuilder({ who, onClose }: { who: PersonId; onClose: () => void }
           <input id="session-date" type="date" className="input" value={date}
             onChange={(e) => setDate(e.target.value)} />
         </div>
-        <div className="relative">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
-          <input
-            className="input pl-9"
-            placeholder="Search exercises"
-            aria-label="Search exercises"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
+        <SearchField
+          placeholder="Search exercises"
+          aria-label="Search exercises"
+          value={query}
+          onChange={setQuery}
+        />
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto px-5 space-y-3">

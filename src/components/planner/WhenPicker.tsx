@@ -52,7 +52,7 @@ export default function WhenPicker({
             cell: five rows of them is a wall of text around the numbers. */}
         <div className="grid grid-cols-7 gap-1 mb-1" aria-hidden="true">
           {weekdays.map((letter, i) => (
-            <span key={i} className="text-center text-[10px] font-bold uppercase text-ink-500">
+            <span key={i} className="text-center text-xs font-bold uppercase text-ink-500">
               {letter}
             </span>
           ))}
@@ -98,7 +98,7 @@ export default function WhenPicker({
               >
                 {/* The month, on the day it turns over, above the number. */}
                 {opens && (
-                  <span className="absolute -top-0.5 inset-x-0 text-[9px] font-bold uppercase tracking-wide text-ink-500 leading-none">
+                  <span className="absolute -top-0.5 inset-x-0 text-xs font-bold uppercase tracking-wide text-ink-500 leading-none">
                     {when.toLocaleDateString('en-GB', { month: 'short' })}
                   </span>
                 )}

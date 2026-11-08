@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Search, Plus, Combine } from 'lucide-react'
+import { Plus, Combine } from 'lucide-react'
 import type { Food, MedCategory } from '../types'
 import { isCuratedFood, useFoods, useFoodStore } from '../store/useFoodStore'
 import { duplicateFoods } from '../lib/mergeFoods'
 import { searchFoods, buildFoodIndex } from '../lib/foodSearch'
-import { TierBadge, EmptyState, SourceLine, ChipRow } from '../components/ui'
+import { TierBadge, EmptyState, SourceLine, ChipRow, ChipCheck, SearchField } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS, CATEGORY_ORDER } from '../lib/categories'
 import FoodEditor from '../components/foods/FoodEditor'
 import { saltFromSodium } from '../lib/nutrition'
@@ -69,19 +69,17 @@ export default function Foods() {
         </header>
 
         <div className="space-y-3">
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
+          <div>
             {/* The stored names, not the aliases. This quoted "paine int",
                 which is how the plans write it and is correctly an alias, but
                 seeing it here made the app look like it holds a typo where it
                 actually holds "pâine integrală". Search still finds either,
                 which is the whole point of aliases. */}
-            <input
-              className="input pl-9"
+            <SearchField
               aria-label="Search foods"
               placeholder="Search telemea, pâine integrală, zabpehely, olive oil…"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={setQuery}
             />
           </div>
           {/* The chosen category leads, so it stays visible when collapsed. */}
@@ -90,8 +88,10 @@ export default function Foods() {
               <button
                 key={c}
                 onClick={() => setCategory(category === c ? null : c)}
+                aria-pressed={category === c}
                 className={category === c ? 'chip-on' : 'chip-off'}
               >
+                <ChipCheck on={category === c} />
                 {CATEGORY_EMOJI[c]} {CATEGORY_LABELS[c]}
               </button>
             ))}
