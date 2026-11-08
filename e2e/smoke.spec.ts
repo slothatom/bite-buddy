@@ -326,7 +326,7 @@ test.describe('the main flow', () => {
     await goto(page, '/recipes')
     await page.locator('[data-recipe-card]').first().click()
 
-    const dialog = page.getByRole('dialog').first()
+    const dialog = page.locator('[data-recipe-detail]')
     // Against a day's target, not a person's: food is one shared figure now,
     // because the household cooks once.
     await expect(dialog.getByText(/one serving against a day/)).toBeVisible()
@@ -342,15 +342,15 @@ test.describe('the main flow', () => {
 
     // The star was only ever on the card, so deciding you liked something
     // while reading it meant closing the sheet to say so.
-    const star = page.getByRole('dialog').or(page.locator('body'))
-      .getByRole('button', { name: 'Add to favourites' }).last()
-    await star.click()
-    await expect(page.getByRole('button', { name: 'Remove from favourites' }).last())
-      .toBeVisible()
+    const detail = page.locator('[data-recipe-detail]')
+    await detail.getByRole('button', { name: 'Add to favourites' }).click()
+    await expect(detail.getByRole('button', { name: 'Remove from favourites' })).toBeVisible()
 
-    // And the card underneath agrees, because a dish is favourited, not one
-    // wording of it.
-    await page.getByRole('button', { name: 'Close' }).click()
+    // And the list agrees, because a dish is favourited, not one wording of
+    // it. On a phone the recipe is a screen of its own, so go back to the list
+    // first; on a wide screen the list is beside it.
+    const back = page.getByRole('button', { name: 'Back to recipes' })
+    if (await back.isVisible()) await back.click()
     await page.getByRole('button', { name: /^Favourites/ }).click()
     await expect(page.locator('[data-recipe-card]')).toHaveCount(1)
   })
@@ -634,8 +634,8 @@ test.describe('the recipe library', () => {
     // Counted after the first card is on screen. Reading the count the instant
     // the route changes raced the render, and with the library three times the
     // size it had, the race started going the other way.
-    await expect(page.locator('.card').first()).toBeVisible()
-    const shown = await page.locator('.card').count()
+    await expect(page.locator('[data-recipe-card]').first()).toBeVisible()
+    const shown = await page.locator('[data-recipe-card]').count()
     expect(shown, 'the opening shelf is empty').toBeGreaterThan(5)
 
     // There used to be a ceiling here, "fewer than 150 of the 228", and it
@@ -649,13 +649,13 @@ test.describe('the recipe library', () => {
     // of recipes behind them. Read off whichever tab is open, which shelf that
     // is depends on the time of day, and hardcoding Breakfast made this pass
     // only before eleven in the morning.
-    const label = await page.locator('button.tab-on').textContent()
+    const label = await page.locator('[data-shelf="on"]').textContent()
     expect(Number(label?.replace(/\D/g, ''))).toBe(shown)
 
     // And the other shelves are one tap away.
     await page.getByRole('button', { name: /^Dishes/ }).click()
     await expect(page.getByText('Cooked once and eaten across several meals.', { exact: false })).toBeVisible()
-    expect(await page.locator('.card').count()).toBeGreaterThan(5)
+    expect(await page.locator('[data-recipe-card]').count()).toBeGreaterThan(5)
   })
 
   test('the same dish written four times is one recipe, not four', async ({ page }) => {
@@ -668,7 +668,7 @@ test.describe('the recipe library', () => {
     // nothing here to group and no numbering to hide. Named in full, because a
     // later plan added a Hungarian green bean soup that is a different dinner:
     // 300 g with yogurt and no bread.
-    await expect(page.locator('.card')).toHaveCount(1)
+    await expect(page.locator('[data-recipe-card]')).toHaveCount(1)
     await expect(page.getByText('(2)')).toHaveCount(0)
     await expect(page.getByText(/versions/)).toHaveCount(0)
   })
@@ -680,29 +680,29 @@ test.describe('the recipe library', () => {
 
     // 30, 40 and 45 g of oats is a real choice rather than a repeat, so all
     // three survive the import, and each name says which one it is.
-    await expect(page.locator('.card')).toHaveCount(1)
+    await expect(page.locator('[data-recipe-card]')).toHaveCount(1)
     await expect(page.getByText(/3 versions/)).toBeVisible()
 
     // Finding 30: the quantity is not in the headline. It used to be, and
     // "Grapefruit with cashews (10 g cashews, 250 g grapefruit)" ran to three
     // lines on a phone.
-    await expect(page.locator('.card')).not.toContainText('(30 g rolled oats)')
+    await expect(page.locator('[data-recipe-card]')).not.toContainText('(30 g rolled oats)')
 
-    await page.locator('.card button').nth(1).click()
+    await page.locator('[data-recipe-card]').first().click()
     await expect(page.getByText(/Written 3 times across the plans/)).toBeVisible()
 
     // The chips said "1", "2", "3", so the one thing you opened this to
     // decide, which portion, was the one thing they would not tell you.
     for (const oats of ['30 g rolled oats', '40 g rolled oats', '45 g rolled oats']) {
-      await expect(page.locator('.bg-paper').getByRole('button', { name: new RegExp(oats) }))
+      await expect(page.locator('[data-recipe-detail]').getByRole('button', { name: new RegExp(oats) }))
         .toBeVisible()
     }
 
     // What changes when you flip between them is the dietician's own line.
-    const line = page.locator('.card-soft').first()
+    const line = page.locator('[data-source-line]')
     const before = await line.textContent()
     // Scoped to the sheet: the filter chips behind it are also .chip-off.
-    await page.locator('.bg-paper .chip-off').first().click()
+    await page.locator('[data-recipe-detail] .chip-off').first().click()
     await expect(line).not.toHaveText(before ?? '')
   })
 
@@ -724,7 +724,7 @@ test.describe('the recipe library', () => {
 
     // 30 g and 45 g of oats are a real choice, so this one keeps its versions
     // and nothing offers to fold them together.
-    await page.locator('.card button').nth(1).click()
+    await page.locator('[data-recipe-card]').first().click()
     await expect(page.getByText(/Written 3 times across the plans/)).toBeVisible()
     await expect(page.getByRole('button', { name: 'Merge them' })).toHaveCount(0)
   })
@@ -733,7 +733,7 @@ test.describe('the recipe library', () => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Breakfast/ }).click()
     await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt & mixed berries')
-    await page.locator('.card button').nth(1).click()
+    await page.locator('[data-recipe-card]').first().click()
 
     await page.getByRole('button', { name: /Merge these into one/ }).click()
     await page.getByRole('button', { name: 'Merge into this one' }).click()
@@ -760,7 +760,7 @@ test.describe('the recipe library', () => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Breakfast/ }).click()
     await page.getByPlaceholder(/Search in English/).fill('rolled oats with yogurt & mixed berries')
-    await page.locator('.card button').nth(1).click()
+    await page.locator('[data-recipe-card]').first().click()
     await page.getByRole('button', { name: /Merge these into one/ }).click()
     await page.getByRole('button', { name: 'Merge into this one' }).click()
 
@@ -771,7 +771,7 @@ test.describe('the recipe library', () => {
 
   test('the filter sheet admits what the app cannot work out', async ({ page }) => {
     await goto(page, '/recipes')
-    await page.getByRole('button', { name: 'Filters' }).click()
+    await page.getByRole('button', { name: 'More filters' }).click()
 
     // Budget Friendly, Lazy, Leftovers, Fridge Clean-Out and Special Occasion
     // are judgements the data cannot supply, and the sheet says so rather than
@@ -781,31 +781,33 @@ test.describe('the recipe library', () => {
   })
 
   test('the three dimensions narrow together', async ({ page }) => {
-    // Meal time + dish category + quick filters, combined.
+    // Meal time + dish category + quick filters, combined. Lunch, because the
+    // made-up library has no veggie-packed soup for dinner: this counted the
+    // empty state's own card as a result while the recipes were cards too.
     await goto(page, '/recipes')
-    await page.getByRole('button', { name: /^Dinner/ }).click()
-    const all = await page.locator('.card').count()
+    await page.getByRole('button', { name: /^Lunch/ }).click()
+    const all = await page.locator('[data-recipe-card]').count()
 
     await page.getByRole('button', { name: 'Any dish' }).click()
     await page.getByRole('button', { name: /^Soup/ }).click()
-    const soups = await page.locator('.card').count()
+    const soups = await page.locator('[data-recipe-card]').count()
     expect(soups).toBeGreaterThan(0)
     expect(soups).toBeLessThan(all)
 
-    await page.getByRole('button', { name: 'Filters' }).click()
+    await page.getByRole('button', { name: 'More filters' }).click()
     await page.getByText('Veggie Packed').click()
     await page.getByRole('button', { name: 'Close' }).click()
 
     // Narrower, and still showing something: an assertion of "fewer" alone is
     // satisfied by zero, which is how a dead-end combination passed once.
-    const veggieSoups = await page.locator('.card').count()
+    const veggieSoups = await page.locator('[data-recipe-card]').count()
     expect(veggieSoups).toBeGreaterThan(0)
     expect(veggieSoups).toBeLessThan(soups)
 
     // And what you picked is visible and removable, not hidden in a sheet.
-    await expect(page.getByRole('button', { name: /Soup/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Soup/ })).toBeVisible()
     await page.getByRole('button', { name: /Veggie Packed/ }).click()
-    expect(await page.locator('.card').count()).toBe(soups)
+    expect(await page.locator('[data-recipe-card]').count()).toBe(soups)
   })
 
   test('a combination with nothing in it offers the way out', async ({ page }) => {
@@ -813,7 +815,7 @@ test.describe('the recipe library', () => {
     await page.getByRole('button', { name: /^Dinner/ }).click()
     await page.getByRole('button', { name: 'Any dish' }).click()
     await page.getByRole('button', { name: /^Soup/ }).click()
-    await page.getByRole('button', { name: 'Filters' }).click()
+    await page.getByRole('button', { name: 'More filters' }).click()
     await page.getByText('High Protein').click()
     await page.getByRole('button', { name: 'Close' }).click()
 
@@ -821,7 +823,7 @@ test.describe('the recipe library', () => {
     // zero there is no other shelf to send anyone to.
     await expect(page.getByText('That combination has nothing in it')).toBeVisible()
     await page.getByRole('button', { name: 'Clear the filters' }).click()
-    expect(await page.locator('.card').count()).toBeGreaterThan(5)
+    expect(await page.locator('[data-recipe-card]').count()).toBeGreaterThan(5)
   })
 
   test('only offers categories that have something in them', async ({ page }) => {
@@ -830,7 +832,7 @@ test.describe('the recipe library', () => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: 'Any dish' }).click()
 
-    const offered = await page.locator('.bg-paper button').count()
+    const offered = await page.getByRole('dialog').getByRole('button').count()
     expect(offered).toBeGreaterThan(3)
     expect(offered).toBeLessThan(37)
     await expect(page.getByRole('button', { name: /^Taco/ })).toHaveCount(0)
@@ -840,7 +842,7 @@ test.describe('the recipe library', () => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Dinner/ }).click()
     await page.getByPlaceholder(/Search in English/).fill('green bean soup with wholemeal bread')
-    await page.locator('.card button').nth(1).click()
+    await page.locator('[data-recipe-card]').first().click()
 
     await expect(page.getByText('Soup', { exact: true })).toBeVisible()
     await expect(page.getByText(/Cozy & Comforting/)).toBeVisible()
@@ -848,19 +850,19 @@ test.describe('the recipe library', () => {
 
   test('a recipe can be scaled, and a serving stays a serving', async ({ page }) => {
     await goto(page, '/recipes')
-    await page.locator('.card button').nth(1).click()
+    await page.locator('[data-recipe-card]').first().click()
 
     // The per-serving figure is the headline. Doubling the batch must not touch
     // it: twice as much food is not a more filling portion.
-    const perServing = (await page.locator('p.font-mono.text-3xl').first().textContent())?.trim() ?? ''
-    const first = page.locator('li').filter({ hasText: /\d+ g$/ }).first()
+    const perServing = (await page.locator('[data-per-serving-kcal]').first().textContent())?.trim() ?? ''
+    const first = page.locator('[data-recipe-detail] li').filter({ hasText: /\d+ g$/ }).first()
     const before = Number(((await first.textContent()) ?? '').match(/(\d+) g/)?.[1] ?? 0)
     expect(before, 'no weighed ingredient to scale').toBeGreaterThan(0)
 
     await page.getByRole('button', { name: 'One serving more' }).click()
 
     await expect(page.getByText(/Scaled from \d+/)).toBeVisible()
-    expect((await page.locator('p.font-mono.text-3xl').first().textContent())?.trim()).toBe(perServing)
+    expect((await page.locator('[data-per-serving-kcal]').first().textContent())?.trim()).toBe(perServing)
     const after = Number(((await first.textContent()) ?? '').match(/(\d+) g/)?.[1] ?? 0)
     expect(after).toBeGreaterThan(before)
   })
@@ -892,8 +894,8 @@ test.describe('the recipe library', () => {
 
   test('a shipped recipe can be edited, and put back the way it was', async ({ page }) => {
     await goto(page, '/recipes')
-    await page.locator('.card button').nth(1).click()
-    const original = (await page.locator('h2').first().textContent())?.trim() ?? ''
+    await page.locator('[data-recipe-card]').first().click()
+    const original = (await page.locator('[data-recipe-detail] h2').first().textContent())?.trim() ?? ''
     expect(original.length).toBeGreaterThan(0)
 
     await page.getByRole('button', { name: 'Edit recipe' }).click()
@@ -939,10 +941,10 @@ test.describe('the recipe library', () => {
     await page.getByRole('button', { name: /^Yours/ }).click()
     await expect(page.locator('[data-recipe-card]').filter({ hasText: 'Doomed dinner' }))
       .toBeVisible()
-    await page.getByRole('button', { name: 'Add to favourites' }).first().click()
+    await page.locator('[data-recipe-card]').first().click()
+    await page.getByRole('button', { name: 'Add to favourites' }).click()
 
     // Delete it. The confirmation names it and says what will not be affected.
-    await page.locator('.card button').nth(1).click()
     await page.getByRole('button', { name: 'Edit recipe' }).click()
     await page.getByRole('button', { name: /Delete this recipe/ }).click()
     await expect(page.getByText('Delete “Doomed dinner”?')).toBeVisible()
@@ -996,20 +998,20 @@ test.describe('the recipe library', () => {
   test('deleting a recipe leaves its ingredients alone', async ({ page }) => {
     // Other recipes use them.
     await goto(page, '/recipes/foods')
-    await expect(page.locator('.card').first()).toBeVisible()
-    const before = await page.locator('.card').count()
+    await expect(page.locator('[data-food-row]').first()).toBeVisible()
+    const before = await page.locator('[data-food-row]').count()
 
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Lunch/ }).click()
     await page.getByPlaceholder(/Search in English/).fill('chili con carne')
-    await page.locator('.card button').nth(1).click()
+    await page.locator('[data-recipe-card]').first().click()
     await page.getByRole('button', { name: 'Edit recipe' }).click()
     await page.getByRole('button', { name: /Delete this recipe/ }).click()
     await page.getByRole('button', { name: 'Yes, delete' }).click()
 
     await goto(page, '/recipes/foods')
-    await expect(page.locator('.card').first()).toBeVisible()
-    expect(await page.locator('.card').count()).toBe(before)
+    await expect(page.locator('[data-food-row]').first()).toBeVisible()
+    expect(await page.locator('[data-food-row]').count()).toBe(before)
   })
 
   test('deleting an edited recipe removes it instead of restoring the original', async ({ page }) => {
@@ -1018,14 +1020,14 @@ test.describe('the recipe library', () => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Lunch/ }).click()
     await page.getByPlaceholder(/Search in English/).fill('chili con carne')
-    await expect(page.locator('.card')).toHaveCount(1)
+    await expect(page.locator('[data-recipe-card]')).toHaveCount(1)
 
-    await page.locator('.card button').nth(1).click()
+    await page.locator('[data-recipe-card]').first().click()
     await page.getByRole('button', { name: 'Edit recipe' }).click()
     await page.getByLabel('Prep').fill('7')
     await page.getByRole('button', { name: 'Save changes' }).click()
 
-    await page.locator('.card button').nth(1).click()
+    await page.locator('[data-recipe-card]').first().click()
     await page.getByRole('button', { name: 'Edit recipe' }).click()
     await page.getByRole('button', { name: /Delete this recipe/ }).click()
     await page.getByRole('button', { name: 'Yes, delete' }).click()
@@ -1105,7 +1107,7 @@ test.describe('building a recipe from the food database', () => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Dinner/ }).click()
     await page.getByPlaceholder(/Search in English/).fill('green bean soup with wholemeal bread')
-    await page.locator('.card button').nth(1).click()
+    await page.locator('[data-recipe-card]').first().click()
 
     const note = page.getByText(/means a floor, not a total/)
     const plus = page.locator('text=/\\d+(\\.\\d+)? g\\u2009\\+/')
@@ -1263,7 +1265,7 @@ test.describe('the food library', () => {
 
     // Add the same food twice, the way two sources would.
     for (const _ of [1, 2]) {
-      await page.getByRole('main').getByRole('button', { name: 'Add food' }).click()
+      await page.getByRole('main').getByRole('button', { name: 'New food' }).click()
       await page.getByLabel('Name (English)').fill('Test kefir')
       // A category has to be chosen. The form used to default to Vegetables,
       // which is how a camembert ended up filed under it on a shopping list.
@@ -1607,7 +1609,7 @@ test.describe('asking the recipe list a question', () => {
   test('quick tonight narrows the list and says what it did', async ({ page }) => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Breakfast/ }).click()
-    const before = await page.locator('.card').count()
+    const before = await page.locator('[data-recipe-card]').count()
 
     await page.getByRole('button', { name: /Quick tonight/ }).click()
     await expect(page.getByText(/Twenty minutes or less/)).toBeVisible()
@@ -1616,7 +1618,7 @@ test.describe('asking the recipe list a question', () => {
     // Narrower, and not empty. The dietician wrote portions rather than
     // methods, so every imported meal used to have no time at all and this
     // filter could only see the hand-written dishes.
-    const after = await page.locator('.card').count()
+    const after = await page.locator('[data-recipe-card]').count()
     expect(after).toBeGreaterThan(0)
     expect(after).toBeLessThan(before)
 
@@ -1635,14 +1637,14 @@ test.describe('asking the recipe list a question', () => {
     // Nothing in this library makes four servings, so the old rule matched
     // nothing at all. A pot of soup that did two dinners twice over is the
     // real answer.
-    expect(await page.locator('.card').count()).toBeGreaterThan(0)
+    expect(await page.locator('[data-recipe-card]').count()).toBeGreaterThan(0)
   })
 
   test('a time nobody wrote down is offered as an estimate', async ({ page }) => {
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Dinner/ }).click()
     await page.getByPlaceholder(/Search in English/).fill('green bean soup with')
-    await page.locator('.card button').first().click()
+    await page.locator('[data-recipe-card]').first().click()
 
     await expect(page.getByText(/about \d+ min/).first()).toBeVisible()
   })
@@ -1731,14 +1733,15 @@ test.describe('a laptop is not a large phone', () => {
     expect(lefts.size, 'the list is still one column on a laptop').toBeGreaterThan(1)
   })
 
-  test('a dietician line never runs past two lines on a card', async ({ page }) => {
-    // `block` and `line-clamp-2` both set display, and block was winning, so
-    // the clamp did nothing and a 187-character line took six lines of a card.
+  test('a recipe in the list is a row, not a card', async ({ page }) => {
+    // The cards carried the dietician's whole line, clamped to two lines, and
+    // a phone showed three dishes at a time. A row is the name, what it is and
+    // what a serving comes to; the line is in the recipe itself.
     await goto(page, '/recipes')
-    const line = page.locator('.card span.line-clamp-2').first()
-    await expect(line).toBeVisible()
-    const box = await line.boundingBox()
-    expect(box!.height).toBeLessThan(48)
+    const row = page.locator('[data-recipe-card]').first()
+    await expect(row).toBeVisible()
+    const box = await row.boundingBox()
+    expect(box!.height).toBeLessThan(90)
   })
 })
 
@@ -2498,7 +2501,7 @@ test.describe('what actually happened', () => {
     await goto(page, '/recipes')
     await page.locator('[data-recipe-card]').first().click()
 
-    await page.getByRole('button', { name: 'Put it in a day' }).click()
+    await page.getByRole('button', { name: 'Add to plan' }).click()
     // Named, because the recipe sheet behind it is a dialog too now that every
     // one of them announces itself.
     const dialog = page.getByRole('dialog', { name: /^Put .* in a day$/ })
@@ -2955,7 +2958,7 @@ test.describe('cooking three and eating one', () => {
     await more.click()
     await expect(page.getByText(/3 servings/)).toBeVisible()
 
-    await page.getByRole('button', { name: /Put it in a day/i }).first().click()
+    await page.getByRole('button', { name: 'Add to plan' }).first().click()
 
     // The dialog asks its own question, and starts where the honest answer is.
     const eating = page.getByLabel('How much are you eating')
@@ -3128,7 +3131,7 @@ test.describe('a food is filed where you put it', () => {
     // barcode was the fastest way to mis-file something. A camembert sat under
     // Vegetables on the shopping list for as long as it existed.
     await goto(page, '/recipes/foods')
-    await page.getByRole('main').getByRole('button', { name: 'Add food' }).click()
+    await page.getByRole('main').getByRole('button', { name: 'New food' }).click()
     await page.getByLabel('Name (English)').fill('Test camembert')
 
     const save = page.getByRole('button', { name: 'Save food' })
