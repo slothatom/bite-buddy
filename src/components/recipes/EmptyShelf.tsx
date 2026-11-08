@@ -34,7 +34,7 @@ export function EmptyShelf({
               <button className="btn-secondary" onClick={onNew}>
                 <Plus size={16} /> Write it
               </button>
-              <Link to="/foods" className="btn-secondary">Look in Foods</Link>
+              <Link to="/recipes/foods" className="btn-secondary">Look in Foods</Link>
             </>
           )}
         </div>

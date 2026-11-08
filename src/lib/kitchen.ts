@@ -77,7 +77,7 @@ export function kitchenNudges(input: KitchenInput): Nudge[] {
         detail: waiting.length === 1
           ? `${portionLabel(waiting[0], ctx.recipes)}, and nothing planned to eat it.`
           : `${waiting.map((p) => portionLabel(p, ctx.recipes)).slice(0, 3).join(', ')}. Nothing planned to eat them yet.`,
-        to: '/plan',
+        to: '/plan/week',
         rank: 20,
       })
     }
@@ -100,7 +100,7 @@ export function kitchenNudges(input: KitchenInput): Nudge[] {
       // to follow, "worth eating first if it is still good", handed back the
       // judgement the sentence before it had just refused to make.
       detail: 'Worth a look, and the oldest thing in there.',
-      to: '/schedule',
+      to: '/plan/cooking',
       rank: 30,
     })
   }
@@ -123,7 +123,7 @@ export function kitchenNudges(input: KitchenInput): Nudge[] {
         detail: needed.length
           ? `${next.recipeIds.length} ${next.recipeIds.length === 1 ? 'dish' : 'dishes'}, and ${needed.length === 1 ? 'one thing is' : `${needed.length} things are`} not in the house: ${needed.slice(0, 3).join(', ')}.`
           : `${next.recipeIds.length} ${next.recipeIds.length === 1 ? 'dish' : 'dishes'}, and everything for ${next.recipeIds.length === 1 ? 'it' : 'them'} is in.`,
-        to: '/schedule',
+        to: '/plan/cooking',
         rank: needed.length ? 10 : 40,
       })
     }
@@ -138,7 +138,7 @@ export function kitchenNudges(input: KitchenInput): Nudge[] {
         kind: 'shopping',
         title: `The list is missing ${missing.length} ${missing.length === 1 ? 'thing' : 'things'}`,
         detail: `The plan has changed since it was built: ${missing.slice(0, 3).join(', ')}. Rebuilding keeps your ticks and anything you added.`,
-        to: '/grocery',
+        to: '/plan/grocery',
         rank: 25,
       })
     }
@@ -152,7 +152,7 @@ export function kitchenNudges(input: KitchenInput): Nudge[] {
       kind: 'shared',
       title: `${shared.meals} meals this week use ${shared.name.toLowerCase()}`,
       detail: 'Worth buying once and using across them, or cooking in one batch.',
-      to: '/grocery',
+      to: '/plan/grocery',
       rank: 50,
     })
   }

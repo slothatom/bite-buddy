@@ -43,7 +43,7 @@ export default function Analytics() {
               was eaten and skipped, the figures and the weights, to print or
               send. */}
           <Link
-            to="/analytics/summary"
+            to="/progress/summary"
             className="inline-flex items-center gap-1.5 mt-2 text-sm font-semibold text-bite-700 hover:underline min-h-11"
           >
             <FileText size={15} /> Summary for your dietician

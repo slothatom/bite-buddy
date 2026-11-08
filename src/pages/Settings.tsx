@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { SectionHeading } from '../components/ui'
 import { PlanArchive } from '../components/settings/PlanArchive'
 import { HouseholdPanel } from '../components/settings/HouseholdPanel'
@@ -25,17 +26,37 @@ import { WeekSection } from '../components/settings/WeekSection'
  */
 type Tab = 'settings' | 'history'
 
-export default function Settings() {
+/**
+ * `signedOut` is the copy reachable from the sign-in screen, which brings its
+ * own way back; everywhere else a phone gets a back arrow here, because
+ * Settings has no bottom bar to leave by.
+ */
+export default function Settings({ signedOut = false }: { signedOut?: boolean }) {
   const location = useLocation()
   const tab: Tab = location.pathname.startsWith('/settings/history') ? 'history' : 'settings'
+  const back = tab === 'history'
+    ? { to: '/settings', label: 'Back to Settings' }
+    : { to: '/', label: 'Back to Today' }
 
   return (
     <div className="flex-1 overflow-y-auto pb-[calc(2rem+env(safe-area-inset-bottom))]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
         <header>
-          <h1 className="display text-xl sm:text-2xl text-ink-900">
-            {tab === 'history' ? 'Plan history' : 'Settings'}
-          </h1>
+          <div className={`flex items-center gap-1 ${signedOut ? '' : '-ml-2.5 md:ml-0'}`}>
+            {!signedOut && (
+              <Link
+                to={back.to}
+                aria-label={back.label}
+                className="md:hidden flex items-center justify-center w-11 h-11 shrink-0 rounded-[14px]
+                           text-ink-900 hover:bg-bite-50"
+              >
+                <ArrowLeft size={22} aria-hidden="true" />
+              </Link>
+            )}
+            <h1 className="display text-xl sm:text-2xl text-ink-900">
+              {tab === 'history' ? 'Plan history' : 'Settings'}
+            </h1>
+          </div>
           <p className="text-sm text-ink-700">
             {tab === 'history'
               ? "Every week your dietician wrote, in their own words."

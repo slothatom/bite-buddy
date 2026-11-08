@@ -27,6 +27,7 @@ import { dayCompleteness } from '../lib/completeness'
 import { isConfigured } from '../lib/supabase'
 import { MOMENTS } from '../lib/moments'
 import Logo from '../components/brand/Logo'
+import TodayHeaderActions from '../components/layout/TodayHeaderActions'
 import { useWatchForMoments } from '../store/useMoments'
 import { useRecipes } from '../store/useRecipeStore'
 import { useCookStore } from '../store/useCookStore'
@@ -195,8 +196,10 @@ export default function Home() {
 
         <MomentNote />
 
-        <header className="flex items-start gap-4">
-          <div className="min-w-0">
+        <header className="flex items-start gap-3">
+          {/* The phone has no top bar any more, so Today carries the mark. */}
+          <Logo variant="mark" size={30} className="md:hidden shrink-0 mt-1.5" />
+          <div className="min-w-0 flex-1">
             <h1 className="display text-xl sm:text-2xl text-ink-900">{greeting()}{profile.name ? `, ${profile.name}` : ''}</h1>
             <p className="text-sm text-ink-700">
               {new Date(today + 'T12:00:00').toLocaleDateString('en-GB', {
@@ -204,6 +207,7 @@ export default function Home() {
               })}
             </p>
           </div>
+          <TodayHeaderActions />
         </header>
 
         {/* ─── At a glance ─────────────────────────────────────────────────── */}
@@ -226,7 +230,7 @@ export default function Home() {
             value={`${mediterranean.met}`}
             unit={`of ${mediterranean.of}`}
             note="goals reached"
-            to="/analytics"
+            to="/progress"
           />
           {/* What is already cooked outranks what is planned to be: it is the
               thing that changes what you do in the next hour. */}
@@ -237,7 +241,7 @@ export default function Home() {
               unit={portions.length === 1 ? 'portion' : 'portions'}
               note={portions.length === 1 ? 'of one thing' : `of ${portions.length} things`}
               icon={CookingPot}
-              to="/schedule"
+              to="/plan/cooking"
             />
           ) : nextCook ? (
             <Tile
@@ -246,7 +250,7 @@ export default function Home() {
               unit={nextCook.time}
               note={nextCook.label}
               icon={CookingPot}
-              to="/schedule"
+              to="/plan/cooking"
             />
           ) : (
             <WeightTile />
@@ -308,7 +312,7 @@ export default function Home() {
               )}
               <MovedToday movement={movedToday} />
               <div className="flex flex-wrap gap-2">
-                <Link to="/plan" className="btn-secondary">
+                <Link to="/plan/week" className="btn-secondary">
                   Open the planner <ArrowRight size={15} />
                 </Link>
                 <button className="btn-secondary" onClick={() => setAte({ date: todayDate(), slot: slotNow() })}>
@@ -323,7 +327,7 @@ export default function Home() {
                 Start from scratch, or load one of the 14 weeks your dietician wrote.
               </p>
               <div className="flex flex-wrap gap-2 justify-center">
-                <Link to="/plan" className="btn-primary">Plan today</Link>
+                <Link to="/plan/week" className="btn-primary">Plan today</Link>
                 <button className="btn-secondary" onClick={() => setAte({ date: todayDate(), slot: slotNow() })}>
                   <Utensils size={15} /> I ate something
                 </button>
@@ -394,8 +398,8 @@ export default function Home() {
             </div>
 
             <div className="flex flex-wrap gap-2 pt-1">
-              <Link to="/plan" className="btn-secondary"><CalendarDays size={15} /> Planner</Link>
-              <Link to="/grocery" className="btn-secondary"><ShoppingBasket size={15} /> Grocery list</Link>
+              <Link to="/plan/week" className="btn-secondary"><CalendarDays size={15} /> Planner</Link>
+              <Link to="/plan/grocery" className="btn-secondary"><ShoppingBasket size={15} /> Grocery list</Link>
               <Link to="/recipes" className="btn-secondary"><BookOpen size={15} /> Recipes</Link>
             </div>
           </div>
@@ -576,7 +580,7 @@ function WeightTile() {
 
   if (!latest?.last) {
     return (
-      <Link to="/analytics" className="card p-3 min-w-0 hover:border-bite-300 transition-colors">
+      <Link to="/progress" className="card p-3 min-w-0 hover:border-bite-300 transition-colors">
         <p className="text-xs font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
           <Scale size={12} /> Weight
         </p>
@@ -590,7 +594,7 @@ function WeightTile() {
   const change = latest.last.weight - first.weight
 
   return (
-    <Link to="/analytics" className="card p-3 min-w-0 hover:border-bite-300 transition-colors">
+    <Link to="/progress" className="card p-3 min-w-0 hover:border-bite-300 transition-colors">
       <p className="text-xs font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
         <Scale size={12} /> {latest.person.name}
       </p>

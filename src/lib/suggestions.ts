@@ -116,7 +116,7 @@ export function suggest({ days, recipes, ctx, today }: SuggestionInput): Suggest
       kind: 'limit',
       title: `${goal.label} twice over`,
       reason: `${servingCount(goal.servings)} servings against the ${goal.target} a week the guide suggests.`,
-      to: '/plan',
+      to: '/plan/week',
     })
   }
 
@@ -132,7 +132,7 @@ export function suggest({ days, recipes, ctx, today }: SuggestionInput): Suggest
       kind: 'unplanned',
       title: `${when} has nothing in it`,
       reason: 'A day with no plan is the one you end up buying lunch for.',
-      to: '/plan',
+      to: '/plan/week',
     })
   }
 

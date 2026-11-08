@@ -76,7 +76,7 @@ export default function DieticianSummary() {
     <div className="flex-1 overflow-y-auto pb-[calc(2rem+env(safe-area-inset-bottom))]">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <header data-print-hide className="space-y-1">
-          <Link to="/analytics" className="inline-flex items-center gap-1 text-sm font-semibold text-bite-700 hover:underline min-h-11">
+          <Link to="/progress" className="inline-flex items-center gap-1 text-sm font-semibold text-bite-700 hover:underline min-h-11">
             <ArrowLeft size={15} /> Progress
           </Link>
           <h1 className="display text-xl sm:text-2xl text-ink-900">For your dietician</h1>

@@ -377,15 +377,27 @@
 
 /* ─── Navigation ───────────────────────────────────────────────────────────── */
 
+/* The sidebar's rows. The current one is a soft bite-100 fill with bite-700
+   words at extra-bold: colour, fill and weight together, so it does not rest
+   on hue alone. */
 @utility nav-item {
-  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold
+  @apply flex items-center gap-3 h-11 px-3 rounded-[14px] text-[15px] font-bold
          text-ink-700 hover:bg-bite-50 hover:text-bite-700
          transition-all duration-150 cursor-pointer;
 }
 
 @utility nav-item-active {
-  @apply nav-item bg-bite-500 text-on-brand hover:bg-bite-400 hover:text-on-brand shadow-e1;
+  @apply nav-item bg-bite-100 text-bite-700 font-extrabold hover:bg-bite-100;
 }
+
+/* The section tabs (Week · Grocery · Cooking and the like): a segmented
+   control on a border-100 track, the current segment raised on paper. */
+@utility segment {
+  @apply flex items-center justify-center min-h-10 md:min-h-9 px-4 rounded-md text-sm
+         whitespace-nowrap transition-all duration-150 cursor-pointer;
+}
+@utility segment-on { @apply segment bg-paper text-ink-900 font-extrabold shadow-e1; }
+@utility segment-off { @apply segment text-ink-700 font-bold hover:text-ink-900; }
 
 /* ─── Planner ──────────────────────────────────────────────────────────────── */
 
@@ -407,7 +419,8 @@
   .btn, .btn-primary, .btn-secondary, .btn-ghost, .btn-danger,
   .tab, .tab-on, .tab-off,
   .chip, .chip-on, .chip-off,
-  .input, select.input, .nav-item {
+  .segment, .segment-on, .segment-off,
+  .input, select.input, .nav-item, .nav-item-active {
     min-height: 44px;
   }
 
@@ -429,7 +442,7 @@
 
 /* ─── Printing the dietician summary ───────────────────────────────────────────
    Only when a page has something marked to print, which today is the summary
-   at /analytics/summary. Everything that is neither the summary, inside it,
+   at /progress/summary. Everything that is neither the summary, inside it,
    nor one of the boxes it sits in is taken out: the sidebar, the tab bar, the
    banners, and the controls above it. The boxes it sits in lose their scroll
    and their height, because a scrolling column prints as one screenful and

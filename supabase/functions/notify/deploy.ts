@@ -75,7 +75,7 @@ export function cookNote(session: CookSession): Note {
     body: dishes
       ? `${session.label} at ${session.time}, ${dishes} dish${dishes === 1 ? '' : 'es'} to get through.`
       : `${session.label} at ${session.time}.`,
-    path: '/#/schedule',
+    path: '/#/plan/cooking',
   }
 }
 
@@ -137,7 +137,7 @@ export function planNote(
       tag: 'plan-changes',
       title: `${who} changed the week`,
       body: `${parts.join(', ')} across ${days.size} day${days.size === 1 ? '' : 's'}.`,
-      path: '/#/plan',
+      path: '/#/plan/week',
     },
     watermark: theirs.reduce((max, r) => (r.updated_at > max ? r.updated_at : max), since),
   }

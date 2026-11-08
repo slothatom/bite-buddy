@@ -1,8 +1,10 @@
 import { Fragment, lazy, Suspense, useEffect } from 'react'
-import { HashRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import Sidebar from './components/layout/Sidebar'
-import MobileNav from './components/layout/MobileNav'
+import BottomNav from './components/layout/BottomNav'
+import SectionLayout from './components/layout/SectionLayout'
+import { REDIRECTS, isSettings } from './components/layout/nav'
 import ErrorBoundary from './components/layout/ErrorBoundary'
 import StorageBanner from './components/layout/StorageBanner'
 import UndoBar from './components/layout/UndoBar'
@@ -85,14 +87,14 @@ function useCurrentWeek() {
  */
 const TITLES: Record<string, string> = {
   '/': 'Today',
-  '/plan': 'Planner',
+  '/plan/week': 'Plan',
+  '/plan/grocery': 'Shopping',
+  '/plan/cooking': 'Cooking',
   '/recipes': 'Recipes',
-  '/foods': 'Foods',
-  '/grocery': 'Shopping',
-  '/schedule': 'Cooking',
-  '/movement': 'Movement',
-  '/analytics': 'Progress',
-  '/analytics/summary': 'For your dietician',
+  '/recipes/foods': 'Foods',
+  '/progress': 'Progress',
+  '/progress/movement': 'Movement',
+  '/progress/summary': 'For your dietician',
   '/settings': 'Settings',
   '/settings/history': 'Plan history',
 }
@@ -133,6 +135,42 @@ function useTheme() {
 }
 
 /**
+ * Where an old address lives now, query string and all.
+ *
+ * `/grocery?tab=cupboard` has to arrive at the cupboard, not at the list, so
+ * the search is carried across rather than dropped.
+ */
+function Redirect({ to }: { to: string }) {
+  const { search } = useLocation()
+  return <Navigate to={{ pathname: to, search }} replace />
+}
+
+/**
+ * A tap on a notification while the app is already open.
+ *
+ * The service worker focuses the open window and posts the path the
+ * notification was about (`/#/plan/cooking`); this is what follows it. Without
+ * it, tapping a cooking reminder brought the app forward on whatever screen
+ * it was last left on.
+ */
+function useNotificationClicks() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const sw = typeof navigator !== 'undefined' ? navigator.serviceWorker : undefined
+    if (!sw) return
+    const follow = (event: MessageEvent) => {
+      const data = event.data as { type?: string; path?: unknown } | null
+      if (data?.type !== 'notification-click' || typeof data.path !== 'string') return
+      const route = data.path.includes('#') ? data.path.slice(data.path.indexOf('#') + 1) : data.path
+      navigate(route || '/')
+    }
+    sw.addEventListener('message', follow)
+    return () => sw.removeEventListener('message', follow)
+  }, [navigate])
+}
+
+/**
  * The household's plan archive, fetched once the household is known.
  *
  * The copy on this device is already in place (main.tsx restores it before
@@ -159,6 +197,10 @@ function Shell() {
   useOtherTabs()
   useRouteTitle()
   useArchiveSync()
+  useNotificationClicks()
+  const { pathname } = useLocation()
+  // Settings is a detour with a back arrow and no bar, so no room for one.
+  const barSpace = isSettings(pathname) ? '' : 'pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0'
   // A new archive remounts every screen, so nothing keeps showing the recipes
   // and plans it read before. Rare (an upload, or a newer one arriving after
   // sign-in), and the stores and the route survive it.
@@ -169,30 +211,46 @@ function Shell() {
       <StorageBanner />
       <div className="flex min-h-screen bg-cream-50">
         <Sidebar />
-        {/* Room under the content for the phone's tab bar, so the last row of a
+        {/* Room under the content for the phone's bar, so the last row of a
             screen is never hidden behind it. */}
-        <main className="flex-1 flex flex-col min-w-0 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
-          <MobileNav />
+        <main className={`flex-1 flex flex-col min-w-0 ${barSpace}`}>
           <Suspense fallback={<ScreenLoading />}>
             <Routes>
-              <Route path="/"          element={<Home />} />
-              <Route path="/plan"      element={<Planner />} />
-              <Route path="/recipes"   element={<Recipes />} />
-              <Route path="/foods"     element={<Foods />} />
-              <Route path="/grocery"   element={<GroceryList />} />
-              {/* The archive lives inside Settings now. The old address still
-                  works, plenty of things link to it. */}
-              <Route path="/history"   element={<Navigate to="/settings/history" replace />} />
-              <Route path="/schedule"  element={<Schedule />} />
-              <Route path="/movement" element={<Activity />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/analytics/summary" element={<DieticianSummary />} />
+              <Route path="/" element={<Home />} />
+
+              <Route path="/plan" element={<SectionLayout section="plan" />}>
+                <Route index          element={<Redirect to="/plan/week" />} />
+                <Route path="week"    element={<Planner />} />
+                <Route path="grocery" element={<GroceryList />} />
+                <Route path="cooking" element={<Schedule />} />
+              </Route>
+
+              <Route path="/recipes" element={<SectionLayout section="recipes" />}>
+                <Route index        element={<Recipes />} />
+                <Route path="foods" element={<Foods />} />
+              </Route>
+
+              <Route path="/progress" element={<SectionLayout section="progress" />}>
+                <Route index           element={<Analytics />} />
+                <Route path="movement" element={<Activity />} />
+                <Route path="summary"  element={<DieticianSummary />} />
+              </Route>
+
               <Route path="/settings/*" element={<Settings />} />
-              <Route path="*"          element={<Navigate to="/" replace />} />
+
+              {/* Every address the app used to have still works: bookmarks,
+                  reminders already on a phone, and links in old notes. */}
+              {/* `/plan` itself is the index of the Plan section above. */}
+              {Object.entries(REDIRECTS).filter(([from]) => from !== '/plan').map(([from, to]) => (
+                <Route key={from} path={from} element={<Redirect to={to} />} />
+              ))}
+
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
         </main>
       </div>
+      <BottomNav />
       <UndoBar />
     </Fragment>
   )
@@ -215,7 +273,7 @@ function SignedOutSettings() {
         <p className="text-sm text-ink-500">Signed out. Everything here is kept on this device.</p>
       </header>
       <Suspense fallback={<ScreenLoading />}>
-        <Settings />
+        <Settings signedOut />
       </Suspense>
     </div>
   )
