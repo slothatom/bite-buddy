@@ -236,7 +236,8 @@ function Shell() {
                 <Route path="foods" element={<Foods />} />
               </Route>
 
-              <Route path="/progress" element={<SectionLayout section="progress" />}>
+              {/* Progress draws its own header, with the tabs inside it. */}
+              <Route path="/progress">
                 <Route index           element={<Analytics />} />
                 <Route path="movement" element={<Activity />} />
                 <Route path="summary"  element={<DieticianSummary />} />

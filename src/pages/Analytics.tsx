@@ -1,802 +1,600 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FileText, Plus } from 'lucide-react'
-import { useMealPlanStore } from '../store/useMealPlanStore'
+import { Check, ChevronRight } from 'lucide-react'
+import { useMealPlanStore, addDays, today as todayDate } from '../store/useMealPlanStore'
 import { useThisWeek } from '../store/useThisWeek'
 import { useUserStore } from '../store/useUserStore'
-import { useUiStore } from '../store/useUiStore'
-import {
-  useBodyStore, useWeightFor, useMeasurementsFor, useUnassignedCount,
-} from '../store/useBodyStore'
-import { MEASUREMENT_KEYS, MEASUREMENT_LABELS, type MeasurementKey } from '../types'
-import { type PersonId } from '../lib/people'
-import { usePeople, useResolvedPerson } from '../store/useHousehold'
+import { useWeightFor } from '../store/useBodyStore'
 import { useNutritionContext } from '../store/useNutrition'
-import { today } from '../store/useMealPlanStore'
-import { weekEaten } from '../lib/nutrition'
-import { scoreWeek, scoreGaps, servingCount, IMPLAUSIBLE_RATIO } from '../lib/mediterranean'
-import { STATUS_STYLES, targetStatus } from '../lib/status'
-import { EmptyState, EstimatesNote, SectionHeading, ChipCheck } from '../components/ui'
-import BodyChart from '../components/body/BodyChart'
-import {
-  BODY_SPANS, BODY_SPAN_LABELS, changeOver, spanStart, withinSpan,
-  type BodySpan, type Reading,
-} from '../lib/body'
 import { useMovementAcross } from '../store/useActivityStore'
+import { weekEaten, type DayReading } from '../lib/nutrition'
+import { scoreWeek, servingCount } from '../lib/mediterranean'
+import { STATUS_STYLES, targetStatus } from '../lib/status'
+import { inUnit, round1, fromKg } from '../lib/weight'
+import { EstimatesNote } from '../components/ui'
 import TrendsTab from '../components/trends/TrendsTab'
-import type { DayMovement } from '../lib/movement'
-import { fromKg, inUnit, round1, toKg } from '../lib/weight'
+import ProgressHeader from '../components/progress/ProgressHeader'
+import { useWhose } from '../components/progress/useWhose'
+import BodyPanel from '../components/progress/BodyPanel'
+import MediterraneanPanel from '../components/progress/MediterraneanPanel'
+import {
+  averageRows, rangeLabel, shortDate, sparkPoints, type AverageRow,
+} from '../components/progress/overview'
 
-type Tab = 'week' | 'trends' | 'mediterranean' | 'body'
+type Detail = 'body' | 'mediterranean' | 'trends'
 
+const DETAILS: [Detail, string][] = [['body', 'Body'], ['mediterranean', 'Mediterranean'], ['trends', 'Trends']]
+
+/**
+ * Progress, the overview: how this week is going, the daily averages against
+ * the targets, and the weight, with the detail underneath.
+ *
+ * Everything that used to sit behind the old This week · Trends ·
+ * Mediterranean · Body strip is still here: the week is the overview, and the
+ * other three are the "In detail" tabs below it.
+ */
 export default function Analytics() {
-  const [tab, setTab] = useState<Tab>('week')
+  const [detail, setDetail] = useState<Detail>('body')
+  const week = useWeek()
+
+  function openDetail(d: Detail) {
+    setDetail(d)
+    document.getElementById('progress-detail')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   return (
     <div className="flex-1 overflow-y-auto pb-[calc(2rem+env(safe-area-inset-bottom))]">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-        <header>
-          <h1 className="display text-xl sm:text-2xl text-ink-900">Progress</h1>
-          <p className="text-sm text-ink-700">How your week is shaping up, and how it is going.</p>
-          <EstimatesNote className="mt-1" />
-          {/* The way out of the app and into an appointment: a page of what
-              was eaten and skipped, the figures and the weights, to print or
-              send. */}
-          <Link
-            to="/progress/summary"
-            className="inline-flex items-center gap-1.5 mt-2 text-sm font-semibold text-bite-700 hover:underline min-h-11"
-          >
-            <FileText size={15} /> Summary for your dietician
-          </Link>
-        </header>
+      <div className="max-w-3xl md:max-w-6xl mx-auto px-4 sm:px-6 md:px-8 pt-3 md:pt-6 space-y-3 md:space-y-4">
+        <ProgressHeader
+          whose
+          actions={<span className="text-[15px] font-extrabold text-ink-900 tabular-nums pl-2">{rangeLabel(week.dates)}</span>}
+        />
 
-        {/* Announced as tabs, like every other strip in the app. These were
-            plain buttons, so nothing told a screen reader they were a set or
-            which one was current. */}
-        {/* Scrolls rather than squashing: four tabs at 331 px is narrower than
-            the words on them, and a tab strip that truncates its own labels is
-            a strip you have to guess at. */}
-        <div className="-mx-4 px-4 overflow-x-auto">
-          <div
-            className="flex gap-1 p-1 bg-cream-50 rounded-xl w-max"
-            role="tablist"
-            aria-label="What to show"
-          >
-          {([
-            ['week', 'This week'], ['trends', 'Trends'],
-            ['mediterranean', 'Mediterranean'], ['body', 'Body'],
-          ] as const).map(([k, label]) => (
-            <button
-              key={k}
-              role="tab"
-              aria-selected={tab === k}
-              onClick={() => setTab(k)}
-              className={tab === k ? 'tab-on' : 'tab-off'}
-            >
-              {label}
-            </button>
-          ))}
+        <StatTiles week={week} />
+
+        <div className="grid gap-3 md:gap-4 md:grid-cols-[minmax(0,1fr)_340px] md:items-start">
+          <WeekCard week={week} onServings={() => openDetail('mediterranean')} />
+          <div className="space-y-3 md:space-y-4">
+            <EightWeeks />
+            <AveragesCard rows={week.rows} />
           </div>
         </div>
 
-        {tab === 'week' && <WeekTab />}
-        {tab === 'trends' && <TrendsTab />}
-        {tab === 'mediterranean' && <MediterraneanTab />}
-        {tab === 'body' && <BodyTab />}
+        <div className="md:hidden space-y-3">
+          <WeightCard onLog={() => openDetail('body')} />
+          <MoreLinks dates={week.dates} />
+        </div>
+
+        <section id="progress-detail" aria-labelledby="detail-h" className="pt-3 space-y-3 scroll-mt-4">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h2 id="detail-h" className="w-full sm:w-auto sm:flex-1 text-base font-extrabold text-ink-900">In detail</h2>
+            <div className="grid grid-cols-3 sm:flex gap-1 p-1 bg-border-100 rounded-lg w-full sm:w-fit" role="tablist" aria-label="Which detail">
+              {DETAILS.map(([k, label]) => (
+                <button
+                  key={k}
+                  role="tab"
+                  aria-selected={detail === k}
+                  onClick={() => setDetail(k)}
+                  className={detail === k ? 'segment-on' : 'segment-off'}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {detail === 'body' && <BodyPanel />}
+          {detail === 'mediterranean' && <MediterraneanPanel />}
+          {detail === 'trends' && <TrendsTab />}
+        </section>
       </div>
     </div>
   )
 }
 
-function WeekTab() {
+interface Week {
+  dates: string[]
+  days: DayReading[]
+  withFood: DayReading[]
+  recorded: number
+  planned: number
+  avg: number
+  onTrack: number
+  target: number
+  rows: AverageRow[]
+}
+
+/**
+ * The week on screen, as what each day amounted to: what was ticked where
+ * anything was, and the plan where nothing was yet. Which days are records and
+ * which are still intentions is said, never blended into one number silently.
+ */
+function useWeek(): Week {
   const plan = useMealPlanStore((s) => s.plan)
-  const weekDates = useThisWeek()
-  const { profile } = useUserStore()
-  const viewingAs = useResolvedPerson(useUiStore((s) => s.viewingAs))
-  const targets = profile.targets
+  const dates = useThisWeek()
+  const targets = useUserStore((s) => s.profile.targets)
   const ctx = useNutritionContext()
 
-  // The week on screen, not every day the app has ever held. Under a tab
-  // labelled "This week" the whole plan was charted, so a week planned a
-  // fortnight ago was still being shown as though it were this one.
-  //
-  // And what each day amounted to, not what was hoped for it. This screen
-  // summed the plan while the planner and Home reported what had been ticked,
-  // so the app recorded the truth in one place and reported the intention here.
-  const { days, recorded, planned: stillPlanned } = weekEaten(weekDates, plan, ctx)
-  // What was done as well as what was eaten. Logged on the Movement screen for
-  // months and never once mentioned on a screen about the week.
-  const moved = useMovementAcross(viewingAs, weekDates)
-  const withFood = days.filter((d) => d.nutrients.calories > 0)
-  const peak = Math.max(targets.calories, ...days.map((d) => d.nutrients.calories), 1)
+  return useMemo(() => {
+    const { days, recorded, planned } = weekEaten(dates, plan, ctx)
+    const withFood = days.filter((d) => d.nutrients.calories > 0)
+    const avg = withFood.length
+      ? withFood.reduce((a, d) => a + d.nutrients.calories, 0) / withFood.length
+      : 0
+    const onTrack = withFood.filter((d) => targetStatus(d.nutrients.calories, targets.calories).level === 'on-track').length
+    return {
+      dates, days, withFood, recorded, planned, avg, onTrack,
+      target: targets.calories, rows: averageRows(withFood, targets),
+    }
+  }, [dates, plan, ctx, targets])
+}
 
-  if (!withFood.length) {
-    return <EmptyState title="Nothing planned yet this week">
-      Add a few meals and the numbers will appear here.
-    </EmptyState>
-  }
+// ─── Desktop tiles ────────────────────────────────────────────────────────────
 
-  const avg = withFood.reduce((a, d) => a + d.nutrients.calories, 0) / withFood.length
-
+function Tile({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-5">
-      <div className="card p-5">
-        <p className="text-xs font-bold uppercase tracking-wide text-ink-500">Daily average</p>
-        <p className="text-3xl font-extrabold font-mono text-ink-900">
-          {Math.round(avg)}<span className="text-base text-ink-500 font-semibold ml-1">kcal</span>
-        </p>
-        {/* Which days are records and which are still intentions. A blend of
-            the two presented as one number is the thing this screen used to do
-            without saying so. */}
-        <p className="text-sm text-ink-700">
-          across {withFood.length} {withFood.length === 1 ? 'day' : 'days'}
-          {recorded > 0 && stillPlanned > 0
-            ? `, ${recorded} recorded and ${stillPlanned} still planned`
-            : recorded > 0 ? ', all recorded' : ', all planned'}
-          {' · '}target {targets.calories}
-        </p>
-      </div>
-
-      <MovementWeek moved={moved} />
-
-      <section>
-        <SectionHeading>Calories by day</SectionHeading>
-        <div className="card p-5">
-          {/* The target used to be labelled on the line itself, where it sat on
-              top of any bar reaching a similar height, measured 24px of overlap
-              on a phone. It reads as a legend instead, and the line stays bare. */}
-          <p className="flex items-center gap-2 mb-3 text-xs text-ink-500">
-            <span className="w-6 border-t-2 border-dashed border-ink-900/25" aria-hidden="true" />
-            target {targets.calories.toLocaleString()} kcal
-            {recorded > 0 && (
-              <span className="ml-1">
-                · <span className="text-leaf-700 font-bold">{'\u2713'}</span> recorded, the rest planned
-              </span>
-            )}
-          </p>
-          <div className="relative flex items-end gap-2 h-40">
-            <div
-              className="absolute inset-x-0 border-t-2 border-dashed border-ink-900/25 pointer-events-none"
-              style={{ bottom: `${Math.min(96, (targets.calories / peak) * 100)}%` }}
-            />
-            {days.map((d) => {
-              const kcal = d.nutrients.calories
-              const height = (kcal / peak) * 100
-              const status = targetStatus(kcal, targets.calories)
-              return (
-                // The figures sit under the bars, not above them: above, they
-                // land exactly where the target line runs whenever the week is
-                // near target, and the dashes struck through the digits.
-                <div key={d.date} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-                  {/* Over target used to be carried by hue alone, which
-                      lib/status.ts exists to prevent: it hands back a label and
-                      a symbol precisely so a bar does not have to be red to
-                      mean something. The symbol rides above the bar. */}
-                  <span
-                    className={`text-xs font-bold leading-none h-3 ${STATUS_STYLES[status.level].text}`}
-                    aria-hidden="true"
-                  >
-                    {status.symbol}
-                  </span>
-                  <div
-                    className={`w-full rounded-t-lg transition-all duration-500 ${STATUS_STYLES[status.level].fill}`}
-                    style={{ height: `${Math.max(height, kcal > 0 ? 4 : 0)}%` }}
-                  />
-                  <span className="text-xs font-mono text-ink-900 tabular-nums leading-none">
-                    {kcal > 0 ? Math.round(kcal) : ''}
-                  </span>
-                  {/* A recorded day and a planned one are different claims, so
-                      the difference is a mark under the day rather than a shade
-                      of the same bar. */}
-                  <span
-                    className="text-xs text-ink-500 leading-none"
-                    title={d.any ? (d.recorded ? 'recorded' : 'planned') : undefined}
-                  >
-                    {new Date(d.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'narrow' })}
-                    {d.recorded ? <span className="text-leaf-700 font-bold">{'\u2009\u2713'}</span> : null}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-
-        </div>
-      </section>
+    <div className="card px-[18px] py-3.5 flex flex-col gap-0.5 min-w-0">
+      <dt className="text-xs font-extrabold tracking-wide uppercase text-ink-700">{label}</dt>
+      {children}
     </div>
   )
 }
 
-/** Servings against the guide's goals, which is what the diet is actually about. */
-/**
- * The week's movement, next to the week's food.
- *
- * Days rather than a total, because a week with four half hours in it and a
- * week with one long Sunday are different weeks and one number cannot tell
- * them apart. Nothing is subtracted from the food: see lib/movement.ts for why
- * the target stays where the dietician put it.
- */
-function MovementWeek({ moved }: { moved: { date: string; movement: DayMovement }[] }) {
-  const active = moved.filter((d) => d.movement.sessions > 0)
-  // Nothing logged is nothing to show. A card reporting zero of everything is
-  // a scolding rather than a summary.
-  if (!active.length) return null
-
-  const minutes = active.reduce((n, d) => n + d.movement.minutes, 0)
-  // Only the days that could be costed. Summing a week where one day has no
-  // weight behind it and calling the result the week's total would report a
-  // smaller number than the week actually was, without saying so.
-  const costed = active.filter((d) => d.movement.kcal != null)
-  const kcal = costed.reduce((n, d) => n + (d.movement.kcal ?? 0), 0)
-
+function StatTiles({ week }: { week: Week }) {
+  const protein = week.rows.find((r) => r.key === 'protein')!
   return (
-    <section>
-      <SectionHeading>Movement</SectionHeading>
-      <div className="card p-5 space-y-3">
-        <p className="text-sm text-ink-700">
-          <strong className="font-mono text-ink-900">{active.length}</strong>
-          {active.length === 1 ? ' day' : ' days'} with something logged
-          {' · '}
-          <strong className="font-mono text-ink-900">{minutes}</strong> min
-          {costed.length > 0 && (
-            <> · about <strong className="font-mono text-ink-900">
-              {Math.round(kcal).toLocaleString()}
-            </strong> kcal</>
-          )}
-        </p>
-
-        {/* A bar per day of the week, in minutes. Same seven columns as the
-            calorie chart above it, so the two read against each other. */}
-        <div className="flex items-end gap-1 h-16" aria-hidden="true">
-          {moved.map(({ date, movement }) => {
-            const tallest = Math.max(...moved.map((d) => d.movement.minutes), 1)
+    <dl className="hidden md:grid grid-cols-4 gap-4">
+      <Tile label="Daily average">
+        <dd className="text-[26px] leading-8 font-extrabold text-ink-900 tabular-nums">
+          {week.withFood.length ? Math.round(week.avg).toLocaleString() : '--'}
+          <span className="text-sm font-bold text-ink-700 ml-1">kcal</span>
+        </dd>
+        <dd className="text-xs text-ink-700">
+          Target {week.target.toLocaleString()} · over {week.withFood.length} {week.withFood.length === 1 ? 'day' : 'days'}
+        </dd>
+      </Tile>
+      <Tile label="On-track days">
+        <dd className="text-[26px] leading-8 font-extrabold text-ink-900 tabular-nums">
+          {week.onTrack}<span className="text-sm font-bold text-ink-700 ml-1">of {week.withFood.length}</span>
+        </dd>
+        <dd className="flex gap-1 items-center mt-1" aria-hidden="true">
+          {week.days.map((d) => {
+            const level = d.nutrients.calories > 0 ? targetStatus(d.nutrients.calories, week.target).level : 'none'
             return (
-              <div key={date} className="flex-1 flex flex-col justify-end h-full">
-                <div
-                  className={movement.minutes > 0 ? 'bg-leaf-500 rounded-t-sm' : 'bg-border-200 rounded-t-sm'}
-                  style={{ height: `${Math.max(2, (movement.minutes / tallest) * 100)}%` }}
-                />
-              </div>
+              <span
+                key={d.date}
+                className={`w-[18px] h-2 rounded-full ${level === 'none' ? 'bg-paper ring-1 ring-inset ring-ink-300' : STATUS_STYLES[level].fill}`}
+              />
             )
           })}
-        </div>
-        <div className="flex gap-1 text-xs font-bold uppercase text-ink-500">
-          {moved.map(({ date, movement }) => (
-            <span key={date} className="flex-1 text-center">
-              {movement.minutes > 0 ? `${movement.minutes}m` : '·'}
-            </span>
-          ))}
-        </div>
+        </dd>
+      </Tile>
+      <Tile label="Protein, daily">
+        <dd className="text-[26px] leading-8 font-extrabold text-ink-900 tabular-nums">{protein.value}</dd>
+        <dd className={`text-xs font-bold ${protein.ok == null ? 'text-ink-700' : protein.ok ? 'text-leaf-700' : 'text-mustard-800'}`}>
+          {protein.symbol && <span aria-hidden="true">{protein.symbol} </span>}
+          {protein.ok == null ? protein.target : `${protein.status}, ${protein.target}`}
+        </dd>
+      </Tile>
+      <Tile label="Weight">
+        <WeightFigures compact />
+      </Tile>
+    </dl>
+  )
+}
 
-        <p className="text-xs text-ink-500">
-          {costed.length < active.length
-            ? 'Some days have no weight recorded, so they carry minutes but no calorie estimate. '
-            : ''}
-          Calories here are an estimate from a table of averages, and none of it is taken off your
-          food target: the plans were written for two people who move.
+// ─── The week ─────────────────────────────────────────────────────────────────
+
+function WeekCard({ week, onServings }: { week: Week; onServings: () => void }) {
+  const today = todayDate()
+  const { days, withFood, target } = week
+
+  return (
+    <section aria-labelledby="week-h" className="card p-4 md:px-[22px] md:py-[18px] flex flex-col gap-2 md:gap-3">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 id="week-h" className="text-base font-extrabold text-ink-900">
+          <span className="md:hidden">This week</span>
+          <span className="hidden md:inline">Calories by day</span>
+        </h2>
+        <span className="text-xs text-ink-700 md:hidden">{rangeLabel(week.dates, true)}</span>
+      </div>
+
+      {!withFood.length ? (
+        <p className="text-sm text-ink-700 py-6">
+          Nothing planned yet this week. Add a few meals and the numbers will appear here.
         </p>
+      ) : (
+        <>
+          <div className="md:hidden flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <span className="text-[28px] leading-7 font-extrabold text-ink-900 tabular-nums">
+              {Math.round(week.avg).toLocaleString()}
+            </span>
+            <span className="text-sm text-ink-700 flex-1">kcal a day</span>
+            <span className="badge bg-leaf-50 text-leaf-700">
+              <Check size={12} strokeWidth={3} aria-hidden="true" />
+              {week.onTrack} of {withFood.length} days on track
+            </span>
+          </div>
+          {/* Which days are records and which are still intentions. A blend of
+              the two presented as one number is what this screen used to do
+              without saying so. */}
+          <p className="md:hidden text-xs text-ink-700">
+            Average of {withFood.length} {withFood.length === 1 ? 'day' : 'days'}
+            {week.recorded > 0 && week.planned > 0
+              ? `, ${week.recorded} recorded and ${week.planned} still planned`
+              : week.recorded > 0 ? ', all recorded' : ', all planned'}
+            {' · '}target {target.toLocaleString()}
+          </p>
+
+          <WeekChart days={days} target={target} today={today} />
+          <Legend />
+        </>
+      )}
+      <EstimatesNote />
+
+      <WeekServings dates={week.dates} onMore={onServings} />
+    </section>
+  )
+}
+
+/** Still planned: a pale fill with an edge, so it is a shape as well as a shade. */
+const PLANNED_FILL = 'bg-leaf-100 ring-[1.5px] ring-inset ring-leaf-500'
+
+/** The fill a still-planned bar wears, as a legend key. A mark, not text. */
+function PlannedSwatch() {
+  return <span aria-hidden="true" className={`w-2.5 h-2.5 rounded-[3px] ${PLANNED_FILL}`} />
+}
+
+function dayKind(d: DayReading, target: number) {
+  const kcal = d.nutrients.calories
+  const status = targetStatus(kcal, target)
+  const over = status.level === 'slightly-over' || status.level === 'over'
+  const fill = !kcal ? 'bg-border-200'
+    : over ? STATUS_STYLES[status.level].fill
+      : d.recorded ? 'bg-leaf-500'
+        : PLANNED_FILL
+  const words = !kcal ? 'nothing yet'
+    : `${Math.round(kcal).toLocaleString()} kcal, ${over ? status.label.toLowerCase() : 'on track'}${d.recorded ? '' : ', still planned'}`
+  return { kcal, status, over, fill, words }
+}
+
+/**
+ * Seven bars against the target. Over is a symbol above the bar as well as a
+ * colour, and a recorded day is a tick under its letter, so neither rests on
+ * hue alone.
+ */
+function WeekChart({ days, target, today }: { days: DayReading[]; target: number; today: string }) {
+  const peak = Math.max(target * 1.2, ...days.map((d) => d.nutrients.calories), 1)
+  const label = `Calories by day against a target of ${target.toLocaleString()}: ${days.map((d) =>
+    `${weekday(d.date, 'long')} ${dayKind(d, target).words}`).join('; ')}.`
+
+  return (
+    <div role="img" aria-label={label} className="flex flex-col gap-1 mt-1">
+      <div className="relative h-28 md:h-60 grid grid-cols-7 gap-2 md:gap-5 md:px-3 items-end">
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 border-t-2 border-dashed border-ink-300 md:border-bite-700 pointer-events-none"
+          style={{ bottom: `${(target / peak) * 100}%` }}
+        />
+        {days.map((d) => {
+          const k = dayKind(d, target)
+          return (
+            <div key={d.date} className="flex flex-col items-center justify-end h-full gap-0.5 min-w-0">
+              <span className="hidden md:block text-[13px] font-extrabold text-ink-900 tabular-nums">
+                {k.kcal ? Math.round(k.kcal).toLocaleString() : ''}
+              </span>
+              <span aria-hidden="true" className={`md:hidden h-3.5 text-xs leading-[14px] font-extrabold ${STATUS_STYLES[k.status.level].text}`}>
+                {k.over ? k.status.symbol : ''}
+              </span>
+              <div
+                className={`w-full md:max-w-16 rounded-t-lg md:rounded-t-[10px] transition-all duration-500 ${k.fill}`}
+                style={{ height: `${Math.max((k.kcal / peak) * 100, k.kcal ? 4 : 2)}%` }}
+              />
+            </div>
+          )
+        })}
+      </div>
+      <div aria-hidden="true" className="grid grid-cols-7 gap-2 md:gap-5 md:px-3 border-t border-border-200 pt-1">
+        {days.map((d) => {
+          const k = dayKind(d, target)
+          const isToday = d.date === today
+          return (
+            <div key={d.date} className="flex flex-col items-center gap-0.5 min-w-0">
+              <span className="md:hidden text-xs leading-[14px] font-bold text-ink-900 tabular-nums">
+                {k.kcal ? Math.round(k.kcal).toLocaleString() : ''}
+              </span>
+              <span className={`text-xs md:text-[13px] leading-[14px] md:leading-5 ${isToday ? 'text-bite-700 font-extrabold' : 'text-ink-700 font-semibold md:font-bold'}`}>
+                <span className="md:hidden">{weekday(d.date, 'narrow')}</span>
+                <span className="hidden md:inline">{weekday(d.date, 'short')} {Number(d.date.slice(8))}</span>
+                {d.recorded ? <span className="md:hidden text-leaf-700 font-extrabold">{' ✓'}</span> : null}
+              </span>
+              <span className={`hidden md:block text-xs font-bold whitespace-nowrap ${
+                !k.kcal ? 'text-ink-700' : k.over ? STATUS_STYLES[k.status.level].text : d.recorded ? 'text-leaf-700' : 'text-ink-700'}`}>
+                {!k.kcal ? '' : k.over ? `${k.status.symbol} ${k.status.label}` : d.recorded ? '✓ On track' : 'Still planned'}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function Legend() {
+  return (
+    <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-ink-700">
+      <span className="inline-flex items-center gap-1.5">
+        <span aria-hidden="true" className="w-[18px] border-t-2 border-dashed border-ink-300 md:border-bite-700" />Target
+      </span>
+      <span><span className="text-leaf-700 font-extrabold">{'✓'}</span> Recorded</span>
+      <span className="inline-flex items-center gap-1.5">
+        <PlannedSwatch />Still planned
+      </span>
+      <span><span className="text-mustard-800 font-extrabold">+</span> Slightly over</span>
+      <span><span className="text-coral-700 font-extrabold">!</span> Over</span>
+    </div>
+  )
+}
+
+/** Four of the week's Mediterranean goals, under the chart from md up. */
+function WeekServings({ dates, onMore }: { dates: string[]; onMore: () => void }) {
+  const plan = useMealPlanStore((s) => s.plan)
+  const ctx = useNutritionContext()
+  const goals = useMemo(() => {
+    const week = plan.filter((d) => dates.includes(d.date))
+    return week.some((d) => d.meals.length) ? scoreWeek(week, ctx).slice(0, 4) : []
+  }, [plan, dates, ctx])
+  if (!goals.length) return null
+
+  return (
+    <div className="hidden md:flex flex-col gap-2 mt-auto pt-3 border-t border-border-100">
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="text-sm font-extrabold text-ink-900">Mediterranean servings this week</h3>
+        <button type="button" onClick={onMore} className="text-sm font-bold text-bite-700 hover:underline">
+          All servings
+        </button>
+      </div>
+      <ul className="grid grid-cols-4 gap-2">
+        {goals.map((g) => {
+          const ok = g.isLimit ? g.ratio <= 1 : g.ratio >= 0.9
+          return (
+            <li key={g.category} className="border border-border-100 rounded-lg px-3 py-2 flex flex-col gap-0.5 min-w-0">
+              <span className="text-[13px] font-bold text-ink-900 truncate">{g.label}</span>
+              <span className="text-xs text-ink-700">
+                {servingCount(g.servings)} of {g.isLimit ? 'at most ' : ''}{servingCount(g.expected)}
+              </span>
+              <span className={`text-xs font-bold ${ok ? 'text-leaf-700' : 'text-mustard-800'}`}>
+                <span aria-hidden="true">{ok ? '✓' : g.isLimit ? '▲' : '▼'} </span>
+                {g.isLimit ? (ok ? 'Within' : 'Over') : (ok ? 'Met' : 'Below')}
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
+// ─── Averages ─────────────────────────────────────────────────────────────────
+
+function statusText(r: AverageRow) {
+  return r.ok == null ? 'text-ink-700' : r.ok ? 'text-leaf-700' : 'text-mustard-800'
+}
+
+function AveragesCard({ rows }: { rows: AverageRow[] }) {
+  const phone = rows.filter((r) => r.key === 'protein' || r.key === 'fiber' || r.key === 'salt')
+  const anyFloor = rows.some((r) => r.value.endsWith('+'))
+
+  return (
+    <section aria-labelledby="avg-h" className="card p-4 md:px-[18px] flex flex-col gap-2 md:gap-2.5">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 id="avg-h" className="text-base font-extrabold text-ink-900">Daily averages</h2>
+        <span className="hidden md:inline text-xs text-ink-700">vs your targets</span>
+      </div>
+
+      <dl className="md:hidden grid grid-cols-3 gap-2">
+        {phone.map((r) => (
+          <div key={r.key} className="bg-cream-50 rounded-lg px-2.5 py-2 flex flex-col gap-0.5 min-w-0">
+            <dt className="text-xs text-ink-700">{r.label}</dt>
+            <dd className="text-lg leading-[22px] font-extrabold text-ink-900 tabular-nums">{r.value}</dd>
+            <dd className={`text-xs ${statusText(r)}`}>
+              {r.symbol && <span aria-hidden="true">{r.symbol} </span>}{r.target}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <ul className="hidden md:flex flex-col gap-2.5">
+        {rows.map((r) => (
+          <li key={r.key} className="flex flex-col gap-1">
+            <div className="flex items-baseline gap-1.5 text-sm">
+              <span className="font-bold text-ink-900 flex-1">{r.label}</span>
+              <span className="font-extrabold text-ink-900 tabular-nums">{r.value}</span>
+              <span className="text-xs text-ink-700">{r.target}</span>
+            </div>
+            {r.ok != null && (
+              <>
+                <div className="h-1.5 rounded-full bg-border-100 overflow-hidden" aria-hidden="true">
+                  <div
+                    className={`h-full rounded-full ${r.ok ? 'bg-leaf-500' : 'bg-mustard-500'}`}
+                    style={{ width: `${r.fill * 100}%` }}
+                  />
+                </div>
+                <span className={`text-xs font-bold ${statusText(r)}`}>
+                  <span aria-hidden="true">{r.symbol} </span>{r.status}
+                </span>
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+      {anyFloor && (
+        <p className="text-xs text-ink-700">A trailing + means at least this much: some foods have no figure for it yet.</p>
+      )}
+    </section>
+  )
+}
+
+// ─── Eight weeks ──────────────────────────────────────────────────────────────
+
+/** The weekly average over the last eight weeks, against the target. */
+function EightWeeks() {
+  const plan = useMealPlanStore((s) => s.plan)
+  const dates = useThisWeek()
+  const ctx = useNutritionContext()
+  const target = useUserStore((s) => s.profile.targets.calories)
+
+  const weeks = useMemo(() => {
+    const out: { start: string; avg: number }[] = []
+    for (let i = 7; i >= 0; i--) {
+      const shifted = dates.map((d) => addDays(d, -7 * i))
+      const withFood = weekEaten(shifted, plan, ctx).days.filter((d) => d.nutrients.calories > 0)
+      if (withFood.length) {
+        out.push({ start: shifted[0], avg: withFood.reduce((a, d) => a + d.nutrients.calories, 0) / withFood.length })
+      }
+    }
+    return out
+  }, [dates, plan, ctx])
+
+  if (weeks.length < 2) return null
+  const W = 300
+  const H = 72
+  const { points, y } = sparkPoints(weeks.map((w) => w.avg), W, H, 6, target)
+  const last = points[points.length - 1]
+  const first = weeks[0]
+  const now = weeks[weeks.length - 1]
+
+  return (
+    <section aria-labelledby="trend-h" className="hidden md:flex card px-[18px] py-4 flex-col gap-2">
+      <div className="flex items-baseline justify-between">
+        <h2 id="trend-h" className="text-base font-extrabold text-ink-900">Last 8 weeks</h2>
+        <span className="text-xs text-ink-700">weekly average</span>
+      </div>
+      <svg
+        viewBox={`0 0 ${W} ${H}`} className="w-full h-[72px]" role="img"
+        aria-label={`Weekly average calories over the last 8 weeks, from ${Math.round(first.avg).toLocaleString()} in the week of ${shortDate(first.start)} to ${Math.round(now.avg).toLocaleString()} now, against a target of ${target.toLocaleString()}.`}
+      >
+        <line x1="0" x2={W} y1={y(target)} y2={y(target)} className="stroke-bite-700" strokeWidth="1.5" strokeDasharray="4 4" />
+        <polyline points={points.map((p) => p.join(',')).join(' ')} fill="none" className="stroke-leaf-500" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+        <circle cx={last[0]} cy={last[1]} r="4" className="fill-leaf-500 stroke-paper" strokeWidth="2" />
+      </svg>
+      <div className="flex justify-between text-xs text-ink-700 tabular-nums">
+        <span>{shortDate(first.start)} · {Math.round(first.avg).toLocaleString()}</span>
+        <span className="font-bold text-ink-900">This week · {Math.round(now.avg).toLocaleString()}</span>
       </div>
     </section>
   )
 }
 
-function MediterraneanTab() {
-  const plan = useMealPlanStore((s) => s.plan)
-  const weekDates = useThisWeek()
-  const ctx = useNutritionContext()
-  const week = useMemo(
-    () => plan.filter((d) => weekDates.includes(d.date)),
-    [plan, weekDates],
-  )
-  const goals = useMemo(() => scoreWeek(week, ctx), [week, ctx])
-  const gaps = useMemo(() => scoreGaps(week, ctx), [week, ctx])
-  const planned = week.filter((d) => d.meals.length).length
+// ─── Weight ───────────────────────────────────────────────────────────────────
 
-  if (!planned) {
-    return <EmptyState title="Nothing to score yet">
-      The Mediterranean serving goals need a planned week to measure against.
-    </EmptyState>
-  }
-
-  return (
-    <div className="space-y-3">
-      <p className="text-sm text-ink-700">
-        Serving goals from the Mediterranean Diet guide, scaled to the {planned}{' '}
-        {planned === 1 ? 'day' : 'days'} planned so far.
-      </p>
-      {/* What the count had to leave out. Dropping a food mid-count and then
-          presenting the total as the week is the same silence that let the
-          serving figures go unquestioned for months. */}
-      {(gaps.noGoal.length > 0 || gaps.lost > 0) && (
-        <div className="card p-4 space-y-1.5">
-          {gaps.noGoal.length > 0 && (
-            <p className="text-sm text-ink-700">
-              {gaps.noGoal.length} {gaps.noGoal.length === 1 ? 'food' : 'foods'} could not be
-              counted as servings, because the guide has no serving size for{' '}
-              {gaps.noGoal.length === 1 ? 'it' : 'them'}:{' '}
-              <span className="text-ink-900">{gaps.noGoal.join(', ')}</span>.
-            </p>
-          )}
-          {gaps.lost > 0 && (
-            <p className="text-sm text-coral-700">
-              {gaps.lost} {gaps.lost === 1 ? 'thing is' : 'things are'} missing from the library
-              altogether, so these counts are short by an unknown amount.
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Two lists, not one. A goal and a limit are opposite questions and had
-          the same row and the same filling bar, so a nearly-full bar meant
-          "nearly there" on one and "nearly over" on the other, with only hue
-          to tell them apart. Split, the shape of the list says which is which
-          before any colour does. */}
-      <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">Aim for</p>
-      <div className="card divide-y divide-border-100">
-        {goals.filter((g) => !g.isLimit).map((g) => {
-          const pct = Math.min(1, g.ratio)
-          const met = g.isLimit ? g.ratio <= 1 : g.ratio >= 0.9
-          return (
-            <div key={g.category} className="px-4 py-3">
-              <div className="flex items-baseline justify-between mb-1.5">
-                <span className="text-sm font-semibold text-ink-900">
-                  {g.label}
-                  <span className="ml-2 text-xs font-normal text-ink-500">
-                    {g.isLimit ? 'at most ' : ''}{g.target} / {g.period}
-                  </span>
-                </span>
-                <span className={`text-xs font-mono ${
-                  g.ratio > IMPLAUSIBLE_RATIO ? 'text-coral-700'
-                    : met ? 'text-bite-700' : 'text-ink-500'}`}>
-                  {/* Named, because "42.1 of 21" with no unit reads as a
-                      broken number rather than a big one. */}
-                  {servingCount(g.servings)} of {servingCount(g.expected)} servings
-                </span>
-              </div>
-              <div className="h-2 rounded-full bg-border-100 overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    g.isLimit ? (g.ratio > 1 ? 'bg-coral-500' : 'bg-leaf-400')
-                              : (met ? 'bg-leaf-500' : 'bg-ink-300')}`}
-                  style={{ width: `${pct * 100}%` }}
-                />
-              </div>
-              {/* Three times a target is not a good week, it is a number to
-                  doubt. This screen once rendered "80.7 of 21" as a result. */}
-              {g.ratio > IMPLAUSIBLE_RATIO && (
-                <p className="mt-1.5 text-xs text-coral-700">
-                  That is {g.ratio.toFixed(0)} times the goal, which is more likely a problem with
-                  the data than a week of eating. Worth checking the foods in it.
-                </p>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      <p className="text-xs font-bold uppercase tracking-wide text-ink-500 pt-1">Keep under</p>
-      <div className="card divide-y divide-border-100">
-        {goals.filter((g) => g.isLimit).map((g) => (
-          <div key={g.category} className="px-4 py-3 flex items-baseline justify-between gap-3">
-            <span className="text-sm font-semibold text-ink-900">
-              {g.label}
-              <span className="ml-2 text-xs font-normal text-ink-500">
-                at most {g.target} / {g.period}
-              </span>
-            </span>
-            {/* No bar at all. There is nothing to fill up here: you are either
-                inside the line or over it, and that is a word, not a length. */}
-            <span className={`text-xs font-mono shrink-0 ${
-              g.ratio > 1 ? 'text-coral-700' : 'text-ink-500'}`}>
-              {servingCount(g.servings)} of {servingCount(g.expected)}
-              <span className="ml-1.5 font-sans font-semibold">
-                {g.ratio > 1 ? 'over' : 'within'}
-              </span>
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function BodyTab() {
-  const {
-    addWeightEntry, removeWeightEntry, addMeasurement, removeMeasurement, claimUnassigned,
-  } = useBodyStore()
-  const { profile, setWeightGoal } = useUserStore()
-
-  // Both people are always on screen, signed in or not. Two waists averaged
-  // into one line is a graph of nothing, and a tab that only appears once
-  // somebody signs in is a tab nobody finds.
-  const people = usePeople()
-  const [chosen, setWho] = useState<PersonId>('')
-  const who = useResolvedPerson(chosen)
-  const unassigned = useUnassignedCount()
-
+/** The latest weight and what it has done over eight weeks, for whoever is picked. */
+function useWeightGlance() {
+  const who = useWhose()
   const weights = useWeightFor(who)
-  const measurements = useMeasurementsFor(who)
-
-  /*
-   * Everything on this screen, in the unit you asked to read in.
-   *
-   * The store keeps what you typed and the unit you typed it in, and this is
-   * where that becomes a number on a page. Before the setting was settable it
-   * did not matter: every entry said kg and so did the profile, so printing
-   * the stored figure with the profile's label next to it happened to be
-   * right. It stops being right the moment somebody switches, so the reading
-   * goes through lib/weight.ts and the store is left alone.
-   *
-   * Goals are held in kilograms whatever the reading unit, because a goal is a
-   * bare number with no unit of its own to remember.
-   */
+  const profile = useUserStore((s) => s.profile)
   const unit = profile.weightUnit
   const goalKg = profile.weightGoals?.[who]
   const goal = goalKg == null ? undefined : round1(fromKg(goalKg, unit))
+  const floor = addDays(todayDate(), -56)
+  const recent = weights.filter((w) => w.date >= floor).map((w) => ({ date: w.date, value: inUnit(w, unit) }))
+  const latest = weights.length ? { date: weights[weights.length - 1].date, value: inUnit(weights[weights.length - 1], unit) } : null
+  return { unit, goal, recent, latest }
+}
 
-  const [value, setValue] = useState('')
-  const [sizes, setSizes] = useState<Partial<Record<MeasurementKey, string>>>({})
+function WeightFigures({ compact = false }: { compact?: boolean }) {
+  const { unit, goal, recent, latest } = useWeightGlance()
+  if (!latest) {
+    return <dd className="text-sm text-ink-700 py-1">No weight logged yet</dd>
+  }
+  const first = recent[0]
+  const change = first && recent.length > 1 ? round1(latest.value - first.value) : null
+  const moved = change == null ? null
+    : change === 0 ? `no change since ${shortDate(first.date)}`
+      : `${change < 0 ? 'down' : 'up'} ${Math.abs(change).toFixed(1)} ${unit} since ${shortDate(first.date)}`
+  const aim = goal != null ? `aiming for ${goal}` : null
+  const line = [moved, aim].filter(Boolean).join(' · ')
 
-  /*
-   * How far back the charts and the histories read.
-   *
-   * One control for both, because a body is one subject: nobody wants the
-   * weight over a year beside a waist over three months. Months rather than
-   * weeks, because a body moves slowly and gets measured rarely, and a
-   * fortnight of it is two dots.
-   */
-  const [span, setSpan] = useState<BodySpan>('halfYear')
-  /** The earliest date the span reaches, or nothing at all for "All". */
-  const spanFloor = spanStart(span, today())
-  const [measuring, setMeasuring] = useState<MeasurementKey>('waist')
-  const now = today()
-
-  /** Every weigh-in in the span, in the unit being read. */
-  const weightSeen = useMemo<Reading[]>(
-    () => withinSpan(weights.map((w) => ({ date: w.date, value: inUnit(w, unit) })), span, now),
-    [weights, unit, span, now],
-  )
-  const weightMoved = useMemo(() => changeOver(weightSeen), [weightSeen])
-
-  const measured = useMemo<Reading[]>(
-    () => withinSpan(
-      measurements
-        .filter((m) => m.measurements[measuring] != null)
-        .map((m) => ({ date: m.date, value: m.measurements[measuring]! })),
-      span, now,
-    ),
-    [measurements, measuring, span, now],
-  )
-  const measureMoved = useMemo(() => changeOver(measured), [measured])
-
-  /** Only the measures actually taken, so the chips are not five dead ends. */
-  const measuresTaken = useMemo(
-    () => MEASUREMENT_KEYS.filter((k) => measurements.some((m) => m.measurements[k] != null)),
-    [measurements],
-  )
-
-
-
-  const anySize = MEASUREMENT_KEYS.some((k) => Number(sizes[k]))
-
+  if (compact) {
+    return (
+      <>
+        <dd className="text-[26px] leading-8 font-extrabold text-ink-900 tabular-nums">
+          {latest.value}<span className="text-sm font-bold text-ink-700 ml-1">{unit}</span>
+        </dd>
+        <dd className="text-xs text-ink-700">{line || `on ${shortDate(latest.date)}`}</dd>
+      </>
+    )
+  }
   return (
-    <div className="space-y-5">
-      {/* Whose body. Named, so it does not read as more of the row above. */}
-      {people.length > 1 && <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist" aria-label="Whose">
-        {people.map((p) => (
-          <button
-            key={p.id}
-            role="tab"
-            aria-selected={who === p.id}
-            onClick={() => setWho(p.id)}
-            className={who === p.id ? 'tab-on' : 'tab-off'}
-          >
-            {p.name}
-          </button>
-        ))}
-      </div>}
-
-      {/* How far back everything below reads. One control, because a body is
-          one subject and nobody wants a year of weight beside three months of
-          waist. */}
-      <div className="flex flex-wrap gap-1.5">
-        {BODY_SPANS.map((s) => (
-          <button
-            key={s}
-            onClick={() => setSpan(s)}
-            aria-pressed={span === s}
-            className={span === s ? 'chip-on' : 'chip-off'}
-          >
-            <ChipCheck on={span === s} />
-            {BODY_SPAN_LABELS[s]}
-          </button>
-        ))}
-      </div>
-
-      {unassigned > 0 && (
-        <div className="rounded-2xl border border-bite-200 bg-bite-50 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-          <p className="flex-1 min-w-0 text-sm text-ink-900">
-            {unassigned} {unassigned === 1 ? 'entry was' : 'entries were'} logged before the app
-            knew who was who. They are nobody's until you say so.
-          </p>
-          <button className="btn-primary shrink-0" onClick={() => claimUnassigned(who)}>
-            {people.find((p) => p.id === who)?.name}'s
-          </button>
-        </div>
-      )}
-
-      {/* ─── Weight ──────────────────────────────────────────────────────── */}
-      <div className="card p-4">
-        <label className="label">Log today's weight ({unit})</label>
-        <div className="flex gap-2">
-          <input
-            type="number" step="0.1" className="input" placeholder="e.g. 68.4"
-            aria-label="Weight"
-            value={value} onChange={(e) => setValue(e.target.value)}
-          />
-          <button
-            className="btn-primary shrink-0"
-            disabled={!Number(value)}
-            onClick={() => {
-              addWeightEntry({
-                id: `${Date.now()}`,
-                date: today(),
-                weight: Number(value),
-                // Stored as typed, in the unit it was typed in. Converting on
-                // the way in would round somebody's 68.4 into 150.8 and back
-                // into 68.399, and the entry would drift every time the
-                // setting was flipped.
-                unit,
-                memberId: who,
-              })
-              setValue('')
-            }}
-          >
-            <Plus size={16} /> Log
-          </button>
-        </div>
-      </div>
-
-      {weights.length === 0 ? (
-        <EmptyState title="No weight logged yet" />
-      ) : (
-        <>
-          <div className="card p-5">
-            <p className="text-xs font-bold uppercase tracking-wide text-ink-500">
-              Over {BODY_SPAN_LABELS[span].toLowerCase()}
-            </p>
-            {/* The change across what is on screen, and how long it took. Down
-                two kilos means two different things over a fortnight and over
-                a year, and one weigh-in is no change rather than a change of
-                nought. */}
-            <p className={`text-3xl font-extrabold font-mono ${
-              (weightMoved?.change ?? 0) <= 0 ? 'text-bite-700' : 'text-coral-600'}`}>
-              {weightMoved?.change == null ? '--' : (
-                <>{weightMoved.change > 0 ? '+' : ''}{weightMoved.change.toFixed(1)}</>
-              )}
-              <span className="text-base text-ink-500 font-semibold ml-1">{unit}</span>
-            </p>
-            <p className="text-xs text-ink-500 mt-1">
-              {weightMoved?.change == null
-                ? 'One weigh-in so far, which is a reading rather than a change.'
-                : `across ${weightMoved.days} ${weightMoved.days === 1 ? 'day' : 'days'}, from ${
-                  weightMoved.first.value} to ${weightMoved.last.value} ${unit}.`}
-              {goal != null && weightMoved && (() => {
-                const togo = weightMoved.last.value - goal
-                return Math.abs(togo) < 0.05
-                  ? ' At your goal.'
-                  : ` ${Math.abs(togo).toFixed(1)} ${unit} ${togo > 0 ? 'to go' : 'below your goal'}.`
-              })()}
-            </p>
-
-            {weightSeen.length
-              ? <BodyChart readings={weightSeen} unit={unit} goal={goal} />
-              : (
-                <p className="text-sm text-ink-500 mt-3">
-                  Nothing weighed in this stretch. The entries are still there; widen the range
-                  above to see them.
-                </p>
-              )}
-
-            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border-100">
-              <label className="label mb-0 shrink-0" htmlFor="goal">Aiming for</label>
-              <input
-                id="goal"
-                type="number" min={0} step={0.1} className="input w-24 px-2"
-                placeholder="none"
-                value={goal ?? ''}
-                // Typed in whatever you read in, held in kilograms.
-                onChange={(e) => setWeightGoal(
-                  who,
-                  e.target.value ? toKg(Number(e.target.value), unit) : undefined,
-                )}
-              />
-              <span className="text-sm text-ink-500">{unit}</span>
-            </div>
-          </div>
-
-          {/* The same stretch the chart above is drawn from, so the list and
-              the picture are about one thing. */}
-          <div className="card divide-y divide-border-100">
-            {[...weights].filter((w) => weightSeen.some((r) => r.date === w.date)).reverse().map((w) => (
-              <div key={w.id} className="flex items-center justify-between px-4 py-2.5">
-                <span className="text-sm text-ink-700">{formatDay(w.date)}</span>
-                <span className="flex items-center gap-3">
-                  <span className="text-sm font-mono font-semibold text-ink-900">
-                  {inUnit(w, unit)} {unit}
-                  {/* What you actually typed, where it was another unit. The
-                      converted figure is the comparable one and the typed one
-                      is the true one, and dropping either loses something. */}
-                  {w.unit !== unit && (
-                    <span className="ml-1.5 font-normal text-ink-500">({w.weight} {w.unit})</span>
-                  )}
-                </span>
-                  <button className="text-xs text-ink-500 hover:text-coral-600" onClick={() => removeWeightEntry(w.id)}>
-                    Remove
-                  </button>
-                </span>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* ─── The tape measure ────────────────────────────────────────────── */}
-      <SectionHeading>Measurements</SectionHeading>
-      <div className="card p-4 space-y-3">
-        <p className="text-xs text-ink-500">
-          In centimetres. Fill in whichever you took. A blank is simply not measured that day,
-          and the trend below skips it rather than reading it as a change.
-        </p>
-        <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-          {MEASUREMENT_KEYS.map((key) => (
-            <div key={key}>
-              <label className="label">{MEASUREMENT_LABELS[key]}</label>
-              <input
-                type="number" step="0.5" min={0} className="input px-2"
-                aria-label={MEASUREMENT_LABELS[key]}
-                value={sizes[key] ?? ''}
-                onChange={(e) => setSizes((s) => ({ ...s, [key]: e.target.value }))}
-              />
-            </div>
-          ))}
-        </div>
-        <button
-          className="btn-primary w-fit"
-          disabled={!anySize}
-          onClick={() => {
-            const taken: Partial<Record<MeasurementKey, number>> = {}
-            for (const key of MEASUREMENT_KEYS) {
-              const n = Number(sizes[key])
-              if (n > 0) taken[key] = n
-            }
-            addMeasurement({
-              id: `${Date.now()}`,
-              date: today(),
-              measurements: taken,
-              unit: 'cm',
-              memberId: who,
-            })
-            setSizes({})
-          }}
-        >
-          <Plus size={16} /> Log measurements
-        </button>
-      </div>
-
-      {measurements.length === 0 ? (
-        <EmptyState title="Nothing measured yet">
-          Waist, hips, chest, arms and thighs, each one its own line, because they move at
-          different times and an average of the five says nothing.
-        </EmptyState>
-      ) : (
-        <>
-          {/* The five latest figures, each with what it has done. Five charts
-              at once would be five pictures nobody compares; the chart below
-              draws whichever one is being asked about. */}
-          <div className="grid gap-3 sm:grid-cols-2">
-            {MEASUREMENT_KEYS.map((key) => {
-              // The same stretch as the chart below. Read over all time while
-              // the chart read six months, the card said the waist was down 11
-              // and the chart said 7, and both were true, which is the worst
-              // way for two numbers about one thing to disagree.
-              const series = measurements
-                .filter((m) => !spanFloor || m.date >= spanFloor)
-                .map((m) => m.measurements[key])
-                .filter((v): v is number => v != null)
-              if (!series.length) return null
-
-              const delta = series.length > 1 ? series[series.length - 1] - series[0] : 0
-              return (
-                <div key={key} className="card p-4">
-                  <p className="text-xs font-bold uppercase tracking-wide text-ink-500">
-                    {MEASUREMENT_LABELS[key]}
-                  </p>
-                  <p className="text-2xl font-extrabold font-mono text-ink-900">
-                    {series[series.length - 1]}<span className="text-sm text-ink-500 font-semibold ml-1">cm</span>
-                    {series.length > 1 && (
-                      <span className={`text-sm font-semibold ml-2 ${delta <= 0 ? 'text-bite-700' : 'text-coral-600'}`}>
-                        {delta > 0 ? '+' : ''}{delta.toFixed(1)}
-                      </span>
-                    )}
-                  </p>
-                </div>
-              )
-            })}
-          </div>
-
-          {measuresTaken.length > 0 && (
-            <div className="card p-5">
-              {/* One at a time, and only the ones you have actually taken.
-                  Waist and thighs on one pair of axes is a chart about the
-                  difference between a waist and a thigh. */}
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {measuresTaken.map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => setMeasuring(key)}
-                    aria-pressed={measuring === key}
-                    className={measuring === key ? 'chip-on' : 'chip-off'}
-                  >
-                    <ChipCheck on={measuring === key} />
-                    {MEASUREMENT_LABELS[key]}
-                  </button>
-                ))}
-              </div>
-
-              {measured.length ? (
-                <>
-                  <p className="text-sm text-ink-700">
-                    {measureMoved?.change == null
-                      ? `One reading of your ${MEASUREMENT_LABELS[measuring].toLowerCase()} in this
-                         stretch, which is a measurement rather than a change.`
-                      : (
-                        <>
-                          <strong className="font-mono text-ink-900">
-                            {measureMoved.change > 0 ? '+' : ''}{measureMoved.change.toFixed(1)} cm
-                          </strong>{' '}
-                          across {measureMoved.days} {measureMoved.days === 1 ? 'day' : 'days'},
-                          from {measureMoved.first.value} to {measureMoved.last.value} cm.
-                        </>
-                      )}
-                  </p>
-                  <BodyChart readings={measured} unit="cm" />
-                </>
-              ) : (
-                <p className="text-sm text-ink-500">
-                  No {MEASUREMENT_LABELS[measuring].toLowerCase()} taken in this stretch. Widen the
-                  range above to reach the earlier ones.
-                </p>
-              )}
-            </div>
-          )}
-
-          <div className="card divide-y divide-border-100">
-            {[...measurements].filter((m) => !spanFloor || m.date >= spanFloor).reverse().map((m) => (
-              <div key={m.id} className="flex items-start justify-between gap-3 px-4 py-2.5">
-                <span className="min-w-0">
-                  <span className="block text-sm text-ink-700">{formatDay(m.date)}</span>
-                  <span className="block text-xs font-mono text-ink-500">
-                    {MEASUREMENT_KEYS
-                      .filter((k) => m.measurements[k] != null)
-                      .map((k) => `${MEASUREMENT_LABELS[k].toLowerCase()} ${m.measurements[k]}`)
-                      .join(' · ')}
-                  </span>
-                </span>
-                <button className="text-xs text-ink-500 hover:text-coral-600 shrink-0"
-                  onClick={() => removeMeasurement(m.id)}>
-                  Remove
-                </button>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+    <div className="flex flex-wrap items-baseline gap-x-2">
+      <span className="text-[22px] leading-[26px] font-extrabold text-ink-900 tabular-nums">{latest.value}<span className="ml-1">{unit}</span></span>
+      <span className="text-[13px] text-ink-700">{line || `on ${shortDate(latest.date)}`}</span>
     </div>
   )
 }
 
-function formatDay(date: string): string {
-  return new Date(date + 'T12:00:00')
-    .toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+function WeightCard({ onLog }: { onLog: () => void }) {
+  const { unit, recent, latest } = useWeightGlance()
+  const W = 326
+  const H = 48
+  const spark = recent.length > 1 ? sparkPoints(recent.map((r) => r.value), W, H) : null
+  const last = spark?.points[spark.points.length - 1]
+
+  return (
+    // Not a labelled region: "Weight" is already the name of the input that
+    // logs one, further down the same screen.
+    <section className="card p-4 flex flex-col gap-1.5">
+      <div className="flex items-baseline justify-between">
+        <h2 className="text-base font-extrabold text-ink-900">Weight</h2>
+        <span className="text-xs text-ink-700">Last 8 weeks</span>
+      </div>
+      <WeightFigures />
+      {spark && last && (
+        <svg
+          viewBox={`0 0 ${W} ${H}`} className="w-full h-12" role="img"
+          aria-label={`The last 8 weeks of weigh-ins: from ${recent[0].value} ${unit} on ${shortDate(recent[0].date)} to ${recent[recent.length - 1].value} ${unit}.`}
+        >
+          <polyline points={spark.points.map((p) => p.join(',')).join(' ')} fill="none" className="stroke-bite-700" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx={last[0]} cy={last[1]} r="4" className="fill-bite-700 stroke-paper" strokeWidth="2" />
+        </svg>
+      )}
+      <button type="button" onClick={onLog} className="self-start min-h-11 text-sm font-bold text-bite-700 hover:underline">
+        {latest ? 'Log a weight or see them all' : 'Log a weight'}
+      </button>
+    </section>
+  )
 }
 
+// ─── The rest of the section ─────────────────────────────────────────────────
+
+function MoreLinks({ dates }: { dates: string[] }) {
+  const who = useWhose()
+  const moved = useMovementAcross(who, dates)
+  const active = moved.filter((d) => d.movement.sessions > 0)
+  const minutes = active.reduce((n, d) => n + d.movement.minutes, 0)
+
+  const rows = [
+    {
+      to: '/progress/movement', title: 'Movement',
+      sub: active.length ? `${active.length} ${active.length === 1 ? 'day' : 'days'} this week · ${minutes} min` : 'Nothing logged this week',
+    },
+    { to: '/progress/summary', title: 'Summary for your dietician', sub: `Ready for ${rangeLabel(dates)}` },
+  ]
+
+  return (
+    <nav aria-label="More in Progress" className="card overflow-hidden divide-y divide-border-100">
+      {rows.map((r) => (
+        <Link key={r.to} to={r.to} className="flex items-center gap-3 px-3.5 py-2.5 min-h-11 hover:bg-cream-50">
+          <span className="flex-1 min-w-0 flex flex-col">
+            <span className="text-[15px] font-bold text-ink-900">{r.title}</span>
+            <span className="text-xs text-ink-700">{r.sub}</span>
+          </span>
+          <ChevronRight size={18} className="text-ink-500 shrink-0" aria-hidden="true" />
+        </Link>
+      ))}
+    </nav>
+  )
+}
+
+function weekday(date: string, style: 'narrow' | 'short' | 'long'): string {
+  return new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: style })
+}

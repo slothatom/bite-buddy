@@ -1149,21 +1149,21 @@ test.describe('progress, per person', () => {
 
     // One tab per person in the household, from the cached member list, so
     // they are there offline and before anything has loaded.
-    await expect(page.getByRole('tab', { name: 'Arany' })).toBeVisible()
-    await expect(page.getByRole('tab', { name: 'Oli' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Show Arany' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Show Oli' })).toBeVisible()
 
     await page.getByLabel('Weight').fill('68.4')
     await page.getByRole('button', { name: /^Log$/ }).click()
     await expect(page.getByText('68.4 kg')).toBeVisible()
 
-    await page.getByRole('tab', { name: 'Oli' }).click()
+    await page.getByRole('button', { name: 'Show Oli' }).click()
     await expect(page.getByText('68.4 kg')).toHaveCount(0)
 
     await page.getByLabel('Weight').fill('61.2')
     await page.getByRole('button', { name: /^Log$/ }).click()
     await expect(page.getByText('61.2 kg')).toBeVisible()
 
-    await page.getByRole('tab', { name: 'Arany' }).click()
+    await page.getByRole('button', { name: 'Show Arany' }).click()
     await expect(page.getByText('68.4 kg')).toBeVisible()
     await expect(page.getByText('61.2 kg')).toHaveCount(0)
   })
@@ -1200,36 +1200,36 @@ test.describe('movement, per person', () => {
 
   test('a session can be logged in one lump, with the figure your watch gave', async ({ page }) => {
     await goto(page, '/progress/movement')
-    await page.getByRole('button', { name: 'Log it in one go' }).click()
+    await page.getByRole('button', { name: 'Log in one go' }).click()
     await page.getByLabel('What was it').fill('Climbing')
     await page.getByLabel('kcal, if known').fill('430')
     await page.getByRole('button', { name: 'Save', exact: true }).click()
 
     await expect(page.getByText('Climbing')).toBeVisible()
-    await expect(page.getByText(/about 430 kcal/)).toBeVisible()
+    await expect(page.getByText(/min · about 430 kcal/)).toBeVisible()
   })
 
   test('the two people keep separate logs', async ({ page }) => {
     await aHouseholdOfTwo(page)
     await goto(page, '/progress/movement')
-    await page.getByRole('button', { name: 'Log it in one go' }).click()
+    await page.getByRole('button', { name: 'Log in one go' }).click()
     await page.getByLabel('What was it').fill('Arany swim')
     await page.getByRole('button', { name: 'Save', exact: true }).click()
     await expect(page.getByText('Arany swim')).toBeVisible()
 
-    await page.getByRole('tab', { name: 'Oli' }).click()
+    await page.getByRole('button', { name: 'Show Oli' }).click()
     await expect(page.getByText('Arany swim')).toHaveCount(0)
   })
 
   test('sleep is logged per person and kept per night', async ({ page }) => {
     await aHouseholdOfTwo(page)
     await goto(page, '/progress/movement')
-    await page.getByRole('tab', { name: 'Sleep' }).click()
+    await page.getByRole('button', { name: 'Sleep', exact: true }).click()
     await page.getByLabel('Hours slept').fill('7.5')
     await page.getByRole('button', { name: /^Log$/ }).click()
     await expect(page.getByText('7.5 h', { exact: true })).toBeVisible()
 
-    await page.getByRole('tab', { name: 'Oli' }).click()
+    await page.getByRole('button', { name: 'Show Oli' }).click()
     await expect(page.getByText('7.5 h', { exact: true })).toHaveCount(0)
   })
 })
@@ -1835,7 +1835,7 @@ test.describe('what you enter is still there tomorrow', () => {
     await expect(page.getByText('69.2 kg')).toBeVisible()
 
     await goto(page, '/progress/movement')
-    await page.getByRole('button', { name: 'Log it in one go' }).click()
+    await page.getByRole('button', { name: 'Log in one go' }).click()
     await page.getByLabel('What was it').fill('Long walk')
     await page.getByLabel('kcal, if known').fill('310')
     await page.getByRole('button', { name: 'Save', exact: true }).click()
