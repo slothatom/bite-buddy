@@ -323,8 +323,9 @@ function audit(name: string, palette: Map<string, string>): string[] {
  * live in an `@utility`; and the calorie ring, whose stroke lives in a table
  * in lib/status.ts. Each shipped below the bar at least once: the ring was
  * bite-500 at 2.33:1, the danger fill coral-500 under white at 2.83:1, and the
- * slightly-over ring mustard-500 at 1.35:1. They are read from where they are
- * defined, not restated here, so changing one there is what gets measured.
+ * slightly-over ring mustard-500 at 1.35:1, and the over ring coral-500 at
+ * 2.64:1. They are read from where they are defined, not restated here, so
+ * changing one there is what gets measured.
  *
  * A mark (ring, focus outline, control border) needs 3:1 on what it sits on.
  * The danger button's label is small bold text, so it needs 4.5:1.
@@ -375,11 +376,10 @@ function marks(): Mark[] {
 
 /**
  * Below the bar before this check existed, and still there, so reported but
- * not failed. The over-target ring is coral-500, 2.64:1 on cream; the state
- * never rests on it, since the pill under the ring says "Over target" with an
- * alert icon. Remove an entry when it is fixed; the check then holds it.
+ * not failed. Empty now: the over-target ring was coral-500 at 2.64:1 on cream
+ * and is coral-600, so the check holds it. Add an entry only with a reason.
  */
-const KNOWN = new Set(['over ring: coral-500 on cream-50', 'over ring: coral-500 on paper'])
+const KNOWN = new Set<string>()
 
 function auditMarks(name: string, palette: Map<string, string>): string[] {
   const failures: string[] = []

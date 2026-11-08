@@ -72,7 +72,8 @@ ships rather than what a palette document claims. WCAG AA: 4.5:1 for words, 3:1 
 text, icons and marks (it also measures the focus ring, the danger button and the calorie
 ring). It pairs colours inside a single string literal, because a whole line is the wrong
 unit: a ternary holds two alternatives that never appear together. It runs in `verify` and
-in CI. One known gap: the well-over ring stroke, `coral-500`, is 2.64:1 on cream.
+in CI. The well-over ring stroke is `coral-600`, 4.53:1 on cream; it was `coral-500`
+at 2.64:1.
 
 **Status is never hue alone.** `src/lib/status.ts` returns a label, a symbol and a signed
 delta alongside the colour: bars show `+ Slightly over · +42 g`, the target sits on the bar
@@ -129,7 +130,8 @@ a target, and nothing scolds. `src/lib/kitchen.ts` sets out the rules.
 ### Planner
 A week, a fortnight or a month at a time, four slots a day (Breakfast, Lunch, Dinner,
 Snacks), each holding any number of entries, with live totals against your targets. On a
-phone the week is a list of days with every slot named in full.
+phone the week is a list of days with every slot named in full. Every day row carries its
+kcal total.
 
 - **Fill the gaps** proposes a breakfast, lunch or dinner for every empty one still ahead, from your own
   library. Arithmetic rather than a model: it prefers what is in the fridge, then what the
@@ -504,12 +506,9 @@ measurement is readable without signing in to the household.
 
 - **Push reminders on the new Supabase project**: function, VAPID keys, public key row
   and cron are not set up yet ([steps](docs/DEPLOY.md#7-reminders-optional-push-notifications)).
-- **Over-target ring contrast**: `coral-500` is 2.64:1 on cream, under 3:1.
 - **Recipe photos across households**: the storage policies check "is a member of some
   household", so a member of another household could read a photo if they knew its path.
 - **One household per account**, enforced by a unique constraint.
-- **Leftover text opacity** on a few count badges (`opacity-60`).
-- **Remove-filter chips** have no check icon.
 - **The dietician plans are public**: they ship in the site's JavaScript bundle and sit
   in this public repo (`src/data/generated/`). Moving them into Supabase behind the login,
   and the repo to private, is a decision still pending.

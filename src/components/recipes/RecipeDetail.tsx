@@ -163,7 +163,7 @@ export function RecipeDetail({
                           one thing they would not tell you, and the importer's
                           answer was being computed and then thrown away. */}
                       {variantLabel(v, i)}
-                      <span className="ml-1.5 font-mono opacity-70">{kcal}</span>
+                      <span className="ml-1.5 font-mono">{kcal}</span>
                     </button>
                   )
                 })}

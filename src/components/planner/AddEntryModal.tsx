@@ -247,7 +247,7 @@ export default function AddEntryModal({
                 >
                   {t}
                   {t === 'fridge' && (
-                    <span className="ml-1.5 text-xs opacity-60 font-mono">{available.length}</span>
+                    <span className="ml-1.5 text-xs text-ink-500 font-mono">{available.length}</span>
                   )}
                 </button>
               ))}

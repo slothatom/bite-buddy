@@ -237,10 +237,6 @@ Both are bundled via `@fontsource`, not fetched from a CDN.
 
 ### Still open
 
-- **Over-target ring**: the well-over stroke, `coral-500`, is 2.64:1 on cream,
-  under the 3:1 a graphic needs. The words beside it carry the meaning meanwhile.
-- **Leftover opacity**: a few count badges still fade their text with `opacity-60`.
-- **Remove-filter chips**: the active filters you tap to take off have no check.
 - **Charts**: the seven-bar chart and the sparkline were drawn ad hoc rather than
   specified.
 

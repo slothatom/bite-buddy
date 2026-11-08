@@ -55,11 +55,14 @@ export function targetStatus(value: number, target: number | undefined, unit = '
  * The slightly-over ring is mustard-700, not the mustard-500 fill: a ring is a
  * mark that carries meaning, so it needs 3:1 on its ground, and mustard-500 on
  * cream is 1.35:1. mustard-700 is 4.56:1 in daylight and lightens after dark.
+ * The over ring is coral-600 for the same reason: coral-500 was 2.64:1 on
+ * cream, coral-600 is 4.53:1 on cream and 4.77:1 on paper, and lightens after
+ * dark (9.10:1 on the dark background).
  * `npm run check:contrast` measures the rings here against both surfaces.
  */
 export const STATUS_STYLES: Record<StatusLevel, { fill: string; text: string; surface: string; ring: string }> = {
   'none':          { fill: 'bg-border-200', text: 'text-ink-500',     surface: 'bg-cream-50',     ring: 'stroke-border-200' },
   'on-track':      { fill: 'bg-leaf-500',   text: 'text-leaf-700',    surface: 'bg-leaf-50',      ring: 'stroke-leaf-500' },
   'slightly-over': { fill: 'bg-mustard-500', text: 'text-mustard-800', surface: 'bg-mustard-100', ring: 'stroke-mustard-700' },
-  'over':          { fill: 'bg-coral-500',  text: 'text-coral-700',   surface: 'bg-coral-50',     ring: 'stroke-coral-500' },
+  'over':          { fill: 'bg-coral-500',  text: 'text-coral-700',   surface: 'bg-coral-50',     ring: 'stroke-coral-600' },
 }

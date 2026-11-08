@@ -51,7 +51,9 @@ export function WeekGrid({
           visual header row is for eyes following a column. */}
       {wide && (
         <div className="grid gap-1.5 px-0.5" style={{ gridTemplateColumns: DAY_COLUMNS }} aria-hidden="true">
-          <span />
+          {/* The date column also carries each day's total, so it is the
+              one place the unit is said rather than on every row. */}
+          <span className="text-xs font-bold uppercase tracking-wide text-ink-500">kcal</span>
           {MEAL_SLOTS.map((slot) => (
             <span key={slot} className="text-center text-xs font-bold uppercase tracking-wide text-ink-500 truncate">
               {SLOT_LABELS[slot]}
@@ -88,9 +90,16 @@ export function WeekGrid({
             {past && !isToday && (
               <span data-past className="text-xs font-bold text-ink-500">Past</span>
             )}
-            {open && (
+            {/* Every row says its day's total, from the same reading as the
+                week summary. Opened, it has room for the unit; closed, the
+                column is 48px and the unit sits once in the header above. */}
+            {open ? (
               <span className={`ml-auto text-xs font-mono ${isToday ? '' : 'text-ink-500'}`}>
                 {kcal} kcal
+              </span>
+            ) : kcal > 0 && (
+              <span data-day-kcal className={`text-xs font-mono leading-tight ${isToday ? '' : 'text-ink-500'}`}>
+                {kcal}
               </span>
             )}
           </>

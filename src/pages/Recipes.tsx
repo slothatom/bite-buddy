@@ -250,7 +250,7 @@ export default function Recipes() {
                   className={`shrink-0 whitespace-nowrap ${tab === t ? 'tab-on' : 'tab-off'}`}
                 >
                   {t === 'mine' ? 'Yours' : GROUP_LABELS[t]}
-                  <span className="ml-1.5 text-xs opacity-60 font-mono">{counts.get(t) ?? 0}</span>
+                  <span className="ml-1.5 text-xs text-ink-500 font-mono">{counts.get(t) ?? 0}</span>
                 </button>
               ))}
             </div>

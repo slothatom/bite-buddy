@@ -157,7 +157,7 @@ export default function GroceryList() {
             <button key={t} onClick={() => setTab(t)} className={`capitalize ${tab === t ? 'tab-on' : 'tab-off'}`}>
               {t === 'list' ? 'To buy' : 'Cupboard'}
               {t === 'cupboard' && pantry.size > 0 && (
-                <span className="ml-1.5 text-xs opacity-60 font-mono">{pantry.size}</span>
+                <span className="ml-1.5 text-xs text-ink-500 font-mono">{pantry.size}</span>
               )}
             </button>
           ))}

@@ -112,9 +112,9 @@ for words, 3:1 for large text, icons and marks. It also measures the focus
 ring, the danger fill and the calorie ring strokes. It runs in `npm run verify`
 and in CI.
 
-**Known gap:** the well-over ring stroke, `coral-500`, is 2.64:1 on cream and
-2.78:1 on paper, below 3:1. The checker lists it as "known, not yet fixed". The
-status pill under the ring still says "Over target" in words.
+The well-over ring stroke is `coral-600`: 4.53:1 on cream and 4.77:1 on paper,
+and 9.10:1 on the dark background, where it lightens. It was `coral-500`, 2.64:1
+on cream, and the checker no longer excuses anything.
 
 ---
 
@@ -127,7 +127,7 @@ delta as well as the colour.
 |---|---|---|---|---|---|
 | On track | up to 105% | `leaf-500` | `leaf-700` | `leaf-500` | "On track", or "N kcal remaining" |
 | Slightly over | 105 to 130% | `mustard-500` | `mustard-800` | `mustard-700` | `+ Slightly over · +120 kcal` |
-| Over | above 130% | `coral-500` | `coral-700` | `coral-500` (see gap above) | `Over target · +430 kcal` |
+| Over | above 130% | `coral-500` | `coral-700` | `coral-600` | `Over target · +430 kcal` |
 | No target | | `border-200` | `ink-500` | `border-200` | nothing |
 
 - **Calorie ring:** past 100% it draws a **second lap** from the top (capped at
@@ -272,8 +272,5 @@ Avoid: "You failed your calorie goal", "Cheat meal", "Bad foods".
 
 ## 11. Open items
 
-- Over-target ring stroke `coral-500` is below 3:1 (see section 3).
-- A few count badges still use `opacity-60` on text (Recipes, Grocery, the add
-  sheet).
-- Remove-filter chips (the active filters you tap to take off) have no check
-  icon.
+None at present. Count badges use `text-ink-500` rather than opacity, and the
+remove-filter chips carry `ChipCheck` and are named "Remove filter X".

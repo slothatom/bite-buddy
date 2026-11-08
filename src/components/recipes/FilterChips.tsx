@@ -37,9 +37,17 @@ export function FilterChips({
         {filters.length ? `${filters.length} filter${filters.length === 1 ? '' : 's'}` : 'Filters'}
       </button>
 
+      {/* On, so they carry the check like every other chip that is on; the
+          cross says what a tap does, and the name says it to a screen reader. */}
       {filters.map((f) => (
-        <button key={f} className="chip-on" onClick={() => onRemoveFilter(f)}>
-          {quickFilterLabel(f)} <X size={12} />
+        <button
+          key={f}
+          className="chip-on"
+          onClick={() => onRemoveFilter(f)}
+          aria-label={`Remove filter ${quickFilterLabel(f)}`}
+        >
+          <ChipCheck on />
+          {quickFilterLabel(f)} <X size={12} aria-hidden="true" />
         </button>
       ))}
     </div>
