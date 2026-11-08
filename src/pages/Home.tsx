@@ -60,6 +60,12 @@ export default function Home() {
   const recipes = useRecipes()
   const sessions = useCookStore((s) => s.sessions)
   const { profile } = useUserStore()
+  // One Bandit per view. When a moment note is up he is in it, so the
+  // greeting goes without him rather than putting two raccoons on one screen.
+  const hasMoment = useUserStore((s) => {
+    const moment = s.unseenMoment()
+    return Boolean(moment && MOMENTS[moment.kind])
+  })
   const viewingAs = useUiStore((s) => s.viewingAs)
   const targets = profile.targets
   const portions = useAvailablePortions()
@@ -192,7 +198,7 @@ export default function Home() {
         <MomentNote />
 
         <header className="flex items-start gap-4">
-          <Zig mood={plannedDays ? 'happy' : 'thinking'} size={58} />
+          {!hasMoment && <Zig mood={plannedDays ? 'happy' : 'thinking'} size={58} />}
           <div className="min-w-0">
             <h1 className="display text-xl sm:text-2xl text-ink-900">{greeting()}{profile.name ? `, ${profile.name}` : ''}</h1>
             <p className="text-sm text-ink-700">
@@ -369,7 +375,7 @@ export default function Home() {
                         lib/status.ts sits above the bar where a thumb cannot
                         hide it, and the label goes to a screen reader. */}
                     <span
-                      className={`text-[10px] font-bold leading-none h-2.5 ${STATUS_STYLES[status.level].text}`}
+                      className={`text-xs font-bold leading-none h-3 ${STATUS_STYLES[status.level].text}`}
                       aria-hidden="true"
                     >
                       {status.symbol}
@@ -380,7 +386,7 @@ export default function Home() {
                       className={`w-full rounded-t transition-all ${kcal > 0 ? STATUS_STYLES[status.level].fill : 'bg-border-100'}`}
                       style={{ height: `${kcal > 0 ? Math.max((kcal / peak) * 100, 6) : 6}%` }}
                     />
-                    <span className={`text-[10px] leading-none ${
+                    <span className={`text-xs leading-none ${
                       date === today ? 'font-bold text-ink-900 underline underline-offset-2' : 'text-ink-500'}`}>
                       {new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'narrow' })}
                     </span>
@@ -493,14 +499,14 @@ function Tile({
 }) {
   const body = (
     <>
-      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
+      <p className="text-xs font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
         {Icon && <Icon size={12} />} {label}
       </p>
       <p className="text-xl font-extrabold text-ink-900 leading-tight mt-0.5">
         {value}
         {unit && <span className="text-xs font-semibold text-ink-500 ml-1">{unit}</span>}
       </p>
-      {note && <p className="text-[11px] text-ink-500 truncate">{note}</p>}
+      {note && <p className="text-xs text-ink-500 truncate">{note}</p>}
     </>
   )
 
@@ -572,11 +578,11 @@ function WeightTile() {
   if (!latest?.last) {
     return (
       <Link to="/analytics" className="card p-3 min-w-0 hover:border-bite-300 transition-colors">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
+        <p className="text-xs font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
           <Scale size={12} /> Weight
         </p>
         <p className="text-sm font-semibold text-ink-700 leading-tight mt-1">Nothing logged</p>
-        <p className="text-[11px] text-ink-500">Tap to add one</p>
+        <p className="text-xs text-ink-500">Tap to add one</p>
       </Link>
     )
   }
@@ -586,14 +592,14 @@ function WeightTile() {
 
   return (
     <Link to="/analytics" className="card p-3 min-w-0 hover:border-bite-300 transition-colors">
-      <p className="text-[11px] font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
+      <p className="text-xs font-bold uppercase tracking-wide text-ink-500 flex items-center gap-1">
         <Scale size={12} /> {latest.person.name}
       </p>
       <p className="text-xl font-extrabold text-ink-900 leading-tight mt-0.5">
         {latest.last.weight}
         <span className="text-xs font-semibold text-ink-500 ml-1">{latest.last.unit}</span>
       </p>
-      <p className="text-[11px] text-ink-500 truncate">
+      <p className="text-xs text-ink-500 truncate">
         {latest.entries.length > 1
           ? `${change > 0 ? '+' : ''}${change.toFixed(1)} since ${new Date(first.date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
           : 'first entry'}
