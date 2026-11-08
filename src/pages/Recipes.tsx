@@ -8,7 +8,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import WhenPicker from '../components/planner/WhenPicker'
 import { slotNow } from '../lib/whenDates'
 import {
-  Search, Star, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
+  Star, X, ChefHat, Plus, Pencil, Clock, Layers, Combine, Undo2,
   ChevronDown, SlidersHorizontal, Minus, ExternalLink, CalendarPlus, Check,
 } from 'lucide-react'
 import type { DishCategory, MealSlot, QuickFilter, Recipe } from '../types'
@@ -19,7 +19,7 @@ import { useNutritionContext } from '../store/useNutrition'
 import { today as todayDate } from '../store/useMealPlanStore'
 import { recipePerServing, reportPerServing, roundNutrients } from '../lib/nutrition'
 import { normaliseTerm } from '../lib/units'
-import { NutrientSummary, EmptyState, SourceLine } from '../components/ui'
+import { NutrientSummary, EmptyState, SourceLine, ChipCheck, SearchField } from '../components/ui'
 import RecipeEditor from '../components/recipes/RecipeEditor'
 import Photo from '../components/recipes/Photo'
 import {
@@ -276,15 +276,11 @@ export default function Recipes() {
         </header>
 
         <div className="space-y-3">
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
-            <input
-              className="input pl-9"
-              placeholder="Search in English, Romanian or Hungarian…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </div>
+          <SearchField
+            placeholder="Search in English, Romanian or Hungarian…"
+            value={query}
+            onChange={setQuery}
+          />
 
           {/* The shelves. Scrolls sideways on a phone rather than wrapping to
               three lines and pushing the recipes off the screen. */}
@@ -356,10 +352,12 @@ export default function Recipes() {
             </button>
 
             <button className={category ? 'chip-on' : 'chip-off'} onClick={() => setSheet('category')}>
+              <ChipCheck on={Boolean(category)} />
               {category ? CATEGORY_LABELS[category] : 'Any dish'} <ChevronDown size={13} />
             </button>
 
             <button className={filters.length ? 'chip-on' : 'chip-off'} onClick={() => setSheet('filters')}>
+              <ChipCheck on={Boolean(filters.length)} />
               <SlidersHorizontal size={12} />
               {filters.length ? `${filters.length} filter${filters.length === 1 ? '' : 's'}` : 'Filters'}
             </button>
@@ -491,7 +489,7 @@ export default function Recipes() {
                     {left}
                   </span>
                   {!d.derived && (
-                    <span className="block text-[10px] text-ink-500">you set this</span>
+                    <span className="block text-xs text-ink-500">you set this</span>
                   )}
                 </span>
               </button>
@@ -897,6 +895,7 @@ function RecipeDetail({
                       className={i === version ? 'chip-on' : 'chip-off'}
                       aria-pressed={i === version}
                     >
+                      <ChipCheck on={i === version} />
                       {/* What this version is, rather than where it sits in
                           the row. These said "1", "2", "3", "4", so the one
                           thing you came here to decide, which portion, was the
@@ -961,14 +960,14 @@ function RecipeDetail({
 
           {recipe.sourceLine ? (
             <div className="card-soft p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-ink-500 mb-1">How your dietician wrote it</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-1">How your dietician wrote it</p>
               <SourceLine text={recipe.sourceLine} translate />
             </div>
           ) : null}
 
           {recipe.description ? (
             <div className="card-soft p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-ink-500 mb-1">Your notes</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-ink-500 mb-1">Your notes</p>
               <p className="text-sm text-ink-900 whitespace-pre-line">{recipe.description}</p>
             </div>
           ) : null}

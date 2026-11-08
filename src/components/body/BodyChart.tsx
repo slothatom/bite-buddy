@@ -102,7 +102,7 @@ export default function BodyChart({
 
       {/* The two ends of the stretch, named. Without them the box could be a
           fortnight or a decade and there is no way to tell. */}
-      <p className="flex justify-between text-[10px] text-ink-500 mt-1">
+      <p className="flex justify-between text-xs text-ink-500 mt-1">
         <span>{shortDay(readings[0].date)}</span>
         {readings.length > 1 && <span>{shortDay(readings[readings.length - 1].date)}</span>}
       </p>

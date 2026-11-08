@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useDialog } from '../../lib/useDialog'
-import { Search, X, CalendarDays, Plus, Globe } from 'lucide-react'
+import { X, CalendarDays, Plus, Globe } from 'lucide-react'
 import type { Component, MealSlot, Recipe } from '../../types'
 import { SLOT_LABELS } from '../../types'
 import { useRecipes } from '../../store/useRecipeStore'
@@ -21,6 +21,7 @@ import { availability, availabilityLabel } from '../../lib/pantry'
 import { usePortionStore } from '../../store/usePortionStore'
 import { surplusLine, surplusOf } from '../../lib/cookExtra'
 import AddFoodModal from '../foods/AddFoodModal'
+import { ChipCheck, SearchField } from '../ui'
 
 /**
  * Adds a recipe, a weighed food, or something already cooked, to a meal slot.
@@ -180,16 +181,12 @@ export default function AddEntryModal({
           </header>
 
           <div className="px-5 pt-4 space-y-3">
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
-              <input
-                className="input pl-9"
-                autoFocus
-                placeholder={isRecord ? 'What did you have?' : 'What are we having?'}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </div>
+            <SearchField
+              autoFocus
+              placeholder={isRecord ? 'What did you have?' : 'What are we having?'}
+              value={query}
+              onChange={setQuery}
+            />
             {(onSlotChange || onDateChange) && (
               <div className="card-soft p-3 space-y-3">
                 <div className="flex items-center gap-2">
@@ -298,6 +295,7 @@ export default function AddEntryModal({
                     aria-label={n === 1 ? 'Cooking one serving' : `Cooking ${n} servings`}
                     className={cooking === n ? 'chip-on' : 'chip-off'}
                   >
+                    <ChipCheck on={cooking === n} />
                     {n}
                   </button>
                 ))}
@@ -432,6 +430,7 @@ export default function AddEntryModal({
                           aria-label={`One ${u.label} of ${f.names.en}`}
                           className={g === u.grams ? 'chip-on' : 'chip-off'}
                         >
+                          <ChipCheck on={g === u.grams} />
                           1 {u.label}
                         </button>
                       ))}

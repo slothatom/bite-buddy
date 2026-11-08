@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
-import { Plus, Check, Trash2, Search, Bell, Minus, AlertTriangle } from 'lucide-react'
+import { Plus, Check, Trash2, Bell, Minus, AlertTriangle } from 'lucide-react'
 import type { CookSession, MealSlot } from '../types'
 import { useDialog } from '../lib/useDialog'
 import { offerUndo } from '../store/useUndo'
 import { useCookStore } from '../store/useCookStore'
 import { useRecipes } from '../store/useRecipeStore'
 import { useMealPlanStore } from '../store/useMealPlanStore'
-import { EmptyState } from '../components/ui'
+import { EmptyState, SearchField } from '../components/ui'
 import { LEAD_MINUTES, overdue, reminderAt, reminderLabel } from '../lib/cookReminder'
 import { usePortionStore, useAvailablePortions } from '../store/usePortionStore'
 import {
@@ -254,23 +254,19 @@ function SessionDialog({
 
           <div>
             <label className="label">Dishes ({picked.length} picked)</label>
-            <div className="relative">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
-              <input
-                className="input pl-9"
-                placeholder="Search your recipes"
-                aria-label="Search dishes"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-              />
-            </div>
+            <SearchField
+              placeholder="Search your recipes"
+              aria-label="Search dishes"
+              value={query}
+              onChange={setQuery}
+            />
           </div>
         </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto px-5">
           <div className="card-soft divide-y divide-border-200">
             {matches.planned.length > 0 && (
-              <p className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-ink-500 bg-cream-50">
+              <p className="px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-ink-500 bg-cream-50">
                 Planned this week
               </p>
             )}
@@ -279,7 +275,7 @@ function SessionDialog({
             ))}
 
             {matches.rest.length > 0 && (
-              <p className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-ink-500 bg-cream-50">
+              <p className="px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-ink-500 bg-cream-50">
                 Everything else
               </p>
             )}

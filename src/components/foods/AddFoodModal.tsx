@@ -8,6 +8,7 @@ import {
   CATEGORY_LABELS, INGREDIENT_GROUPS, DISH_CHOICES, categoryValue, parseCategoryValue,
 } from '../../lib/categories'
 import { saltFromSodium } from '../../lib/nutrition'
+import { SearchField } from '../ui'
 import {
   searchFoods as lookupOnline, lookupBarcode,
   type NutritionResult, type LookupOutcome, type LookupProblem,
@@ -203,9 +204,10 @@ export default function AddFoodModal({
           {tab === 'lookup' && (
             <div className="space-y-3">
               <div className="flex gap-2">
-                <input
-                  className="input" placeholder="Search USDA and Open Food Facts…"
-                  value={query} onChange={(e) => setQuery(e.target.value)}
+                <SearchField
+                  icon={false}
+                  placeholder="Search USDA and Open Food Facts…"
+                  value={query} onChange={setQuery}
                   onKeyDown={(e) => { if (e.key === 'Enter') runLookup() }}
                 />
                 <button className="btn-primary shrink-0" onClick={runLookup} disabled={searching}>

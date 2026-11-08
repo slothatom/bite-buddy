@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { RefreshCw, Trash2, ShoppingBasket, Plus, X, Check, Search, Share2 } from 'lucide-react'
+import { RefreshCw, Trash2, ShoppingBasket, Plus, X, Check, Share2 } from 'lucide-react'
 import type { GroceryItem, MedCategory, PantryItem } from '../types'
 import { useMealPlanStore, getRangeDates, today } from '../store/useMealPlanStore'
 import { useThisWeek } from '../store/useThisWeek'
 import { offerUndo } from '../store/useUndo'
 import { useNutritionContext } from '../store/useNutrition'
-import { EmptyState, SectionHeading } from '../components/ui'
+import { EmptyState, SectionHeading, ChipCheck, SearchField } from '../components/ui'
 import { CATEGORY_EMOJI, CATEGORY_LABELS } from '../lib/categories'
 import { formatGrams, householdAmount, listAsText } from '../lib/grocery'
 import { copyToClipboard } from '../lib/clipboard'
@@ -376,15 +376,11 @@ function Cupboard() {
           </p>
         </div>
 
-        <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
-          <input
-            className="input pl-9"
-            placeholder="Search your foods"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
+        <SearchField
+          placeholder="Search your foods"
+          value={query}
+          onChange={setQuery}
+        />
 
         {matches.map((f) => (
           <button
@@ -496,6 +492,7 @@ function PantryRow({
           aria-label={`Always have ${name}`}
           className={item.staple ? 'chip-on shrink-0' : 'chip-off shrink-0'}
         >
+          <ChipCheck on={item.staple} />
           Always
         </button>
 
@@ -561,7 +558,7 @@ function DayPicker({
             >
               {/* White, for the same reason as the planner's day chips: the
                   tint is 4.19:1 on bite-500 and this is small text. */}
-              <span className={`block text-[11px] font-semibold uppercase ${on ? 'text-white' : 'text-ink-500'}`}>
+              <span className={`block text-xs font-semibold uppercase ${on ? 'text-white' : 'text-ink-500'}`}>
                 {d.toLocaleDateString('en-GB', { weekday: 'short' })}
               </span>
               <span className="block text-sm font-bold leading-tight">{d.getDate()}</span>

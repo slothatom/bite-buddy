@@ -4,7 +4,7 @@ import { CATEGORY_LABELS } from '../../lib/categories'
 import { useMealPlanStore, today } from '../../store/useMealPlanStore'
 import { useNutritionContext } from '../../store/useNutrition'
 import { useUserStore } from '../../store/useUserStore'
-import { EmptyState, SectionHeading } from '../ui'
+import { EmptyState, SectionHeading, ChipCheck } from '../ui'
 import {
   SPANS, SPAN_LABELS, direction, foodsEaten, pointsFrom, smooth, spanDates, trend, type Span,
 } from '../../lib/trends'
@@ -98,6 +98,7 @@ export default function TrendsTab() {
               aria-pressed={span === s}
               className={span === s ? 'chip-on' : 'chip-off'}
             >
+              <ChipCheck on={span === s} />
               {SPAN_LABELS[s]}
             </button>
           ))}
@@ -110,6 +111,7 @@ export default function TrendsTab() {
               aria-pressed={watching === w.key}
               className={watching === w.key ? 'chip-on' : 'chip-off'}
             >
+              <ChipCheck on={watching === w.key} />
               {w.label}
             </button>
           ))}
@@ -171,6 +173,7 @@ export default function TrendsTab() {
                 aria-pressed={category === 'all'}
                 className={category === 'all' ? 'chip-on' : 'chip-off'}
               >
+                <ChipCheck on={category === 'all'} />
                 Everything
               </button>
               {categories.map((c) => (
@@ -180,6 +183,7 @@ export default function TrendsTab() {
                   aria-pressed={category === c}
                   className={category === c ? 'chip-on' : 'chip-off'}
                 >
+                  <ChipCheck on={category === c} />
                   {CATEGORY_LABELS[c]}
                 </button>
               ))}

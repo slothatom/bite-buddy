@@ -125,7 +125,7 @@ export default function DayChart({
 
       <div className="flex gap-px mt-1" aria-hidden="true">
         {points.map((p, i) => (
-          <span key={p.date} className="flex-1 min-w-0 text-center text-[9px] text-ink-500">
+          <span key={p.date} className="flex-1 min-w-0 text-center text-xs text-ink-500">
             {i % every === 0 ? new Date(p.date + 'T12:00:00').getDate() : ''}
           </span>
         ))}
