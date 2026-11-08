@@ -1,13 +1,15 @@
 /**
- * Draws the app's icons from one description of Bandit.
+ * Renders the app's icons, tab icon and launch screens from the logo masters.
  *
- * The icons used to be three separate files nobody could regenerate: a
- * favicon somebody drew, and two PNGs of the old purple blob. When the brand
- * changed they were the last thing still purple, and there was no way to
- * bring them along except by opening a drawing tool.
+ * The artwork is the Bitten B, and its source of truth is the SVGs in
+ * `brand/`: a rounded app tile, a full-bleed maskable tile with the mark in
+ * the safe zone, and a tab icon that adapts to a dark browser by itself. This
+ * script draws nothing of its own. It reads those files, rasterises the ones a
+ * platform wants as PNG, and copies the favicon across as vector. Run
+ * `npm run icons` after changing anything in `brand/`.
  *
- * So the face lives here once, as text, and the PNGs are rendered from it.
- * Run `npm run icons` after changing the mascot or the brand colour.
+ * (It used to draw Bandit's face from coordinates written out in this file.
+ * He is still the mascot inside the app, but he is no longer the icon.)
  *
  * Every file it writes carries a hash of its own contents in its name, and
  * `src/generated/icons.ts` records what those names are. That is the fix for
@@ -20,95 +22,43 @@
  *
  * Rendering is done by taking a screenshot of the SVG in the browser that is
  * already a dev dependency for the end-to-end tests, rather than adding an
- * image library to the project for three files.
+ * image library to the project for a handful of files.
  */
 import { chromium } from '@playwright/test'
 import { createHash } from 'node:crypto'
-import { readdirSync, unlinkSync, writeFileSync } from 'node:fs'
+import { readFileSync, readdirSync, unlinkSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
+const BRAND = resolve(import.meta.dirname, '../brand')
 const OUT = resolve(import.meta.dirname, '../public')
 const GENERATED = resolve(import.meta.dirname, '../src/generated/icons.ts')
 
-/** The brand, as literals. These files are read outside the document, where
- *  a CSS variable means nothing. */
+/** The launch screen's ground: the manifest's background colour and
+ *  --color-cream-50, as a literal, because a file rendered outside the
+ *  document cannot read a CSS variable. */
 const CREAM = '#faf7f0'
-/* bite-400 rather than bite-500: the only brand on the icon is the inner ear,
-   and at 16px the lighter step is the one that still reads as turquoise
-   against the dark ear rim around it. */
-const BRAND = '#2dd4bf'
-const PAPER = '#fffdf9'
-const BLUSH = '#ff8888'
-/* The fur, copied from --color-fur-* in index.css. These are literals on both
-   sides on purpose: the tokens do not invert, and a file rendered outside the
-   document cannot read a variable anyway. Change one, change the other. */
-const FUR_PALE = '#e9e6e1'
-const FUR = '#9c9791'
-const FUR_DARK = '#2f2b28'
+
+/** A master from `brand/`, as text. */
+function master(name: string): string {
+  return readFileSync(resolve(BRAND, name), 'utf8')
+}
 
 /**
- * Bandit's face, filling a tile.
+ * The tile with its corners squared off.
  *
- * His head rather than the whole of him: a standing figure in a square leaves
- * air above and below and reads as a speck on a home screen, while a face
- * fills the space and is still recognisable at the 16 pixels a browser tab
- * gives it. The dark band across a pale face is what does the work small: it
- * is the one shape large enough to survive, and it is also what keeps him a
- * raccoon rather than a panda at 16px. It matches Mascot.tsx, which carries
- * the reasoning in full.
- *
- * `scale` shrinks the face towards the middle for the maskable icon, whose
- * corners Android is entitled to cut away.
- *
- * `ground` draws the cream tile behind him. The PNGs need it: iOS composites
- * a transparent icon onto black rather than honouring it, and a maskable icon
- * has to bleed to its own edges or the platform's crop shows through. The tab
- * icon is the opposite case - it is drawn onto chrome whose colour is not ours
- * to guess, so a tile there is a cream box sitting on somebody's dark title
- * bar.
+ * The rounded corners on the master are right for a manifest icon, which a
+ * browser or launcher shows as given. They are wrong for iOS: a home screen
+ * draws its own rounded square over whatever it is handed and composites any
+ * transparency onto black, so a pre-rounded tile comes out with dark slivers
+ * in its corners. iOS gets the same tile, square.
  */
-function face(scale: number, ground = true): string {
-  const t = `translate(32 32) scale(${scale}) translate(-32 -32)`
-  /*
-   * One ear, drawn on the left and mirrored for the right.
-   *
-   * Short and round, not pointed. Drawn as triangles first, the face read as
-   * a cat: pointed ears are the single strongest cat signal there is, and a
-   * raccoon's are stubby and rounded. Mirroring rather than writing the
-   * second one out keeps them the same shape as the numbers get nudged.
-   */
-  const ear = (cx: number) => `<g>
-      <circle cx="${cx}" cy="14" r="10" fill="${FUR_DARK}"/>
-      <circle cx="${cx}" cy="14" r="7.6" fill="${FUR}"/>
-      <circle cx="${cx}" cy="14.6" r="3.4" fill="${BRAND}"/>
-    </g>`
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-${ground ? `  <rect width="64" height="64" fill="${CREAM}"/>\n` : ''}  <g transform="${t}">
-    ${ear(15)}
-    ${ear(49)}
+function squared(svg: string): string {
+  return svg.replace(/ rx="[\d.]+"/, '')
+}
 
-    <ellipse cx="32" cy="33" rx="27" ry="24" fill="${FUR_DARK}"/>
-    <ellipse cx="32" cy="33" rx="25" ry="22" fill="${FUR}"/>
-
-    <ellipse cx="32" cy="37" rx="21" ry="17.6" fill="${FUR_PALE}"/>
-    <path d="M8.6 31 Q17.4 21.4 32 27.4 Q46.6 21.4 55.4 31 Q52.8 43.2 43.2 43.4 Q32 37.8 20.8 43.4 Q11.2 43.2 8.6 31 Z" fill="${FUR_DARK}"/>
-
-    <circle cx="20.6" cy="32.6" r="6.6" fill="${PAPER}"/>
-    <circle cx="43.4" cy="32.6" r="6.6" fill="${PAPER}"/>
-    <circle cx="21.4" cy="33.2" r="3.8" fill="${FUR_DARK}"/>
-    <circle cx="44.2" cy="33.2" r="3.8" fill="${FUR_DARK}"/>
-    <circle cx="19.8" cy="31.6" r="1.6" fill="${PAPER}"/>
-    <circle cx="42.6" cy="31.6" r="1.6" fill="${PAPER}"/>
-
-    <ellipse cx="14.6" cy="46.6" rx="4.2" ry="3" fill="${BLUSH}"/>
-    <ellipse cx="49.4" cy="46.6" rx="4.2" ry="3" fill="${BLUSH}"/>
-    <ellipse cx="32" cy="46.6" rx="10.8" ry="7.8" fill="${PAPER}"/>
-    <path d="M28 43.4 q4 -3 8 0 q-4 4 -8 0 Z" fill="${FUR_DARK}"/>
-    <path d="M32 47.4 v2.2" stroke="${FUR_DARK}" stroke-width="2" stroke-linecap="round"/>
-    <path d="M32 49.2 q-2.6 2.6 -5.2 0" stroke="${FUR_DARK}" stroke-width="2" stroke-linecap="round" fill="none"/>
-    <path d="M32 49.2 q2.6 2.6 5.2 0" stroke="${FUR_DARK}" stroke-width="2" stroke-linecap="round" fill="none"/>
-  </g>
-</svg>`
+/** Gives a master a pixel size. The masters carry only a viewBox. */
+function sized(svg: string, size: number): string {
+  return svg.replace('<svg ', `<svg width="${size}" height="${size}" `)
 }
 
 /** Eight characters of the contents, which is what makes the name honest. */
@@ -133,18 +83,22 @@ function clearOldArtwork(): void {
 }
 
 /**
- * Full bleed for the ordinary icon, and pulled in for the maskable one.
+ * Which master each PNG comes from.
  *
- * A maskable icon is cropped to whatever shape the platform likes, and only
- * the middle 80% is guaranteed to survive. The old manifest offered the same
- * file for both, so on a phone that draws round icons the mascot lost his
- * ears. 0.72 keeps them inside the circle with room to spare.
+ * The ordinary icons are the rounded tile, transparent past its corners. The
+ * maskable one has its own master: full bleed, with the mark pulled into the
+ * middle 80% that every platform's crop is guaranteed to keep. The manifest
+ * once offered one file for both, and a phone that draws round icons cut the
+ * artwork's edges off.
  */
 const ICONS = [
-  { stem: 'icon-192', size: 192, scale: 1 },
-  { stem: 'icon-512', size: 512, scale: 1 },
-  { stem: 'icon-maskable-512', size: 512, scale: 0.72, purpose: 'maskable' },
+  { stem: 'icon-192', size: 192, svg: master('app-icon.svg') },
+  { stem: 'icon-512', size: 512, svg: master('app-icon.svg') },
+  { stem: 'icon-maskable-512', size: 512, svg: master('app-icon-maskable.svg'), purpose: 'maskable' },
 ]
+
+/** The iOS home screen icon: square (see `squared`), at the 180px iOS asks for. */
+const APPLE = { stem: 'icon-apple-180', size: 180, svg: squared(master('app-icon.svg')) }
 
 /*
  * The browser the end-to-end tests already use.
@@ -162,28 +116,37 @@ const page = await browser.newPage()
 
 clearOldArtwork()
 
-const iconLines: string[] = []
-let appleTouch = ''
-for (const { stem, size, scale, purpose } of ICONS) {
+/** One square PNG of a master, written under its hashed name. */
+async function render(stem: string, size: number, svg: string): Promise<string> {
   await page.setViewportSize({ width: size, height: size })
-  await page.setContent(
-    `<body style="margin:0">${face(scale).replace('<svg ', `<svg width="${size}" height="${size}" `)}</body>`,
-  )
-  const shot = await page.locator('svg').screenshot({ omitBackground: false })
+  await page.setContent(`<body style="margin:0">${sized(svg, size)}</body>`)
+  // Transparent outside the artwork, so the rounded tile keeps its corners.
+  const shot = await page.locator('svg').screenshot({ omitBackground: true })
   const file = `${stem}.${stamp(shot)}.png`
   writeFileSync(resolve(OUT, file), shot)
-  if (stem === 'icon-192') appleTouch = file
+  console.log(`${file.padEnd(34)} ${size}x${size}`)
+  return file
+}
+
+const iconLines: string[] = []
+let notification = ''
+for (const { stem, size, svg, purpose } of ICONS) {
+  const file = await render(stem, size, svg)
+  // A notification icon is drawn as given, about this size, so it is the
+  // rounded 192 rather than the square iOS tile.
+  if (stem === 'icon-192') notification = file
   iconLines.push(
     `  { src: '${file}', sizes: '${size}x${size}', type: 'image/png'`
     + `${purpose ? `, purpose: '${purpose}'` : ''} },`,
   )
-  console.log(`${file.padEnd(34)} ${size}x${size}${scale < 1 ? `, inset to ${scale * 100}%` : ''}`)
 }
+const appleTouch = await render(APPLE.stem, APPLE.size, APPLE.svg)
 
-// The tab icon is the same face, as vector, so it stays sharp wherever a
-// browser decides to draw it, and without the cream tile so it sits on the
-// tab or title bar's own colour instead of on a box.
-const svg = `${face(1, false)}\n`
+// The tab icon is the favicon master as it stands: vector, so it stays sharp
+// wherever a browser draws it; no tile, so it sits on the tab's own colour;
+// and a prefers-color-scheme rule inside it, so the B turns light teal on a
+// dark tab strip without the page having to do anything.
+const svg = master('favicon.svg')
 const favicon = `favicon.${stamp(svg)}.svg`
 writeFileSync(resolve(OUT, favicon), svg)
 console.log(`${favicon.padEnd(34)} vector`)
@@ -210,12 +173,13 @@ const SPLASHES = [
   { w: 1290, h: 2796, dw: 430, dh: 932, dpr: 3 },  // 14 Plus, 15 Pro Max
 ]
 
-/** The face on a cream field, sized as a fraction of the shorter edge. */
+/** The rounded app tile centred on a cream field, a third of the shorter
+ *  edge across. Nothing crops a launch screen, so the corners stay. */
 function splash(w: number, h: number): string {
   const art = Math.round(Math.min(w, h) * 0.34)
   return `<div style="margin:0;width:${w}px;height:${h}px;background:${CREAM};
     display:flex;align-items:center;justify-content:center">
-    ${face(1).replace('<svg ', `<svg width="${art}" height="${art}" style="border-radius:${Math.round(art * 0.24)}px" `)}
+    ${sized(master('app-icon.svg'), art)}
   </div>`
 }
 
@@ -267,11 +231,12 @@ export interface LaunchScreen {
 /** The tab icon, as vector. */
 export const FAVICON = '${favicon}'
 
-/** What iOS puts on the home screen, read once when the app is added. */
+/** What iOS puts on the home screen, read once when the app is added. Square,
+ *  because iOS rounds the corners itself. */
 export const APPLE_TOUCH_ICON = '${appleTouch}'
 
 /** What a notification is drawn with, which the service worker asks for. */
-export const NOTIFICATION_ICON = '${appleTouch}'
+export const NOTIFICATION_ICON = '${notification}'
 
 /** The manifest's icon list. */
 export const ICONS: AppIcon[] = [
