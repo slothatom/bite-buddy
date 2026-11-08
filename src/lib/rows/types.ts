@@ -20,6 +20,12 @@ export interface SyncRow {
   merged_into?: string | null
   updated_at?: string
   updated_by?: string | null
+  /**
+   * Whose household the row belongs to. Sent on every write and stripped from
+   * every read: the app holds one household's rows at a time, and a column it
+   * never sets would otherwise make every row from the server look changed.
+   */
+  household_id?: string
 }
 
 /**

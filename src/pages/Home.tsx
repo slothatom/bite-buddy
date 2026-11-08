@@ -37,7 +37,7 @@ import { kitchenNudges } from '../lib/kitchen'
 import { usePantry } from '../store/usePantryStore'
 import { useDayMovement } from '../store/useActivityStore'
 import { movementLabel, type DayMovement } from '../lib/movement'
-import { PEOPLE } from '../lib/people'
+import { usePeople, useResolvedPerson } from '../store/useHousehold'
 
 /**
  * The welcome screen, what you land on, before the planner.
@@ -60,7 +60,7 @@ export default function Home() {
   const recipes = useRecipes()
   const sessions = useCookStore((s) => s.sessions)
   const { profile } = useUserStore()
-  const viewingAs = useUiStore((s) => s.viewingAs)
+  const viewingAs = useResolvedPerson(useUiStore((s) => s.viewingAs))
   const targets = profile.targets
   const portions = useAvailablePortions()
   const groceryItems = useMealPlanStore((s) => s.groceryItems)
@@ -560,8 +560,9 @@ function MovedToday({ movement }: { movement: DayMovement }) {
 
 function WeightTile() {
   const weights = useBodyStore((s) => s.weightEntries)
+  const people = usePeople()
 
-  const latest = PEOPLE
+  const latest = people
     .map((p) => {
       const mine = weights.filter((w) => w.memberId === p.id)
       return { person: p, entries: mine, last: mine[mine.length - 1] }

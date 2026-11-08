@@ -1,5 +1,5 @@
 /**
- * The two people this app is for.
+ * The people this app is for.
  *
  * Weight, measurements, sleep and exercise are personal, so every one of those
  * rows has to say whose it is. The obvious identifier is the signed-in account
@@ -7,38 +7,36 @@
  * different on each device until then, and it left the screen showing a single
  * unnamed history to whoever happened to be holding the phone.
  *
- * These ids are fixed and shared instead. Both phones agree on them, they work
- * signed out, and both people are on screen whether or not either has signed
- * in, which is what a household of two actually looks like.
- *
- * Names are here rather than in a store because they do not change. If a third
- * person ever eats here, this is the list to add them to.
+ * So rows carry a person key instead: a short, stable id per person, shared by
+ * every device. It used to be a hardcoded list of two. It is data now, one
+ * `person_key` per row in `household_members`, and the two original people
+ * were backfilled with the ids they always had, so nothing logged before
+ * changed owner. See lib/household.ts and store/useHousehold.ts.
  */
-export type PersonId = 'arany' | 'oli'
+export type PersonId = string
 
 export interface Person {
   id: PersonId
   name: string
 }
 
-export const PEOPLE: readonly Person[] = [
-  { id: 'arany', name: 'Arany' },
-  { id: 'oli', name: 'Oli' },
-]
-
-const IDS = new Set<string>(PEOPLE.map((p) => p.id))
+/**
+ * Who is here when there is no household to ask: a copy running on its own,
+ * without Supabase. One person, one history.
+ */
+export const LOCAL_PEOPLE: readonly Person[] = [{ id: 'me', name: 'Me' }]
 
 /**
  * Whether a stored id still means somebody.
  *
- * Entries logged before this existed carry either nothing or an account id
- * from whichever session wrote them. Neither names a person any more, so both
- * count as unclaimed and the screen offers them back rather than hiding them.
+ * Entries logged before people existed carry either nothing or an account id
+ * from whichever session wrote them. Neither names a person, so both count as
+ * unclaimed and the screen offers them back rather than hiding them.
  */
-export function isPersonId(id: string | undefined): id is PersonId {
-  return id != null && IDS.has(id)
+export function isPersonIn(people: readonly Person[], id: string | undefined): boolean {
+  return id != null && people.some((p) => p.id === id)
 }
 
-export function personName(id: string | undefined): string {
-  return PEOPLE.find((p) => p.id === id)?.name ?? 'Someone'
+export function personName(people: readonly Person[], id: string | undefined): string {
+  return people.find((p) => p.id === id)?.name ?? 'Someone'
 }

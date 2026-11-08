@@ -9,6 +9,9 @@
 import { create } from 'zustand'
 import type { Session, User } from '@supabase/supabase-js'
 import { isConfigured, redirectUrl, supabase } from '../lib/supabase'
+import { connectHousehold, useHousehold } from './useHousehold'
+
+connectHousehold(supabase, isConfigured)
 
 export interface Member {
   id: string
@@ -60,21 +63,24 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     if (!supabase) return
     await supabase.auth.signOut()
     set({ session: null, user: null, members: [], linkSentTo: null })
+    // Other people's names and roles: not something to leave on a device
+    // nobody is signed in to.
+    useHousehold.getState().clear()
   },
 
   setDisplayName: async (name) => {
     const user = get().user
     if (!supabase || !user) return false
-    // .select() matters: a row-level policy that refuses the update does not
-    // raise an error, it just changes nothing. Asking for the changed rows back
-    // is the only way to tell a save from a silent refusal.
-    const { data, error } = await supabase
-      .from('members').update({ display_name: name }).eq('id', user.id).select('id')
-    if (error || !data?.length) return false
+    // Through a function, because the name lives in two places, the account's
+    // own row and its household membership, and only the database may write
+    // the second.
+    const { error } = await supabase.rpc('set_display_name', { name })
+    if (error) return false
     // Optimistic, so the field keeps the name even if the reload is slow or the
     // row comes back filtered by a policy.
     set({ members: get().members.map((m) => (m.id === user.id ? { ...m, display_name: name } : m)) })
     await get().refreshMembers()
+    await useHousehold.getState().load(user.id)
     return true
   },
 
@@ -89,15 +95,20 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
 }))
 
 /**
- * Announce this user to the household.
+ * Announce this user, then find their household.
  *
- * The row is created on first sign-in rather than by a database trigger, so
- * signing in is the only thing that puts someone on the members list, an
- * account that exists but has never been used does not appear.
+ * The members row is a note of who has signed in and when; it grants nothing.
+ * What decides access is `household_members`, which `useHousehold.load` reads,
+ * accepting a waiting invite on the way if there is one (or, during the
+ * transition, joining the original household if this email is on the old
+ * guest list). An account that ends up in no household is shown the screen
+ * to start one, not an error.
  */
 async function recordPresence(user: User) {
   if (!supabase) return
-  const { error } = await supabase.from('members').upsert(
+  // Best effort: nothing depends on it, and a refusal here says nothing about
+  // whether this account can read or write the household's data.
+  await supabase.from('members').upsert(
     {
       id: user.id,
       email: user.email ?? '',
@@ -106,41 +117,20 @@ async function recordPresence(user: User) {
     { onConflict: 'id', ignoreDuplicates: false },
   )
 
-  if (!error) {
-    await useAuthStore.getState().refreshMembers()
-    return
-  }
+  await useHousehold.getState().load(user.id)
+  await useAuthStore.getState().refreshMembers()
 
-  // The write failing does not necessarily mean anything is wrong. The database
-  // adds an account to the household the moment it is created, so this row
-  // usually exists already and all that was refused is a note of when you were
-  // last here, which nothing depends on.
-  //
-  // What matters is the answer to one question, so ask it rather than guessing.
-  const { data } = await supabase.from('members').select('id').eq('id', user.id).maybeSingle()
-  if (data) {
-    await useAuthStore.getState().refreshMembers()
-    return
+  const after = useHousehold.getState()
+  if (after.status === 'error' && !after.household) {
+    // Not in a household, and the database would not say why. Every policy
+    // consults membership, so this account can read and write nothing, which
+    // from the inside looks exactly like an app that has stopped saving.
+    // Saying so, with the server's own words, is the only useful thing left.
+    useAuthStore.setState({
+      error: 'Signed in, but the household could not be loaded, so nothing can be saved yet. '
+        + `The database said: ${after.error ?? 'nothing'}`,
+    })
   }
-
-  // Not a member, and writing the row directly was refused. There is one more
-  // way in, and it exists precisely for this: a function that runs as its owner
-  // and so answers to none of the policies that might be wrong. It can add one
-  // row, yours.
-  const { error: joinError } = await supabase.rpc('join_household')
-  if (!joinError) {
-    await useAuthStore.getState().refreshMembers()
-    return
-  }
-
-  // Not a member, and the app cannot make itself one. Every policy in the
-  // database consults membership, so this account can read and write nothing,
-  // which from the inside looks exactly like an app that has stopped saving.
-  // Saying so, with the server's own words, is the only useful thing left.
-  useAuthStore.setState({
-    error: 'Signed in, but this account is not in the household, so nothing can be saved. '
-      + `Run supabase/fix-membership.sql in the Supabase SQL editor. The database said: ${joinError.message}`,
-  })
 }
 
 if (supabase) {

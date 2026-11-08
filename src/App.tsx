@@ -9,6 +9,8 @@ import UndoBar from './components/layout/UndoBar'
 import Home from './pages/Home'
 import Planner from './pages/Planner'
 import SignIn from './pages/SignIn'
+import HouseholdSetup from './pages/HouseholdSetup'
+import { useHousehold } from './store/useHousehold'
 
 import { useAuthStore } from './store/useAuth'
 import { useSyncSession } from './store/useSync'
@@ -204,6 +206,11 @@ function SignedOutSettings() {
 function Gate() {
   const ready = useAuthStore((s) => s.ready)
   const session = useAuthStore((s) => s.session)
+  // In no household, once the database has said so. A cached household counts
+  // as being in one, so a phone opened offline goes straight to the app.
+  const homeless = useHousehold((s) =>
+    !s.household && (s.status === 'none' || s.status === 'error')
+    && s.userId === session?.user?.id)
 
   if (!isConfigured) return <Shell />
 
@@ -217,6 +224,9 @@ function Gate() {
       </div>
     )
   }
+
+  if (session && homeless) return <HouseholdSetup />
+
 
   if (session) return <Shell />
 

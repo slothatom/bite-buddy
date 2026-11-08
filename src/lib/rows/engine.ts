@@ -108,12 +108,25 @@ function isNews(row: SyncRow, known: string | undefined, here: ReadonlySet<strin
   return known !== fingerprint(row)
 }
 
-function asAppRow(row: SyncRow): SyncRow {
+/**
+ * The household column is the server's business: every row this device sees
+ * is already its own household's (row-level security sees to that), and the
+ * app's rows never carry it. Left in, it would make every row from the server
+ * fingerprint differently from the same row read locally.
+ */
+export function asAppRow(raw: SyncRow): SyncRow {
+  const { household_id: _household, ...row } = raw
   const day = row.day as unknown
   if (day instanceof Date) return { ...row, day: day.toISOString().slice(0, 10) }
   if (typeof day === 'string' && day.length > 10) return { ...row, day: day.slice(0, 10) }
   return row
 }
+
+/**
+ * The key every write is matched on. A row's id is only unique within its
+ * household: two households both have a 'profile' settings row.
+ */
+export const CONFLICT_KEY = 'household_id,id'
 
 export class RowSync {
   private stopped = false
@@ -125,6 +138,12 @@ export class RowSync {
     private readonly tables: RowTable[],
     private readonly userId: string,
     private readonly hooks: EngineHooks = {},
+    /**
+     * The household every write goes to. Optional only because the database
+     * fills it in from the session when it is missing; the app always knows
+     * it before it starts syncing, and says so.
+     */
+    private readonly householdId?: string,
   ) {}
 
   stop(): void {
@@ -246,8 +265,12 @@ export class RowSync {
     this.allowed.delete(table.table)
 
     const { error } = await this.db.from(table.table).upsert(
-      send.map((row) => ({ ...row, updated_by: this.userId })),
-      { onConflict: 'id' },
+      send.map((row) => ({
+        ...row,
+        updated_by: this.userId,
+        ...(this.householdId ? { household_id: this.householdId } : {}),
+      })),
+      { onConflict: CONFLICT_KEY },
     )
 
     if (error) {

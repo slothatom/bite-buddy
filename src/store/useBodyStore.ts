@@ -3,7 +3,8 @@ import { persist } from 'zustand/middleware'
 import { safeStorage, SCHEMA_VERSION, upgradeThrough } from './persist'
 import { useMemo } from 'react'
 import type { WeightEntry, BodyMeasurement } from '../types'
-import { isPersonId } from '../lib/people'
+import { isPersonIn } from '../lib/people'
+import { currentPeople, peopleKnown, usePeople, usePeopleKnown } from './useHousehold'
 
 /**
  * Weight and measurements, per person.
@@ -60,13 +61,18 @@ export const useBodyStore = create<BodyStore>()(
         return entries[entries.length - 1]
       },
 
-      claimUnassigned: (memberId) =>
+      claimUnassigned: (memberId) => {
+        // Until the household's people are known, every key looks like
+        // nobody's, and claiming would hand one person the other's history.
+        if (!peopleKnown()) return
+        const people = currentPeople()
         set((s) => ({
           weightEntries: s.weightEntries.map((e) =>
-            (isPersonId(e.memberId) ? e : { ...e, memberId })),
+            (isPersonIn(people, e.memberId) ? e : { ...e, memberId })),
           measurements: s.measurements.map((m) =>
-            (isPersonId(m.memberId) ? m : { ...m, memberId })),
-        })),
+            (isPersonIn(people, m.memberId) ? m : { ...m, memberId })),
+        }))
+      },
     }),
     {
       name: 'bite-buddy-body',
@@ -114,9 +120,13 @@ export function useMeasurementsFor(memberId: string | undefined): BodyMeasuremen
 /** How many entries belong to nobody yet, for offering to claim them. */
 export function useUnassignedCount(): number {
   const { weightEntries, measurements } = useBodyStore()
+  const people = usePeople()
+  const known = usePeopleKnown()
   return useMemo(
-    () => weightEntries.filter((e) => !isPersonId(e.memberId)).length
-      + measurements.filter((m) => !isPersonId(m.memberId)).length,
-    [weightEntries, measurements],
+    () => (known
+      ? weightEntries.filter((e) => !isPersonIn(people, e.memberId)).length
+        + measurements.filter((m) => !isPersonIn(people, m.memberId)).length
+      : 0),
+    [weightEntries, measurements, people, known],
   )
 }

@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react'
 import { useDialog } from '../lib/useDialog'
 import { Plus, Trash2, Upload, X, Search, Moon, Footprints } from 'lucide-react'
 import type { ExerciseKind, SleepEntry, StepEntry, Workout, WorkoutEntry } from '../types'
-import { PEOPLE, type PersonId } from '../lib/people'
+import { personName, type PersonId } from '../lib/people'
+import { usePeople, useResolvedPerson } from '../store/useHousehold'
 import { today as todayDate } from '../store/useMealPlanStore'
 import {
   useActivityStore, useSleepFor, useStepsFor, useWorkoutsFor,
@@ -21,7 +22,9 @@ import { EmptyState, SectionHeading } from '../components/ui'
  * sessions added together is a graph of a household, which nobody trains for.
  */
 export default function Activity() {
-  const [who, setWho] = useState<PersonId>(PEOPLE[0].id)
+  const people = usePeople()
+  const [chosen, setWho] = useState<PersonId>('')
+  const who = useResolvedPerson(chosen)
   const [tab, setTab] = useState<'exercise' | 'sleep'>('exercise')
 
   return (
@@ -37,12 +40,12 @@ export default function Activity() {
             four where picking Sleep might have deselected Oli. Named, and
             pushed apart, so the row says which half is who and which is what. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <div
+          {people.length > 1 && <div
             className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit"
             role="tablist"
             aria-label="Whose"
           >
-            {PEOPLE.map((p) => (
+            {people.map((p) => (
               <button
                 key={p.id}
                 role="tab"
@@ -53,7 +56,7 @@ export default function Activity() {
                 {p.name}
               </button>
             ))}
-          </div>
+          </div>}
 
           <div
             className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit sm:ml-auto"
@@ -91,6 +94,7 @@ function useWeightOf(personId: PersonId): number | undefined {
 }
 
 function ExerciseTab({ who }: { who: PersonId }) {
+  const people = usePeople()
   const workouts = useWorkoutsFor(who)
   const steps = useStepsFor(who)
   const { removeWorkout } = useActivityStore()
@@ -114,7 +118,7 @@ function ExerciseTab({ who }: { who: PersonId }) {
 
       {!weightKg && (
         <p className="text-xs text-ink-500">
-          No weight logged for {PEOPLE.find((p) => p.id === who)?.name} yet, so sessions show
+          No weight logged for {personName(people, who)} yet, so sessions show
           minutes but no calories. A calorie figure that assumes a body weight is a made-up
           number. Log one under Progress and they fill in.
         </p>

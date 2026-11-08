@@ -187,7 +187,7 @@ export function allowDeletions(table: string): void {
 
 let retry: () => Promise<void> = async () => {}
 
-export function startSync(userId: string): () => void {
+export function startSync(userId: string, householdId?: string): () => void {
   const db = supabase
   if (!db) {
     announce({ state: 'off', at: null, unsaved: 0, lastError: null, heldBack: [] })
@@ -215,7 +215,7 @@ export function startSync(userId: string): () => void {
     // This device's version was kept and is being sent; theirs is kept here
     // so it can be brought back rather than vanishing.
     onContested: (table, rows) => useConflicts.getState().add(table, rows),
-  })
+  }, householdId)
 
   // Delivery, retries and "what is still unsaved" live in the queue, which
   // rejects rather than swallowing, so a failed round stays owed.
