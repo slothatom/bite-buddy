@@ -51,10 +51,15 @@ export function targetStatus(value: number, target: number | undefined, unit = '
 /**
  * Tailwind classes per level, kept beside the logic so a new level cannot be
  * added without deciding how it looks.
+ *
+ * The slightly-over ring is mustard-700, not the mustard-500 fill: a ring is a
+ * mark that carries meaning, so it needs 3:1 on its ground, and mustard-500 on
+ * cream is 1.35:1. mustard-700 is 4.56:1 in daylight and lightens after dark.
+ * `npm run check:contrast` measures the rings here against both surfaces.
  */
 export const STATUS_STYLES: Record<StatusLevel, { fill: string; text: string; surface: string; ring: string }> = {
   'none':          { fill: 'bg-border-200', text: 'text-ink-500',     surface: 'bg-cream-50',     ring: 'stroke-border-200' },
   'on-track':      { fill: 'bg-leaf-500',   text: 'text-leaf-700',    surface: 'bg-leaf-50',      ring: 'stroke-leaf-500' },
-  'slightly-over': { fill: 'bg-mustard-500', text: 'text-mustard-800', surface: 'bg-mustard-100', ring: 'stroke-mustard-500' },
+  'slightly-over': { fill: 'bg-mustard-500', text: 'text-mustard-800', surface: 'bg-mustard-100', ring: 'stroke-mustard-700' },
   'over':          { fill: 'bg-coral-500',  text: 'text-coral-700',   surface: 'bg-coral-50',     ring: 'stroke-coral-500' },
 }
