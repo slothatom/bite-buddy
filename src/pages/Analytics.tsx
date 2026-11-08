@@ -15,7 +15,7 @@ import { today } from '../store/useMealPlanStore'
 import { weekEaten } from '../lib/nutrition'
 import { scoreWeek, scoreGaps, servingCount, IMPLAUSIBLE_RATIO } from '../lib/mediterranean'
 import { STATUS_STYLES, targetStatus } from '../lib/status'
-import { EmptyState, SectionHeading, ChipCheck } from '../components/ui'
+import { EmptyState, EstimatesNote, SectionHeading, ChipCheck } from '../components/ui'
 import BodyChart from '../components/body/BodyChart'
 import {
   BODY_SPANS, BODY_SPAN_LABELS, changeOver, spanStart, withinSpan,
@@ -37,6 +37,7 @@ export default function Analytics() {
         <header>
           <h1 className="display text-xl sm:text-2xl text-ink-900">Progress</h1>
           <p className="text-sm text-ink-700">How your week is shaping up, and how it is going.</p>
+          <EstimatesNote className="mt-1" />
         </header>
 
         {/* Announced as tabs, like every other strip in the app. These were

@@ -7,7 +7,7 @@ import { SOURCE_PLANS } from '../../data'
 import {
   ACTIVITY_LABELS, averagePlanDay, explainTdee, fromPlans, fromTdee, totalDailyEnergy,
 } from '../../lib/targets'
-import { SectionHeading } from '../ui'
+import { EstimatesNote, SectionHeading } from '../ui'
 import { ManualTargets } from './ManualTargets'
 
 /**
@@ -41,6 +41,9 @@ export function TargetsSection() {
         {shown.source === 'from-plans' ? 'from your plans'
           : shown.source === 'tdee' ? 'by the calculator' : 'by hand'}.
       </p>
+      {/* Said once, where the targets are set: none of these numbers came
+          from the dietician, who wrote meals rather than calories. */}
+      <EstimatesNote className="-mt-2 mb-4" />
 
       <div className="space-y-3">
         {/* From the plans */}

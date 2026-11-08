@@ -22,7 +22,8 @@ import { MEAL_SLOTS, SLOT_LABELS } from '../types'
 import type { MealSlot } from '../types'
 import AddEntryModal from '../components/planner/AddEntryModal'
 import { slotNow } from '../lib/whenDates'
-import { CalorieRing, SectionHeading } from '../components/ui'
+import { CalorieRing, KnownHint, SectionHeading } from '../components/ui'
+import { dayCompleteness } from '../lib/completeness'
 import { isConfigured } from '../lib/supabase'
 import Zig from '../components/brand/Mascot'
 import { MOMENTS } from '../lib/moments'
@@ -82,6 +83,9 @@ export default function Home() {
   // Where today has got to, for the line under the ring. The ring is the whole
   // day against the target; this is how much of it has actually happened.
   const standing = todayPlan ? dayStanding(todayPlan, ctx) : null
+  // How many of today's entries the figures are fully sure of. See
+  // lib/completeness.ts: the same rule as the `+` floor on the planner.
+  const todayKnown = todayPlan ? dayCompleteness(todayPlan, ctx) : null
   // What you did today, which every screen about today had never heard of.
   const movedToday = useDayMovement(viewingAs, today)
 
@@ -293,6 +297,7 @@ export default function Home() {
                       </div>
                     )
                   })}
+                  {todayKnown && <KnownHint known={todayKnown.known} total={todayKnown.total} className="pt-1" />}
                 </div>
               </div>
               {/* The two facts a tracker exists to give you, once any of the

@@ -3,6 +3,7 @@ import { AlertTriangle, Check, Loader2, Search, X } from 'lucide-react'
 import type { Macros, MedTier, Nutrients } from '../../types'
 import { STATUS_STYLES, targetStatus, type StatusLevel } from '../../lib/status'
 import { saltFromSodium } from '../../lib/nutrition'
+import { completenessLine } from '../../lib/completeness'
 import Zig, { type ZigMood } from '../brand/Mascot'
 import { useEnglish } from '../../store/useEnglish'
 
@@ -382,6 +383,36 @@ export function EmptyState({
       {children ? <div className="text-sm text-ink-700 mt-2 max-w-sm mx-auto">{children}</div> : null}
     </div>
   )
+}
+
+/**
+ * Where the numbers come from, said once and plainly.
+ *
+ * The dietician wrote meals, not calories. Every kcal and gram on screen is
+ * worked out by the app from its food library, and targets come from averaging
+ * the plans or from Mifflin-St Jeor, so the figures are estimates and are
+ * labelled as such wherever they are the point of the screen.
+ */
+export const ESTIMATES_NOTE =
+  "Calories are estimates worked out by Bite Buddy, not by your dietician. This isn't medical advice."
+
+export function EstimatesNote({ className = '' }: { className?: string }) {
+  return (
+    <p data-estimates-note className={`text-xs text-ink-500 ${className}`}>{ESTIMATES_NOTE}</p>
+  )
+}
+
+/**
+ * "3 of 5 entries fully known", under a day's totals.
+ *
+ * The other half of the `+` floor: the marker says a figure is at least this
+ * much, and this says how many of the day's entries are behind it. Quiet
+ * caption, because it is context for the numbers rather than news about them.
+ */
+export function KnownHint({ known, total, className = '' }: { known: number; total: number; className?: string }) {
+  const line = completenessLine({ known, total })
+  if (!line) return null
+  return <p data-completeness className={`text-xs text-ink-500 ${className}`}>{line}</p>
 }
 
 export function SectionHeading({ children, action }: { children: ReactNode; action?: ReactNode }) {

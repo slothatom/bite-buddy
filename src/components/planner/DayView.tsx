@@ -2,9 +2,10 @@ import { Copy, Sparkles, Trash2 } from 'lucide-react'
 import type { DayPlan, MealOutcome, MealSlot, Targets } from '../../types'
 import { MEAL_SLOTS } from '../../types'
 import { useNutritionContext } from '../../store/useNutrition'
-import { dayEaten, dayLabel, dayProgress, dayStanding, reportDay } from '../../lib/nutrition'
+import { dayEaten, dayLabel, dayProgress, dayStanding } from '../../lib/nutrition'
+import { dayCompleteness } from '../../lib/completeness'
 import { formatDate } from '../../lib/planner/format'
-import { CalorieRing, NutrientSummary, SectionHeading } from '../ui'
+import { CalorieRing, KnownHint, NutrientSummary, SectionHeading } from '../ui'
 import { SlotRow } from './SlotRow'
 
 /**
@@ -50,7 +51,9 @@ export function DayView({
   // What the day's figures do not know. The planner totalled with a function
   // that discards it, so a day of foods with no sodium figure between them
   // still showed a salt total as though it were one.
-  const dayReport = reportDay(selectedDay, ctx)
+  // And how many of the day's entries are behind those floors, counted from
+  // the same report rather than a second idea of what "known" means.
+  const { report: dayReport, known, total } = dayCompleteness(selectedDay, ctx)
 
   return (
     <>
@@ -64,6 +67,7 @@ export function DayView({
               partial={dayReport.partial}
               unresolved={dayReport.unresolved}
             />
+            <KnownHint known={known} total={total} className="mt-2" />
             {/* Where the day has got to, once any of it has happened. Two
                 facts rather than one sum: at four in the afternoon "this day
                 is 1,600 kcal" is not the thing you want to know. */}
