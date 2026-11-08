@@ -450,16 +450,17 @@ test.describe('the home screen', () => {
     await page.getByRole('button', { name: /^Load$/ }).first().click()
     await goto(page, '/')
 
-    // Four tiles across the top.
+    // The day so far, and the week under it.
+    await expect(page.getByRole('region', { name: 'Day so far' })).toBeVisible()
     await expect(page.getByText('Mediterranean', { exact: false }).first()).toBeVisible()
     // Goals reached, not goals-plus-limits: a limit is met by eating nothing,
     // and an empty week used to report a quarter of the guide achieved.
     await expect(page.getByText('goals reached')).toBeVisible()
     await expect(page.getByText('days planned').first()).toBeVisible()
 
-    // A fortnight of bars rather than a week: fourteen columns.
-    const bars = page.locator('[title*="kcal"]')
-    await expect(bars).toHaveCount(14)
+    // The week you are in, a column a day.
+    const week = page.locator('section').filter({ has: page.getByRole('heading', { name: 'This week at a glance' }) })
+    await expect(week.getByRole('listitem')).toHaveCount(7)
 
     // And ideas, every one of which is grounded in the plan or the guide.
     await expect(page.getByText('Worth a thought')).toBeVisible()
@@ -2478,11 +2479,9 @@ test.describe('what actually happened', () => {
 
     // The sheet says where this is going before you have chosen what, and the
     // clock's guess can be corrected there.
-    await expect(page.getByText(/, today$/)).toBeVisible()
-    await page.getByRole('button', { name: 'Change' }).click()
-    await page.getByRole('button', { name: 'Snacks', exact: true }).click()
+    await expect(page.getByRole('dialog').getByText('today', { exact: true })).toBeVisible()
+    await page.getByRole('group', { name: 'Which meal' }).getByRole('button', { name: 'Snacks', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Had this for snacks' })).toBeVisible()
-    await page.getByRole('button', { name: 'Done' }).click()
 
     await page.getByRole('button', { name: 'foods', exact: true }).click()
     await page.getByPlaceholder('What did you have?').fill('apple')
@@ -3284,8 +3283,8 @@ test.describe('the bottom bar on a phone', () => {
     await aHouseholdOfTwo(page)
     await goto(page, '/')
     const household = page.getByRole('list', { name: 'Household' })
-    await expect(household.getByRole('img', { name: 'Arany' })).toHaveText('A')
-    await expect(household.getByRole('img', { name: 'Oli' })).toHaveText('O')
+    await expect(household.getByRole('button', { name: 'Show Arany' })).toHaveText('A')
+    await expect(household.getByRole('button', { name: 'Show Oli' })).toHaveText('O')
     // A gear to Settings, which left the bar.
     await expect(page.getByRole('link', { name: 'Settings' })).toBeVisible()
   })

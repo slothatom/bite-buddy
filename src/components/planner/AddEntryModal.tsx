@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useDialog } from '../../lib/useDialog'
 import { X, CalendarDays, Plus, Globe } from 'lucide-react'
+import { slotNow } from '../../lib/whenDates'
 import type { Component, MealSlot, Recipe } from '../../types'
-import { SLOT_LABELS } from '../../types'
+import { MEAL_SLOTS, SLOT_LABELS } from '../../types'
 import { useRecipes } from '../../store/useRecipeStore'
 import { useFoods } from '../../store/useFoodStore'
 import { useNutritionContext } from '../../store/useNutrition'
@@ -160,40 +161,64 @@ export default function AddEntryModal({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/40 backdrop-blur-xs p-0 sm:p-4"
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-ink-900/45 p-0 sm:p-4"
         onClick={onClose}>
         <div
           ref={panel}
           role="dialog"
           aria-modal="true"
-          className="bg-paper w-full sm:max-w-2xl sm:rounded-2xl rounded-t-2xl max-h-[88vh] flex flex-col shadow-xl"
+          aria-labelledby="add-sheet-h"
+          className="bg-paper w-full sm:max-w-2xl rounded-t-card sm:rounded-card h-[calc(100dvh-3.5rem)] sm:h-auto sm:max-h-[88vh]
+                     flex flex-col shadow-e3"
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
           onClick={(e) => e.stopPropagation()}
         >
-          <header className="flex items-center justify-between px-5 py-4 border-b border-border-200">
-            <div>
-              <h2 className="text-base font-extrabold text-ink-900">
-                {isRecord ? `Had this for ${SLOT_LABELS[slot].toLowerCase()}` : `Add to ${SLOT_LABELS[slot]}`}
+          <div aria-hidden="true" className="sm:hidden w-10 h-1 rounded-full bg-ink-300 mx-auto mt-2 mb-1 shrink-0" />
+          <header className="flex items-center gap-2 px-4 sm:px-5 pt-1 sm:pt-4">
+            <div className="flex-1 min-w-0">
+              <h2 id="add-sheet-h" className="text-xl leading-[26px] font-extrabold text-ink-900">
+                {isRecord ? `Had this for ${SLOT_LABELS[slot].toLowerCase()}` : `Add to ${SLOT_LABELS[slot].toLowerCase()}`}
               </h2>
-              <p className="text-xs text-ink-500">{new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+              <p className="text-xs leading-4 text-ink-700">
+                <span>{new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+                {/* Why this meal, when it was the clock that chose it. */}
+                {onSlotChange && date === today() && slot === slotNow() && (
+                  <span>
+                    {` · it's ${new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}, so ${SLOT_LABELS[slot].toLowerCase()} is picked`}
+                  </span>
+                )}
+              </p>
             </div>
-            <button className="btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} /></button>
+            <button className="btn-ghost btn-icon rounded-[14px] shrink-0" onClick={onClose} aria-label="Close"><X size={20} /></button>
           </header>
 
-          <div className="px-5 pt-4 space-y-3">
-            <SearchField
-              autoFocus
-              placeholder={isRecord ? 'What did you have?' : 'What are we having?'}
-              value={query}
-              onChange={setQuery}
-            />
-            {(onSlotChange || onDateChange) && (
-              <div className="card-soft p-3 space-y-3">
+          <div className="px-4 sm:px-5 pt-3 space-y-2.5">
+            {/* Which meal, always in view: the clock's guess is a guess, and
+                it should take one tap to correct, not a menu. */}
+            {onSlotChange && (
+              <div className="grid grid-cols-4 gap-1 p-1 bg-border-100 rounded-lg" role="group" aria-label="Which meal">
+                {MEAL_SLOTS.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    aria-pressed={slot === s}
+                    onClick={() => onSlotChange(s)}
+                    className={`min-h-10 rounded-md text-[13px] ${slot === s
+                      ? 'bg-paper text-ink-900 font-extrabold shadow-e1'
+                      : 'text-ink-700 font-bold hover:text-ink-900'}`}
+                  >
+                    {SLOT_LABELS[s]}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {onDateChange && (
+              <div className="card-soft px-3 py-1.5">
                 <div className="flex items-center gap-2">
-                  <CalendarDays size={15} className="shrink-0 text-ink-500" />
+                  <CalendarDays size={15} aria-hidden="true" className="shrink-0 text-ink-700" />
                   <p className="flex-1 min-w-0 text-sm text-ink-900">
-                    <span className="font-semibold">{SLOT_LABELS[slot]}</span>
-                    {', '}
+                    {!onSlotChange && <><span className="font-semibold">{SLOT_LABELS[slot]}</span>{', '}</>}
                     {date === today()
                       ? 'today'
                       : new Date(date + 'T12:00:00').toLocaleDateString('en-GB', {
@@ -201,79 +226,69 @@ export default function AddEntryModal({
                       })}
                   </p>
                   <button
-                    className="btn-ghost text-xs shrink-0"
+                    type="button"
+                    className="btn-ghost text-xs shrink-0 min-h-11 px-3"
                     aria-expanded={when}
                     onClick={() => setWhen((v) => !v)}
                   >
-                    {when ? 'Done' : 'Change'}
+                    {when ? 'Done' : 'Change day'}
                   </button>
                 </div>
-
                 {when && (
-                  <WhenPicker
-                    date={date}
-                    onDate={(d) => onDateChange?.(d)}
-                    slot={onSlotChange ? slot : undefined}
-                    onSlot={onSlotChange}
-                  />
-                )}
-
-                {/* Plan or record, said here rather than decided by whichever
-                    button you happened to press to get here. Not offered for a
-                    day ahead: "I already ate Friday's dinner" is not a thing. */}
-                {past && (
-                  <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
-                    {([false, true] as const).map((r) => (
-                      <button
-                        key={String(r)}
-                        onClick={() => setRecording(r)}
-                        aria-pressed={recording === r}
-                        className={recording === r ? 'tab-on' : 'tab-off'}
-                      >
-                        {r ? 'Already had it' : 'Planning it'}
-                      </button>
-                    ))}
+                  <div className="pb-2">
+                    <WhenPicker date={date} onDate={(d) => onDateChange(d)} />
                   </div>
                 )}
               </div>
             )}
 
-            <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit">
+            <SearchField
+              autoFocus
+              placeholder={isRecord ? 'What did you have?' : 'What are we having?'}
+              value={query}
+              onChange={setQuery}
+            />
+
+            <div className="flex flex-wrap gap-2">
               {([...(available.length ? ['fridge' as const] : []), 'recipes' as const, 'foods' as const]).map((t) => (
                 <button
                   key={t}
+                  type="button"
                   onClick={() => setTab(t)}
-                  className={`capitalize ${tab === t ? 'tab-on' : 'tab-off'}`}
+                  aria-pressed={tab === t}
+                  className={`capitalize min-h-9 px-3.5 rounded-full border text-[13px] inline-flex items-center ${tab === t
+                    ? 'border-bite-700 bg-bite-100 text-bite-700 font-extrabold'
+                    : 'border-border-200 bg-paper text-ink-900 font-bold hover:border-bite-300'}`}
                 >
                   {t}
                   {t === 'fridge' && (
-                    <span className="ml-1.5 text-xs text-ink-500 font-mono">{available.length}</span>
+                    <span className="ml-1.5 text-xs font-mono">{available.length}</span>
                   )}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-1.5">
+          <div className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-5 py-3 space-y-2">
             {tab === 'fridge' && offerOrder(available).map((p) => {
               const n = componentsNutrients([{ kind: 'portion', portionId: p.id, servings: 1 }], ctx)
               return (
                 <button
                   key={p.id}
                   onClick={() => { onAdd(stamped({ kind: 'portion', portionId: p.id, servings: 1 })); onClose() }}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left transition-colors"
+                  className="w-full min-h-14 flex items-center gap-3 px-3 py-2 rounded-lg border border-border-200 bg-paper hover:border-bite-300 hover:bg-bite-50 text-left transition-colors"
                 >
                   <span className="text-xl">{p.storage === 'freezer' ? '🧊' : '🥡'}</span>
                   <span className="flex-1 min-w-0">
-                    <span className="block text-sm font-semibold text-ink-900 truncate">
+                    <span className="block text-[15px] leading-5 font-bold text-ink-900 truncate">
                       {portionLabel(p, ctx.recipes)}
                     </span>
-                    <span className="block text-xs text-ink-500 truncate">
+                    <span className="block text-xs leading-4 text-ink-700 truncate">
                       {p.servings === 1 ? '1 portion left' : `${p.servings} portions left`} · {madeWhen(p)}
                     </span>
                   </span>
                   {n.calories > 0 && (
-                    <span className="text-sm font-mono text-ink-700 shrink-0">
+                    <span className="text-sm font-extrabold text-ink-900 tabular-nums shrink-0">
                       {Math.round(n.calories)} kcal
                     </span>
                   )}
@@ -330,23 +345,23 @@ export default function AddEntryModal({
                     if (spare) addPortion(spare)
                     onClose()
                   }}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-cream-50 text-left transition-colors"
+                  className="w-full min-h-14 flex items-center gap-3 px-3 py-2 rounded-lg border border-border-200 bg-paper hover:border-bite-300 hover:bg-bite-50 text-left transition-colors"
                 >
                   <span className="text-xl">{r.emoji}</span>
                   <span className="flex-1 min-w-0">
-                    <span className="block text-sm font-semibold text-ink-900 truncate">{r.name.en}</span>
+                    <span className="block text-[15px] leading-5 font-bold text-ink-900 truncate">{r.name.en}</span>
                     {/* What you have matters more at this moment than what the
                         dietician wrote, so it takes the line when there is
                         anything in the cupboard to say. */}
                     {pantry.size > 0 ? (
-                      <span className="block text-xs text-ink-500 truncate">
+                      <span className="block text-xs leading-4 text-ink-700 truncate">
                         {availabilityLabel(availability(r, ctx, pantry)) || r.sourceLine}
                       </span>
                     ) : r.sourceLine ? (
-                      <span className="block text-xs text-ink-500 truncate">{r.sourceLine}</span>
+                      <span className="block text-xs leading-4 text-ink-700 truncate">{r.sourceLine}</span>
                     ) : null}
                   </span>
-                  <span className="text-sm font-mono text-ink-700 shrink-0">{Math.round(n.calories)} kcal</span>
+                  <span className="text-sm font-extrabold text-ink-900 tabular-nums shrink-0">{Math.round(n.calories)} kcal</span>
                 </button>
               )
             })}
@@ -376,14 +391,14 @@ export default function AddEntryModal({
             {tab === 'foods' && (
               <div className="flex gap-2 pb-1">
                 <button
-                  className="btn-secondary text-sm flex-1 justify-center"
+                  className="btn flex-1 min-w-0 justify-center min-h-12 rounded-lg border border-dashed border-ink-300 text-bite-700 text-sm"
                   onClick={() => setWriting('manual')}
                 >
                   <Plus size={15} />
                   <span className="truncate">{query.trim() ? `Add “${query.trim()}”` : 'Write one down'}</span>
                 </button>
                 <button
-                  className="btn-secondary text-sm flex-1 justify-center"
+                  className="btn-secondary text-sm flex-1 min-w-0 justify-center"
                   onClick={() => setWriting('lookup')}
                 >
                   <Globe size={15} />
@@ -398,7 +413,7 @@ export default function AddEntryModal({
               return (
                 // Name on its own row, then controls beneath: on a phone the
                 // one-line version squeezed the food name down to a few characters.
-                <div key={f.id} className="p-3 rounded-xl hover:bg-cream-50 transition-colors">
+                <div key={f.id} className="p-3 rounded-lg border border-border-200 bg-paper">
                   <div className="min-w-0 mb-2">
                     <p className="text-sm font-semibold text-ink-900 truncate">{f.names.en}</p>
                     {/* Marked as what it is. The document is English and these
@@ -479,6 +494,30 @@ export default function AddEntryModal({
               </div>
             )}
           </div>
+
+          {/* Plan or record, said at the foot where the choice lands, rather
+              than decided by whichever button you pressed to get here. Not
+              offered for a day ahead: "I already ate Friday's dinner" is not
+              a thing. */}
+          {past && (onSlotChange || onDateChange) && (
+            <div className="shrink-0 px-4 sm:px-5 pt-3 pb-4 border-t border-border-100">
+              <div className="grid grid-cols-2 gap-1 p-1 bg-border-100 rounded-lg" role="group" aria-label="Eaten yet">
+                {([false, true] as const).map((r) => (
+                  <button
+                    key={String(r)}
+                    type="button"
+                    onClick={() => setRecording(r)}
+                    aria-pressed={recording === r}
+                    className={`min-h-11 sm:min-h-9 rounded-md text-[13px] ${recording === r
+                      ? 'bg-paper text-ink-900 font-extrabold shadow-e1'
+                      : 'text-ink-700 font-bold hover:text-ink-900'}`}
+                  >
+                    {r ? 'Already had it' : 'Planning it'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
