@@ -30,13 +30,14 @@ export default function SignIn() {
     <div className="min-h-dvh flex items-center justify-center bg-cream-50 px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center text-center mb-7">
-          {/* Bandit reacts (he celebrates once the link is on its way), and the
-              logo underneath is the name. It is the heading, so it is the one
-              logo in the app with an accessible name. In the header and the
-              menu it is decoration and stays silent. */}
-          <Zig mood={linkSentTo ? 'celebrate' : 'happy'} size={84} />
-          <h1 className="mt-4">
-            <Logo size={34} title="Bite Buddy" />
+          {/* The logo is the first thing you see, and the heading, so it is the
+              one logo in the app with an accessible name. In the header and the
+              menu it is decoration and stays silent. Bandit only turns up once
+              the link is on its way, to celebrate: before that a raccoon above
+              the logo read as the old logo. */}
+          {linkSentTo && <Zig mood="celebrate" size={84} />}
+          <h1 className={linkSentTo ? 'mt-4' : ''}>
+            <Logo size={linkSentTo ? 34 : 48} title="Bite Buddy" />
           </h1>
           <p className="text-sm text-ink-700 mt-1">Plan your week. Eat well. Feel good.</p>
         </div>
