@@ -1,633 +1,280 @@
-# Bite Buddy, Bold & Playful Design System
+# Bite Buddy design system
 
-> **Design direction:** funky, cosy, energetic, useful.  
-> Bite Buddy should feel like a very competent meal planner that happens to have a personality, not a clinical nutrition dashboard and not a children's food app.
+> **Direction:** bold and playful, but calm where the work is. A competent meal
+> planner with a personality, not a clinical nutrition dashboard and not a
+> children's food app.
 
-This design system builds on **Option 3, Bold & Playful** while respecting the shipped product constraints and content model in `DESIGNBRIEF.md`.
+This file describes what ships today. The code is the authority:
+`src/index.css` holds every token, `src/components/ui/index.tsx` the shared
+components, `src/lib/status.ts` the over-target rules. If this file and the code
+disagree, the code wins and this file is the bug.
 
----
+The full reference, with swatches, specimens and component sheets, is the
+**Bite Buddy Design System** artifact:
+<https://claude.ai/artifact/9wDHyw1EFe2AQ9Eq2cqAxD> (private to the owner). This
+file is written to stand on its own without it.
 
-## 1. Design principles
-
-### 1.1 Food first, numbers second
-Nutrition data is important, but food remains the protagonist. Calories and macros should be easy to scan without making every screen feel like an analytics product.
-
-### 1.2 Playful, never chaotic
-Bold colour, chunky headings, doodles and Zig give Bite Buddy personality. Dense working areas, recipe lists, food tables, grocery rows and meal entries, stay calm and highly legible.
-
-### 1.3 Inform, never judge
-Going over a calorie target is information, not failure. Status is communicated through copy, iconography, pattern/shape and colour together.
-
-### 1.4 Built for real kitchens
-Phone controls are thumb-friendly and high-priority actions remain reachable one-handed. Desktop gets deliberate higher-density layouts rather than stretched mobile cards.
-
-### 1.5 Provenance is part of the product
-The original Romanian/Hungarian meal text is not metadata to hide completely. It gets a distinct secondary typographic treatment and remains available wherever provenance matters.
+The product inventory behind the system (screens, content sizes, states) is in
+[`DESIGN-BRIEF.md`](DESIGN-BRIEF.md).
 
 ---
 
-# 2. Brand personality
+## 1. Principles
 
-**Keywords:** bold · friendly · funky · cosy · clever · imperfect · foodie · optimistic
-
-**Avoid:** clinical wellness · sterile SaaS · diet culture · childish kawaii overload · neon fitness app · excessive gamification.
-
-The visual balance should be approximately:
-
-- **70% calm:** off-white surfaces, ink, whitespace
-- **20% functional colour:** lavender, muted category backgrounds, borders
-- **10% chaos:** purple, coral, teal, mustard, Zig, stickers and doodles
+1. **Food first, numbers second.** Figures are easy to scan, but food is the
+   protagonist.
+2. **Playful, never chaotic.** Roughly 70% calm (cream, ink, whitespace), 20%
+   functional colour, 10% personality. Bold accents live in navigation,
+   headings, empty states and moments; dense lists stay quiet.
+3. **Inform, never judge.** Over target is information, not failure. Status is
+   never hue alone.
+4. **Built for real kitchens.** Thumb-sized controls on phones, deliberate
+   density on desktop.
+5. **Provenance is part of the product.** The dietician's original Romanian or
+   Hungarian gets a real typographic treatment, not hidden metadata.
 
 ---
 
-# 3. Colour system
+## 2. Brand
 
-## Brand colours
+### Logo: the Bitten B
 
-| Token | Value | Purpose |
-|---|---:|---|
-| `bite-purple-500` | `#6D5BD0` | Primary brand/action |
-| `bite-purple-600` | `#5947BE` | Hover |
-| `bite-purple-700` | `#4938A7` | Pressed / strong text |
-| `coral-500` | `#FF6868` | Warm accent |
-| `teal-500` | `#00B8A9` | Data / positive progress |
-| `mustard-500` | `#FFD166` | Highlights / attention |
-| `lavender-100` | `#E9E4FF` | Soft branded surface |
-| `cream-50` | `#FAF7F0` | App background |
-| `paper-0` | `#FFFDF9` | Primary card surface |
-| `ink-900` | `#2D2320` | Main text |
-| `ink-700` | `#514744` | Secondary text |
-| `ink-500` | `#79706D` | Muted text, 4.5:1 on cream |
-| `border-200` | `#E6DED5` | Borders / dividers |
+A capital B with a bite out of its upper bowl and two crumbs flying off. It is
+the name on the door: the sidebar, the phone's top bar, the sign-in screen, the
+app icon, the tab icon and the iOS launch screens.
 
-## Semantic colours
+- Masters live in `brand/` (`mark.svg`, `mark-mono.svg`, `lockup-horizontal.svg`,
+  `lockup-stacked.svg`, `app-icon.svg`, `app-icon-maskable.svg`, `favicon.svg`).
+- `src/components/brand/Logo.tsx` inlines the same paths so the colours come from
+  tokens: the B in `bite-700`, the crumbs in `mustard-600`, the words in
+  `ink-900`. Variants `mark` and `horizontal`, plus `mono` (all `currentColor`).
+- Decorative by default (`aria-hidden`); pass `title` only where the logo is the
+  name, as on the sign-in heading.
+- Also the illustration for empty, error and loading states, where it stays
+  decorative because a title beside it says what the state is.
+- `npm run icons` (`scripts/make-icons.ts`) renders the PNG icons from the
+  masters with content-hashed file names, so a home screen cannot keep an old
+  picture at the same address. `npm run icons:check` fails if they drift.
 
-Brand accents must not double as semantic meaning.
+### No mascot
 
-| State | Colour | Additional signal |
+There is no mascot. The mark (`<Logo variant="mark" />`) fills those places:
+empty states (`EmptyState`), the error screen, the start-up wait and first-run
+household setup, with a small mark on moment notes. The Home greeting has no
+illustration, and sign-in leads with the logo. Personality otherwise comes from
+colour, Bungee headings and the copy. (Bandit the raccoon, and before him a
+blob called Zig, were retired.)
+
+---
+
+## 3. Colour
+
+All tokens are CSS custom properties in the `@theme` block of `src/index.css`,
+so `bg-bite-500`, `text-leaf-700` and so on exist automatically.
+
+### Roles
+
+| Ramp | Role | Key steps |
 |---|---|---|
-| On track | Teal | check / plain status label |
-| Slightly over | Mustard | `+120 kcal` text + marker |
-| Well over | Coral | alert icon + explicit label |
-| Error | Coral/dark coral | error icon + message |
-| Info | Purple/blue-purple | info icon |
-| Disabled | warm grey | reduced contrast + disabled state |
+| `bite` (turquoise) | The brand: primary buttons, active nav, selected chips, focus ring | `500 #14b8a6` fill, `700 #0f766e` brand text and focus, `50/100` soft grounds |
+| `on-brand` | Text on a `bite-500` fill, both themes | `#12312c` (white on `bite-500` is only 2.49:1) |
+| `leaf` (green) | Data and done: on track, eaten, filled bars, trend lines, Daily/Weekly tiers | `500 #0a9d63` fill, `700 #096847` text |
+| `mustard` | Slightly over, attention, Rarely tier, the logo's crumbs | `500 #ffd166` fill, `700 #906b1f` ring, `800 #8b661a` text |
+| `coral` | Well over, errors, destructive | `500 #ff6868` fill, `700 #ce3a3a` text, `800 #a93030` danger button |
+| `cream` / `paper` | Grounds | `cream-50 #faf7f0` page, `paper #fffdf9` cards |
+| `ink` | Text | `900 #2d2320` main, `700 #514744` secondary, `500 #79706d` muted (the faintest colour any word may use), `300 #998d8a` icons and dividers only |
+| `border` | Hairlines | `100 #f0eae2`, `200 #e6ded5` |
 
-### Calorie target behaviour
+The brand and data colours are deliberately far apart on the wheel: a ticked
+meal must not look like "this is Bite Buddy".
 
-**Under 105%:** neutral/on-track presentation.  
-**105–130%:** `Slightly over · +120 kcal` using mustard plus a small `+` marker extending beyond the target line.  
-**130%+:** `Over target · +430 kcal` using coral plus an alert marker.
+### Dark theme
 
-Never rely on hue alone.
+There is a working dark theme. **Settings → Your week → Appearance** offers
+**System** (the default), **Light** and **Dark**.
+
+- `src/lib/theme.ts` sets `data-theme="light|dark"` on `<html>`, or removes it
+  for System so the `prefers-color-scheme` media query decides. It also updates
+  the `theme-color` meta tag.
+- `src/index.css` redefines tokens under `:root[data-theme='dark']` and again
+  under `@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) }`.
+  No component knows a theme exists.
+- In dark: neutrals invert and stay warm (`cream-50 #17130f`, `paper #221d18`,
+  `ink-900 #f7f2ea`); the shades used as words (`bite-700`, `leaf-600/700`,
+  `coral-600/700`, `mustard-700/800`) lighten; soft grounds become shades of the
+  surface; shadows give way to lighter surfaces.
+- `bite-500`, `on-brand` and `coral-800` do not change.
+
+### Contrast is measured
+
+`npm run check:contrast` (`scripts/check-contrast.ts`) reads the tokens for both
+themes and the class pairs out of the components and fails below WCAG AA: 4.5:1
+for words, 3:1 for large text, icons and marks. It also measures the focus
+ring, the danger fill and the calorie ring strokes. It runs in `npm run verify`
+and in CI.
+
+**Known gap:** the well-over ring stroke, `coral-500`, is 2.64:1 on cream and
+2.78:1 on paper, below 3:1. The checker lists it as "known, not yet fixed". The
+status pill under the ring still says "Over target" in words.
 
 ---
 
-# 4. Typography
+## 4. Status: over target
 
-## Display
-**Bungee** or a similarly chunky locally bundled display face.
+From `src/lib/status.ts`. Every consumer renders a label, a symbol or a signed
+delta as well as the colour.
 
-Use only for:
-- Wordmark
-- H1
-- occasional section/empty-state statement
-- short expressive labels
+| Level | Rule | Fill | Text | Ring stroke | Words |
+|---|---|---|---|---|---|
+| On track | up to 105% | `leaf-500` | `leaf-700` | `leaf-500` | "On track", or "N kcal remaining" |
+| Slightly over | 105 to 130% | `mustard-500` | `mustard-800` | `mustard-700` | `+ Slightly over · +120 kcal` |
+| Over | above 130% | `coral-500` | `coral-700` | `coral-500` (see gap above) | `Over target · +430 kcal` |
+| No target | | `border-200` | `ink-500` | `border-200` | nothing |
 
-Never use it for long copy, recipe names, tables or numeric data.
+- **Calorie ring:** past 100% it draws a **second lap** from the top (capped at
+  one extra lap) over a paper halo, so 101% and 160% no longer look the same.
+- **Macro bars:** the target is an explicit line on the bar; overflow stays
+  visible; a partial figure fades out at its end instead of stopping flat.
 
-## UI / body
-**Plus Jakarta Sans Variable**
+---
 
-Fallback: `system-ui, sans-serif`.
+## 5. Typography
 
-| Style | Size / line | Weight |
+| Role | Face | Use |
 |---|---|---|
-| Display XL | 36 / 40 | 800 |
-| H1 | 30 / 36 | 800 |
-| H2 | 24 / 30 | 700 |
-| H3 | 20 / 26 | 700 |
-| Body | 16 / 24 | 500 |
-| Body strong | 16 / 24 | 700 |
-| Small | 14 / 20 | 500 |
-| Caption | 12 / 16 | 600 |
-| Data XL | 32 / 36 | 700 |
-| Data | 16 / 20 | 700 |
+| Display | **Bungee** (`display` utility) | Page titles, empty-state titles, short expressive labels. Never recipe names, tables or numbers |
+| Everything else | **Plus Jakarta Sans Variable**, weight 500 | Body, labels, data |
 
-All numeric styles use `font-variant-numeric: tabular-nums`.
-
-### Second-language treatment
-
-English name:
-**16px / 700 / Ink 900**
-
-Original source:
-**13px / 500 / Ink 500**, optionally prefixed by a tiny `RO` / `HU` language badge.
-
-Do not use italics or ultra-low contrast. On dense cards it may truncate to one line; full source text is available in detail views.
+- Both bundled with `@fontsource`, never fetched, so the app looks the same
+  offline. `--font-mono` also points at Jakarta; alignment comes from
+  `font-variant-numeric: tabular-nums`, set on `body`.
+- **12px is the floor.** `text-xs` (12px) is the smallest text anywhere; an e2e
+  test checks the phone week list stays at 12px or more.
+- **No opacity on text.** Quietness comes from `ink-700` or `ink-500`, never from
+  fading a colour. Past days say **Past** and skipped meals say **Skipped** in
+  words (skipped is also struck through) instead of being dimmed.
+- **Second language** (`SourceLine`): 13px, `ink-500`, upright (not italic),
+  with the right `lang` attribute (`ro` or `hu`), under the 13px `ink-700`
+  English reading. Dense rows show the English reading alone; the plan archive
+  puts the original first.
 
 ---
 
-# 5. Shape
+## 6. Shape, space, elevation, motion
 
-Bite Buddy uses rounded geometry but should not become a collection of pills.
+| Token | Value | Used by |
+|---|---|---|
+| `--radius-sm` | 8px | Focus ring corners |
+| `--radius-md` | 12px | Segmented tabs |
+| `--radius-lg` | 16px | Buttons, inputs, nav items |
+| `--radius-xl` | 20px | Soft cards |
+| `--radius-card` | 24px | Cards |
+| `rounded-full` | | Chips, badges, tags only |
 
-| Token | Value |
-|---|---:|
-| `radius-sm` | 8px |
-| `radius-md` | 12px |
-| `radius-lg` | 16px |
-| `radius-xl` | 20px |
-| `radius-card` | 24px |
-| `radius-round` | 999px |
-
-**Cards:** 20–24px  
-**Inputs:** 14–16px  
-**Buttons:** 14–16px  
-**Chips:** full pill is allowed  
-**Sheets:** 24–28px top corners
-
----
-
-# 6. Spacing
-
-4px base grid.
-
-`4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64`
-
-Default card padding:
-- phone: 16px
-- desktop compact: 16–20px
-- hero/summary: 24px
+- Spacing: Tailwind's default 4px scale.
+- Elevation: `--shadow-e1/e2/e3`, warm and diffuse in light; in dark, surfaces
+  are told apart by being lighter than the page.
+- Motion: 150ms on controls, 500 to 600ms on bars and rings, `pop` and `wiggle`
+  for personality. Everything non-essential goes under
+  `prefers-reduced-motion: reduce`.
 
 ---
 
-# 7. Elevation
+## 7. Interaction and accessibility rules
 
-Use elevation sparingly.
-
-### Level 0
-Flat surface + border.
-
-### Level 1
-Normal cards. Very soft warm shadow.
-
-### Level 2
-Floating controls, sticky mobile navigation, menus.
-
-### Level 3
-Dialogs and sheets.
-
-Avoid grey/black SaaS shadows. Shadows should feel warm and diffuse.
-
----
-
-# 8. Buttons
-
-## Primary
-Purple fill, white text.
-
-Use for the single strongest action in a context:
-`Add meal`, `Save`, `Load week`.
-
-## Secondary
-Paper background, purple border/text.
-
-## Tertiary / ghost
-No fill until hover.
-
-## Destructive
-Coral/red treatment only for genuinely destructive actions.
-
-## Icon-only
-Minimum 44×44px on coarse pointers. Always has `aria-label`.
-
-### Interaction
-- hover: subtle colour shift / 1–2px lift
-- pressed: return to baseline or 1px downward shift
-- focus-visible: 3px outer purple focus ring with cream separation
-- disabled: reduced contrast; no motion
+- **Focus:** one treatment everywhere, `3px solid var(--color-bite-700)`, offset
+  2px (5.12:1 on cream). Inputs take the same ring.
+- **Touch:** under `(pointer: coarse)` only, buttons, chips, tabs, inputs and
+  nav items are at least 44px tall, icon buttons 44x44. An e2e test fails any
+  control under 40x32.
+- **No horizontal scroll** at 390px; filter rows wrap (`ChipRow`) rather than
+  scroll sideways.
+- **Selected chips** show a check icon (`ChipCheck`) and set `aria-pressed`, as
+  well as the turquoise fill.
+- **Icon-only controls** have an `aria-label`.
+- **Search** (`SearchField`) has a clear button once there is text, 44px on
+  coarse pointers, which returns focus to the box.
+- **Unknown is not zero:** a figure built partly on missing data shows a `+` and
+  is a floor; a day can say "3 of 5 entries fully known" (`KnownHint`).
+- **Estimates:** screens where the figures are the point carry the
+  `EstimatesNote`: "Calories are estimates worked out by Bite Buddy, not by your
+  dietician. This isn't medical advice."
 
 ---
 
-# 9. Chips & tags
+## 8. Components
 
-Chips carry filters and compact metadata.
+### CSS utilities (`src/index.css`)
 
-Recipe filters may use playful category colours, but selected state must also use:
-- stronger border
-- check or selection indicator
-- weight change
+| Utility | What it is |
+|---|---|
+| `btn-primary` | `bite-500` fill, `on-brand` text, lifts 1px on hover |
+| `btn-secondary` | Paper, `bite-700` text, `bite-200` border |
+| `btn-ghost` | No fill until hover |
+| `btn-danger` | `coral-800` fill, white text (6.66:1 in both themes) |
+| `btn-icon` | Square icon button |
+| `chip-off` / `chip-on` | Pill filter chips, 36px (44px on coarse) |
+| `tab-on` / `tab-off` | Segmented control |
+| `card` / `card-soft` | Raised card / flat nested panel |
+| `input`, `label` | Form field and its label |
+| `badge`, `tag` | Compact markers |
+| `nav-item` / `nav-item-active` | Sidebar and More-sheet links |
+| `meal-slot` | Dashed empty-slot target |
+| `display` | Bungee |
 
-Examples:
+`@utility` inlines its base, so a rule aimed at `.btn` will not match
+`.btn-primary`; the coarse-pointer block lists every variant.
 
-`✓ Breakfast` `Lunch` `Quick` `High protein` `♥ Favourites`
+### React (`src/components/ui/index.tsx`)
 
-Do not assign a completely unique colour to every one of the 13 tags.
+`MacroBar` · `CalorieRing` · `StatusPill` · `NutrientSummary` · `TierBadge` ·
+`SourceLine` · `EmptyState` (with the mark) · `EstimatesNote` · `KnownHint` ·
+`SectionHeading` · `ChipCheck` · `SearchField` · `ChipRow`
 
----
+### Brand and layout
 
-# 10. Forms
+`Logo` in `src/components/brand/`; `Sidebar`, `MobileNav`,
+`StorageBanner`, `UndoBar` and `ErrorBoundary` in `src/components/layout/`.
 
-Number entry is a first-class component because grams, calories and body measurements are entered frequently.
+### Mediterranean tiers
 
-### Numeric input
-Large tabular number + fixed unit suffix.
-
-Example:
-
-`[  125  ]  g`
-
-Units never disappear when focused.
-
-### Search
-Search icon + clear action. On mobile it can become sticky on Recipes/Foods.
-
-### Validation
-Errors appear below the control with icon + plain-language explanation. Never indicate invalid state through red border alone.
-
----
-
-# 11. Cards and rows
-
-## Recipe card
-
-Contains:
-1. optional food thumbnail/illustration
-2. English recipe name
-3. original Romanian/Hungarian line
-4. kcal
-5. compact macro summary when useful
-6. tags
-7. favourite action
-
-Desktop supports compact and comfortable density.
-
-## Meal slot
-
-Each of the five slots is a **container**, not a recipe card.
-
-Header:
-`BREAKFAST` + slot total
-
-Then 1–6 meal-entry rows.
-
-This respects the underlying dietician data where a meal consists of multiple weighed food entries.
-
-## Food row
-
-Left:
-food name + translations + tier
-
-Right:
-kcal / protein / carbs / fat per 100g using aligned tabular columns.
-
-## Grocery row
-
-Designed for one-handed supermarket use:
-- large checkbox
-- ingredient
-- amount
-- category
-- checked items remain readable but visually recede
+Symbol plus word, quiet enough for every food row: `● Daily`, `◐ Weekly` (leaf),
+`○ Moderation` (cream and ink), `◇ Rarely` (mustard).
 
 ---
 
-# 12. Navigation
+## 9. Navigation
 
-## Desktop
-Persistent sidebar with all nine destinations:
+Nine destinations, one list in `src/components/layout/nav.ts`: Home, Planner,
+Recipes, Foods, Grocery, Schedule, Movement, Progress, Settings. The plan
+archive is a tab inside Settings, and the dietician summary is a page under
+Progress.
 
-1. Home
-2. Planner
-3. Recipes
-4. Foods
-5. Grocery
-6. Schedule
-7. Movement
-8. Progress
-9. Settings
-
-Desktop sidebar should be compact enough to leave room for working content.
-
-## Mobile
-Five-item bottom bar:
-
-**Home · Plan · + · Recipes · More**
-
-The centre `+` opens the most contextually useful creation action.
-
-`More` exposes Grocery, Foods, Schedule, Movement, Progress and Settings. The plan
-archive is a tab inside Settings rather than a destination of its own.
-
-The bar remains reachable one-handed and respects safe-area insets.
+- **Desktop (md and up):** a sidebar with the Bitten B and all nine.
+- **Phone:** a top bar with the logo, and a bottom tab bar
+  **Home · Plan · + · Recipes · More**. The centre **+** opens the add sheet on
+  today, at the slot for the time of day. **More** opens a sheet with the other
+  six screens and reads as current while you are on one of them. The bar
+  respects safe-area insets.
 
 ---
 
-# 13. Planner
+## 10. Voice
 
-The Planner is the product's visual centre.
+A competent friend in the kitchen. Warm and plain, British spelling, never
+scolding about food. No points, streaks or levels. **No em dashes** (enforced by
+`npm run text:check`; see `.claude/skills/no-em-dashes/`).
 
-### Week strip
-Seven days using the configured week start. **Wednesday is the default.**
-
-Each day shows:
-- weekday
-- date where relevant
-- tiny kcal indicator
-- today state
-- selected state
-- empty-day state
-
-Never hard-code Monday-first visual assumptions.
-
-### Daily summary
-
-Primary:
-`1,437 kcal`
-
-Secondary:
-`163 kcal remaining`
-
-Then calorie progress + four macro bars.
-
-Numbers remain more prominent than decorative graphics.
-
-### Meal area
-Five vertically ordered slots:
-
-Breakfast  
-Snack 1  
-Lunch  
-Snack 2  
-Dinner
-
-Each can contain multiple entries.
+Good: "What's the plan?", "Nothing here yet. Pop something in.",
+"Slightly over · +120 kcal".
+Avoid: "You failed your calorie goal", "Cheat meal", "Bad foods".
 
 ---
 
-# 14. Data visualisation
-
-All data components belong to one visual family.
-
-### Calorie ring
-Use for a single day's overview only.
-
-### Macro bars
-Protein · Carbs · Fat · Fibre.
-
-Actual and target are explicitly distinguishable.
-
-### Weekly chart
-Seven vertical bars. The target is represented as a line, not only inferred from bar colour.
-
-### Mediterranean goals
-Seven quiet progress rows rather than seven competing colourful charts.
-
-Each row contains:
-icon · category · actual / goal · progress.
-
----
-
-# 15. Mediterranean tiers
-
-Do not use four colours alone.
-
-Use compact text+symbol badges:
-
-- `● Daily`
-- `◐ Weekly`
-- `○ Moderation`
-- `◇ Rarely`
-
-Colour can reinforce the distinction but the word and symbol carry the meaning.
-
-These badges must remain quiet enough for 122-row food lists.
-
----
-
-# 16. Zig, Bite Buddy character
-
-Zig is an **abstract bite-shaped creature**, not a bowl or literal food.
-
-Personality:
-curious · energetic · slightly chaotic · supportive · never judgemental.
-
-### Zig appears in
-- onboarding / first-run
-- empty states
-- successful week-planning moments
-- errors
-- occasional contextual hints
-- app icon / brand moments
-
-### Zig does NOT appear in
-- every card
-- every navigation item
-- every calorie warning
-- dense food tables
-- repetitive grocery rows
-
-### Core poses
-- Default Zig
-- Chef Zig
-- Hungry Zig
-- Thinking Zig
-- Celebration Zig
-- Oops Zig
-- Sleeping Zig
-
-Illustration style: bold irregular silhouette, black/ink hand-drawn outline, simple facial features, tiny imperfect limbs.
-
----
-
-# 17. Iconography
-
-Simple rounded outline icons, approximately 2px stroke.
-
-Icons should feel slightly hand-drawn without compromising recognition.
-
-Food-category icons can be filled illustrations; functional icons remain line-based.
-
-All icons ship as inline SVG. No external icon CDN.
-
----
-
-# 18. Illustration
-
-Illustrations use:
-- thick ink outlines
-- flat fills
-- minimal shading
-- imperfect geometry
-- occasional doodle marks
-- limited palette
-
-Food illustrations should look appetising rather than scientifically accurate.
-
-Avoid stock photography as a core dependency; the product must work fully offline.
-
----
-
-# 19. Motion
-
-Default:
-- controls: 120–160ms
-- sheets/dialogs: 180–240ms
-- data transitions: 400–600ms
-
-Personality motion can include tiny bounce/wiggle effects for Zig and celebratory states.
-
-Under `prefers-reduced-motion: reduce`, all nonessential animation is removed and state changes become immediate.
-
----
-
-# 20. Feedback states
-
-### Success
-`Meal copied`
-
-Soft teal surface + check.
-
-### Slightly over
-`Slightly over · +120 kcal`
-
-Mustard surface + `+` marker. Neutral language.
-
-### Well over
-`Over target · +430 kcal`
-
-Coral surface + alert icon. Still informational rather than scolding.
-
-### Empty
-Zig may appear.
-
-`Nothing planned for Thursday yet.`  
-`Pop something in when you're ready.`
-
-### Error
-Oops Zig.
-
-`Oops, something spilled.`  
-`This screen tripped over itself. Your recipes and plans are safe.`
-
-### Offline
-Do not treat offline as an error. Offline is normal product behaviour.
-
----
-
-# 21. Desktop density
-
-Desktop receives a deliberate compact density.
-
-Differences may include:
-- shorter row heights
-- reduced card padding
-- 3-column recipe grid
-- persistent filters/sidebar
-- data columns visible without opening details
-
-Touch sizing overrides remain limited to coarse pointers.
-
----
-
-# 22. Dark mode
-
-**Decided: no. There is no dark theme and no theme switch.**
-
-One was built and then removed. A second surface doubled every contrast decision and
-every screenshot for an app whose whole palette is warm paper, and the two never looked
-like the same product. If it is ever revisited it should be warm charcoal or aubergine
-rather than pure black, and it should keep the accent palette without turning neon, but
-nothing in the system assumes it is coming.
-
----
-
-# 23. Accessibility
-
-Required:
-- coarse-pointer targets ≥44px preferred and never below existing tested minimum
-- visible custom focus state
-- WCAG contrast audit before palette lock
-- no semantic state conveyed through colour alone
-- reduced-motion support
-- no horizontal viewport overflow at 390px
-- icon-only controls labelled
-- tabular numerals for nutrition figures
-- long names and 187-character source lines handled without layout breakage
-
----
-
-# 24. Tone of voice
-
-Bite Buddy sounds like a competent friend in the kitchen.
-
-### Good
-**What's the plan?**
-
-**Your week is looking delicious.**
-
-**Nothing here yet. Pop something in.**
-
-**Slightly over · +120 kcal**
-
-**You've got dinner covered.**
-
-### Avoid
-`You failed your calorie goal.`
-
-`Bad foods`
-
-`Cheat meal`
-
-`You have exceeded your allowance.`
-
-`Congratulations! You earned 40 XP for staying under calories!`
-
-Food is data and enjoyment, not morality.
-
----
-
-# 25. Tailwind v4 token starter
-
-```css
-@theme {
-  --color-bite-500: #6D5BD0;
-  --color-bite-600: #5947BE;
-  --color-bite-700: #4938A7;
-
-  --color-coral-500: #FF6868;
-  --color-teal-500: #00B8A9;
-  --color-mustard-500: #FFD166;
-  --color-lavender-100: #E9E4FF;
-
-  --color-cream-50: #FAF7F0;
-  --color-paper: #FFFDF9;
-
-  --color-ink-900: #2D2320;
-  --color-ink-700: #514744;
-  --color-ink-500: #79706D;
-  --color-border-200: #E6DED5;
-
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-card: 1.5rem;
-}
-```
-
----
-
-# 26. Product decisions locked by this system
-
-1. **Bold & Playful is the primary visual direction.**
-2. Zig is an abstract bite-shaped companion, not a food bowl.
-3. Purple is the brand primary; teal/mustard/coral handle supporting and semantic roles.
-4. Over-target states use explicit labels and markers, never colour alone.
-5. Mediterranean tiers use symbol + text + optional colour.
-6. Original Romanian/Hungarian content remains visible as deliberately styled provenance.
-7. Desktop gets a compact density.
-8. Calendar components support a configurable week start, any of the seven. Monday is the default; the dietician's own plans ran Wednesday to Tuesday and line up by weekday when loaded.
-9. Light mode is the only mode. Dark mode was built, removed, and is not planned.
-10. Personality concentrates around navigation, headings, empty states, illustrations and moments of delight. Dense data remains calm.
+## 11. Open items
+
+- Over-target ring stroke `coral-500` is below 3:1 (see section 3).
+- A few count badges still use `opacity-60` on text (Recipes, Grocery, the add
+  sheet).
+- Remove-filter chips (the active filters you tap to take off) have no check
+  icon.

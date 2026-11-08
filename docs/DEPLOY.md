@@ -1,25 +1,28 @@
 # Deploying Bite Buddy
 
 Free, end to end: GitHub Pages for the site, Supabase's free tier for the
-database and the sign-in links. Two people, one shared set of plans.
+database and the sign-in links. One household, one shared set of plans.
 
-There are four things only you can do, they need accounts I can't create. Each
-takes a couple of minutes.
+There are a handful of things only you can do, because they need accounts I
+can't create. Each takes a couple of minutes.
 
 ---
 
 ## 1. Make the repository public
 
 GitHub Pages is free only on public repos. Pages on a private repo needs a paid
-plan, and the published site is public either way, so this buys nothing to keep
-it private.
+plan, and the published site is public either way.
 
 > **Settings → General → Danger Zone → Change repository visibility → Public**
 
 What becomes readable: the code, and the parsed dietician plans in
-`src/data/generated/`. What does **not**: everything you enter from now on -
-your weeks, weights, targets and shopping lists all live in the database behind
-the login.
+`src/data/generated/`, which also ship inside the site's JavaScript. What does
+**not**: everything you enter from now on. Your weeks, weights, targets and
+shopping lists live in the database behind the login.
+
+(Whether the dietician plans should move out of the public bundle and the
+public repo, into Supabase behind the login, is an open decision. See "Not done
+yet" in the README.)
 
 ## 2. Create the Supabase project
 
@@ -30,66 +33,73 @@ kilobytes against a 500 MB allowance.
 Pick the region closest to you, it's the round trip on every save.
 
 > **One caveat worth knowing:** Supabase pauses free projects after a week with
-> no requests. Two people using it most days will never hit that. If you both
-> go away for a fortnight, the first person back gets an error and you restore
-> the project from the Supabase dashboard in one click. Nothing is lost.
+> no requests. If you all go away for a fortnight, the first person back gets
+> an error and you restore the project from the Supabase dashboard in one
+> click. Nothing is lost.
 
-## 3. Set up the database
+## 3. Add the three repository secrets
 
-The schema lives in [`supabase/migrations/`](../supabase/migrations/), one
-folder per change, and the deploy applies whatever the database has not seen
-yet (`npm run db:migrate`, see [Migrations](#migrations) below). Nothing is
-pasted by hand any more, except the guest list.
+From Supabase, **Project Settings → API**, copy the Project URL and the
+publishable (`anon`) key, and from **Connect** (or **Project Settings →
+Database**) the connection string for the **Session pooler** (port 5432). Then
+in GitHub:
 
-Once the first deploy has run, open **SQL Editor** in the Supabase dashboard
-and put the two of you on the guest list:
+> **Settings → Secrets and variables → Actions → New repository secret**
 
-```sql
-insert into public.allowed_emails (email, note) values
-  ('you@example.com',   'you'),
-  ('them@example.com',  'the other person')
-on conflict (email) do nothing;
-```
+| Name | Value |
+|---|---|
+| `VITE_SUPABASE_URL` | `https://xxxxxxxx.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | the publishable key (`sb_publishable_...`) or the legacy `anon` key (`eyJ...`) |
+| `SUPABASE_DB_URL` | `postgresql://postgres.xxxx:<password>@...pooler.supabase.com:5432/postgres` |
 
-Do this in the SQL editor, not in the repository: this repo is public, and an
-address committed to it is an address published.
+**`SUPABASE_DB_URL` is a real secret**, unlike the anon key: it holds the
+database password. Only the deploy's migrate job reads it. Use the session
+pooler, not the transaction pooler on 6543, which cannot hold the lock the
+migration runner takes.
 
-That list is the whole security model for who gets in, and it is checked in
-two places. A database trigger rejects a signup from anyone not on it, when
-the project lets that trigger be created (newer projects may not; the file
-carries on with a notice). And every read and write checks it again:
-`is_member()` requires the account's email to be on the list, so an account
-that got past signup still sees nothing, and removing an email from the list
-revokes access straight away.
+The runner is forgiving about how it was pasted (`scripts/lib/db-url.ts`): it
+trims spaces and line breaks, strips quotes around the whole value and square
+brackets left around the password, and encodes special characters in the
+password. It refuses, with a message describing the problem but never the
+value, when the `[YOUR-PASSWORD]` placeholder is still there, the password is
+empty, the value is the `https://` Project URL, or the port is 6543.
 
-**Also turn off open signups:** Authentication → Sign In / Providers → untick
-"Allow new users to sign up", then invite the two of you from Authentication →
-Users. With that off, nobody else can create an account at all.
+**The anon key is meant to be public.** It ships in the JavaScript bundle. It
+grants nothing on its own: every table requires a signed-in session belonging to
+a household member, enforced by row-level security in Postgres. The
+`service_role` key is never used by the app and must never be added here.
 
-Since the households migration the guest list is a legacy way in, kept so
-nobody already using the app loses access: an address on it, with no invite,
-joins the original household. New people are invited from the app instead
-(see [Inviting someone](#inviting-someone)), and access is decided by
-`household_members`, so removing an address from `allowed_emails` no longer
-revokes anything. Remove the person from the household instead.
+**The deploy checks the two `VITE_` secrets before building**, because anything
+named `VITE_*` is baked into the public JavaScript. It fails if
+`VITE_SUPABASE_URL` is not an `https://<ref>.supabase.co` address (a
+`postgresql://` string there would publish the database password), if
+`VITE_SUPABASE_ANON_KEY` is neither a publishable key nor a JWT, or if it is a
+JWT whose role is anything but `anon` (a `service_role` key looks the same from
+the outside). Values are never printed. It also fails, rather than publishing a
+local-only site, when `VITE_SUPABASE_URL` or `SUPABASE_DB_URL` is missing.
 
-If somebody who should be in is told they are not, paste
-`supabase/fix-membership.sql` into the SQL editor. It lists every household,
-member, pending invite and account with no household, and has a commented
-insert for putting an account back into the original household.
+## 4. Push, and it deploys itself
 
-The rows migration creates the tables the app stores your data in, one row per
-meal, weight, recipe or shopping line. It ends by reading whatever the older
-`app_state` documents hold and writing them out as rows, so a project that has
-been in use keeps everything it had.
+Every push to `main` runs `.github/workflows/deploy.yml`, in this order:
+
+1. **CI**, the whole of `.github/workflows/ci.yml`: lint, typecheck, unit tests,
+   data checks, house style, contrast, the function check, the schema check, a
+   build, and the end-to-end tests in a browser.
+2. **Migrate**: `npm run db:migrate` against `SUPABASE_DB_URL`. The database
+   moves before the site does, so published code never talks to an older
+   schema.
+3. **Build**: the secret safety check above, then `npm run build`.
+4. **Publish** to Pages. Pages turns itself on the first time, so there is no
+   switch to find in the settings.
+
+Your site: `https://<your-github-username>.github.io/bite-buddy/`
 
 ### Migrations
 
-Ported from rebelMerch. Each migration is
-`supabase/migrations/<timestamp>_<name>/migration.sql` and runs once, in its
-own transaction, recorded with a checksum in the `bite_migrations.journal`
-table (a private schema, so it is not served by the API). The runner refuses
-to go on, rather than guessing, when:
+Each migration is `supabase/migrations/<timestamp>_<name>/migration.sql` and
+runs once, in its own transaction, recorded with a SHA-256 checksum in
+`bite_migrations.journal` (a private schema, so the API does not serve it). The
+runner refuses to go on, rather than guessing, when:
 
 - a migration that already ran has been edited since. Write a new one instead.
 - the database has a migration this commit does not, meaning an older commit is
@@ -97,19 +107,21 @@ to go on, rather than guessing, when:
 - an earlier run started a migration and never finished it.
 
 To change the schema, add a folder with a later timestamp. `npm run db:check`
-runs every migration against a real Postgres (PGlite) on each push, and the
-deploy applies them before the site is published:
+runs every migration against a real Postgres (PGlite) on each push. By hand:
 
 ```sh
 SUPABASE_DB_URL=postgres://... npm run db:migrate -- --dry-run   # what would run
 SUPABASE_DB_URL=postgres://... npm run db:migrate                # apply
 ```
 
-The four baseline migrations are the files that used to be pasted in by hand,
-and they are safe to repeat, so a database set up the old way simply adopts
-them on the first deploy.
+Today there are five: `schema`, `rows`, `push`, `photos` (the four files that
+used to be pasted by hand, safe to repeat, so a database set up the old way
+adopts them on the first deploy) and `households`. Nothing in them needs
+pasting into the SQL editor any more.
 
-Then two settings in the dashboard:
+## 5. Sign-in settings
+
+In the Supabase dashboard:
 
 - **Authentication → URL Configuration → Site URL:**
   `https://<your-github-username>.github.io/bite-buddy/`
@@ -119,10 +131,58 @@ Then two settings in the dashboard:
 A magic link that comes back to an address not on that list is rejected, which
 looks exactly like a broken link. It's the most common thing to get wrong.
 
-### Inviting someone
+**Turn off open signups:** Authentication → Sign In / Providers → untick
+"Allow new users to sign up". With that off, nobody can create an account
+unless you create it for them (Authentication → Users → Invite user).
 
-A household is data now: a row in `households`, one row per person in
+## 6. The first person in
+
+A household is data: a row in `households`, one row per person in
 `household_members` with a role, and pending invites in `household_invites`.
+Access is decided by `household_members` alone.
+
+On a new, empty project there is no household yet. Two ways to start one:
+
+- **Guest list (the legacy way, kept for the transition).** In the SQL editor:
+
+  ```sql
+  insert into public.allowed_emails (email, note) values
+    ('you@example.com', 'you')
+  on conflict (email) do nothing;
+  ```
+
+  The first address on the list to sign in creates the original ("default")
+  household and becomes its admin; any later guest-list address joins it as an
+  editor. Do this in the SQL editor, never in the repository: the repo is
+  public, and an address committed to it is an address published.
+- **First-run screen.** An account with no invite and no guest-list entry is
+  offered to start a household of its own, as its admin.
+
+Either way, with signups off you also create the account first
+(Authentication → Users → Invite user).
+
+**Check person keys after the first sign-in.** Personal rows (weights,
+measurements, workouts, steps, sleep) say whose they are by `member_id`, which
+matches a member's `person_key`. On a new project the key is made from the
+display name or the email (`arany` from `arany.mak@...`), which may not match
+the ids in a backup you are about to restore. Before restoring, run:
+
+```sql
+select m.email, m.person_key, m.role, h.name as household
+from public.household_members m join public.households h on h.id = m.household_id;
+```
+
+and, if a key is not the one the backup uses:
+
+```sql
+update public.household_members set person_key = 'arany' where email = 'you@example.com';
+```
+
+(On a project that was already in use, the households migration matched the
+existing ids, `arany` and `oli`, to their owners itself, and raised a notice if
+it could not.)
+
+### Inviting someone
 
 | Role | Can |
 |---|---|
@@ -130,92 +190,122 @@ A household is data now: a row in `households`, one row per person in
 | Editor | plan, cook, shop and log |
 | Admin | all of that, plus invite people, change roles and remove members |
 
-To add someone:
-
 1. As an admin, open **Settings → Household**, type their email, pick a role
    and press **Invite**.
-2. If open signups are off (they should be, see above), also create their
-   account: **Authentication → Users → Invite user**, with the same address.
-   With signups on, the sign-in link creates it.
-3. They open the site and sign in with that address. The invite is accepted
-   on their first sign-in, and they are in with the role you picked.
+2. With signups off, also create their account: **Authentication → Users →
+   Invite user**, with the same address.
+3. They open the site and sign in with that address. The invite is accepted on
+   their first sign-in, with the role you picked.
 
-An invite admits only the address it was sent to, and only once. Change a
-role or remove someone from the same screen; the database keeps at least one
-admin per household. The same can be done in the SQL editor with
-`select public.invite_member('them@example.com', 'editor');` run as an admin
-of the household, but the screen is easier.
+An invite admits only the address it was sent to, and only once. Change a role
+or remove someone from the same screen; the database keeps at least one admin
+per household. The SQL equivalent, run as an admin, is
+`select public.invite_member('them@example.com', 'editor');`.
 
-An account that signs in with no invite (only possible with open signups) is
-offered to start a household of its own, as its admin. It sees nothing of
-anyone else's.
+Where the signup trigger could be created (newer projects may refuse it; the
+migration carries on with a notice), it rejects any address that is neither on
+the guest list nor has a pending invite.
 
-The two people already using the app were moved into the original household
-by the migration, both as admins, keeping the person ids (`arany`, `oli`)
-their logs already use. Check it worked with the first query in
-`supabase/fix-membership.sql`.
+**Removing someone** is Settings → Household (or `remove_member()`). Deleting an
+address from `allowed_emails` no longer revokes anything: `is_member()` now
+means "has a `household_members` row".
 
-## 4. Add the three repository secrets
+**One household per account**, for now: `household_members` has a unique
+constraint on the user.
 
-From Supabase, **Project Settings → API**, copy the Project URL and the
-`anon` `public` key, and from **Project Settings → Database** the connection
-string for the **session pooler** (port 5432). Then in GitHub:
+### When somebody is told they are not in
 
-> **Settings → Secrets and variables → Actions → New repository secret**
+Paste `supabase/fix-membership.sql` into the SQL editor. It lists every
+household, member, pending invite and account with no household, and has a
+commented insert for putting an account back into the original household. It
+was rewritten for households: the older version of that file redefined
+`is_member()` the pre-households way, and **must not be pasted** into a
+database that has the households migration.
 
-| Name | Value |
+## 7. Reminders (optional): push notifications
+
+The one part that needs something running while nobody has the app open: an
+Edge Function called `notify`, on a five-minute schedule. It sends push
+notifications only (there is no email path), for two things: fifteen minutes
+before a cook session, and when someone else in the household has changed the
+week and then been still for ten minutes.
+
+**On a new Supabase project none of this exists yet**: the function, its VAPID
+secrets, the public key row and the cron job all have to be set up again. The
+`push` migration (tables) runs on deploy; the rest is by hand:
+
+```bash
+supabase functions deploy notify
+
+npx web-push generate-vapid-keys        # prints a public and a private key
+supabase secrets set VAPID_PUBLIC_KEY=...
+supabase secrets set VAPID_PRIVATE_KEY=...
+supabase secrets set VAPID_SUBJECT=https://your-site/
+```
+
+`supabase/functions/notify/deploy.ts` is a single-file copy for pasting into
+the dashboard instead, generated by `npm run function:build`; `verify` fails if
+it drifts from its sources.
+
+Then, in the SQL editor, the **public** half of the key, which the app reads
+(it is public by design and authorises nothing on its own):
+
+```sql
+insert into public.push_config (key, value)
+values ('vapid_public', '<the public key>')
+on conflict (key) do update set value = excluded.value;
+```
+
+Then the schedule. **Copy** the commented `cron.schedule` block from the bottom
+of `supabase/migrations/20261108000100_schema/migration.sql` into the SQL
+editor, fill in the project ref and the anon key, and run it there. Do not
+uncomment it in the file: that migration has already run, and the runner
+refuses an edited migration.
+
+**The Authorization header is not optional.** Edge Functions verify a JWT before
+your code runs; without the header the gateway answers 401, the function never
+executes, and `pg_cron` still records the job as succeeded. When a
+notification does not arrive, look here first:
+
+```sql
+select id, status_code, content, timed_out, error_msg
+from net._http_response order by id desc limit 20;
+```
+
+| What you see | What it means |
 |---|---|
-| `VITE_SUPABASE_URL` | `https://xxxxxxxx.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | the long `anon` key |
-| `SUPABASE_DB_URL` | `postgresql://postgres.xxxx:<password>@...pooler.supabase.com:5432/postgres` |
+| `UNAUTHORIZED_NO_AUTH_HEADER` | No `Authorization` header. The dashboard's cron builder writes `headers := '{}'` unless you fill it in. |
+| `UNAUTHORIZED_INVALID_JWT_FORMAT` | The token was truncated or line-broken in a paste. Use the copy button on the API keys page. |
+| `200` with `"pushing": false` | The function runs; the VAPID secrets are not set. |
+| `timed_out` true | A cold function took longer than pg_net's default; schedule with `timeout_milliseconds := 20000` (the block in the migration already does). |
 
-**`SUPABASE_DB_URL` is a real secret**, unlike the anon key: it is the database
-password. It is only ever read by the deploy's migrate job. Use the session
-pooler, not the transaction pooler on 6543, which cannot hold the lock the
-runner takes.
+Use the **anon** key in the cron job, never the service role key.
 
-**The anon key is meant to be public.** It ships in the JavaScript bundle and
-anyone can read it out. It grants nothing on its own: every table requires a
-signed-in session belonging to a household member, enforced by row-level
-security in Postgres. The key that *would* matter, `service_role`, is never
-used by this app and must never be added here.
-
-The deploy workflow fails deliberately if these are missing, rather than
-publishing a site that silently falls back to local-only storage.
-
----
-
-## Then it deploys itself
-
-Every push to the branch runs `.github/workflows/deploy.yml`: lint, typecheck,
-unit tests and the data checks, then a build and a publish. Pages turns itself
-on the first time it runs, so there's no switch to find in the settings.
-
-Your site: `https://<your-github-username>.github.io/bite-buddy/`
-
-Send the other person the link. They type their address, get a link, and they're
-in, no account to create, no password to agree on.
+Each person then turns notifications on per device in **Settings →
+Notifications**, and chooses which of the two kinds they want. On Android it is
+more reliable once the app is on the home screen. Without any of this the
+toggle still saves and nothing is sent; nothing else depends on it.
 
 ---
 
 ## How the sharing works
 
-Everything is shared: one week, one grocery list, one recipe library, one set of
-targets. It is stored as one row per thing, a meal, a weight, a shopping list
-line, and Postgres realtime pushes changes to the other screen as they happen.
+Everything in a household is shared except the personal logs: one week, one
+grocery list, one recipe library, one set of targets. It is stored as one row
+per thing, and Postgres realtime pushes changes to every other open screen,
+including your own other devices. A pull reads every page of changes, not just
+the first thousand rows.
 
 What wins is decided per row, and it favours the device in front of you: a row
-you have changed and not yet sent stays, whatever the server says. Everything
-else takes the shared version, deletions included.
+you changed and have not yet sent stays, and is sent. When someone else changed
+the same row in the meantime, their version is kept on your Home screen with
+**Use theirs** and **Keep mine**, rather than disappearing.
 
-**The honest limitation: both of you editing the same row.** Not the same day,
-the same meal. The later write wins and the app says so on screen rather than
-letting your version disappear without a word. It does not offer you both
-versions to choose between.
+If this device would delete rows that the shared copy still has, and its own
+copy looks wiped, it holds the deletions and asks before sending them.
 
 Offline still works. The app writes locally first, so a dropped connection
-changes nothing except that the other person doesn't see it yet; the welcome
-screen says so, and it goes up when you're back.
+changes nothing except that the others don't see it yet.
 
 ---
 
@@ -227,11 +317,11 @@ Unchanged, and it still needs no accounts:
 npm install && npm run dev
 ```
 
-Without `VITE_SUPABASE_URL` set there is no sign-in screen and no sync, the app
-runs entirely on localStorage, exactly as it did before any of this. That is
-also why the test suite doesn't need a database.
+Without `VITE_SUPABASE_URL` set there is no sign-in screen and no sync; the app
+runs entirely on localStorage. That is also why the test suite doesn't need a
+database.
 
-To test the real thing locally, put the same two values in `.env.local`:
+To test the real thing locally, put the two public values in `.env.local`:
 
 ```
 VITE_SUPABASE_URL=https://xxxxxxxx.supabase.co

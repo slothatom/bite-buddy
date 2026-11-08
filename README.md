@@ -1,11 +1,11 @@
-# 🫐 Bite Buddy
+# Bite Buddy
 
 *Plan your week. Eat well. Feel good.*
 
-A meal planner built around one person's actual dietician plans and the Mediterranean diet.
+A meal planner built around real dietician plans and the Mediterranean diet.
 
-Two people, one shared week. Deployed free on GitHub Pages with a Supabase back end,
-and it still runs entirely offline on your own machine with no account at all.
+One household, one shared week. Deployed free on GitHub Pages with a Supabase back
+end, and it still runs entirely offline on your own machine with no account at all.
 
 ---
 
@@ -13,676 +13,354 @@ and it still runs entirely offline on your own machine with no account at all.
 
 Bite Buddy isn't seeded with invented recipes. Its library comes from two real sources:
 
-**14 dietician plan documents** (Jan 2021 in Hungarian, Apr–Nov 2022 in Romanian), **97 days,
-481 meals**. These are parsed into **157 named meal recipes** and **71 underlying dishes**,
-every one traceable back to the line the dietician wrote.
+**36 dietician plan documents** (October 2020 to November 2022, 18 in Hungarian and
+18 in Romanian), **254 days, 1,255 meal lines**. These are parsed into **493 meal
+recipes** and **83 underlying dishes**, every one traceable back to the line the
+dietician wrote.
 
-**An 89-page Mediterranean Diet guide**, its 17 food categories, allowed-lists and serving
-goals become the food database's structure, the tier badges in the food library, and the
-weekly serving scoring on the Progress screen.
+**An 89-page Mediterranean Diet guide**: its 17 food categories, allowed-lists and
+serving goals become the food database's structure, the tier badges in the food
+library, and the weekly serving scoring on the Progress screen.
 
 Three things about that source data shape the whole app:
 
 - **The unit of planning is a weighed portion, not a recipe.** `50 g paine int + 100 g humus,
-  jumatate de farfurie de legume`. So a planned meal is a list of entries, a snack is two food
-  lines, not a fabricated recipe.
+  jumatate de farfurie de legume`. So a planned meal is a list of entries, and a snack is
+  two food lines, not a fabricated recipe.
 - **Weights are stated raw.** `50 g bulgur nefiert`, `100 g piept de pui crud`. Dry bulgur is
   roughly three times the calories of cooked, so the state a food is weighed in is part of its
   identity (`raw` / `dry` / `cooked` / `as-sold`).
-- **The dietician's weeks run Wednesday to Tuesday.** The app's week is the ordinary
-  Monday → Sunday; loading a plan lines its days up by weekday, so a Wednesday meal still
-  lands on Wednesday. The start day is configurable in Settings.
+- **The dietician's weeks mostly ran Wednesday to Tuesday.** The app's week is Monday to
+  Sunday by default and can start on any day; loading a plan lines its days up by weekday,
+  so a Wednesday meal still lands on Wednesday.
 
-The dietician never wrote a single calorie. Supplying them is what this app adds.
+The dietician never wrote a single calorie. Supplying them is what this app adds, and the
+app says so: every screen where the figures are the point carries "Calories are estimates
+worked out by Bite Buddy, not by your dietician. This isn't medical advice."
 
 ---
 
 ## Look and feel
 
-Implements `docs/DESIGN-SYSTEM.md`, Bold & Playful. The balance it asks for is
-roughly 70% calm (paper, ink, whitespace), 20% functional colour, 10% chaos, so
-the bold accents concentrate in navigation, headings, empty states and moments
-of delight while dense working areas stay quiet.
+The full spec is [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md). In short: bold and
+playful, roughly 70% calm (cream, ink, whitespace), 20% functional colour, 10%
+personality, with the bold accents in navigation, headings and empty states while
+dense working areas stay quiet.
 
-**Zig** is the mascot: an abstract bite-shaped creature, deliberately not a bowl
-or a piece of food, the silhouette is a lumpy blob with a bite out of one
-shoulder, so the name is in the shape rather than illustrated literally. Six
-moods (`happy`, `sleepy`, `oops`, `chef`, `celebrate`, `thinking`) drawn inline
-as SVG in `src/components/brand/Mascot.tsx`. He appears in empty states, errors
-and brand moments, never on every card or in dense tables.
+**The Bitten B** is the brand: a capital B with a bite out of it and two crumbs. It is
+the logo in the sidebar, the phone's top bar, the sign-in screen and the app icon, and
+the illustration in empty states, errors and loading. There is no mascot. (Masters in
+`brand/`, inlined in `src/components/brand/Logo.tsx`, icons rendered by `npm run icons`.)
 
-**Colour.** Purple `#6D5BD0` is the single brand primary. Teal carries data and
-positive progress, mustard means slightly over, coral means well over. Cream
+**Colour.** Turquoise (`bite`) is the brand: primary buttons, the active nav item,
+selected chips, the focus ring. Green (`leaf`) carries data and "this happened": on
+track, eaten, filled bars. Mustard means slightly over, coral means well over. Cream
 grounds, warm ink text.
 
-**Type.** Bungee for the wordmark, page titles and short expressive labels only
-- never for recipe names, tables or numeric data. Plus Jakarta Sans for
-everything else. Both bundled, not fetched from a CDN, so the app looks the same
-offline.
+**Light and dark.** Settings → Your week → Appearance: System (the default), Light or
+Dark. The whole palette is tokens in `src/index.css`, redefined for dark, so no
+component knows a theme exists (`src/lib/theme.ts`).
 
-**One palette.** The app is cream and ink, and only that. A dark theme existed
-and has been taken out: it doubled every colour decision, and the guard it
-needed, a walk over every screen looking for text whose contrast against its
-painted background collapsed, was catching bugs that only a second palette
-could create.
+**Type.** Bungee for page titles and short expressive labels only, never recipe names,
+tables or numbers. Plus Jakarta Sans for everything else. Both bundled, so the app looks
+the same offline. Nothing is smaller than 12px, and no text is faded with opacity: past
+days say **Past** and skipped meals say **Skipped**.
 
-**Colour is measured, not asserted.** `npm run check:contrast` reads the tokens
-out of `index.css` and the class pairs out of the components, so it grades what
-ships rather than what a palette document claims. WCAG AA: 4.5:1 for words,
-3:1 for large text and for icons, which is the bar WCAG actually sets for a
-graphic. It found twenty six combinations below the line, including the muted
-text colour used in 189 places, and it runs in `verify` and in both workflows
-so they cannot come back.
+**Colour is measured, not asserted.** `npm run check:contrast` reads the tokens for both
+themes out of `index.css` and the class pairs out of the components, so it grades what
+ships rather than what a palette document claims. WCAG AA: 4.5:1 for words, 3:1 for large
+text, icons and marks (it also measures the focus ring, the danger button and the calorie
+ring). It pairs colours inside a single string literal, because a whole line is the wrong
+unit: a ternary holds two alternatives that never appear together. It runs in `verify` and
+in CI. One known gap: the well-over ring stroke, `coral-500`, is 2.64:1 on cream.
 
-The pairing is done inside a single string literal, which sounds like a detail
-and is not. A whole line is the wrong unit: a ternary holds two alternatives
-that never appear together, and a table of style variants holds a fill, a text
-colour and a surface as separate keys, where the fill is a dot rather than the
-ground the words sit on. Measuring by line reported a third more failures than
-exist, and a check that cries wolf is one people learn to silence.
+**Status is never hue alone.** `src/lib/status.ts` returns a label, a symbol and a signed
+delta alongside the colour: bars show `+ Slightly over · +42 g`, the target sits on the bar
+as an explicit line, and the calorie ring draws a second lap past 100% so 101% and 160% no
+longer look the same.
 
-**A total says how much of it is actually known.** Missing nutrient data means unknown, never
-zero, so a figure built partly on silence is marked with a `+` and shown as a floor. Two
-things were wrong with that. The marking counted each top-level component as one source, and
-a recipe entry had already had its own ingredients summed by the time the count saw them, so
-a five-ingredient dish where two said nothing reported a complete figure: since most planner
-entries are recipe references, nearly every partial total in the app was suppressed. And
-fibre could never be marked at all, because it renders as a bar rather than a figure, and the
-bar turned unknown into a hard zero, which is the one thing the types say must never happen.
-With 109 of the 115 foods in use carrying no sodium at all, most of what these screens state
-is a floor, and now they say so.
+**A total says how much of it is actually known.** Missing nutrient data means unknown,
+never zero, so a figure built partly on silence is marked with a `+` and shown as a floor,
+and a day says how many of its entries are fully known: "3 of 5 entries fully known".
 
-**Servings are counted in the state the food is in.** A serving of grains is conventionally
-40 g uncooked and a serving of legumes a cooked weight, and the scorer used one flat figure
-per category, so 40 g of dry lentils were scored against a cooked serving and counted as less
-than half of one. Treats had no goal at all despite being listed as a category to limit, so
-the group the guide is loudest about was the one group the screen never mentioned.
+**Mediterranean tiers** use a symbol and a word (`● Daily`, `◐ Weekly`, `○ Moderation`,
+`◇ Rarely`), quiet enough to sit on every food row at once.
 
-**Status is never hue alone.** `src/lib/status.ts` returns a label, a symbol and
-a signed delta alongside the colour level, and every consumer renders at least
-one of them: bars show `+ Slightly over · +42 g`, and the target sits on the bar
-as an explicit line rather than being inferred from where the fill stops.
+**Navigation.** Nine destinations (`src/components/layout/nav.ts`): Home, Planner, Recipes,
+Foods, Grocery, Schedule, Movement, Progress, Settings. A sidebar on desktop. On a phone a
+bottom tab bar, Home · Plan · **+** · Recipes · More, where the centre button opens the add
+sheet on today at the slot for the time of day, and More opens a sheet with the other six.
 
-**Mediterranean tiers** use a symbol and a word (`● Daily`, `◐ Weekly`,
-`○ Moderation`, `◇ Rarely`), quiet enough to sit on 122 food rows at once.
+**Filters wrap, they don't scroll.** `ChipRow` wraps and collapses to the first few behind
+a `+N more`, with any active filter sorted to the front. A chip that is on shows a check
+and sets `aria-pressed`, so the state is not carried by colour alone. Search boxes have a
+clear button.
 
-**Navigation.** Ten destinations in the desktop sidebar; on a phone the bar is
-Home · Plan · **+** · Recipes · More, where the centre button opens the first
-empty meal slot and More holds the remaining six screens.
-
-**Filters wrap, they don't scroll.** Foods has 17 category chips; a horizontal
-scroller showed four of them and hid the rest with no affordance. `ChipRow`
-wraps and collapses to the first few behind a `+N more`, and callers sort any
-active filter to the front so a live filter is never behind the toggle.
-
-**Three axes, not one row of tags.** Recipes used to offer thirteen tags side by
-side, meal times, diets and dish shapes as if they answered the same question.
-A recipe is now described by three separate things:
+**Three axes, not one row of tags.** A recipe is described by three separate things:
 
 | Axis | Cardinality | Where it comes from |
 |---|---|---|
-| **Meal time**, breakfast, lunch, dinner, snack | several | the fourteen plans |
-| **Dish category**, what the food *is* | exactly one | `scripts/classify-recipes.ts` |
-| **Quick filters**, what it asks of you | any number | derived, or applied by hand |
+| **Meal time**: breakfast, lunch, dinner, snack | several | the plans |
+| **Dish category**: what the food *is* | exactly one | `scripts/classify-recipes.ts` |
+| **Quick filters**: what it asks of you | any number | derived, or applied by hand |
 
-A category says what the food *is*, never when it is eaten, how it is served or
-how it was cooked, which rules out "Main", "Side" and "Bowl": those describe a
-role at a table and tell you nothing when you are deciding what to make. There
-are 38 of them; this library uses 19, and the filter only offers the ones with
-something behind them.
-
-**Grain** is the 38th, added because Rice, Pasta and Noodles left nowhere for the
-bulgur, couscous and quinoa this library runs on, those dishes fell through to
-their protein, so there was no way to ask for a grain bowl. It means *the grain
-is the dish*: "Bulgur with chicken breast" is one, "Zucchini patties with bulgur"
-is not. Mămăligă sits here rather than under Porridge, since in these plans it
-arrives under cottage cheese as the starch of a meal rather than in a bowl with
-a spoon; oats stay Porridge, which is the distinction the two categories are for.
-
-`CATEGORY_MEAL_TIMES` maps a category to when it is usually eaten, but only ever
-as a *default*: a recipe's own meal times come from the plans, which is actual
-evidence, and always win. The mapping fills the gap for the 71 batch-cooked
-dishes, which were never a meal in a plan and so carry no meal time, without it
-the planner would never offer you the lentil stew for lunch.
+A category says what the food *is*, never when it is eaten or how it is served, which
+rules out "Main", "Side" and "Bowl". There are 38; this library uses 23, and the filter
+only offers the ones with something behind them. `CATEGORY_MEAL_TIMES` maps a category to
+when it is usually eaten, but only as a *default*: a recipe's own meal times come from the
+plans and always win.
 
 ---
 
 ## Features
 
 ### Home
-Where you land: today's meals against your calorie ring, the week as seven bars, and who
-else is in the household and when they were last here. On the deployed app it also says
-whether your copy and theirs are in step.
+Where you land: today's meals against your calorie ring, the week as seven bars, who else
+is in the household and when they were last here, and whether your copy and theirs are in
+step. If you and someone else changed the same thing, it is listed here with **Use theirs**
+and **Keep mine** (see [what wins](#what-wins-when-two-people-change-something)).
 
-**Worth a thought** is up to four things, and they come from two places. The kitchen ones
-are about now: portions cooked with nothing planned to eat them, something that has been in
-the fridge a few days, a cook session tomorrow with two of its ingredients not in the house,
-a shopping list that no longer matches the plan, three meals this week that all want
-spinach. The week ones are about balance against the Mediterranean guide, which matters and
-never matters today, so they sort below.
-
-Four is a cap rather than a target. A screen that raises five things is one people learn to
-scroll past, which costs the one that actually needed saying. Nothing scolds, and nothing
-passes a verdict on food it cannot see: "in the fridge 6 days" is a fact you can act on,
-"expired" is not the app's to say. `src/lib/kitchen.ts` sets out the rules.
+**Worth a thought** is up to four things. The kitchen ones are about now: portions cooked
+with nothing planned to eat them, something in the fridge a few days, a cook session
+tomorrow with ingredients not in the house, a shopping list that no longer matches the
+plan. The week ones are about balance against the Mediterranean guide. Four is a cap, not
+a target, and nothing scolds. `src/lib/kitchen.ts` sets out the rules.
 
 ### Planner
-**Fill the gaps** proposes a meal for every empty breakfast, lunch and dinner on screen, from
-your own library. It is arithmetic rather than a model: it prefers what is already in the
-fridge, then what the cupboard covers, avoids what you ate in the last fortnight, aims each
-day near your calorie target, and gives every proposal a reason you can check. Nothing is
-written until you accept it, anything can be dropped first, and it works with no signal
-because there is nothing to phone. `src/lib/autoPlan.ts` explains the scoring.
+A week, a fortnight or a month at a time, four slots a day (Breakfast, Lunch, Dinner,
+Snacks), each holding any number of entries, with live totals against your targets. On a
+phone the week is a list of days with every slot named in full.
 
-A week, a fortnight or a whole month at a time, five slots a day (breakfast, two snacks,
-lunch, dinner), live totals against your targets, and copy a day onto another day. The week
-starts on Monday by default and can start on any of the seven; loading an archived plan lines
-its days up by weekday, so a Wednesday meal still lands on a Wednesday.
-
-**The week is the one you are in.** It sounds like nothing and it was the worst bug in the
-app. The window was persisted and only the Today button ever moved it, so a fortnight after
-planning, Home counted a week that had already happened, Progress charted it, the shopping
-list offered its days, and the week you were standing in was empty and unmentioned
-everywhere. It is now recomputed on start and whenever the app comes back to the foreground,
-kept out of storage entirely, and kept out of backups and sync too: a window is a fact about
-right now, not about your data, and restoring a backup should not move your week.
-
-The centre button carries the day it meant. It used to raise a bare flag and let the planner
-fill in the day from whatever it had selected, which from another screen meant the first day
-of the window: "Add to Snack 1, Monday 17 August", on a Saturday the 29th.
-
-**Targets are per person; the plan is not.** A household cooks once, so there is one week of
-meals, and the line it is measured against belongs to whoever is looking. Body and Movement
-had known whose row was whose for months while the one screen about how much to eat carried a
-single figure for two people. Whoever has not set their own is measured against the
-household's, so nothing needed migrating. The switch sits on the planner rather than only in
-Settings, because that is where you notice it is the wrong one, and which person a device is
-showing is remembered per device and never synced: two people, two phones.
-
-**A batch can land in the week.** Ticking off a cook session offers to put the portions into
-the days ahead, one a day, into the first free dinner and then lunch, leaving days you have
-already planned alone. Off until asked for, like everything else here that writes to a week.
-It defaulted to on for about ten minutes and the test suite caught what that meant: four
-portions cooked, four days planned nobody asked for, and a fridge emptied the moment it was
-filled.
-
-**A plan is an intention; a tick makes it a record.** Every meal carries one button with
-three states: nothing said, eaten, skipped. The label says what the next press does, so the
-cycle needs no legend, and it goes round to nothing said because people change their minds
-and a tick you cannot take back is one nobody presses honestly. A skipped meal is dimmed and
-struck through rather than marked in red: not eating what you planned is a Tuesday, not a
-failure.
-
-Until something on a day is ticked, the day's totals are the plan and the heading says
-"planned". The moment one meal is a fact, the totals are what was eaten and the heading says
-"eaten". A skipped meal counts as neither. This is what the home screen's calorie ring was
-missing: it read like a tracker and was really a sum of intentions.
-
-**How much of it there was can be changed after the fact.** Grams for a food, servings for
-anything already made, in the steps people actually eat in rather than a free number field
-that invites 0.37 of a stew. Recipes and fridge portions used to go in at one serving and
-stay there, so "I had half" and "I had two" were both unsayable, on a library whose imported
-meals average well above the target. Changing a portion gives the rest back to the fridge,
-the same bookkeeping as adding and removing one.
-
-**A recipe can go straight into a day.** The sheet offered Edit and nothing else, so acting
-on a decision you had already made meant closing it, opening the planner, finding the day and
-searching for the same dish again. It keeps whatever servings the sheet was scaled to.
-
-**Fill the gaps only offers days still ahead.** It filled whatever was on screen, so on a
-Saturday it carefully proposed meals for the Monday to Friday that had already gone. Every one
-of those pushed a real empty day further down a list people scan rather than read.
-
-**Saved weeks** keep a week you eat often so it can be dropped onto one that has not
-happened yet. Held as offsets from the start of the week rather than as dates, so a saved
-week lands the same way whichever day yours begins on, and every copied meal gets its own
-id so moving one does not move the other. Applying replaces the week rather than merging
-into it, which is the honest behaviour and also the destructive one, so it counts what is
-already there and puts the number on the button: "Replace 6". Nothing moves until that
-second tap.
-
-They sync like everything else, without a migration: a saved week is a row in the settings
-table under a `template:` id. A new table would have meant new SQL to find, paste and run
-before the feature worked at all, which is a poor trade for a prefix.
-
-Each planned meal also says **whether you can actually cook it tonight**: either everything
-it needs is in, or the two or three things that are short, named rather than counted, since
-"3 missing" sends you to open the cupboard anyway. It stays quiet until the cupboard has
-something in it, because an empty cupboard means the app does not know what you have, not
-that you have nothing. Portions from the fridge are already yours, so they never count as
-shopping. `mealAvailability()` in `src/lib/pantry.ts` does the work.
+- **Fill the gaps** proposes a breakfast, lunch or dinner for every empty one still ahead, from your own
+  library. Arithmetic rather than a model: it prefers what is in the fridge, then what the
+  cupboard covers, avoids what you ate in the last fortnight, aims near your target, and
+  gives every proposal a reason. Nothing is written until you accept it.
+  `src/lib/autoPlan.ts` explains the scoring.
+- **The week is the one you are in.** The window is recomputed on start and when the app
+  comes back to the foreground, and kept out of storage, backups and sync.
+- **Targets are per person; the plan is not.** One week of meals, measured against whoever
+  is looking. Which person a device shows is remembered per device.
+- **A plan is an intention; a tick makes it a record.** Each meal cycles nothing said →
+  eaten → skipped. Until something on a day is ticked its totals are "planned"; after,
+  they are "eaten". A skipped meal is struck through and says Skipped, not red.
+- **Portions can change after the fact**, in steps people actually eat in. Changing a
+  portion gives the rest back to the fridge.
+- **A batch can land in the week**: ticking off a cook session offers to put the portions
+  into the days ahead. Off until asked for.
+- **Saved weeks** keep a week you eat often, as offsets from the week start, and apply
+  with "Replace 6" on the button. They sync as settings rows under a `template:` id.
+- Each planned meal says **whether you can cook it tonight**, naming what is short, once
+  the cupboard has something in it. `mealAvailability()` in `src/lib/pantry.ts`.
 
 ### Recipes
-A row of **lenses** across the top, because nobody stands in a kitchen at seven wondering
-about categories. They wonder what is quick, what can be made from what is in, and what
-needs using up. Each is a different order as much as a different filter, and each prints its
-rule underneath, since a filter nobody can explain is a filter nobody trusts:
+A row of **lenses**, each a different order as much as a filter, each printing its rule:
 
 | Lens | Rule |
 |---|---|
-| Quick tonight | Twenty minutes or less, start to plate, estimated for the imported meals. Quickest first. |
+| Quick tonight | Twenty minutes or less, estimated for the imported meals. Quickest first. |
 | From the cupboard | Everything it needs is something you have. Fewest ingredients first. |
 | Use it up | Uses something in the cupboard with a date on it. Soonest first. |
 | Fits today | Lands inside what is left of today against your target. Closest first. |
 | Not lately | Nothing you have planned in the last month. Longest gap first. |
 | Worth a batch | Makes more than one meal, and the plans came back to it. Most used first. |
 
-One at a time, and they compose with the search and the chips, so "quick" inside "soups" is
-a sensible question. A lens that cannot answer, "from the cupboard" with an empty cupboard,
-says what is missing rather than showing an empty screen that reads as "you have no
-recipes". `src/lib/discovery.ts` holds the rules.
+They compose with search and chips, and a lens that cannot answer says what is missing.
+`src/lib/discovery.ts` holds the rules. The dietician wrote portions, never methods, so an
+imported meal's time is estimated from the hand-written dishes it contains and the dish
+library's own medians (`cookingTimes.test.ts` pins them), and shown as "about 25 min".
 
-Two of those lenses used to match **nothing at all**, which is worse than a lens that admits
-it cannot answer: an empty screen reads as an empty library. The dietician wrote portions,
-never methods, so all 157 imported meals had no time on them and "Quick tonight" could only
-see the 71 hand-written dishes; and nothing in a library written for two people makes four
-servings, so "Worth a batch" was permanently empty.
+576 recipes, searchable in English, Romanian or Hungarian. Every imported meal shows the
+dietician's line as provenance, translated where the app knows the words and left as
+written where it does not. Macros are derived from components, never stored.
 
-Both now read real evidence. A meal's time is the longest thing in it, the hand-written dish
-times it contains, plus a minute for each other thing to be weighed out, with a per-category
-estimate as the floor. Those estimates are the dish library's **own medians**, and
-`cookingTimes.test.ts` pins them there, so they are the numbers somebody already wrote rather
-than numbers this app made up. They are still estimates, and every screen showing one says
-"about 25 min" rather than pretending to a stopwatch. A batch is what makes more than one
-meal and got cooked again: `reuse.ts` counts how many of the 481 meals each recipe feeds,
-counting through the meals, so the tray of roasted vegetables inside seven different lunches
-is credited with all seven. 93 recipes are now under twenty minutes and 20 are worth a batch.
+Where the plans wrote the same food in different words, the importer keeps one recipe;
+where the portion genuinely differs, both survive and the name says which, and variants
+collapse into one card. You can also **merge** your own repeats: a merge records "this is
+really that one" and deletes nothing, so archived weeks still resolve. Undo puts them back.
 
-A recipe of your own can also carry **your notes**, **where it came from** and **how much
-of an evening it is** (easy, some effort, a project). Three levels rather than five,
-because the only thing that has to be told apart is a Tuesday from a Sunday.
+Every recipe is editable, the shipped ones included: the first change keeps your own copy
+over the original, so **Revert** and **Delete** mean different things. **Deleting** hides a
+recipe everywhere but keeps it resolvable, so a day you planned in March keeps its meal;
+**Settings → Deleted recipes** puts it back. A recipe of your own can carry notes, a source
+link (only http and https become links, `src/lib/links.ts`), an effort level and a photo.
 
-A source link is checked before it is stored and again before it is shown. Only http and
-https ever become a link: a recipe is data, it can arrive from a backup, from the other
-phone or from a backup, and `javascript:` in an href is a script running on your page
-with your session. `src/lib/links.ts` is four lines of that and a test for each way in.
-
-228 recipes on six shelves, opening on the meal you are most likely looking for at this hour.
-Searchable in English, Romanian or Hungarian, typing `telemea` or `zabpehely` finds the right
-thing. Every imported meal shows the original dietician line as provenance. Macros are always
-derived from components, never stored, so they can't drift out of date.
-
-The plans write the same dish more than once, sometimes at a different portion, more often
-just worded differently (`supă de fasole verde` one week, `ciorbă de fasole verde` the next).
-Where the wording differs but the food does not, the importer keeps one recipe rather than
-two: 47 of the 204 lines that used to be their own recipe now resolve to another one, or to
-the dish they amount to. Where the portion genuinely differs, both survive and the name says
-which is which, `Rolled oats with yogurt & mixed berries (45 g rolled oats)`, and the 13
-dishes written at more than one portion collapse into one card with the portions inside it,
-taking the library from 228 cards to 211.
-
-Collapsing them is only a display; they can also be **merged** for real, which takes them out
-of the library and out of the planner's picker. The shipped library now offers nothing to
-merge, since the importer has already done it; the offer is for the repeats you create
-yourself. Versions that differ by portion are a real choice and are never swept up
-automatically; merge those by hand from the recipe itself.
-
-A merge deletes nothing. It records "this recipe is really that one", and every lookup resolves
-through the note, which is what lets you merge something a planned day already names, or
-something one of the fourteen archived weeks refers to, since those ids live in code and cannot
-be rewritten. Undo puts them back.
-
-Filtering combines all three axes, `Dinner` + `Soup` + `💪 High Protein`, with the category
-and the fourteen quick filters behind two buttons rather than fifty chips, and whatever you
-pick coming back as a chip you can take off.
-
-Nine of the fourteen quick filters are derived from the recipe: time, macros, and what goes in.
-The other five are not, and are left empty rather than guessed at. Lazy Meals, Leftovers,
-Fridge Clean-Out and Special Occasion are judgements about a particular week in a particular
-kitchen. **Budget Friendly** is the interesting one: the app holds no prices, and the nearest
-guess, "contains nothing expensive", was true of 83% of the library, because Mediterranean
-home cooking out of a Romanian supermarket is cheap almost by definition. A filter matching
-four recipes in five narrows nothing, so it is yours to apply.
-
-Every recipe is editable, including the 228 that ship in code: the first change keeps a copy
-of your own and the original stays underneath, so **Revert** and **Delete** are separate
-buttons that mean different things.
-
-**Deleting** takes a recipe out of the library, search, the planner's picker, your favourites
-and every filter, but does not destroy it. A day you planned in March names the recipe by id
-rather than storing a copy, so throwing it away turned that day's dinner into a blank worth
-zero calories, quietly rewriting your own history. Deleted recipes stay resolvable: the day
-keeps its meal and its numbers, with the entry marked `deleted`. **Settings → Deleted recipes**
-puts them back. Ingredients are never touched, other recipes use them. **New recipe** writes one from scratch, name, shelf,
-labels, weighed ingredients (foods or other recipes) and a method, with the nutrition derived
-as you type rather than entered.
+Nine of the fourteen quick filters are derived from the recipe; the other five (Lazy Meals,
+Leftovers, Fridge Clean-Out, Special Occasion, Budget Friendly) are judgements and are
+yours to apply.
 
 ### Foods
-122 foods with per-100 g nutrition, each carrying EN/RO/HU names and a Mediterranean tier.
-Every one is editable and deletable, the curated ones included: the first change keeps a copy
-of your own with the original underneath, so **Revert** and **Delete** mean different things.
-Deleting takes a food out of the library without destroying it, a food is named by every
-recipe that contains it *and* directly by the snack lines in your plan, so throwing it away
-would blank all of them at once. **Settings → Deleted foods** puts them back
-(daily / weekly / moderation / rarely). Add your own by hand, by USDA / Open Food Facts
-lookup, or by scanning a barcode. A lookup that fails says why, rate-limited, offline, or
-the service being down, rather than reporting "no results" for a food the database has.
-
-### History
-All 14 plans as a browsable archive with the original Romanian and Hungarian preserved
-verbatim. Load any week straight into the planner.
+148 foods with per-100 g nutrition, EN/RO/HU names and a Mediterranean tier. Editable and
+deletable on the same terms as recipes (**Settings → Deleted foods**). Add your own by
+hand, by USDA / Open Food Facts lookup, or by scanning a barcode. A lookup that fails says
+why: rate-limited, offline, or the service down.
 
 ### Grocery list
-Built from the planned week, resolving nested recipes down to what you actually buy, merged by
-food and grouped by category. Weights are raw, matching how the plans are written. Anything
-covered by a portion already in the fridge is left off, since it is already cooked.
+Built from the planned week, resolving nested recipes down to what you buy, merged and
+grouped by category. Weights are raw. Anything covered by a portion in the fridge is left
+off. Amounts are counts where that is honest ("3 tomatoes", grams beside it). Share where
+the browser can, the clipboard everywhere else.
 
-The box for typing a line sits above the list rather than under it. It was always there and
-it was under a categorised list of forty items, which on a phone means off the bottom of the
-screen: a walkthrough reported the shopping list as unable to take a typed item at all.
-
-**Amounts are what you buy, where the app can say so.** "3 tomatoes" rather than "Tomatoes
-360 g", with the grams still beside it, because the count is a rounding of them. Only for
-things you can pick up: three tablespoons of oats is not a shopping instruction and reads
-like one, which is worse than the weight it replaced. Only where the rounding is honest, so
-1.4 peppers stays as grams.
-
-**The list can leave the app.** Share where the browser has it, the clipboard everywhere
-else. Grouped as the screen groups it, and only what is left to buy, since a list of things
-already in the trolley is not a shopping list. Before this the only way anything left was a
-backup file, which is not a thing you send to a person.
-
-A second tab holds the cupboard. Two kinds of entry and the difference matters: something you
-have now, and something you always have. A staple never appears on a list again, which is the
-setting that earns its place, without it a week of real cooking produces forty lines and
-thirty of them are salt, oil and flour. An amount is optional: blank means enough, which is
-what anybody means when they say they have olive oil, and a number is believed and subtracted,
-because 200 g of the 500 g a week needs is a different answer.
-
-"Have it" on any line puts it in the cupboard rather than merely removing it, so the next
-rebuild does not ask again. Nothing is ever decremented automatically. The cupboard is in your
-kitchen and the app has never seen it.
-
-A recipe says what it would still cost you a trip for. Worded as a list rather than a
-verdict: whether three missing things is a lot depends entirely on which three.
-
-### Moments
-Eight little things Zig notices, a first day planned, a whole week, something actually
-cooked. Each once, ever, then he stops. Deliberately not a points system: nothing counts,
-so nothing can be lost, and nothing resets. A streak works by threatening you with what
-you lose by stopping, which is a poor thing to aim at somebody's eating, a week where you
-skip the planner is a normal week. `src/lib/moments.ts` says so at greater length.
-
-### Backup
-Settings → Your data. Download or copy everything you've entered as one JSON file, and restore
-it from a file or a paste. There's no account behind the app, so this is the only copy that
-survives clearing browser data, switching phone, or a browser that won't let the page save at
-all. A backup from a different `SCHEMA_VERSION` is refused rather than merged into a shape it
-no longer fits.
-
-### Progress
-The week's calories and macros, Mediterranean serving goals against the guide, and body
-tracking, which is **the one thing in the app that is not shared**.
-
-The week, the targets, the recipes and the grocery list are shared on purpose: you eat the
-same dinners. A waist measurement is not that, and averaging two people into one trend line
-is a graph of nothing. Every weight and measurement carries the id of whoever it belongs to,
-and the Body tab shows one person at a time. The rows still sync, so either of you can log
-from either phone, shared storage, separate histories.
-
-Weight, plus waist, hips, chest, arms and thighs, each with its own trend. Fill in whichever
-you took: a blank means not measured that day, so it gets no card and never reads as a change.
-Entries logged before the app knew who was who stay unclaimed rather than being handed to
-whoever is looking; the screen offers to claim them.
-
-
-### Movement
-Exercise and sleep, one person at a time. Workouts are built from an exercise search and
-costed against that person's own body weight, steps are logged per day, and a Garmin CSV
-export can be imported rather than retyped. Like the Body tab, none of it is shared: every
-row carries whose it is.
+The **Cupboard** tab holds what you have now and what you always have. A staple never
+appears on a list again; an amount is optional, and blank means enough. "Have it" puts a
+line in the cupboard. Nothing is decremented automatically.
 
 ### Schedule
-Batch-cook sessions, since the plans deliberately repeat one dish across several days. A
-session holds a date, a time and the dishes it covers, with a weigh-out derived from each
-recipe's components, nested recipes resolved and duplicates merged, because the dietician
-wrote portions rather than instructions. Both people get an email before a session starts.
+Batch-cook sessions: date, time, dishes, and a weigh-out derived from each recipe. Ticking
+a session off asks what came out of the pan; those portions go in the fridge or freezer
+and are offered first the next time a slot needs filling. Leftovers work the same way.
+With push set up, a reminder arrives fifteen minutes before a session.
 
-Ticking a session off asks what came out of the pan, because that is the one moment
-anybody knows. Those portions go in the fridge or the freezer and are offered first the
-next time a meal slot needs filling, which is the entire point of cooking in advance and
-the thing the app used to make harder: a batch had to be typed in on each day it covered,
-and the shopping list bought its ingredients again every time.
+### Progress
+The week's calories and macros, Mediterranean serving goals (counted in the state the food
+is in, with treats scored too), and body tracking: weight with an optional goal line, plus
+waist, hips, chest, arms and thighs, one person at a time. Body rows are personal: each
+carries whose it is, and still syncs so anyone can log from any phone.
 
-Leftovers are the same mechanism with a different label. A recipe when it was one, free
-text when it was not, because half a lasagne somebody improvised is a real thing in a real
-fridge.
+**Summary for your dietician** (Progress → `/analytics/summary`): pick a span and a person,
+read it, then **Download** one HTML file or **Print / Save as PDF**. It uses the app's own
+rules for what a day came to and which figures are floors (`src/lib/export/`).
 
-None of it is an inventory. Nobody weighs what they took out of the tub, so the count is a
-note to yourselves: always editable, allowed to be wrong, and never the reason something
-refuses to work. A planned portion comes off the count, unplanning it puts it back, and a
-portion already eaten stays on record so the day it fed still says what it was.
+### Movement
+Exercise and sleep, one person at a time. Workouts from an exercise search, costed against
+that person's body weight, steps per day, and Garmin CSV import.
+
+### Moments
+Eight little firsts the app notices, a first day planned, a whole week, something cooked.
+Each once, ever. Deliberately not a points system: nothing counts and nothing resets.
+`src/lib/moments.ts`.
+
+### Settings
+Targets, exercise, week start, appearance, weight unit, **Your data** (backup and restore
+as one JSON file; a backup from a different `SCHEMA_VERSION` is refused), deleted recipes
+and foods, the weekly food check, and when signed in: account, **Household**, sync and
+notifications. A second tab holds the **Plan history**: every original plan, with its own
+wording, loadable into the planner. Settings works signed out.
 
 ---
 
 ## Targets
 
-Two independent routes, because they answer different questions, and either can be overridden:
+Two routes, either can be overridden:
 
-- **From your plans**, averages what the dietician actually prescribed across the 14 weeks.
-- **Calculator**, Mifflin-St Jeor from your body stats, adjusted for activity and goal.
+- **From your plans**: averages what the dietician prescribed.
+- **Calculator**: Mifflin-St Jeor from your body stats, adjusted for activity and goal.
+
+---
+
+## Households
+
+A household is data (`supabase/migrations/20261109000100_households`): a row in
+`households`, a row per person in `household_members` with a role and a person key, and
+pending invites in `household_invites`. Every synced row belongs to a household.
+
+| Role | Can |
+|---|---|
+| Viewer | see everything, change nothing |
+| Editor | plan, cook, shop and log |
+| Admin | all of that, plus invite, change roles and remove members |
+
+- **Settings → Household**: admins invite by email with a role, change roles and remove
+  people; the household always keeps at least one admin.
+- An invite is accepted on that address's first sign-in.
+- **First run**: an account with no invite is offered to start a household of its own,
+  as admin.
+- **The legacy guest list** (`allowed_emails`) still admits an address to the original
+  household, as a transition, so nobody already using the app lost access. It no longer
+  revokes anything: removing someone is done from the household.
+- One household per account, for now.
+
+Setup and the SQL are in [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
 ---
 
 ## How your data is stored
 
-Everything lives on the device first, in localStorage, and every screen reads
-from there. That is what makes the app work with no signal and with no account
-at all: run it yourself without Supabase keys and there is no sign-in, no
-network, and nothing missing.
+Everything lives on the device first, in localStorage, and every screen reads from there.
+That is what makes the app work with no signal and with no account at all.
 
-When an account is configured, the shared copy lives in Postgres as **one row
-per thing**: a meal, a weight, a shopping list line, a recipe you wrote. Not one
-document per store, which is what it used to be and which caused the worst bug
-this app has had.
+When an account is configured, the shared copy lives in Postgres as **one row per thing**:
+a meal, a weight, a shopping list line, a recipe you wrote. Each table carries `id`,
+`household_id`, `data`, `updated_at`, `deleted_at` and `updated_by`, plus the few columns
+the app filters on. Everything else stays inside `data`, since the types are enforced in
+TypeScript. Rows are never removed, only marked deleted, which is also what keeps archived
+weeks resolving.
 
-A document says what exists. Three consequences, all of which bit:
-
-| Under documents | Under rows |
+| Under the old documents | Under rows |
 |---|---|
-| A write is all or nothing, so saving a weight rewrote every weight | A write is about one thing, so two people rarely contend at all |
-| A deletion is an absence, and merging two lists cannot express "this went away" | A deletion is a row with `deleted_at` set, a fact that travels like any other |
-| Every change sent the whole store | A pull asks for what changed since last time |
+| Saving a weight rewrote every weight | A write is about one thing |
+| A deletion was an absence, which merging cannot express | A deletion is a row with `deleted_at`, a fact that travels |
+| Every change sent the whole store | A pull asks for what changed since last time, every page of it |
 
-Each table carries `id`, `data`, `updated_at`, `deleted_at` and `updated_by`,
-plus the few columns the app filters on: `day`, `member_id`, `slot`. Everything
-else stays inside `data`. That is a deliberate middle position: a column per
-field would be more conventional and would mean a database migration every time
-a recipe gains one, for no gain, since this database has exactly one client and
-the types are enforced in TypeScript. What matters is that **the unit of change
-is a row**, because that is what was wrong before.
+Realtime pushes changes to every other open screen, **including your own other devices**:
+echoes are skipped by content, not by who wrote them.
 
-Rows are never removed, only marked deleted, which is also what keeps archived
-weeks resolving: a plan from 2022 names a recipe by id, and that id still finds
-something.
+### What wins when two people change something
 
-`supabase/migrations/20261108000200_rows/migration.sql` creates it all, and ends with a one-time import that reads
-whatever the old `app_state` documents hold and writes them out as rows. The old
-table is left alone.
+Per row, and local-first: a row this device changed and has not yet delivered stays, and
+is sent. Anything else takes the server's version, deletions included. When someone else
+changed the same row in the meantime, **their version is kept** on Home with **Use theirs**
+(restore it here and send it on) and **Keep mine**, instead of being overwritten silently.
 
-### What wins when both of you change something
-
-Per row, and local-first: a row this device changed and has not yet delivered
-stays, whatever the server says. Anything else takes the server's version,
-including its deletions. When both copies moved since they last agreed, theirs
-is kept and yours is reported on screen rather than disappearing quietly.
-
-The device remembers a fingerprint of every row it has sent or received, which
-is what makes a deletion detectable at all, and it is persisted so a deletion
-made offline survives being closed. If local state is empty but that record is
-full, the app holds the deletions rather than publishing them: that is what a
-cleared browser looks like from the inside, and sending it faithfully would
-take the other person's copy down too.
-
-Held, and then **asked about**, because emptying a shopping list of twenty-one
-things is indistinguishable from a wiped browser at this level and is a thing
-people do on purpose every week. The banner says which table and how many, and
-offers "I deleted those"; nothing goes without that answer. The answer covers
-one table once and is not remembered, so agreeing to empty a list today cannot
-wave through a lost browser tomorrow. It arrived the hard way: the guard shipped
-with no way to say yes, so a deliberately emptied list left a red banner and a
-stuck queue with no route out of either.
+The device remembers a fingerprint of every row it has sent or received, which is what
+makes a deletion detectable. If its own copy looks wiped, it **holds the deletions and
+asks** which table and how many, with "I deleted those"; the answer covers one table once.
+That is the difference between emptying a shopping list on purpose and a cleared browser
+taking the other person's copy down with it.
 
 ---
 
 ## Deployment
 
-Free end to end: **GitHub Pages** for the site, **Supabase** free tier for the
-database and the sign-in links. Sign-in is a magic link, no passwords, and the
-guest list lives in the database, so an address that isn't on it cannot create
-an account even with the URL and the key.
+Free end to end: **GitHub Pages** for the site, **Supabase** free tier for the database and
+the sign-in links (magic links, no passwords). Signups are meant to be off: people get in
+by invitation.
 
-Everything is shared between the two accounts: one week, one grocery list, one
-recipe library. It syncs as rows, one per meal, weight or shopping line, and
-Postgres realtime pushes changes to the other screen as they happen. See
-[how your data is stored](#how-your-data-is-stored) for what wins when you both
-change the same thing.
+Everything is in [`docs/DEPLOY.md`](docs/DEPLOY.md): make the repo public, create the
+Supabase project, add **three repository secrets** (`VITE_SUPABASE_URL`,
+`VITE_SUPABASE_ANON_KEY`, and `SUPABASE_DB_URL`, the **session pooler** string on port
+5432), set the sign-in URLs, and push. Every push to `main` then:
 
-Setup is five steps, all in [`docs/DEPLOY.md`](docs/DEPLOY.md): make the repo
-public, create the Supabase project, run `supabase/migrations/20261108000100_schema/migration.sql` and then
-`supabase/migrations/20261108000200_rows/migration.sql`, add two repository secrets. Every push then deploys
-itself.
+1. runs the whole of CI, end-to-end tests included;
+2. applies migrations with `npm run db:migrate`;
+3. checks the `VITE_` secrets look public (a `postgresql://` string or a non-anon key there
+   would be baked into the public JavaScript) and builds;
+4. publishes.
 
-### Reminders and notifications
+**Versioned migrations.** Each is `supabase/migrations/<timestamp>_<name>/migration.sql`,
+runs once in its own transaction, and is recorded with a checksum in the
+`bite_migrations` schema. The runner refuses an edited migration, a database ahead of the
+code, or a half-finished run. `npm run db:check` runs every migration against PGlite on
+each push. `SUPABASE_DB_URL` is read the way people paste it: stray spaces, quotes and
+brackets are removed and the password is encoded, and a wrong value is described by its
+shape, never printed.
 
-The one part of the app that needs something running when nobody is looking at
-it: a browser that is closed sends no email and receives no push. It is an Edge
-Function called `notify` on a five-minute schedule, and it does two jobs.
+### Reminders
 
-**Before a cooking session.** A push fifteen minutes before, to whichever
-devices asked for one. The time is worked out by the browser that scheduled it:
-"18:00" is an instant only once you know where the person typing it was
-standing, and the server does not. Each reminder is recorded in `reminder_log`
-so it is sent once, and only after something actually arrived, so a run that
-reached nobody tries again rather than recording a send that never happened.
-Sending it twice is worse than sending it late, because the second one teaches
-you to ignore the first.
+An Edge Function, `supabase/functions/notify`, on a five-minute cron, sends **push
+notifications only** (there is no email): fifteen minutes before a cook session, and when
+someone else has changed the week and then been still for ten minutes. Each person turns
+them on per device and picks which kinds under **Settings → Notifications**. The decisions
+live in `supabase/functions/_shared/notify.ts`, with fourteen tests.
 
-**When the other one of you changes the week.** Nothing is sent until they have
-been still for ten minutes, so planning a week is one line rather than thirty,
-and you are never told about your own edits.
-
-There was an email path here as well, and it has been taken out. Reaching two
-different mailboxes needs a verified sending domain, and a push reaches both
-phones for nothing; a second channel that only worked for one of the two people
-would have been worse than no second channel at all.
-
-The whole of that decision, what to send and when, lives in
-`supabase/functions/_shared/notify.ts`, which has no imports so it runs under
-vitest with the rest of the app. Fourteen tests cover it. The encryption and
-delivery around it belong to `web-push` and to Google, and that half has been
-run for real: a cook session reminder reaching an Android phone on the lock
-screen, from the cron to the notification, on 29 August 2026.
-
-#### Setting it up
-
-The function is two files here, the plumbing and the decisions, so the
-decisions can be tested. For deploying by hand there is one:
-`supabase/functions/notify/deploy.ts`, generated by `npm run function:build`
-with the shared file inlined. `verify` fails if it has drifted from its
-sources, because a stale pasted copy is the sort of thing nobody finds out
-about until a notification does the wrong thing.
-
-```bash
-supabase functions deploy notify
-
-npx web-push generate-vapid-keys        # prints a public and a private key
-supabase secrets set VAPID_PUBLIC_KEY=...
-supabase secrets set VAPID_PRIVATE_KEY=...
-supabase secrets set VAPID_SUBJECT=https://your-site/
-```
-
-Run `supabase/migrations/20261108000300_push/migration.sql` in the SQL editor, then put the **public** half of the
-key where the app can read it:
-
-```sql
-insert into public.push_config (key, value)
-values ('vapid_public', 'BEl62i...')
-on conflict (key) do update set value = excluded.value;
-```
-
-That key is public by design. It is handed to the push service on every
-subscription and authorises nothing on its own, which is why it can live in a
-table the app reads rather than in a repository secret and a rebuild. The
-private half never leaves the function's secrets.
-
-Then schedule it, by uncommenting the `cron.schedule` block at the bottom of
-`supabase/migrations/20261108000100_schema/migration.sql` and filling in the project ref and the anon key. The
-dashboard's Integrations > Cron can schedule an Edge Function too, but check
-what it wrote: **the Authorization header is not optional**, and a job without
-one is the one setup mistake that hides completely.
-
-Edge Functions verify a JWT before your code runs, so a request with no header
-is answered `401 UNAUTHORIZED_NO_AUTH_HEADER` by the gateway and the function
-never executes. `pg_cron` still records the job as `succeeded`, because posting
-the request did succeed, and `net.http_post` is asynchronous so the answer lands
-somewhere else entirely. Everything looks healthy and nothing is ever sent.
-
-This is the query that shows the truth, and it is worth running first whenever a
-notification does not arrive:
-
-```sql
-select id, status_code, content, created
-from net._http_response order by id desc limit 20;
-```
-
-`content` is the function's own reply: `checked` cook sessions, `pushed`, `told`,
-and `pushing` for whether the VAPID keys are set. A 401 there means the header,
-not the code, and the code says which mistake it was:
-
-| `content` | What it means |
-|---|---|
-| `UNAUTHORIZED_NO_AUTH_HEADER` | No `Authorization` header at all. The dashboard's cron builder writes `headers := '{}'` unless you fill it in. |
-| `UNAUTHORIZED_INVALID_JWT_FORMAT` | A header, but the token is not a JWT. Nearly always a key truncated or line-broken on the way through a paste. Use the copy button on the API keys page rather than selecting it by hand. |
-| `200` with `"pushing": false` | The function is running. The VAPID secrets are not set on it. |
-| `status_code` null, `timed_out` true | The reply never arrived inside pg_net's five-second default, which a cold Edge Function will exceed. Whether that run did its work is unknowable, which is the reason to fix it: re-schedule with `timeout_milliseconds := 20000`. Select `timed_out` and `error_msg` to see it, they are null in the columns above. |
-
-Use the **anon** key, never the service role key. Anon is enough to get past the
-gateway, it is in the app's bundle already and authorises nothing on its own;
-the service role key bypasses every row-level policy in the schema and belongs
-only in the function's own secrets.
-
-Each person turns notifications on per device, in Settings. Per device rather
-than per person because a phone is what gets notified, and because the profile
-syncs: putting the setting there would mean switching it off on your phone
-switched it off on theirs. On Android it is more reliable once the app has been
-added to the home screen.
-
-Without any of this the toggle still saves and the app simply never sends.
-Nothing else depends on it.
-
-Each person also chooses which of the two they want, under Settings. That is
-per person rather than per device, and the switch above it, whether this phone
-is reachable at all, is per device. The row lives in `notify_state`, which does
-not sync: on the shared profile, one of you turning a notification off would
-turn it off for both.
+**On the current Supabase project this is not set up yet**: the function, its VAPID keys,
+the public key row and the cron job all need doing again. The steps, and the query to run
+when a notification does not arrive, are in
+[`docs/DEPLOY.md`, Reminders](docs/DEPLOY.md#7-reminders-optional-push-notifications).
+Without it the app works and simply never sends.
 
 ### Photos on recipes
 
-Run `supabase/migrations/20261108000400_photos/migration.sql` in the SQL editor. It creates one storage bucket and
-four policies, all gated on `is_member()` like every other table.
-
-Until you run it the app does not offer to add a photo at all: the editor asks
-storage whether the bucket exists and hides the control when it does not, so
-nothing appears half-built.
-
-The bucket is **private**. A public one would have been less code and the
-service worker could cache the images like any other file, but a public bucket
-is public to anybody who ever sees a URL, and these are photographs taken in
-your kitchen. The cost of the private one is that the app mints a signed URL to
-show a photo, cached for the session, so a photo will not appear on a phone
-that is fully offline and has not shown it before.
-
-Photos are shrunk in the browser before they are sent, to 1400px on the longest
-edge, which is well above anything the app displays.
+The `photos` migration creates a private storage bucket. The app shrinks a photo to
+1400px before upload and shows it through a signed URL, so a photo will not appear on a
+phone that is fully offline and has not shown it before.
 
 ---
 
 ## Running it
 
-Locally it needs no account and no network. Without `VITE_SUPABASE_URL` set
-there is no sign-in screen and no sync, the app runs entirely on localStorage,
-which is also why the test suite needs no database.
+Locally it needs no account and no network. Without `VITE_SUPABASE_URL` there is no
+sign-in and no sync; the app runs on localStorage, which is also why the tests need no
+database.
 
 ```bash
 npm install
@@ -691,27 +369,10 @@ npm run build
 npm run preview    # http://localhost:4173
 ```
 
-**Node 20.19+, 22.13+, or 24 and up.** Not simply "20 or newer", the toolchain
-leaves gaps. ESLint 10 is the tightest constraint at
-`^20.19.0 || ^22.13.0 || >=24`, which rules out every odd-numbered release
-along with 20.0–20.18 and 22.0–22.12. Vite 8 and Vitest 4 exclude much the same
-set. `package.json` declares the range, so npm warns instead of letting you find
-out from a confusing build error.
+**Node 20.19+, 22.13+, or 24 and up** (`^20.19.0 || ^22.13.0 || >=24`, set by ESLint 10;
+Vite 8 and Vitest 4 exclude much the same). CI runs Node 26.
 
-CI runs **Node 26**, the current release, even-numbered, so it becomes LTS in
-October 2026. Node 24 is the conservative choice if you would rather stay on a
-line that is already LTS; both satisfy the range above.
-
-(`@zxing/library`, pulled in by the barcode scanner, declares
-`engines.node >= 24`. It doesn't bind here, it is browser code that Vite
-bundles and Node never executes, so `npm install` warns about it on Node 22
-and everything still passes.)
-
-Run `npm install` even on an existing clone, React, Vite, Tailwind, Router and
-TypeScript all changed major versions.
-
-`base` is `./`, so the built app runs from wherever it is put, a folder, a
-different port, a USB stick, without being told its own address.
+`base` is `./`, so the built app runs from wherever it is put.
 
 ### On your phone, on your own wifi
 
@@ -719,18 +380,8 @@ different port, a USB stick, without being told its own address.
 npm run build && npm run serve    # prints a http://192.168.x.x:4173 address
 ```
 
-Open that address on the phone. One caveat worth knowing before you rely on it:
-browsers only allow service workers on `localhost` or over HTTPS, so over a
-plain LAN address the app runs as an ordinary web page, no home-screen
-install, no offline once the laptop sleeps. For a phone copy that genuinely
-works offline, use the one-file build below.
-
-### Checks
-
-```bash
-npm run verify     # lint + typecheck + unit tests + data integrity + build
-npm run test:e2e   # drives the real app in a browser, desktop and phone
-```
+Over a plain LAN address there is no service worker, so no install and no offline. For a
+phone copy that works offline, use the one-file build.
 
 ### One-file build
 
@@ -739,14 +390,15 @@ npm run build:single   # dist-single/bite-buddy.html, CSS, JS and fonts inlined
 npm run test:single    # asserts it makes no external request at all
 ```
 
-Everything in one file, no server, no install, nothing fetched. Put it in your
-phone's Files app or a synced folder and open it; it works with the wifi off.
-Two things it gives up: there's no manifest, so it can't be added to the home
-screen as an app, and opened from certain viewers it may have nowhere to save
-to, take a backup from Settings before closing it if you're unsure.
+No manifest, so it cannot be added to the home screen, and some viewers give it nowhere
+to save: take a backup from Settings if unsure.
 
-`npm run verify` and `npm run test:e2e` run in CI on every push
-(`.github/workflows/ci.yml`).
+### Checks
+
+```bash
+npm run verify     # lint, typecheck, unit tests, data, text, contrast, db, function, icons, build
+npm run test:e2e   # drives the real app in a browser, desktop and phone
+```
 
 ### Optional
 
@@ -754,8 +406,6 @@ to, take a backup from Settings before closing it if you're unsure.
 # .env.local, raises the USDA rate limit for ingredient lookup
 VITE_USDA_API_KEY=your_key    # https://fdc.nal.usda.gov/api-guide.html
 ```
-
-The app works without it and works with no network at all.
 
 ---
 
@@ -769,45 +419,24 @@ npm run data:build                                 # or from the committed archi
 npm run data:check                                 # integrity checks
 ```
 
-`scripts/build-data.ts` reads the `.docx` files directly (a small ZIP reader, no dependency)
-and hands each meal line to `scripts/lib/library.ts`, which splits it into fragments and
-resolves each fragment to either a food or a dish. Without the `.docx` files it rebuilds from
-the committed archive instead, which stores every line verbatim: the same rules over the same
-text, so a dish definition or an import rule can be changed and the data regenerated on any
-clone of the repository.
+`scripts/build-data.ts` reads the `.docx` files directly and hands each meal line to
+`scripts/lib/library.ts`, which resolves each fragment to a food or a dish. Without the
+originals it rebuilds from the committed archive, which stores every line verbatim.
 
-Four judgement calls live in the data or the rules rather than the parser:
+Judgement calls live in the data or the rules rather than the parser:
 
-- `DISH_BY_WEIGHT` in `src/data/dishes.ts` marks dishes the plans portion by weight
-  (`350 g ciorba a la grec`). For everything else a stated weight names an *ingredient*
-  (`tigaie picanta: 100 g piept de pui`) and must not be read as a portion size. A bare number
-  in front of one of them is grams: `300 gombakremleves` lost its `g` in the typing, and
-  without this it imported as the whole two-serving pot.
-- A food a dish in the same meal already contains is not added twice. `bruschete cu telemea:
-  50 g telemea, 50 g paine int, rosii…` names the dish and then lists what is on it; read
-  literally that is a bruschetta plus a second helping of everything, which is how 45 of the
-  204 imported meals came to carry a median of 88 kcal of food nobody ate. Where she asked for
-  more than the dish definition assumes, the difference is kept, so `salata cezar … salata de
-  cruditati` at 200 g against a 150 g definition still gets its extra 50 g.
-- Two lines that come to the same ingredients in the same amounts are one recipe. The first
-  survives, the rest become entries in `recipeAliases.ts` so a day planned against one of them
-  still resolves, and a meal that amounts to exactly one serving of one dish becomes that dish.
-- A duplicate name is settled by saying what differs, never by a number. An ingredient one of
-  them has joins its name (`Feta with puffed rice cakes, raw vegetable salad & extra virgin
-  olive oil`); otherwise the weight that differs most goes in brackets (`Rolled oats with
-  yogurt & mixed berries (45 g rolled oats)`).
+- `DISH_BY_WEIGHT` in `src/data/dishes.ts` marks dishes portioned by weight
+  (`350 g ciorba a la grec`); elsewhere a stated weight names an *ingredient*.
+- A food a dish in the same meal already contains is not added twice; where the
+  dietician asked for more than the dish assumes, the difference is kept.
+- Two lines with the same ingredients in the same amounts are one recipe, and the others
+  become aliases in `recipeAliases.ts` so planned days still resolve.
+- A duplicate name is settled by saying what differs, never by a number.
 
-`scripts/check-data.ts` verifies every reference resolves, no recipe nests itself, every one of
-the 481 source lines maps to something, recipe names are unique and carry no bare numbering,
-no two recipes have identical ingredients, every merged-away id still resolves, every recipe
-carries a time and enough of them are worth a batch for that lens to say anything, and each
-food's stated calories agree with its own macros, using fibre-aware Atwater (fibre at 2 kcal/g),
-because plain 4/4/9 makes every vegetable look mis-keyed.
-
-It also rebuilds the whole library from the committed archive and compares it to what is
-committed. That is the only check that can see a whole class of import bug: a meal quietly
-counting its dish's olive oil twice looks perfectly plausible sitting in the file, and only
-disagrees with the rules that were supposed to produce it.
+`scripts/check-data.ts` verifies every reference resolves, no recipe nests itself, every
+source line maps to something, names are unique, no two recipes are identical, merged ids
+still resolve, and each food's calories agree with its macros (fibre-aware Atwater). It
+also rebuilds the library from the archive and compares it with what is committed.
 
 ---
 
@@ -819,205 +448,68 @@ disagrees with the rules that were supposed to produce it.
 | Styling | Tailwind CSS v4 (CSS-first `@theme`, no config file) |
 | Routing | React Router v7, hash-based so it works offline |
 | State | Zustand + `persist` (localStorage) |
+| Back end | Supabase: Postgres with row-level security, realtime, magic links, storage, one Edge Function |
 | Build | Vite 8 · `vite-plugin-pwa` (Workbox) |
-| Quality | ESLint 10 · Vitest · Playwright |
+| Quality | ESLint 10 · Vitest · Playwright · PGlite for migrations |
 | Nutrition lookup | USDA FoodData Central (CC0) · Open Food Facts (ODbL) |
 | Barcodes | `@zxing/browser` |
-| Data pipeline | `tsx` scripts, run on demand |
 
-TypeScript is held at 6 deliberately: 7.0 works for `tsc` and the build, but
-typescript-eslint does not support it yet, and losing the linter costs more than
-the upgrade gains. Revisit when typescript-eslint ships TS 7 support.
-
-```
-src/
-├── data/
-│   ├── foods.ts          # 122 curated foods, EN/RO/HU
-│   ├── dishes.ts         # 71 dishes the plans name but don't spell out
-│   └── generated/        # built by scripts/build-data.ts
-├── lib/
-│   ├── units.ts          # "o lingurita", "jumatate de farfurie", raw vs dry
-│   ├── portions.ts       # g/kg/ml/l/piece/tsp/tbsp/cup → grams
-│   ├── foodImport.ts     # a search result becomes a food you own
-│   ├── nutrition.ts      # the one place nutrition numbers are produced
-│   ├── targets.ts        # plan averages + TDEE
-│   ├── mediterranean.ts  # serving goals from the guide
-│   ├── recipeGroups.ts   # shelves, labels and the repeated-dish grouping
-│   ├── dishCategories.ts # the 38 categories, 14 filters, and the meal-time map
-│   ├── classify.ts       # reading a category off a recipe's components
-│   └── mergeRecipes.ts   # folding repeats together without losing references
-├── pages/                # Home, Planner, Recipes, Foods, Grocery, Schedule, Movement, Progress, Settings
-└── store/                # zustand stores
-```
+TypeScript is held at 6 because typescript-eslint does not support 7 yet.
 
 ---
 
 ## Ingredients and nutrition
 
-One search covers everything an ingredient could come from. Your own foods and
-recipes appear instantly and work with no signal; USDA and Open Food Facts
-arrive underneath a moment later, and picking one of those saves it to your
-foods, with its source and id, and drops it into the recipe in a single tap.
-There is no leaving a half-written recipe to go and fetch an ingredient.
+One search covers your own foods and recipes (instant, offline) and USDA and Open Food
+Facts (a moment later). Picking a remote result saves it with its **provenance**: source,
+the source's id, what the figures are per, and when they were fetched.
 
-Free and open sources only, in this order: **USDA FoodData Central → Open Food
-Facts → typed in by hand**. USDA is the reference for generic ingredients -
-chicken, rice, a tomato, because its figures are laboratory measurements; Open
-Food Facts covers branded and packaged products, which is what community-entered
-label data is actually good for. Barcodes go straight to Open Food Facts.
-
-Every imported food keeps its **provenance**: which source, the source's own id
-(FDC ID or barcode) and name, what the figures are per, and the date they were
-fetched. That is what stops the same ingredient being fetched twice, and what
-lets a wrong number be traced back to whoever said it.
-
-**Missing means unknown, never zero.** A source that says nothing about zinc has
-not told you there is no zinc. Nutrients are optional throughout, absent rather
-than `0`, and a total made of ingredients that do not all report a nutrient is
-marked: `12 g +` means a floor rather than a figure. `reportNutrients` is what
-computes that, and it is the reason `addNutrients` does not coerce.
-
-**Salt and sodium are one number.** Sodium in milligrams is canonical, salt is
-`sodium × 2.5 ÷ 1000`, and what the source actually said is kept on the food's
-provenance, European labels state salt, USDA states sodium. Sugar and salt are
-shown alongside the macros rather than among the micronutrients, because they
-are the two you watch across a day.
-
-**Units.** `g · kg · ml · l · piece · tsp · tbsp · cup`, all converted to grams
-on entry, because grams are the only thing the grocery list and recipe scaling
-can work with. `piece` is read off the food's own named portions and is not
-offered for a food that has none, falling back to grams would turn "1 piece"
-into 1 g. Millilitres are treated as grams; spoons and cups are volumes used as
-weights, and the UI says so rather than pretending otherwise.
-
-Nutrition is calculated at three levels and always derived, never stored:
-ingredient (per the quantity used) → recipe (the sum) → serving (÷ servings).
-Changing a quantity recalculates everything immediately, because there is
-nothing to keep in step.
+- **Missing means unknown, never zero.** `reportNutrients` marks a total built on gaps as a
+  floor (`12 g +`).
+- **Salt and sodium are one number**: sodium in mg is canonical, salt is
+  `sodium × 2.5 ÷ 1000`.
+- **Units** `g · kg · ml · l · piece · tsp · tbsp · cup`, converted to grams on entry;
+  `piece` only where the food has named portions.
+- Nutrition is derived at three levels (ingredient, recipe, serving), never stored.
 
 ---
 
 ## Guardrails
 
-Everything here exists because of a failure that actually happened, or one that
-would be silent if it did.
-
-**Data invariants** (`npm run data:check`), every component resolves to a real
-food or recipe, no recipe nests itself, all 481 plan lines map to something,
-recipe names are unique and say what makes them different, no two recipes are
-made of the same thing, and each food's stated calories agree with its own
-macros. Calorie agreement uses fibre-aware Atwater (fibre at 2 kcal/g); plain
-4/4/9 flags every vegetable as mis-keyed. Foods whose energy genuinely isn't in
-the macros, vanilla extract is mostly ethanol, are listed explicitly rather
-than silently tolerated. Last, the whole library is rebuilt from the committed
-archive and compared to the committed files, so the data always follows from
-the rules that produced it.
-
-**Unit tests** cover the parsing vocabulary and the nutrition maths, the two
-places where a mistake produces a plausible wrong number instead of an error:
-raw-vs-dry detection, spoon measures, decimal commas, nested-recipe scaling,
-cycle safety, and the Wednesday week boundary across daylight saving.
-
-**Lint rules** include a custom one banning a `<button>` inside a `<button>`.
-That bug shipped twice here, browsers reparent the inner element and its click
-handler silently stops firing, so it is now caught mechanically.
-
-**End-to-end tests** run at desktop and phone sizes and assert four things per
-screen: it renders with no console errors, it does not scroll horizontally,
-every control is at least 40x32px, and, at phone width, nothing is clipped and
-nothing is hidden inside a sideways scroller.
-
-That last one exists because measuring the screens at 390px turned up nine
-places where the layout was quietly hiding its own content: meal names cut to
-`Potatoes with egg, Teleme…`, the dietician's line reduced to a stub, 829px of
-recipe filters and 1,578px of food categories scrolled out of sight with nothing
-on screen to say they were there. Every one of those looked fine in a
-screenshot. The check compares `scrollWidth` against `clientWidth`, so it does
-not.
-
-**Storage safety**, writes go through a wrapper that degrades instead of
-throwing. A full or blocked localStorage shows a banner rather than losing data
-quietly, and corrupt JSON falls back to defaults. Every store is schema-versioned:
-bump `SCHEMA_VERSION` in `src/store/persist.ts` when a persisted shape changes
-and old state is discarded rather than misread. Backups are read from the live
-stores, not from localStorage, so the case where storage never worked is still
-recoverable, and an end-to-end test wipes storage and restores from a paste to
-prove it.
-
-**Error boundary**, a render error shows a recovery screen with the message,
-not a blank white page. On a phone with no console, those are indistinguishable.
-
-**Accessibility**, 44px minimum touch targets under `(pointer: coarse)` only,
-so phones get thumb-sized controls while desktop keeps compact ones, and
-animations are disabled under `prefers-reduced-motion`. Nothing below 11px.
-
-**A phone is not a narrow desktop.** Two rules came out of the layout pass and
-are worth keeping: a fixed-width column beside flexible text will win at 390px -
-the food rows gave a 112px figures column and a tier badge the room, leaving the
-name 85px of 356, and any flex child holding text needs `min-w-0`, or it
-refuses to shrink and overflows instead of wrapping. Long content wraps or
-clamps; it is never truncated to a single line where the words carry meaning.
+- **Data invariants**: `npm run data:check`, above.
+- **Unit tests** on the parsing vocabulary and the nutrition maths, where a mistake gives
+  a plausible wrong number rather than an error.
+- **Lint** bans a `<button>` inside a `<button>`, a bug that shipped twice.
+- **End-to-end tests** at desktop and phone sizes: no console errors, no horizontal
+  scroll, every control at least 40x32px, nothing clipped at 390px, and a 12px text floor
+  on the phone week.
+- **Storage safety**: a full or blocked localStorage shows a banner rather than losing
+  data; every store is schema-versioned (`SCHEMA_VERSION` in `src/store/persist.ts`).
+- **Error boundary**: a recovery screen, not a blank page.
+- **Accessibility**: 44px targets under `(pointer: coarse)`, one `bite-700` focus ring,
+  reduced motion respected, decorative artwork `aria-hidden`, status never colour alone.
+- **House style**: no em dashes, `npm run text:check`.
 
 ---
 
-**The dietician reads in English, and still says what she said.** Fourteen weeks of plans,
-481 lines, written in Romanian and Hungarian. The archive shows both: the reading first,
-because for one of the two people here the original is not readable at all, and the original
-underneath, because it is the record and a plan you cannot check against what was prescribed
-is one you have to take on faith. On dense screens, a recipe card or a planner row, only the
-reading is shown, since doubling every line pushed the fifth meal of a day off a laptop.
-
-Composed rather than listed. A table of 291 translated lines would be a second copy of the
-data, correct on the day it was written and wrong the first time anybody edited a plan.
-Instead the vocabulary is translated and the line is rebuilt from it, which means the food
-database stays the single source of truth: `paine int` reads as Wholemeal bread because that
-is what `bread-wholemeal` is called on every other screen, and renaming a food renames it in
-the archive too.
-
-It refuses to guess. A word it does not know is left exactly as written, so the gap is
-visible rather than papered over with something plausible, and a test measures how much of
-the archive that amounts to: **2 unrecognised words out of 2,580**, both proper nouns in one
-Hungarian line.
-
-**The tab says which screen you are on.** Every route was called "Bite Buddy", so two tabs of
-this app were indistinguishable and so was a month of history.
-
-**Clearing a day and emptying the list ask first**, and put the count on the button rather
-than in a sentence above it: "Clear 5 meals". Removing a single meal still goes straight
-through, deliberately: the row already carries three controls, a fourth step on each of them
-would cost more than the mistake does, and the portions go back to the fridge either way.
-
-**Settings stops contradicting itself.** "Everything lives in this browser and nowhere else.
-There's no account behind it" sat directly above "Signed in as", unconditionally. The
-frightening sentence was the one that was out of date. It now says which of the two is true.
-
-**A weight has somewhere to head.** Body logged faithfully and had nothing to compare against,
-so the chart was a line with no destination. A goal per person, a dashed line on the chart,
-and how far there is to go. Optional, because plenty of people are not aiming anywhere.
-
 ## Deliberately not done
 
-**No resolution screen for a contested row.** Sync is per row now, so two
-people have to be editing the same meal, not the same day, before either can
-lose anything. When that does happen the later write wins and the app says so
-on screen. Offering both versions and asking you to choose is a screen and a
-data model for something that has to happen at the same second in a household
-of two.
+**No "my plan" and "their plan".** A household shares its week by choice. The only
+personal data is body, exercise and sleep.
 
-**No per-user data.** You share everything, by choice. There is no notion of
-"my plan" and "their plan", which is what keeps the permission model down to a
-single question: are you a member of this household.
-
-**Nothing is published publicly.** The site is public; your data is not. No
-recipe, plan or measurement is served at a public URL for anything else to read.
+**Your data is never served publicly.** The site is public; no plan, recipe of yours or
+measurement is readable without signing in to the household.
 
 ## Not done yet
 
-Nothing, which is worth stating rather than leaving the heading empty.
-
-One line that used to sit here read like a backlog item and was not one: the
-app works entirely signed out, every screen and every recipe, offline. What an
-account adds is sync, sharing and notifications, and each of those is about
-something outside this device by definition. There is no version of "notify my
-phone" that works without something knowing which phone. That is where the
-boundary sits, not work waiting to be done.
+- **Push reminders on the new Supabase project**: function, VAPID keys, public key row
+  and cron are not set up yet ([steps](docs/DEPLOY.md#7-reminders-optional-push-notifications)).
+- **Over-target ring contrast**: `coral-500` is 2.64:1 on cream, under 3:1.
+- **Recipe photos across households**: the storage policies check "is a member of some
+  household", so a member of another household could read a photo if they knew its path.
+- **One household per account**, enforced by a unique constraint.
+- **Leftover text opacity** on a few count badges (`opacity-60`).
+- **Remove-filter chips** have no check icon.
+- **The dietician plans are public**: they ship in the site's JavaScript bundle and sit
+  in this public repo (`src/data/generated/`). Moving them into Supabase behind the login,
+  and the repo to private, is a decision still pending.
