@@ -14,6 +14,7 @@ const SIZES = {
   sm: 'w-5 h-5 text-xs',
   md: 'w-7 h-7 text-[13px]',
   lg: 'w-8 h-8 text-sm',
+  xl: 'w-10 h-10 text-base',
 } as const
 
 export function PersonAvatar({ person, index = 0, size = 'lg', selected = false, label, className = '' }: {

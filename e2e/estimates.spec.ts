@@ -16,7 +16,7 @@ const NOTE = "Calories are estimates worked out by Bite Buddy, not by your dieti
 
 test.describe('estimates, not medical advice', () => {
   test('Settings says so next to the targets', async ({ page }) => {
-    await goto(page, '/settings')
+    await goto(page, '/settings/targets')
     const targets = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Daily targets' }) })
     await expect(targets.getByText(NOTE)).toBeVisible()
   })

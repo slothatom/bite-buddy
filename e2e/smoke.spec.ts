@@ -412,7 +412,7 @@ test.describe('the main flow', () => {
   })
 
   test('the food check reports on the library without changing it', async ({ page }) => {
-    await goto(page, '/settings')
+    await goto(page, '/settings/backups')
     await expect(page.getByText(/foods checked against their own numbers/)).toBeVisible()
 
     await page.getByRole('button', { name: 'Show me' }).click()
@@ -423,7 +423,7 @@ test.describe('the main flow', () => {
   })
 
   test('the calorie calculator shows its arithmetic', async ({ page }) => {
-    await goto(page, '/settings')
+    await goto(page, '/settings/targets')
     await page.getByLabel('Sex').selectOption('female')
     await page.getByLabel('Age').fill('34')
     await page.getByLabel('Height (cm)').fill('168')
@@ -437,7 +437,7 @@ test.describe('the main flow', () => {
   })
 
   test('targets can be taken from the plan history', async ({ page }) => {
-    await goto(page, '/settings')
+    await goto(page, '/settings/targets')
     await expect(page.getByText(/Averaged over \d+ full days/)).toBeVisible()
     await page.getByRole('button', { name: 'Use these' }).first().click()
     await expect(page.getByText(/set from your plans/)).toBeVisible()
@@ -981,7 +981,7 @@ test.describe('the recipe library', () => {
     await expect(line).toContainText('deleted')
 
     // And it can be put back.
-    await goto(page, '/settings')
+    await goto(page, '/settings/backups')
     await page.getByRole('button', { name: 'Restore' }).first().click()
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /^Yours/ }).click()
@@ -1306,7 +1306,7 @@ test.describe('the food library', () => {
     expect(await page.locator('text=/\\d+ of 7 days planned/').first().textContent()).toBe(before)
 
     // And it can be put back.
-    await goto(page, '/settings')
+    await goto(page, '/settings/backups')
     await expect(page.getByText('Deleted foods')).toBeVisible()
     await page.getByRole('button', { name: 'Restore' }).first().click()
     await goto(page, '/recipes/foods')
@@ -1373,7 +1373,7 @@ test.describe('your data survives the browser', () => {
     await planDay(page)
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
 
-    await goto(page, '/settings')
+    await goto(page, '/settings/backups')
     await page.getByRole('button', { name: 'Copy backup' }).click()
     const backup = await page.evaluate(() => navigator.clipboard.readText())
     expect(backup).toContain('bite-buddy-mealplan-v2')
@@ -1384,7 +1384,7 @@ test.describe('your data survives the browser', () => {
     await planDay(page)
     await expect(page.getByText('0 of 7 days planned')).toBeVisible()
 
-    await goto(page, '/settings')
+    await goto(page, '/settings/backups')
     await page.getByRole('button', { name: 'Paste a backup' }).click()
     await page.getByPlaceholder(/Paste the contents/).fill(backup)
 
@@ -1403,7 +1403,7 @@ test.describe('your data survives the browser', () => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
-    await goto(page, '/settings')
+    await goto(page, '/settings/backups')
     await page.getByRole('button', { name: 'Paste a backup' }).click()
     await page.getByPlaceholder(/Paste the contents/)
       .fill('{"app":"bite-buddy","schema":99,"stores":{"bite-buddy-mealplan-v2":{"plan":[]}}}')
@@ -1845,7 +1845,7 @@ test.describe('what you enter is still there tomorrow', () => {
     await page.getByRole('button', { name: 'Save', exact: true }).click()
     await expect(page.getByText('Reload cook')).toBeVisible()
 
-    await goto(page, '/settings')
+    await goto(page, '/settings/targets')
     await page.getByRole('button', { name: 'Use these' }).first().click()
     await expect(page.getByText(/set from your plans/)).toBeVisible()
 
@@ -1866,7 +1866,7 @@ test.describe('what you enter is still there tomorrow', () => {
     await goto(page, '/plan/cooking')
     await expect(page.getByText('Reload cook')).toBeVisible()
 
-    await goto(page, '/settings')
+    await goto(page, '/settings/targets')
     await expect(page.getByText(/set from your plans/)).toBeVisible()
 
     // Every store that holds something is on disk under its own key, which is
@@ -2709,7 +2709,7 @@ test.describe('taking it back', () => {
  */
 test.describe('bringing a backup back', () => {
   test('says what it is about to replace, and does nothing until told', async ({ page }) => {
-    await goto(page, '/settings')
+    await goto(page, '/settings/backups')
     await page.getByRole('button', { name: 'Paste a backup' }).click()
 
     // Written out here rather than exported from the running app: the panel's
@@ -2737,7 +2737,7 @@ test.describe('bringing a backup back', () => {
   })
 
   test('refuses a file that is the wrong shape, and changes nothing', async ({ page }) => {
-    await goto(page, '/settings')
+    await goto(page, '/settings/backups')
     await page.getByRole('button', { name: 'Paste a backup' }).click()
 
     await page.getByPlaceholder(/Paste the contents of a backup/).fill(JSON.stringify({
@@ -2837,7 +2837,7 @@ test.describe('the small sharp edges', () => {
   })
 
   test('signed out, the backup panel does not promise an account it lacks', async ({ page }) => {
-    await goto(page, '/settings')
+    await goto(page, '/settings/backups')
     // These tests never sign in, so the honest sentence is the local one.
     await expect(page.getByText(/lives in this browser and nowhere else/)).toBeVisible()
     await expect(page.getByText(/Signed in as/)).toHaveCount(0)
@@ -2908,9 +2908,9 @@ test.describe('after dark', () => {
     // The preference this exists for: a phone on dark and a person who wants
     // this one app light. Following the device blindly makes that unsayable.
     await page.emulateMedia({ colorScheme: 'dark' })
-    await goto(page, '/settings')
+    await goto(page, '/settings/appearance')
 
-    await page.getByLabel('Appearance').selectOption('light')
+    await page.getByRole('radio', { name: 'Light' }).click()
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
 
     const painted = await ground(page)
@@ -2918,8 +2918,8 @@ test.describe('after dark', () => {
   })
 
   test('remembers it, and gets there before the first paint', async ({ page }) => {
-    await goto(page, '/settings')
-    await page.getByLabel('Appearance').selectOption('dark')
+    await goto(page, '/settings/appearance')
+    await page.getByRole('radio', { name: 'Dark' }).click()
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
 
     // Reloaded, the attribute is on the document from the start rather than
@@ -2931,8 +2931,8 @@ test.describe('after dark', () => {
   })
 
   test('paints the strip above the page to match', async ({ page }) => {
-    await goto(page, '/settings')
-    await page.getByLabel('Appearance').selectOption('dark')
+    await goto(page, '/settings/appearance')
+    await page.getByRole('radio', { name: 'Dark' }).click()
 
     // The one piece of a phone screen a stylesheet cannot reach. Left alone it
     // stayed the brand colour around a dark app.
