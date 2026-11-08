@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useBodyStore } from './useBodyStore'
+import { useHousehold } from './useHousehold'
+import type { HouseholdMember } from '../lib/household'
 import type { BodyMeasurement, WeightEntry } from '../types'
 
 const weight = (id: string, memberId: string | undefined, w: number): WeightEntry =>
@@ -12,8 +14,16 @@ const measured = (id: string, memberId: string | undefined, waist: number): Body
 const forMember = (memberId: string | undefined) =>
   useBodyStore.getState().weightEntries.filter((e) => e.memberId === memberId)
 
+const member = (personKey: string, userId: string): HouseholdMember => ({
+  userId, personKey, role: 'admin', displayName: null, email: null, createdAt: userId,
+})
+
 describe('two bodies, one app', () => {
-  beforeEach(() => useBodyStore.setState({ weightEntries: [], measurements: [] }))
+  beforeEach(() => {
+    useBodyStore.setState({ weightEntries: [], measurements: [] })
+    // The people come from the household now, not from a list in the code.
+    useHousehold.setState({ members: [member('arany', 'u1'), member('oli', 'u2')] })
+  })
 
   it('keeps each person\'s weights apart', () => {
     // Averaging two people into one trend line is a graph of nothing.

@@ -47,7 +47,7 @@ export default function SignIn() {
               <Check size={18} className="text-leaf-600" /> Check your email
             </p>
             <p className="text-sm text-ink-700">
-              If <strong className="break-all">{linkSentTo}</strong> is on the guest list, a sign-in
+              If <strong className="break-all">{linkSentTo}</strong> has been invited, a sign-in
               link is on its way. It works once and expires in an hour.
             </p>
             <p className="text-xs text-ink-500">
@@ -81,7 +81,7 @@ export default function SignIn() {
             )}
 
             <p className="text-xs text-ink-500">
-              This is a private app for two people. No password to remember, and nothing to reset.
+              This is a private app for your household. No password to remember, and nothing to reset.
             </p>
 
             {/* Settings are a property of this device rather than of an account,

@@ -8,7 +8,8 @@ import {
   useBodyStore, useWeightFor, useMeasurementsFor, useUnassignedCount,
 } from '../store/useBodyStore'
 import { MEASUREMENT_KEYS, MEASUREMENT_LABELS, type MeasurementKey } from '../types'
-import { PEOPLE, type PersonId } from '../lib/people'
+import { type PersonId } from '../lib/people'
+import { usePeople, useResolvedPerson } from '../store/useHousehold'
 import { useNutritionContext } from '../store/useNutrition'
 import { today } from '../store/useMealPlanStore'
 import { weekEaten } from '../lib/nutrition'
@@ -80,7 +81,7 @@ function WeekTab() {
   const plan = useMealPlanStore((s) => s.plan)
   const weekDates = useThisWeek()
   const { profile } = useUserStore()
-  const viewingAs = useUiStore((s) => s.viewingAs)
+  const viewingAs = useResolvedPerson(useUiStore((s) => s.viewingAs))
   const targets = profile.targets
   const ctx = useNutritionContext()
 
@@ -396,7 +397,9 @@ function BodyTab() {
   // Both people are always on screen, signed in or not. Two waists averaged
   // into one line is a graph of nothing, and a tab that only appears once
   // somebody signs in is a tab nobody finds.
-  const [who, setWho] = useState<PersonId>(PEOPLE[0].id)
+  const people = usePeople()
+  const [chosen, setWho] = useState<PersonId>('')
+  const who = useResolvedPerson(chosen)
   const unassigned = useUnassignedCount()
 
   const weights = useWeightFor(who)
@@ -467,8 +470,8 @@ function BodyTab() {
   return (
     <div className="space-y-5">
       {/* Whose body. Named, so it does not read as more of the row above. */}
-      <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist" aria-label="Whose">
-        {PEOPLE.map((p) => (
+      {people.length > 1 && <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist" aria-label="Whose">
+        {people.map((p) => (
           <button
             key={p.id}
             role="tab"
@@ -479,7 +482,7 @@ function BodyTab() {
             {p.name}
           </button>
         ))}
-      </div>
+      </div>}
 
       {/* How far back everything below reads. One control, because a body is
           one subject and nobody wants a year of weight beside three months of
@@ -505,7 +508,7 @@ function BodyTab() {
             knew who was who. They are nobody's until you say so.
           </p>
           <button className="btn-primary shrink-0" onClick={() => claimUnassigned(who)}>
-            {PEOPLE.find((p) => p.id === who)?.name}'s
+            {people.find((p) => p.id === who)?.name}'s
           </button>
         </div>
       )}

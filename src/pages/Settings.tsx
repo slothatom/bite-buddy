@@ -8,7 +8,7 @@ import type { ActivityLevel, Goal, Sex, Targets, Theme, UserProfile, WeekStart }
 import { THEMES, THEME_LABELS } from '../types'
 import { useUserStore } from '../store/useUserStore'
 import { useUiStore } from '../store/useUiStore'
-import { PEOPLE } from '../lib/people'
+import { usePeople, useResolvedPerson } from '../store/useHousehold'
 import { useDeletedRecipes, useRecipeStore, useResolvableRecipes } from '../store/useRecipeStore'
 import { useDeletedFoods, useFoodStore, useResolvableFoods } from '../store/useFoodStore'
 import { useMealPlanStore } from '../store/useMealPlanStore'
@@ -28,6 +28,7 @@ import { saveTextFile } from '../lib/download'
 import { SectionHeading } from '../components/ui'
 import { copyToClipboard } from '../lib/clipboard'
 import { PlanArchive } from '../components/settings/PlanArchive'
+import { HouseholdPanel } from '../components/settings/HouseholdPanel'
 import { useAuthStore } from '../store/useAuth'
 import {
   currentState, deviceLabel, disable, enable, readWants, writeWants,
@@ -101,7 +102,8 @@ function SettingsPanels() {
   } = useUserStore()
   // The same person the rest of the app is showing figures for, so setting a
   // target and then reading it back are about the same human being.
-  const whose = useUiStore((s) => s.viewingAs)
+  const people = usePeople()
+  const whose = useResolvedPerson(useUiStore((s) => s.viewingAs))
   const setViewingAs = useUiStore((s) => s.setViewingAs)
   const shown = profile.targets
   // Signed out, the account section has nothing to show and no one to sign out;
@@ -273,7 +275,7 @@ function SettingsPanels() {
         </section>
 
         {/* ─── Whose exercise ──────────────────────────────────────────────── */}
-        <section>
+        {people.length > 1 && <section>
           <SectionHeading>Whose exercise</SectionHeading>
           {/* All that is left of a switch that used to sit on three screens.
               Food is one target now, because the household cooks once. What
@@ -285,7 +287,7 @@ function SettingsPanels() {
             The Movement and Body screens ask for themselves.
           </p>
           <div className="flex gap-1 p-1 bg-cream-50 rounded-xl w-fit" role="tablist">
-            {PEOPLE.map((person) => (
+            {people.map((person) => (
               <button
                 key={person.id}
                 role="tab"
@@ -298,7 +300,7 @@ function SettingsPanels() {
               </button>
             ))}
           </div>
-        </section>
+        </section>}
 
         {/* ─── Week & profile ──────────────────────────────────────────────── */}
         <section>
@@ -373,6 +375,8 @@ function SettingsPanels() {
         <DeletedFoodsPanel />
 
         {isConfigured && session && <AccountPanel />}
+
+        {isConfigured && session && <HouseholdPanel />}
 
         {isConfigured && session && <SyncPanel />}
 

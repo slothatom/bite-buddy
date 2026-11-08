@@ -45,7 +45,9 @@ export const useUiStore = create<UiStore>()(
       requestQuickAdd: (date) => set({ quickAdd: date }),
       clearQuickAdd: () => set({ quickAdd: null }),
 
-      viewingAs: 'arany',
+      // Nobody in particular until chosen; the screens resolve it to the
+      // signed-in person, or whoever is first (see useResolvedPerson).
+      viewingAs: '',
       setViewingAs: (who) => set({ viewingAs: who }),
     }),
     {

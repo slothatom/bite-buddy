@@ -10,7 +10,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const state = {
   user: { id: 'u1', email: 'me@example.test' } as { id: string; email: string } | null,
-  member: { id: 'u1' } as { id: string } | null,
+  member: { role: 'editor' } as { role: string } | null,
   memberError: null as { message: string } | null,
   writeError: null as { message: string } | null,
   stored: undefined as { probe?: string } | undefined,
@@ -26,7 +26,7 @@ vi.mock('../supabase', () => ({
       select: () => ({
         eq: () => ({
           maybeSingle: async () =>
-            table === 'members'
+            table === 'household_members'
               ? { data: state.member, error: state.memberError }
               : { data: state.stored ? { data: state.stored } : null, error: null },
         }),
@@ -48,7 +48,7 @@ const step = (steps: Awaited<ReturnType<typeof probeSaving>>, what: string) =>
 
 beforeEach(() => {
   state.user = { id: 'u1', email: 'me@example.test' }
-  state.member = { id: 'u1' }
+  state.member = { role: 'editor' }
   state.memberError = null
   state.writeError = null
   state.deleteError = null
@@ -77,7 +77,7 @@ describe('checking whether saving works', () => {
     state.member = null
     const steps = await probeSaving()
     expect(step(steps, 'In the household')?.ok).toBe(false)
-    expect(step(steps, 'In the household')?.detail).toContain('not on the members list')
+    expect(step(steps, 'In the household')?.detail).toContain('not in a household')
   })
 
   it('repeats what the server said about a refused write', async () => {

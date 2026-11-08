@@ -30,6 +30,30 @@ async function goto(page: Page, route: string) {
 }
 
 /**
+ * A household of two, as a signed-in phone would have cached it.
+ *
+ * The people are data now, read from the household and kept on the device.
+ * This copy runs without Supabase, so nobody is loaded and it would show one
+ * person, "Me". Seeding the cache is exactly the state a phone is in after
+ * its first sign-in, and it is what the per-person screens are built from.
+ */
+async function aHouseholdOfTwo(page: Page) {
+  await page.addInitScript(() => {
+    const member = (userId: string, personKey: string, displayName: string, createdAt: string) =>
+      ({ userId, personKey, displayName, role: 'admin', email: null, createdAt })
+    localStorage.setItem('bite-buddy-household', JSON.stringify({
+      version: 1,
+      state: {
+        userId: 'u1',
+        household: { id: 'h1', name: 'Home' },
+        members: [member('u1', 'arany', 'Arany', '1'), member('u2', 'oli', 'Oli', '2')],
+        invites: [],
+      },
+    }))
+  })
+}
+
+/**
  * A tub in the fridge, without cooking a session to get one.
  *
  * These used to be created through a "Leftovers" dialog on the schedule, which
@@ -1098,14 +1122,13 @@ test.describe('progress, per person', () => {
     await expect(page.locator('.card').filter({ hasText: /^Chest\d/ })).toHaveCount(0)
   })
 
-  test('the two people have their own histories, signed in or not', async ({ page }) => {
+  test('the two people have their own histories', async ({ page }) => {
+    await aHouseholdOfTwo(page)
     await goto(page, '/analytics')
     await page.getByRole('tab', { name: 'Body' }).click()
 
-    // Both tabs are there before anybody signs in. They used to appear only
-    // once the household list loaded, which meant never on a device that was
-    // signed out, and the one history on screen belonged to whoever was
-    // holding the phone.
+    // One tab per person in the household, from the cached member list, so
+    // they are there offline and before anything has loaded.
     await expect(page.getByRole('tab', { name: 'Arany' })).toBeVisible()
     await expect(page.getByRole('tab', { name: 'Oli' })).toBeVisible()
 
@@ -1167,6 +1190,7 @@ test.describe('movement, per person', () => {
   })
 
   test('the two people keep separate logs', async ({ page }) => {
+    await aHouseholdOfTwo(page)
     await goto(page, '/movement')
     await page.getByRole('button', { name: 'Log it in one go' }).click()
     await page.getByLabel('What was it').fill('Arany swim')
@@ -1178,6 +1202,7 @@ test.describe('movement, per person', () => {
   })
 
   test('sleep is logged per person and kept per night', async ({ page }) => {
+    await aHouseholdOfTwo(page)
     await goto(page, '/movement')
     await page.getByRole('tab', { name: 'Sleep' }).click()
     await page.getByLabel('Hours slept').fill('7.5')

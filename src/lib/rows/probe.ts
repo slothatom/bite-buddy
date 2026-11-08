@@ -1,4 +1,5 @@
 import { supabase } from '../supabase'
+import { CONFLICT_KEY } from './engine'
 
 /**
  * Asking the database, directly, whether saving works.
@@ -45,17 +46,19 @@ export async function probeSaving(): Promise<ProbeStep[]> {
   // account is signed in and allowed to touch nothing, which is the state that
   // looked exactly like an app that had stopped saving.
   const { data: member, error: memberError } = await db
-    .from('members').select('id').eq('id', uid).maybeSingle()
+    .from('household_members').select('role').eq('user_id', uid).maybeSingle()
   steps.push({
     what: 'In the household',
     ok: Boolean(member),
     detail: memberError?.message
-      ?? (member ? undefined : 'This account is not on the members list, so nothing can be read or written.'),
+      ?? (member
+        ? `As ${String(member.role)}.`
+        : 'This account is not in a household, so nothing can be read or written.'),
   })
 
   const { error: writeError } = await db.from('settings').upsert(
     { id: PROBE_ID, data: { probe: stamp }, updated_by: uid },
-    { onConflict: 'id' },
+    { onConflict: CONFLICT_KEY },
   )
   steps.push({ what: 'Wrote a row', ok: !writeError, detail: writeError?.message })
 
@@ -74,7 +77,7 @@ export async function probeSaving(): Promise<ProbeStep[]> {
   // already exists.
   const { error: deleteError } = await db.from('settings').upsert(
     { id: PROBE_ID, deleted_at: new Date().toISOString(), updated_by: uid },
-    { onConflict: 'id' },
+    { onConflict: CONFLICT_KEY },
   )
   steps.push({ what: 'Deleted it again', ok: !deleteError, detail: deleteError?.message })
 

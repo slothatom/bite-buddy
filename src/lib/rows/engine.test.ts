@@ -409,3 +409,44 @@ describe('live changes', () => {
     expect(state.rows).toEqual([])
   })
 })
+
+describe('households', () => {
+  it('writes every row to its household, matched on (household_id, id)', async () => {
+    const server = new Map<string, SyncRow>()
+    const state = { rows: [{ id: 'profile', data: { v: 1 } }] }
+    const db = fakeDb(server)
+    const options: unknown[] = []
+    const from = db.from
+    db.from = () => {
+      const t = from()
+      return {
+        ...t,
+        upsert: async (rows: SyncRow[], opts?: unknown) => { options.push(opts); return t.upsert(rows) },
+      }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await new RowSync(db as any, [fakeTable('settings', state)], 'u1', {}, 'h1').round()
+
+    expect(db.upserted[0][0]).toMatchObject({ id: 'profile', household_id: 'h1', updated_by: 'u1' })
+    expect(options[0]).toEqual({ onConflict: 'household_id,id' })
+  })
+
+  it('does not hand the household column to the app, or treat it as a change', async () => {
+    // The app's rows never carry it. Kept on the way in, every row from the
+    // server would fingerprint differently from the same row read locally.
+    const server = new Map<string, SyncRow>([
+      ['a', { id: 'a', data: { v: 1 }, household_id: 'h1', updated_at: '2026-08-21T10:00:00.000Z' }],
+    ])
+    const state = { rows: [] as SyncRow[] }
+    const db = fakeDb(server)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const engine = new RowSync(db as any, [fakeTable('settings', state)], 'u1', {}, 'h1')
+
+    await engine.round()
+    expect(state.rows).toEqual([{ id: 'a', data: { v: 1 }, updated_at: '2026-08-21T10:00:00.000Z' }])
+
+    await engine.round()
+    expect(db.upserted).toHaveLength(0)
+  })
+})

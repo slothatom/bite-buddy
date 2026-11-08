@@ -66,10 +66,17 @@ revokes access straight away.
 "Allow new users to sign up", then invite the two of you from Authentication →
 Users. With that off, nobody else can create an account at all.
 
-If the database was set up before this check existed, paste
-`supabase/fix-membership.sql` into the SQL editor to apply it. Its last query
-lists every member with an `on_guest_list` column; anyone showing `false` has
-no access, and you can delete their account from Authentication → Users.
+Since the households migration the guest list is a legacy way in, kept so
+nobody already using the app loses access: an address on it, with no invite,
+joins the original household. New people are invited from the app instead
+(see [Inviting someone](#inviting-someone)), and access is decided by
+`household_members`, so removing an address from `allowed_emails` no longer
+revokes anything. Remove the person from the household instead.
+
+If somebody who should be in is told they are not, paste
+`supabase/fix-membership.sql` into the SQL editor. It lists every household,
+member, pending invite and account with no household, and has a commented
+insert for putting an account back into the original household.
 
 The rows migration creates the tables the app stores your data in, one row per
 meal, weight, recipe or shopping line. It ends by reading whatever the older
@@ -111,6 +118,42 @@ Then two settings in the dashboard:
 
 A magic link that comes back to an address not on that list is rejected, which
 looks exactly like a broken link. It's the most common thing to get wrong.
+
+### Inviting someone
+
+A household is data now: a row in `households`, one row per person in
+`household_members` with a role, and pending invites in `household_invites`.
+
+| Role | Can |
+|---|---|
+| Viewer | see everything in the household, change nothing |
+| Editor | plan, cook, shop and log |
+| Admin | all of that, plus invite people, change roles and remove members |
+
+To add someone:
+
+1. As an admin, open **Settings → Household**, type their email, pick a role
+   and press **Invite**.
+2. If open signups are off (they should be, see above), also create their
+   account: **Authentication → Users → Invite user**, with the same address.
+   With signups on, the sign-in link creates it.
+3. They open the site and sign in with that address. The invite is accepted
+   on their first sign-in, and they are in with the role you picked.
+
+An invite admits only the address it was sent to, and only once. Change a
+role or remove someone from the same screen; the database keeps at least one
+admin per household. The same can be done in the SQL editor with
+`select public.invite_member('them@example.com', 'editor');` run as an admin
+of the household, but the screen is easier.
+
+An account that signs in with no invite (only possible with open signups) is
+offered to start a household of its own, as its admin. It sees nothing of
+anyone else's.
+
+The two people already using the app were moved into the original household
+by the migration, both as admins, keeping the person ids (`arany`, `oli`)
+their logs already use. Check it worked with the first query in
+`supabase/fix-membership.sql`.
 
 ## 4. Add the three repository secrets
 
