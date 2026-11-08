@@ -1,5 +1,4 @@
-import type { Theme, UserProfile, WeekStart } from '../../types'
-import { THEMES, THEME_LABELS } from '../../types'
+import type { UserProfile, WeekStart } from '../../types'
 import { useUserStore } from '../../store/useUserStore'
 import { SectionHeading } from '../ui'
 
@@ -9,42 +8,27 @@ const WEEKDAYS: { value: WeekStart; label: string }[] = [
   { value: 0, label: 'Sunday' },
 ]
 
-/** Your name, the day the week starts on, the look, and the weight unit. */
+/** Your name, the day the week starts on, and the weight unit. The look has its own page. */
 export function WeekSection() {
-  const { profile, setName, setWeekStart, setWeightUnit, setTheme } = useUserStore()
+  const { profile, setName, setWeekStart, setWeightUnit } = useUserStore()
 
   return (
     <section>
       <SectionHeading>Your week</SectionHeading>
       <div className="card p-4 space-y-4">
         <div>
-          <label className="label">Name</label>
-          <input className="input" value={profile.name} onChange={(e) => setName(e.target.value)} />
+          <label className="label" htmlFor="profile-name">Name</label>
+          <input id="profile-name" className="input" value={profile.name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div>
-          <label className="label">Week starts on</label>
-          <select className="input" value={profile.weekStartsOn}
+          <label className="label" htmlFor="week-start">Week starts on</label>
+          <select id="week-start" className="input" value={profile.weekStartsOn}
             onChange={(e) => setWeekStart(Number(e.target.value) as WeekStart)}>
             {WEEKDAYS.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
           </select>
           <p className="text-xs text-ink-500 mt-1">
             Monday to Sunday by default. Your dietician's own plans ran Wednesday to
             Tuesday; loading one lines its days up by weekday either way.
-          </p>
-        </div>
-        <div>
-          <label className="label" htmlFor="theme">Appearance</label>
-          <select
-            id="theme"
-            className="input"
-            value={profile.theme ?? 'system'}
-            onChange={(e) => setTheme(e.target.value as Theme)}
-          >
-            {THEMES.map((t) => <option key={t} value={t}>{THEME_LABELS[t]}</option>)}
-          </select>
-          <p className="text-xs text-ink-500 mt-1">
-            Following your device is the default and changes with it, so the app goes dark
-            when your phone does. Pick one of the other two to say otherwise.
           </p>
         </div>
         <div>

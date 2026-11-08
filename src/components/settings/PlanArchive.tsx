@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { CalendarPlus, Check } from 'lucide-react'
+import { CalendarPlus, Check, ChevronDown } from 'lucide-react'
 import type { MealSlot, SourcePlan } from '../../types'
 import { SLOT_LABELS } from '../../types'
 import { SOURCE_PLANS } from '../../data'
@@ -12,6 +12,7 @@ import { EMPTY_CONTEXT } from '../../lib/moments'
 import { EmptyState, SourceLine } from '../ui'
 import { useArchiveVersion } from '../../store/useArchive'
 import { ArchiveUploadPanel } from './ArchiveUploadPanel'
+import { SettingsGroup } from './SettingsList'
 import { useNutritionContext } from '../../store/useNutrition'
 import { componentsNutrients } from '../../lib/nutrition'
 
@@ -52,7 +53,7 @@ export function PlanArchive() {
   )
 
   return (
-    <div className="space-y-5">
+    <div className="flex flex-col gap-3.5">
       <ArchiveUploadPanel />
 
       {plans.length === 0 ? (
@@ -60,30 +61,34 @@ export function PlanArchive() {
           Your dietician's weeks appear here once the plan archive is uploaded.
         </EmptyState>
       ) : (
-        <p className="text-sm text-ink-700">
-          {plans.length} weeks from your dietician, {plans.reduce((a, p) => a + p.days.length, 0)} days in all.
-          Drop any week straight into your planner.
-        </p>
+        <SettingsGroup id="plans-heading" title="Plans" aside="Newest first">
+          <p className="mx-1 -mt-0.5 mb-0.5 text-xs text-ink-700">
+            {plans.length} weeks from your dietician, {plans.reduce((a, p) => a + p.days.length, 0)} days in all.
+            Load any week straight into your planner.
+          </p>
+          <ul
+            aria-label="Plans"
+            className="bg-paper border border-border-200 rounded-card overflow-hidden divide-y divide-border-100"
+          >
+            {plans.map((plan) => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                open={openId === plan.id}
+                loaded={loadedId === plan.id}
+                onToggle={() => setOpenId(openId === plan.id ? null : plan.id)}
+                onLoad={() => {
+                  loadSourcePlan(plan)
+                  setLoadedId(plan.id)
+                  notice({ ...EMPTY_CONTEXT, loadedFromArchive: true })
+                }}
+                onTake={setTaking}
+                weekLabel={weekDates[0]}
+              />
+            ))}
+          </ul>
+        </SettingsGroup>
       )}
-
-      <div className="space-y-3">
-        {plans.map((plan) => (
-          <PlanCard
-            key={plan.id}
-            plan={plan}
-            open={openId === plan.id}
-            loaded={loadedId === plan.id}
-            onToggle={() => setOpenId(openId === plan.id ? null : plan.id)}
-            onLoad={() => {
-              loadSourcePlan(plan)
-              setLoadedId(plan.id)
-              notice({ ...EMPTY_CONTEXT, loadedFromArchive: true })
-            }}
-            onTake={setTaking}
-            weekLabel={weekDates[0]}
-          />
-        ))}
-      </div>
 
       {taking && <PutItSomewhere taken={taking} onClose={() => setTaking(null)} />}
     </div>
@@ -201,6 +206,7 @@ function PlanCard({
   weekLabel: string
 }) {
   const ctx = useNutritionContext()
+  const hu = plan.language === 'hu'
 
   const dayTotals = plan.days.map((d) =>
     d.meals.reduce((sum, m) => sum + componentsNutrients(m.entries, ctx).calories, 0))
@@ -208,20 +214,38 @@ function PlanCard({
   const average = complete.length ? Math.round(complete.reduce((a, b) => a + b, 0) / complete.length) : 0
 
   return (
-    <article className="card overflow-hidden">
+    <li>
       {/* Two sibling buttons rather than one nested inside the other: a button
           inside a button is invalid, and browsers reparent it so its click
           handler never fires. */}
-      <div className="flex items-center gap-3 px-4 py-3.5 hover:bg-cream-50">
-        <button onClick={onToggle} className="flex items-center gap-3 flex-1 min-w-0 min-h-11 text-left">
-          <span className="text-xl">{plan.language === 'hu' ? '🇭🇺' : '🇷🇴'}</span>
-          <span className="flex-1 min-w-0">
-            <span className="block font-semibold text-ink-900 text-sm">{plan.label}</span>
-            <span className="block text-xs text-ink-500">
+      <div className="flex items-center gap-3 pl-3.5 pr-3 py-2.5 hover:bg-cream-50">
+        <button
+          onClick={onToggle}
+          aria-expanded={open}
+          className="flex items-center gap-3 flex-1 min-w-0 min-h-11 text-left"
+        >
+          {/* The language the dietician wrote it in, as a two-letter tile:
+              teal for Romanian, mustard for Hungarian. */}
+          <abbr
+            title={hu ? 'Hungarian' : 'Romanian'}
+            className={`no-underline w-10 h-10 rounded-[14px] shrink-0 flex items-center justify-center
+                        text-[13px] font-extrabold tracking-[0.04em]
+                        ${hu ? 'bg-mustard-100 text-mustard-800' : 'bg-bite-100 text-bite-700'}`}
+          >
+            {hu ? 'HU' : 'RO'}
+          </abbr>
+          <span className="flex-1 min-w-0 flex flex-col gap-0.5">
+            <span className="text-[15px] leading-5 font-bold text-ink-900">{plan.label}</span>
+            <span className="text-xs text-ink-700">
               {plan.days.length} days · avg {average} kcal
               {plan.subject === 'other' ? ' · not your plan' : ''}
             </span>
           </span>
+          <ChevronDown
+            size={18}
+            aria-hidden="true"
+            className={`shrink-0 text-ink-300 transition-transform ${open ? 'rotate-180' : ''}`}
+          />
         </button>
         <button
           onClick={onLoad}
@@ -232,7 +256,7 @@ function PlanCard({
       </div>
 
       {open && (
-        <div className="border-t border-border-200 divide-y divide-border-100">
+        <div className="border-t border-border-100 bg-cream-50/40 divide-y divide-border-100">
           {plan.days.map((day, i) => (
             <div key={i} className="px-4 py-3">
               <div className="flex items-baseline justify-between gap-2 mb-1.5">
@@ -284,6 +308,6 @@ function PlanCard({
           </p>
         </div>
       )}
-    </article>
+    </li>
   )
 }

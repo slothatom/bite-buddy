@@ -1,6 +1,5 @@
 import { Fragment, lazy, Suspense, useEffect } from 'react'
-import { HashRouter, Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import Sidebar from './components/layout/Sidebar'
 import BottomNav from './components/layout/BottomNav'
 import SectionLayout from './components/layout/SectionLayout'
@@ -97,6 +96,12 @@ const TITLES: Record<string, string> = {
   '/progress/summary': 'For your dietician',
   '/settings': 'Settings',
   '/settings/history': 'Plan history',
+  '/settings/household': 'Household',
+  '/settings/targets': 'Targets',
+  '/settings/reminders': 'Reminders',
+  '/settings/appearance': 'Appearance',
+  '/settings/backups': 'Backups',
+  '/settings/account': 'Account',
 }
 
 function useRouteTitle() {
@@ -268,10 +273,6 @@ function Shell() {
 function SignedOutSettings() {
   return (
     <div className="min-h-dvh flex flex-col bg-cream-50">
-      <header className="flex items-center gap-3 px-4 sm:px-6 py-3 border-b border-border-200 bg-paper">
-        <Link to="/" className="btn-secondary"><ArrowLeft size={15} /> Sign in</Link>
-        <p className="text-sm text-ink-500">Signed out. Everything here is kept on this device.</p>
-      </header>
       <Suspense fallback={<ScreenLoading />}>
         <Settings signedOut />
       </Suspense>
@@ -316,7 +317,7 @@ function Gate() {
 
   return (
     <Routes>
-      <Route path="/settings" element={<SignedOutSettings />} />
+      <Route path="/settings/*" element={<SignedOutSettings />} />
       <Route path="*" element={<SignIn />} />
     </Routes>
   )

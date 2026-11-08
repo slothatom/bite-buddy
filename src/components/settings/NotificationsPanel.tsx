@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { SectionHeading } from '../ui'
+import { Bell, Check } from 'lucide-react'
+import { IconTile, SettingsGroup, Switch } from './SettingsList'
 import {
   currentState, deviceLabel, disable, enable, readWants, writeWants, WANTS_ALL,
   type PushState, type Wants,
@@ -86,121 +87,126 @@ export function NotificationsPanel() {
     setBusy(false)
   }
 
+  const live = state?.kind === 'off' || state?.kind === 'on'
+
   return (
-    <section>
-      <SectionHeading>Notifications</SectionHeading>
-      <div className="card p-4 space-y-3">
-        <p className="text-sm text-ink-700">
-          Two things, and nothing else. Never more than one at a time for the same thing.
-        </p>
+    <div className="flex flex-col gap-3.5">
+      <section
+        aria-label="This phone"
+        className="bg-paper border border-border-200 rounded-card p-3.5 flex flex-col gap-2"
+      >
+        <div className="flex items-center gap-3">
+          <IconTile icon={Bell} />
+          <span id="reminders-device" className="flex-1 text-[15px] leading-5 font-extrabold text-ink-900">
+            Reminders on this phone
+          </span>
+          {live && (
+            <Switch
+              checked={state.kind === 'on'}
+              labelledBy="reminders-device"
+              disabled={busy}
+              onChange={(on) => void (on ? turnOn() : turnOff())}
+            />
+          )}
+        </div>
 
         {state === null && (
-          <p className="text-sm text-ink-500">Checking this device.</p>
+          <p className="text-sm text-ink-700">Checking this phone.</p>
         )}
 
         {state?.kind === 'unsupported' && (
-          <p className="text-sm text-ink-500">This browser cannot show notifications.</p>
+          <p className="text-sm text-ink-700">This browser cannot show notifications.</p>
         )}
 
         {state?.kind === 'unconfigured' && (
-          <p className="text-sm text-ink-500">
+          <p className="text-sm text-ink-700">
             No signing key has been set up for this household yet, so there is nothing to switch
             on. It is one line in the SQL editor, and the README has it.
           </p>
         )}
 
         {state?.kind === 'blocked' && (
-          <p className="text-sm text-ink-500">
+          <p className="text-sm text-ink-700">
             This site is set to block notifications in your browser. The app cannot undo that, and
             asking again would do nothing: it has to be changed in the browser's own settings for
             this site.
           </p>
         )}
 
-        {(state?.kind === 'off' || state?.kind === 'on') && (
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              className={state.kind === 'on' ? 'btn-secondary' : 'btn-primary'}
-              onClick={state.kind === 'on' ? turnOff : turnOn}
-              disabled={busy}
-            >
-              {state.kind === 'on' ? 'Turn off on this device' : 'Turn on for this device'}
-            </button>
-            <span className="text-sm text-ink-500">
-              {state.kind === 'on' ? `On, for your ${deviceLabel()}.` : 'Off on this device.'}
-            </span>
+        {live && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {state.kind === 'on' ? (
+              <span className="badge bg-leaf-50 text-leaf-700">
+                <Check size={14} aria-hidden="true" /> On, for your {deviceLabel()}
+              </span>
+            ) : (
+              <span className="badge bg-border-100 text-ink-700">Off on this phone</span>
+            )}
+            <span className="text-xs text-ink-700">Every phone has its own switch.</span>
           </div>
         )}
+      </section>
 
-        {/* Which of the two, once there is anything to receive them. Hidden
-            while push is unsupported, unconfigured or blocked, where the
-            switches would be two controls over something that cannot happen. */}
-        {(state?.kind === 'off' || state?.kind === 'on') && (
-          <div className="border-t border-border-100 pt-3 space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wide text-ink-500">
-              What to send
-            </p>
+      {/* Which of the two, once there is anything to receive them. Hidden
+          while push is unsupported, unconfigured or blocked, where the
+          switches would be two controls over something that cannot happen. */}
+      {live && (
+        <SettingsGroup id="reminders-what" title="What to send" aside="Follows you to any phone">
+          <ul
+            aria-labelledby="reminders-what"
+            className="bg-paper border border-border-200 rounded-card overflow-hidden divide-y divide-border-100"
+          >
             <Wanted
+              id="reminders-cook"
               label="Before a cooking session"
-              note="A couple of hours before something you have scheduled to cook."
+              note="A couple of hours before something you planned to cook."
               on={wants.cook}
               onChange={(on) => void choose({ ...wants, cook: on })}
             />
             <Wanted
+              id="reminders-plan"
               label="When the other one of you changes the week"
-              note="One line, after the change settles, rather than one per meal moved."
+              note="One line once the change settles, not one per meal."
               on={wants.plan}
               onChange={(on) => void choose({ ...wants, plan: on })}
             />
-            {!wants.cook && !wants.plan && state.kind === 'on' && (
-              <p className="text-xs text-ink-700">
-                Both off, so this device is subscribed and will never be sent anything. That is a
-                fine way to leave it, and turning the switch above off is the tidier one.
-              </p>
-            )}
-          </div>
-        )}
+          </ul>
+          {!wants.cook && !wants.plan && state.kind === 'on' && (
+            <p className="mx-1 text-xs text-ink-700">
+              Both off, so this phone is subscribed and will never be sent anything. That is a
+              fine way to leave it, and turning the switch above off is the tidier one.
+            </p>
+          )}
+        </SettingsGroup>
+      )}
 
-        {message && <p className="text-sm text-coral-600">{message}</p>}
+      {message && <p role="status" className="mx-1 text-sm text-coral-600">{message}</p>}
 
-        <p className="text-xs text-ink-500">
-          The switch above is per device, because a phone is what gets notified, and turning it on
-          here does nothing to the other one. What to send is per person and follows you to any
-          device you sign in on. On Android notifications are more reliable once the app has been
-          added to the home screen.
-        </p>
-      </div>
-    </section>
+      <p className="mx-1 text-center text-xs text-ink-500">
+        Two kinds of reminder and nothing else, never more than one at a time for the same thing.
+        On Android they are more reliable once the app is on your home screen.
+      </p>
+    </div>
   )
 }
 
-/**
- * One kind of notification, on or off.
- *
- * A checkbox rather than a styled toggle: it is a real one under the label, so
- * it is reachable by keyboard, announced as a checkbox, and toggled by tapping
- * anywhere on the row rather than on a 20px switch.
- */
+/** One kind of reminder, on or off, named by its label. */
 function Wanted({
-  label, note, on, onChange,
+  id, label, note, on, onChange,
 }: {
+  id: string
   label: string
   note: string
   on: boolean
   onChange: (on: boolean) => void
 }) {
   return (
-    <label className="flex items-start gap-3 py-1.5 cursor-pointer">
-      <input
-        type="checkbox"
-        className="mt-0.5 w-5 h-5 shrink-0 accent-bite-500"
-        checked={on}
-        onChange={(e) => onChange(e.target.checked)}
-      />
-      <span className="min-w-0">
-        <span className="block text-sm text-ink-900">{label}</span>
-        <span className="block text-xs text-ink-500">{note}</span>
+    <li className="flex items-center gap-3 py-2.5 pl-3.5 pr-2.5">
+      <span className="flex-1 min-w-0 flex flex-col gap-0.5">
+        <span id={id} className="text-[15px] leading-5 font-bold text-ink-900">{label}</span>
+        <span className="text-xs text-ink-700">{note}</span>
       </span>
-    </label>
+      <Switch checked={on} onChange={onChange} labelledBy={id} />
+    </li>
   )
 }

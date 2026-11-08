@@ -1,7 +1,37 @@
 import { useState } from 'react'
 import { Check, LogOut } from 'lucide-react'
-import { SectionHeading } from '../ui'
 import { useAuthStore } from '../../store/useAuth'
+import { useOwnPersonKey, usePeople } from '../../store/useHousehold'
+import { PersonAvatar } from '../ui/PersonAvatar'
+import { SettingsGroup } from './SettingsList'
+
+/**
+ * Who is signed in here, and the way out: an avatar, the address, and a
+ * Sign out button. Shared by the Settings list on a phone and the Account page.
+ */
+export function SignedInRow() {
+  const { user, signOut } = useAuthStore()
+  const people = usePeople()
+  const own = useOwnPersonKey()
+  const at = people.findIndex((p) => p.id === own)
+
+  return (
+    <div className="flex items-center gap-3">
+      {at >= 0 && <PersonAvatar person={people[at]} index={at} size="lg" />}
+      <span className="flex-1 min-w-0 flex flex-col gap-0.5">
+        <span className="text-xs text-ink-700">Signed in as</span>
+        <span className="text-[15px] leading-5 font-bold text-ink-900 truncate">{user?.email}</span>
+      </span>
+      <button
+        type="button"
+        className="btn min-h-11 px-3.5 rounded-lg border border-border-200 text-ink-900 hover:bg-coral-50 hover:text-coral-700 shrink-0"
+        onClick={() => void signOut()}
+      >
+        <LogOut size={16} aria-hidden="true" /> Sign out
+      </button>
+    </div>
+  )
+}
 
 /**
  * The signed-in account.
@@ -11,7 +41,7 @@ import { useAuthStore } from '../../store/useAuth'
  * is worth being able to set it to something friendlier than an email address.
  */
 export function AccountPanel() {
-  const { user, members, setDisplayName, signOut } = useAuthStore()
+  const { user, members, setDisplayName } = useAuthStore()
   const mine = members.find((m) => m.id === user?.id)
 
   // The saved name arrives a moment after the page does, the session is read
@@ -25,18 +55,15 @@ export function AccountPanel() {
   const [failed, setFailed] = useState(false)
 
   return (
-    <section>
-      <SectionHeading>Account</SectionHeading>
-      <div className="card p-4 space-y-4">
-        <p className="text-sm text-ink-700">
-          Signed in as <strong className="break-all">{user?.email}</strong>. Your plans, recipes and
-          shopping list are shared with everyone else in the household.
-        </p>
+    <SettingsGroup id="account-heading" title="Account">
+      <div className="bg-paper border border-border-200 rounded-card p-3.5 flex flex-col gap-3.5">
+        <SignedInRow />
 
-        <div>
-          <label className="label">What the others should call you</label>
+        <div className="border-t border-border-100 pt-3">
+          <label className="label" htmlFor="display-name">What the others should call you</label>
           <div className="flex gap-2">
             <input
+              id="display-name"
               className="input" placeholder="e.g. Ana" value={name}
               onChange={(e) => { setTyped(e.target.value); setSaved(false); setFailed(false) }}
             />
@@ -59,11 +86,10 @@ export function AccountPanel() {
             </p>
           )}
         </div>
-
-        <button className="btn-ghost text-ink-500 hover:text-coral-600 w-fit" onClick={() => void signOut()}>
-          <LogOut size={15} /> Sign out
-        </button>
       </div>
-    </section>
+      <p className="mx-1 text-xs text-ink-500">
+        Your plans, recipes and shopping list are shared with everyone else in the household.
+      </p>
+    </SettingsGroup>
   )
 }
