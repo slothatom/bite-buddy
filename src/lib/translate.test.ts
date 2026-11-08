@@ -38,7 +38,7 @@ describe('reading the dietician in English', () => {
   })
 
   it('reads Hungarian as well as Romanian', () => {
-    expect(say('[removed plan text]')).toBe('1 apple + 10 g walnuts')
+    expect(say('1 alma + 15 g dio')).toBe('1 apple + 15 g walnuts')
     // The food database's own name for it, gloss and all, because that is what
     // the food is called on every other screen in the app.
     expect(say('vegyes salata + 60 g telemea + 1 tk. olivaolaj'))
