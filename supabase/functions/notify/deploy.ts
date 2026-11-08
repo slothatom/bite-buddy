@@ -200,6 +200,17 @@ Deno.serve(async () => {
 
   const { data: members } = await db.from('members').select('id, email, display_name')
   const people = members ?? []
+
+  // Which household each person is in. This runs as the service role, which
+  // row-level security does not apply to, so keeping one household's news
+  // away from another is this file's job: a reminder or a "the week changed"
+  // goes only to the people in the household it is about.
+  const { data: memberships } = await db.from('household_members').select('user_id, household_id')
+  const householdOf = new Map(
+    (memberships ?? []).map((m) => [m.user_id as string, m.household_id as string]),
+  )
+  const peopleIn = (household: string | undefined) =>
+    people.filter((m) => household != null && householdOf.get(m.id as string) === household)
   // Only real names go in. An empty entry would beat the fallback in the
   // shared code and produce "They changed the week", which reads like a bug.
   const names = new Map(
@@ -266,11 +277,16 @@ Deno.serve(async () => {
   // ─── Before a cooking session ──────────────────────────────────────────────
 
   const { data: sessionRows } = await db
-    .from('cook_sessions').select('data').is('deleted_at', null)
+    .from('cook_sessions').select('data, household_id').is('deleted_at', null)
 
+  const sessionHousehold = new Map<string, string>()
   const sessions = (sessionRows ?? [])
-    .map((r) => r.data as CookSession)
-    .filter(Boolean)
+    .map((r) => {
+      const session = r.data as CookSession | null
+      if (session?.id) sessionHousehold.set(session.id, r.household_id as string)
+      return session
+    })
+    .filter((s): s is CookSession => Boolean(s))
 
   const ready = dueSessions(sessions, now)
   let pushed = 0
@@ -287,8 +303,10 @@ Deno.serve(async () => {
 
       const note = cookNote(session)
       let delivered = false
+      const household = sessionHousehold.get(session.id)
+      const cooks = peopleIn(household)
 
-      for (const member of people) {
+      for (const member of cooks) {
         if (!(await wants(member.id as string)).cook) continue
         const count = await push(member.id as string, note)
         pushed += count
@@ -300,7 +318,8 @@ Deno.serve(async () => {
       if (delivered) {
         await db.from('reminder_log').insert({
           session_id: session.id,
-          sent_to: people.map((m) => m.email as string).filter(Boolean),
+          household_id: household,
+          sent_to: cooks.map((m) => m.email as string).filter(Boolean),
           session_at: `${session.date} at ${session.time}`,
         })
       }
@@ -317,17 +336,20 @@ Deno.serve(async () => {
     const since = new Date(now.getTime() - 24 * 60 * 60_000).toISOString()
     const { data: planRows } = await db
       .from('plan_meals')
-      .select('id, day, slot, updated_at, updated_by, deleted_at')
+      .select('id, day, slot, updated_at, updated_by, deleted_at, household_id')
       .gt('updated_at', since)
 
-    const rows = (planRows ?? []) as PlanRow[]
+    const rows = (planRows ?? []) as (PlanRow & { household_id: string })[]
 
     for (const member of people) {
       const id = member.id as string
+      const household = householdOf.get(id)
+      if (!household) continue
       const preference = await wants(id)
       if (!preference.plan) continue
 
-      const result = planNote(rows, id, preference.seen, now, names)
+      const theirs = rows.filter((r) => r.household_id === household)
+      const result = planNote(theirs, id, preference.seen, now, names)
       if (!result) continue
 
       const count = await push(id, result.note)
