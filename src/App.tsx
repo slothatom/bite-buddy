@@ -39,6 +39,7 @@ const GroceryList = lazy(lazyRoute(() => import('./pages/GroceryList')))
 const Schedule = lazy(lazyRoute(() => import('./pages/Schedule')))
 const Activity = lazy(lazyRoute(() => import('./pages/Activity')))
 const Analytics = lazy(lazyRoute(() => import('./pages/Analytics')))
+const DieticianSummary = lazy(lazyRoute(() => import('./pages/DieticianSummary')))
 const Settings = lazy(lazyRoute(() => import('./pages/Settings')))
 
 /** Deliberately quiet: a chunk off the local service worker arrives in a frame
@@ -90,6 +91,7 @@ const TITLES: Record<string, string> = {
   '/schedule': 'Cooking',
   '/movement': 'Movement',
   '/analytics': 'Progress',
+  '/analytics/summary': 'For your dietician',
   '/settings': 'Settings',
   '/settings/history': 'Plan history',
 }
@@ -163,6 +165,7 @@ function Shell() {
               <Route path="/schedule"  element={<Schedule />} />
               <Route path="/movement" element={<Activity />} />
               <Route path="/analytics" element={<Analytics />} />
+              <Route path="/analytics/summary" element={<DieticianSummary />} />
               <Route path="/settings/*" element={<Settings />} />
               <Route path="*"          element={<Navigate to="/" replace />} />
             </Routes>

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { FileText, Plus } from 'lucide-react'
 import { useMealPlanStore } from '../store/useMealPlanStore'
 import { useThisWeek } from '../store/useThisWeek'
 import { useUserStore } from '../store/useUserStore'
@@ -38,6 +39,15 @@ export default function Analytics() {
           <h1 className="display text-xl sm:text-2xl text-ink-900">Progress</h1>
           <p className="text-sm text-ink-700">How your week is shaping up, and how it is going.</p>
           <EstimatesNote className="mt-1" />
+          {/* The way out of the app and into an appointment: a page of what
+              was eaten and skipped, the figures and the weights, to print or
+              send. */}
+          <Link
+            to="/analytics/summary"
+            className="inline-flex items-center gap-1.5 mt-2 text-sm font-semibold text-bite-700 hover:underline min-h-11"
+          >
+            <FileText size={15} /> Summary for your dietician
+          </Link>
         </header>
 
         {/* Announced as tabs, like every other strip in the app. These were

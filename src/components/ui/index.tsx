@@ -4,6 +4,7 @@ import type { Macros, MedTier, Nutrients } from '../../types'
 import { STATUS_STYLES, targetStatus, type StatusLevel } from '../../lib/status'
 import { saltFromSodium } from '../../lib/nutrition'
 import { completenessLine } from '../../lib/completeness'
+import { ESTIMATES_NOTE } from '../../lib/estimates'
 import Zig, { type ZigMood } from '../brand/Mascot'
 import { useEnglish } from '../../store/useEnglish'
 
@@ -385,17 +386,7 @@ export function EmptyState({
   )
 }
 
-/**
- * Where the numbers come from, said once and plainly.
- *
- * The dietician wrote meals, not calories. Every kcal and gram on screen is
- * worked out by the app from its food library, and targets come from averaging
- * the plans or from Mifflin-St Jeor, so the figures are estimates and are
- * labelled as such wherever they are the point of the screen.
- */
-export const ESTIMATES_NOTE =
-  "Calories are estimates worked out by Bite Buddy, not by your dietician. This isn't medical advice."
-
+/** The estimates caption: see lib/estimates.ts for why it is there. */
 export function EstimatesNote({ className = '' }: { className?: string }) {
   return (
     <p data-estimates-note className={`text-xs text-ink-500 ${className}`}>{ESTIMATES_NOTE}</p>

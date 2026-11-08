@@ -445,3 +445,42 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ─── Printing the dietician summary ───────────────────────────────────────────
+   Only when a page has something marked to print, which today is the summary
+   at /analytics/summary. Everything that is neither the summary, inside it,
+   nor one of the boxes it sits in is taken out: the sidebar, the tab bar, the
+   banners, and the controls above it. The boxes it sits in lose their scroll
+   and their height, because a scrolling column prints as one screenful and
+   the rest of a month would be cut off at the first page. Paper is white
+   whatever the phone is set to. */
+@media print {
+  @page { margin: 14mm; }
+
+  body:has([data-print-root]) {
+    background: #ffffff !important;
+  }
+
+  body:has([data-print-root]) *:not(:has([data-print-root])):not([data-print-root]):not([data-print-root] *),
+  body:has([data-print-root]) [data-print-hide] {
+    display: none !important;
+  }
+
+  body:has([data-print-root]) :has([data-print-root]) {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  [data-print-root] {
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+}
