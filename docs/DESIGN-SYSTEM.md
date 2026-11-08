@@ -217,7 +217,8 @@ delta as well as the colour.
 | `card` / `card-soft` | Raised card / flat nested panel |
 | `input`, `label` | Form field and its label |
 | `badge`, `tag` | Compact markers |
-| `nav-item` / `nav-item-active` | Sidebar and More-sheet links |
+| `nav-item` / `nav-item-active` | Sidebar rows; current is `bite-100` fill, `bite-700`, extra-bold |
+| `segment-on` / `segment-off` | Section tabs (Week · Grocery · Cooking), on a `border-100` track |
 | `meal-slot` | Dashed empty-slot target |
 | `display` | Bungee |
 
@@ -230,10 +231,17 @@ delta as well as the colour.
 `SourceLine` · `EmptyState` (with the mark) · `EstimatesNote` · `KnownHint` ·
 `SectionHeading` · `ChipCheck` · `SearchField` · `ChipRow`
 
+`PersonAvatar` and `PersonStack` (`src/components/ui/PersonAvatar.tsx`): a
+person as their initial in a circle. Colours are fixed, not chosen: Arany (or
+the first member) `bite-500`, Oli (or the second) `mustard-500`, then
+`coral-300` and `leaf-300` by place in the household (`src/lib/personTone.ts`).
+The initial is always `on-brand`, which does not invert after dark.
+
 ### Brand and layout
 
-`Logo` in `src/components/brand/`; `Sidebar`, `MobileNav`,
-`StorageBanner`, `UndoBar` and `ErrorBoundary` in `src/components/layout/`.
+`Logo` in `src/components/brand/`; `Sidebar`, `BottomNav`, `SectionLayout`,
+`SectionTabs`, `TodayHeaderActions`, `StorageBanner`, `UndoBar` and
+`ErrorBoundary` in `src/components/layout/`.
 
 ### Mediterranean tiers
 
@@ -244,17 +252,34 @@ Symbol plus word, quiet enough for every food row: `● Daily`, `◐ Weekly` (le
 
 ## 9. Navigation
 
-Nine destinations, one list in `src/components/layout/nav.ts`: Home, Planner,
-Recipes, Foods, Grocery, Schedule, Movement, Progress, Settings. The plan
-archive is a tab inside Settings, and the dietician summary is a page under
-Progress.
+Four places and a header, one list in `src/components/layout/nav.ts`. Every
+old screen lives inside the place you would look for it, as a tab:
 
-- **Desktop (md and up):** a sidebar with the Bitten B and all nine.
-- **Phone:** a top bar with the logo, and a bottom tab bar
-  **Home · Plan · + · Recipes · More**. The centre **+** opens the add sheet on
-  today, at the slot for the time of day. **More** opens a sheet with the other
-  six screens and reads as current while you are on one of them. The bar
-  respects safe-area insets.
+| Place | Tabs (route) |
+|---|---|
+| **Today** | `/` |
+| **Plan** | Week `/plan/week` · Grocery `/plan/grocery` · Cooking `/plan/cooking` |
+| **Recipes** | Recipes `/recipes` · Foods `/recipes/foods` |
+| **Progress** | Overview `/progress` · Movement `/progress/movement` · Summary `/progress/summary` |
+| Settings | `/settings`, plan archive at `/settings/history` |
+
+- **Section tabs** (`SectionTabs`, rendered by `SectionLayout`): a segmented
+  control at the top of Plan, Recipes and Progress. They are links, one route
+  per tab, with `aria-current="page"`, so deep links and the back gesture work.
+  Full width on a phone, as wide as their words from md up.
+- **Old addresses redirect** (`REDIRECTS` in `nav.ts`), keeping the query
+  string: `/plan`, `/grocery`, `/schedule`, `/foods`, `/movement`,
+  `/analytics`, `/analytics/summary`, `/history` and a few aliases.
+- **Phone:** no top bar. A bottom bar **Today · Plan · + · Recipes · Progress**:
+  the current place has a `bite-100` pill behind its icon and a `bite-700`
+  extra-bold label. The centre **+** is a 56px `bite-500` circle that opens the
+  add sheet on today, at the slot for the time of day. Today's header carries
+  the mark, the household's avatars and a gear to Settings. Settings screens
+  have no bar and a back arrow. The bar respects safe-area insets.
+- **Desktop (md and up):** a 248px sticky sidebar on paper: the Bitten B and
+  wordmark, the four places (current: `bite-100` fill, `bite-700`, extra-bold,
+  radius 14), an **Add food** button, and at the foot the household's avatars
+  and names and a Settings link with a gear.
 
 ---
 

@@ -37,7 +37,7 @@ const NOTE = "Calories are estimates worked out by Bite Buddy, not by your dieti
 
 test.describe('a summary for the dietician', () => {
   test('is reached from Progress and covers the week, the month or two dates', async ({ page }) => {
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('link', { name: 'Summary for your dietician' }).click()
     await expect(page.getByRole('heading', { name: 'For your dietician' })).toBeVisible()
 
@@ -50,20 +50,20 @@ test.describe('a summary for the dietician', () => {
     await expect(summary.locator('[data-summary-week]')).toHaveCount(0)
 
     await page.getByRole('tab', { name: 'Custom' }).click()
-    await page.getByLabel('From').fill('2026-03-02')
-    await page.getByLabel('To').fill('2026-03-04')
+    await page.getByLabel('From', { exact: true }).fill('2026-03-02')
+    await page.getByLabel('To', { exact: true }).fill('2026-03-04')
     await expect(summary.locator('[data-summary-day]')).toHaveCount(3)
     await expect(summary.locator('[data-summary-day="2026-03-02"]')).toContainText('Nothing written down')
   })
 
   test('says what was eaten, the figures against the target, the servings and the weights', async ({ page }) => {
     await loadAWeek(page)
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Body' }).click()
     await page.getByLabel('Weight').fill('68.4')
     await page.getByRole('button', { name: /^Log$/ }).click()
 
-    await goto(page, '/analytics/summary')
+    await goto(page, '/progress/summary')
     const summary = page.locator('[data-summary]')
     const day = summary.locator('[data-summary-day]').filter({ hasText: 'Not ticked' }).first()
     await expect(day).toContainText(/of [\d,]+ kcal/)
@@ -74,7 +74,7 @@ test.describe('a summary for the dietician', () => {
 
   test('downloads as one HTML file that stands on its own', async ({ page }) => {
     await loadAWeek(page)
-    await goto(page, '/analytics/summary')
+    await goto(page, '/progress/summary')
 
     const [download] = await Promise.all([
       page.waitForEvent('download'),
@@ -89,7 +89,7 @@ test.describe('a summary for the dietician', () => {
   })
 
   test('prints the summary and nothing else', async ({ page }) => {
-    await goto(page, '/analytics/summary')
+    await goto(page, '/progress/summary')
     await page.evaluate(() => {
       (window as unknown as { printed: number }).printed = 0
       window.print = () => { (window as unknown as { printed: number }).printed++ }
@@ -106,7 +106,7 @@ test.describe('a summary for the dietician', () => {
 
   test('is about the person you pick', async ({ page }) => {
     await aHouseholdOfTwo(page)
-    await goto(page, '/analytics/summary')
+    await goto(page, '/progress/summary')
     await page.getByRole('tab', { name: 'Oli' }).click()
     await expect(page.locator('[data-summary] h1')).toHaveText('Food summary for Oli')
     await page.getByRole('tab', { name: 'Arany' }).click()

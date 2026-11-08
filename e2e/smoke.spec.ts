@@ -7,8 +7,23 @@ import { pick } from './archive'
  */
 
 const ROUTES = [
-  '/', '/plan', '/recipes', '/foods', '/grocery',
-  '/schedule', '/movement', '/analytics', '/settings', '/settings/history',
+  '/', '/plan/week', '/plan/grocery', '/plan/cooking', '/recipes', '/recipes/foods',
+  '/progress', '/progress/movement', '/progress/summary', '/settings', '/settings/history',
+]
+
+/**
+ * Every address the app used to have, and where it lives now. Bookmarks,
+ * reminders already sitting on a phone and old notes all still use these.
+ */
+const OLD_ROUTES: [string, string][] = [
+  ['/plan', '/plan/week'],
+  ['/grocery', '/plan/grocery'],
+  ['/schedule', '/plan/cooking'],
+  ['/foods', '/recipes/foods'],
+  ['/movement', '/progress/movement'],
+  ['/analytics', '/progress'],
+  ['/analytics/summary', '/progress/summary'],
+  ['/history', '/settings/history'],
 ]
 
 /** Fails the test on any uncaught error or console error, on any page. */
@@ -95,7 +110,7 @@ async function putATubInTheFridge(page: Page, label: string) {
  * is a single day's meals, the tick, the portion, the bin, comes here first.
  */
 async function planDay(page: Page) {
-  await goto(page, '/plan')
+  await goto(page, '/plan/week')
   await page.getByRole('tab', { name: 'Day' }).click()
 }
 
@@ -108,7 +123,7 @@ async function planDay(page: Page) {
  * the grid, or an arrow that means seven days rather than one, comes here.
  */
 async function planWeek(page: Page) {
-  await goto(page, '/plan')
+  await goto(page, '/plan/week')
   await page.getByRole('tab', { name: '1 week' }).click()
 }
 
@@ -254,7 +269,7 @@ test.describe('the main flow', () => {
     expect(kcal).toMatch(/of [\d,]+ kcal/)
 
     // 4. A grocery list can be generated from that week.
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByRole('button', { name: /Build list/i }).click()
     await expect(page.getByText(/0 of \d+ picked up/)).toBeVisible()
 
@@ -346,14 +361,14 @@ test.describe('the main flow', () => {
     // screen shipped permanently empty and rendered fine while doing it.
     // Nothing caught that, because "renders without errors" is exactly what an
     // empty state does.
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await page.getByRole('button', { name: /Session/ }).click()
     const pickable = await page.locator('input[type=checkbox]').count()
     expect(pickable, 'Schedule offers no recipes to batch').toBeGreaterThan(10)
   })
 
   test('a cook session says when it will email both of you', async ({ page }) => {
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await page.getByRole('button', { name: /Session/ }).click()
     await page.getByPlaceholder('Sunday batch cook').fill('Evening cook')
 
@@ -373,7 +388,7 @@ test.describe('the main flow', () => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await page.getByRole('button', { name: /Session/ }).click()
 
     // The week's own dishes come first, ahead of two hundred you are not
@@ -457,7 +472,7 @@ test.describe('the shopping list', () => {
     await planAheadOfToday(page)
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
 
     // Everything planned, then one day only: a shorter list, because nobody
     // shops for a fortnight at once.
@@ -504,7 +519,7 @@ test.describe('the planner', () => {
     // Planning a week is deliberate and can afford a tap. Ticking off a snack
     // cannot, and what you have had so far only exists in the day view, which
     // was two taps away every single time the screen was opened.
-    await goto(page, '/plan')
+    await goto(page, '/plan/week')
 
     await expect(page.getByRole('tab', { name: 'Day' })).toHaveAttribute('aria-selected', 'true')
     await expect(page.locator('[data-day-row]')).toHaveCount(0)
@@ -980,7 +995,7 @@ test.describe('the recipe library', () => {
 
   test('deleting a recipe leaves its ingredients alone', async ({ page }) => {
     // Other recipes use them.
-    await goto(page, '/foods')
+    await goto(page, '/recipes/foods')
     await expect(page.locator('.card').first()).toBeVisible()
     const before = await page.locator('.card').count()
 
@@ -992,7 +1007,7 @@ test.describe('the recipe library', () => {
     await page.getByRole('button', { name: /Delete this recipe/ }).click()
     await page.getByRole('button', { name: 'Yes, delete' }).click()
 
-    await goto(page, '/foods')
+    await goto(page, '/recipes/foods')
     await expect(page.locator('.card').first()).toBeVisible()
     expect(await page.locator('.card').count()).toBe(before)
   })
@@ -1102,7 +1117,7 @@ test.describe('building a recipe from the food database', () => {
 
 test.describe('progress, per person', () => {
   test('weight and the five measurements are logged and shown separately', async ({ page }) => {
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Body' }).click()
 
     await page.getByLabel('Weight').fill('68.4')
@@ -1126,7 +1141,7 @@ test.describe('progress, per person', () => {
 
   test('the two people have their own histories', async ({ page }) => {
     await aHouseholdOfTwo(page)
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Body' }).click()
 
     // One tab per person in the household, from the cached member list, so
@@ -1151,7 +1166,7 @@ test.describe('progress, per person', () => {
   })
 
   test('a measurement can be taken back off', async ({ page }) => {
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Body' }).click()
     await page.getByLabel('Hips').fill('95')
     await page.getByRole('button', { name: /Log measurements/ }).click()
@@ -1165,12 +1180,12 @@ test.describe('progress, per person', () => {
 test.describe('movement, per person', () => {
   test('a session is built from the exercise list and costed from your weight', async ({ page }) => {
     // A weight first: without one the app refuses to guess a calorie figure.
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Body' }).click()
     await page.getByLabel('Weight').fill('70')
     await page.getByRole('button', { name: /^Log$/ }).click()
 
-    await goto(page, '/movement')
+    await goto(page, '/progress/movement')
     await page.getByRole('button', { name: 'Build a session' }).click()
     await page.getByLabel('Search exercises').fill('running')
     await page.getByRole('button', { name: /Running \(10 km\/h\)/ }).click()
@@ -1181,7 +1196,7 @@ test.describe('movement, per person', () => {
   })
 
   test('a session can be logged in one lump, with the figure your watch gave', async ({ page }) => {
-    await goto(page, '/movement')
+    await goto(page, '/progress/movement')
     await page.getByRole('button', { name: 'Log it in one go' }).click()
     await page.getByLabel('What was it').fill('Climbing')
     await page.getByLabel('kcal, if known').fill('430')
@@ -1193,7 +1208,7 @@ test.describe('movement, per person', () => {
 
   test('the two people keep separate logs', async ({ page }) => {
     await aHouseholdOfTwo(page)
-    await goto(page, '/movement')
+    await goto(page, '/progress/movement')
     await page.getByRole('button', { name: 'Log it in one go' }).click()
     await page.getByLabel('What was it').fill('Arany swim')
     await page.getByRole('button', { name: 'Save', exact: true }).click()
@@ -1205,7 +1220,7 @@ test.describe('movement, per person', () => {
 
   test('sleep is logged per person and kept per night', async ({ page }) => {
     await aHouseholdOfTwo(page)
-    await goto(page, '/movement')
+    await goto(page, '/progress/movement')
     await page.getByRole('tab', { name: 'Sleep' }).click()
     await page.getByLabel('Hours slept').fill('7.5')
     await page.getByRole('button', { name: /^Log$/ }).click()
@@ -1218,7 +1233,7 @@ test.describe('movement, per person', () => {
 
 test.describe('the food library', () => {
   test('a food can be edited, and the edit sticks', async ({ page }) => {
-    await goto(page, '/foods')
+    await goto(page, '/recipes/foods')
     await page.getByPlaceholder(/Search/).first().fill('asparagus')
     await page.getByRole('button', { name: /^Edit / }).first().click()
 
@@ -1236,7 +1251,7 @@ test.describe('the food library', () => {
   test('the name line no longer claims a language it is not', async ({ page }) => {
     // It joined the Romanian name, the Hungarian name and the weighing state
     // into one string and labelled the lot "RO".
-    await goto(page, '/foods')
+    await goto(page, '/recipes/foods')
     await page.getByPlaceholder(/Search/).first().fill('asparagus')
 
     await expect(page.getByText('sparanghel · spárga', { exact: false })).toBeVisible()
@@ -1244,11 +1259,11 @@ test.describe('the food library', () => {
   })
 
   test('duplicate ingredients can be folded together, and stay folded', async ({ page }) => {
-    await goto(page, '/foods')
+    await goto(page, '/recipes/foods')
 
     // Add the same food twice, the way two sources would.
     for (const _ of [1, 2]) {
-      await page.getByRole('button', { name: 'Add food' }).click()
+      await page.getByRole('main').getByRole('button', { name: 'Add food' }).click()
       await page.getByLabel('Name (English)').fill('Test kefir')
       // A category has to be chosen. The form used to default to Vegetables,
       // which is how a camembert ended up filed under it on a shopping list.
@@ -1274,7 +1289,7 @@ test.describe('the food library', () => {
     await planDay(page)
     const before = await page.locator('text=/\\d+ of 7 days planned/').first().textContent()
 
-    await goto(page, '/foods')
+    await goto(page, '/recipes/foods')
     await page.getByPlaceholder(/Search/).first().fill('olive oil')
     await page.getByRole('button', { name: /^Edit / }).first().click()
     await page.getByRole('button', { name: /Delete this food/ }).click()
@@ -1294,7 +1309,7 @@ test.describe('the food library', () => {
     await goto(page, '/settings')
     await expect(page.getByText('Deleted foods')).toBeVisible()
     await page.getByRole('button', { name: 'Restore' }).first().click()
-    await goto(page, '/foods')
+    await goto(page, '/recipes/foods')
     await page.getByPlaceholder(/Search/).first().fill('olive oil')
     await expect(page.getByRole('button', { name: /^Edit Extra virgin olive oil/ })).toBeVisible()
   })
@@ -1445,7 +1460,7 @@ test.describe('rearranging the week', () => {
 
 test.describe('cooking once and eating twice', () => {
   test('a cook session fills the fridge, and the fridge fills a meal slot', async ({ page }) => {
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
 
     // Nothing cooked yet, so the app says so rather than showing an empty list.
     await expect(page.getByText('Nothing cooked and waiting')).toBeVisible()
@@ -1479,7 +1494,7 @@ test.describe('the cupboard', () => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByRole('button', { name: /Build list/ }).click()
 
     const lines = page.locator('.card input[type="checkbox"]')
@@ -1507,7 +1522,7 @@ test.describe('the cupboard', () => {
   })
 
   test('a staple never appears again', async ({ page }) => {
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByRole('button', { name: /^Cupboard/ }).click()
 
     await page.getByPlaceholder('Search your foods').fill('olive oil')
@@ -1555,7 +1570,7 @@ test.describe('filling the gaps', () => {
 
 test.describe('what the kitchen has to say', () => {
   test('leftovers with nothing planned to eat them reach the home screen', async ({ page }) => {
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await putATubInTheFridge(page, 'Half a lasagne')
 
     await goto(page, '/')
@@ -1563,7 +1578,7 @@ test.describe('what the kitchen has to say', () => {
   })
 
   test('it stops once something is planned to eat them', async ({ page }) => {
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await putATubInTheFridge(page, 'Half a lasagne')
 
     await planDay(page)
@@ -1643,7 +1658,7 @@ test.describe('asking the recipe list a question', () => {
   })
 
   test('the cupboard lens works once there is something in it', async ({ page }) => {
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByRole('button', { name: /^Cupboard/ }).click()
     await page.getByPlaceholder('Search your foods').fill('olive oil')
     await page.locator('button').filter({ hasText: /olive oil/i }).first().click()
@@ -1699,7 +1714,7 @@ test.describe('a laptop is not a large phone', () => {
   test('the shopping list uses both halves of the screen', async ({ page }) => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByRole('button', { name: /Build list/ }).click()
 
     const rows = page.locator('.card input[type="checkbox"]')
@@ -1782,7 +1797,7 @@ test.describe('whether tonight can actually be cooked', () => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByRole('button', { name: /^Cupboard/ }).click()
     await page.getByPlaceholder('Search your foods').fill('olive oil')
     await page.locator('button').filter({ hasText: /olive oil/i }).first().click()
@@ -1809,20 +1824,20 @@ test.describe('what you enter is still there tomorrow', () => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Body' }).click()
     await page.getByLabel('Weight').fill('69.2')
     await page.getByRole('button', { name: /^Log$/ }).click()
     await expect(page.getByText('69.2 kg')).toBeVisible()
 
-    await goto(page, '/movement')
+    await goto(page, '/progress/movement')
     await page.getByRole('button', { name: 'Log it in one go' }).click()
     await page.getByLabel('What was it').fill('Long walk')
     await page.getByLabel('kcal, if known').fill('310')
     await page.getByRole('button', { name: 'Save', exact: true }).click()
     await expect(page.getByText('Long walk')).toBeVisible()
 
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await page.getByRole('button', { name: /Session/ }).click()
     await page.getByPlaceholder('Sunday batch cook').fill('Reload cook')
     await page.locator('input[type=date]')
@@ -1841,14 +1856,14 @@ test.describe('what you enter is still there tomorrow', () => {
     await planDay(page)
     await expect(page.getByText('7 of 7 days planned')).toBeVisible()
 
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Body' }).click()
     await expect(page.getByText('69.2 kg')).toBeVisible()
 
-    await goto(page, '/movement')
+    await goto(page, '/progress/movement')
     await expect(page.getByText('Long walk')).toBeVisible()
 
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await expect(page.getByText('Reload cook')).toBeVisible()
 
     await goto(page, '/settings')
@@ -1985,7 +2000,7 @@ test.describe('the app when there is no signal', () => {
    * bars wondering where their shopping list went.
    */
   test('opens with the network cut off, once it has been seen once', async ({ page, context }) => {
-    await page.goto('#/grocery')
+    await page.goto('#/plan/grocery')
     await page.waitForLoadState('networkidle')
 
     // Wait for the worker to actually be in charge, rather than merely present.
@@ -2081,7 +2096,7 @@ test.describe('the week you are actually in', () => {
   })
 
   test('the shopping list offers the days you are about to live', async ({ page }) => {
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
 
     // The day picker is anchored on the planner's window. Anchored on a stale
     // one it offered a fortnight that had already been and gone, so the list
@@ -2103,7 +2118,7 @@ test.describe('the week you are actually in', () => {
     // The planner's window used to be the app's only idea of "this week", so
     // looking back at what you ate a fortnight ago moved the shopping list
     // there too and left it there.
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await expect(page.getByRole('button', { name: longDate(todayIso()) })).toBeVisible()
   })
 
@@ -2141,8 +2156,8 @@ test.describe('the week you are actually in', () => {
 
     // Leave the planner entirely, which is where this went wrong: the day came
     // from a screen that was no longer mounted.
-    await goto(page, '/analytics')
-    await page.getByRole('button', { name: 'Add a meal' }).click()
+    await goto(page, '/progress')
+    await page.getByRole('button', { name: 'Add to today' }).click()
 
     await expect(page.getByRole('heading', { name: /^Add to / })).toBeVisible()
     // The date the modal says it is writing to. It used to be read off the
@@ -2240,7 +2255,7 @@ test.describe('what actually happened', () => {
   })
 
   test('a search can be cleared with one tap', async ({ page }) => {
-    await goto(page, '/foods')
+    await goto(page, '/recipes/foods')
     const search = page.getByLabel('Search foods')
     await expect(page.getByRole('button', { name: 'Clear search' })).toHaveCount(0)
 
@@ -2251,7 +2266,7 @@ test.describe('what actually happened', () => {
   })
 
   test('selected chips carry a check and say they are pressed', async ({ page }) => {
-    await goto(page, '/foods')
+    await goto(page, '/recipes/foods')
     const chip = page.locator('.chip-off').first()
     await chip.click()
     const on = page.locator('.chip-on').first()
@@ -2318,7 +2333,7 @@ test.describe('what actually happened', () => {
     // A slot with more than one line in it, which is the case the meal-level
     // tick had no honest answer for.
     await page.getByRole('button', { name: /^Add another$|^\+ Add another$/ }).first().click()
-    // Scoped to the sheet: the phone's bar carries an "Add a meal" of its own,
+    // Scoped to the sheet: the phone's bar carries an "Add to today" of its own,
     // sitting over the top of this one.
     const sheet = page.getByRole('dialog').first()
     await sheet.getByRole('button', { name: 'foods', exact: true }).click()
@@ -2499,7 +2514,7 @@ test.describe('a list you can take to a shop', () => {
   test('the box for typing a line is above the list, not under it', async ({ page }) => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByRole('button', { name: /Build list/ }).click()
 
     const box = page.getByLabel('Add an item')
@@ -2513,7 +2528,7 @@ test.describe('a list you can take to a shop', () => {
   })
 
   test('a typed line joins the list', async ({ page }) => {
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByLabel('Add an item').fill('Washing-up liquid')
     await page.getByLabel('Add an item').press('Enter')
 
@@ -2522,7 +2537,7 @@ test.describe('a list you can take to a shop', () => {
 
   test('the list can leave the app', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write'])
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByLabel('Add an item').fill('Washing-up liquid')
     await page.getByLabel('Add an item').press('Enter')
     await expect(page.getByText('Washing-up liquid')).toBeVisible()
@@ -2543,7 +2558,7 @@ test.describe('a batch that lands in the week', () => {
    * that knew nothing about each other.
    */
   test('the portions go into the days ahead, not just the fridge', async ({ page }) => {
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await page.getByRole('button', { name: 'Session' }).click()
     await page.getByPlaceholder('Search your recipes').fill('soup')
     await page.locator('label').filter({ hasText: /soup/i }).first().click()
@@ -2570,7 +2585,7 @@ test.describe('a batch that lands in the week', () => {
 
     await page.getByRole('button', { name: 'Into the fridge' }).click()
 
-    await goto(page, '/plan')
+    await goto(page, '/plan/week')
     // A fortnight, because a batch spreads into the days ahead and those run
     // past the end of whichever week today happens to sit in.
     await page.getByRole('tab', { name: '2 weeks' }).click()
@@ -2578,7 +2593,7 @@ test.describe('a batch that lands in the week', () => {
   })
 
   test('it can be turned off, and then nothing is planned', async ({ page }) => {
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await page.getByRole('button', { name: 'Session' }).click()
     await page.getByPlaceholder('Search your recipes').fill('soup')
     await page.locator('label').filter({ hasText: /soup/i }).first().click()
@@ -2639,7 +2654,7 @@ test.describe('taking it back', () => {
   })
 
   test('an emptied shopping list comes back, typed lines included', async ({ page }) => {
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByLabel('Add an item').fill('Washing-up liquid')
     await page.getByLabel('Add an item').press('Enter')
     await expect(page.getByText('Washing-up liquid')).toBeVisible()
@@ -2670,7 +2685,7 @@ test.describe('taking it back', () => {
   })
 
   test('one line off the list comes back where it was', async ({ page }) => {
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByLabel('Add an item').fill('Bicarbonate of soda')
     await page.getByLabel('Add an item').press('Enter')
 
@@ -2758,7 +2773,7 @@ test.describe('the small sharp edges', () => {
   test('a filter that cannot answer says why, and where to fix it', async ({ page }) => {
     // The chip sat at half opacity with the reason hidden until you tapped it,
     // and the fix was a sentence naming a screen you then had to find: the
-    // Cupboard is behind More, then Grocery, then a tab.
+    // Cupboard was behind More, then Grocery, then a tab.
     await goto(page, '/recipes')
     await page.getByRole('button', { name: /From the cupboard/ }).click()
 
@@ -2779,9 +2794,9 @@ test.describe('the small sharp edges', () => {
 
   test('the tab is named after the screen', async ({ page }) => {
     await planDay(page)
-    await expect(page).toHaveTitle(/^Planner · Bite Buddy$/)
+    await expect(page).toHaveTitle(/^Plan · Bite Buddy$/)
 
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await expect(page).toHaveTitle(/^Shopping · Bite Buddy$/)
 
     // Every route used to be "Bite Buddy", so two tabs of this app were
@@ -2810,7 +2825,7 @@ test.describe('the small sharp edges', () => {
   })
 
   test('emptying the shopping list asks first', async ({ page }) => {
-    await goto(page, '/grocery')
+    await goto(page, '/plan/grocery')
     await page.getByLabel('Add an item').fill('Washing-up liquid')
     await page.getByLabel('Add an item').press('Enter')
 
@@ -2829,7 +2844,7 @@ test.describe('the small sharp edges', () => {
   })
 
   test('a weight can be given somewhere to head', async ({ page }) => {
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Body' }).click()
 
     await page.getByLabel('Weight', { exact: true }).fill('72')
@@ -2859,7 +2874,7 @@ test.describe('the dietician, in English', () => {
   })
 
   test('a food keeps its own foreign names, which are the point of them', async ({ page }) => {
-    await goto(page, '/foods')
+    await goto(page, '/recipes/foods')
     await page.getByPlaceholder(/Search/).first().fill('asparagus')
 
     // Translating these would turn "sparanghel · spárga" into
@@ -2957,7 +2972,7 @@ test.describe('cooking three and eating one', () => {
     // They are actually there. The surplus used to be described and then
     // dropped: you cooked three, the app recorded one, and the other two
     // existed only in your fridge and your memory.
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await expect(page.getByText('In the fridge')).toBeVisible()
     await expect(page.locator('text=/^2$/').first()).toBeVisible()
   })
@@ -2976,7 +2991,7 @@ test.describe('cooking three and eating one', () => {
     // One serving on the day, whatever the size of the pot.
     await expect(page.locator('[data-entry-name]').first()).toBeVisible()
 
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await expect(page.getByText('In the fridge')).toBeVisible()
   })
 
@@ -2986,7 +3001,7 @@ test.describe('cooking three and eating one', () => {
     await expect(page.getByText(/One serving, eaten on the day/)).toBeVisible()
 
     await page.getByRole('dialog').locator('button').filter({ hasText: /kcal/ }).first().click()
-    await goto(page, '/schedule')
+    await goto(page, '/plan/cooking')
     await expect(page.getByText('In the fridge')).toHaveCount(0)
   })
 })
@@ -3059,7 +3074,7 @@ test.describe('how it is going', () => {
     // A reload, because moving between hashes never re-reads what is stored:
     // the store hydrates once, and it hydrated before any of this was written.
     await page.reload()
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Trends' }).click()
   }
 
@@ -3112,8 +3127,8 @@ test.describe('a food is filed where you put it', () => {
     // the macros while knowing nothing about the category, so scanning a
     // barcode was the fastest way to mis-file something. A camembert sat under
     // Vegetables on the shopping list for as long as it existed.
-    await goto(page, '/foods')
-    await page.getByRole('button', { name: 'Add food' }).click()
+    await goto(page, '/recipes/foods')
+    await page.getByRole('main').getByRole('button', { name: 'Add food' }).click()
     await page.getByLabel('Name (English)').fill('Test camembert')
 
     const save = page.getByRole('button', { name: 'Save food' })
@@ -3139,7 +3154,7 @@ test.describe('a food is filed where you put it', () => {
  */
 test.describe('weight and measurements over time', () => {
   test('reads a stretch you choose, and says how long the change took', async ({ page }) => {
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Body' }).click()
 
     // Two weigh-ins, so there is a change to report.
@@ -3156,7 +3171,7 @@ test.describe('weight and measurements over time', () => {
   })
 
   test('a measurement chart is drawn for one measure at a time', async ({ page }) => {
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await page.getByRole('tab', { name: 'Body' }).click()
 
     await page.getByLabel('Waist').fill('93')
@@ -3175,32 +3190,25 @@ test.describe('weight and measurements over time', () => {
 /**
  * The phone's navigation.
  *
- * A tab bar along the bottom, in reach of the thumb: Home, Plan, Add a meal,
- * Recipes and More, with More holding every other screen. Nothing may go
- * missing between the bar and the sheet: together they are the same nine
- * screens the sidebar lists.
+ * A bar along the bottom, in reach of the thumb: Today, Plan, Add to today,
+ * Recipes and Progress. There is no More sheet: every other screen is a tab
+ * inside one of those four, and Settings is the gear in Today's header.
  */
-test.describe('the tab bar on a phone', () => {
+test.describe('the bottom bar on a phone', () => {
   test.beforeEach(({ }, testInfo) => {
-    test.skip(testInfo.project.name !== 'mobile', 'the tab bar is a phone thing')
+    test.skip(testInfo.project.name !== 'mobile', 'the bottom bar is a phone thing')
   })
 
-  test('holds every screen between the bar and More, with no third tier', async ({ page }) => {
+  test('holds the four places and the add button, and nothing else', async ({ page }) => {
     await goto(page, '/')
     const bar = page.getByRole('navigation', { name: 'Main' })
-    for (const label of ['Home', 'Plan', 'Recipes']) {
+    for (const label of ['Today', 'Plan', 'Recipes', 'Progress']) {
       await expect(bar.getByRole('link', { name: label })).toBeVisible()
     }
-    await expect(bar.getByRole('button', { name: 'Add a meal' })).toBeVisible()
-
-    await bar.getByRole('button', { name: 'More' }).click()
-    const more = page.getByRole('dialog', { name: 'More' })
-    // The other six, from the same array the sidebar reads, so they cannot
-    // drift apart again.
-    await expect(more.getByRole('link')).toHaveCount(6)
-    for (const label of ['Foods', 'Grocery', 'Schedule', 'Movement', 'Progress', 'Settings']) {
-      await expect(more.getByRole('link', { name: label })).toBeVisible()
-    }
+    await expect(bar.getByRole('link')).toHaveCount(4)
+    await expect(bar.getByRole('button', { name: 'Add to today' })).toBeVisible()
+    await expect(bar.getByRole('button', { name: 'More' })).toHaveCount(0)
+    await expect(bar.getByRole('link', { name: 'Today' })).toHaveAttribute('aria-current', 'page')
   })
 
   test('every slot on the bar is at least 44px, at the bottom of the screen', async ({ page }) => {
@@ -3211,11 +3219,11 @@ test.describe('the tab bar on a phone', () => {
     expect(box.y + box.height).toBeGreaterThanOrEqual(viewport.height - 1)
 
     for (const target of [
-      bar.getByRole('link', { name: 'Home' }),
+      bar.getByRole('link', { name: 'Today' }),
       bar.getByRole('link', { name: 'Plan' }),
-      bar.getByRole('button', { name: 'Add a meal' }),
+      bar.getByRole('button', { name: 'Add to today' }),
       bar.getByRole('link', { name: 'Recipes' }),
-      bar.getByRole('button', { name: 'More' }),
+      bar.getByRole('link', { name: 'Progress' }),
     ]) {
       const b = (await target.boundingBox())!
       expect(b.height).toBeGreaterThanOrEqual(44)
@@ -3223,31 +3231,107 @@ test.describe('the tab bar on a phone', () => {
     }
   })
 
-  test('takes you somewhere and gets out of the way', async ({ page }) => {
+  test('reaches every old screen through a place and a tab', async ({ page }) => {
     await goto(page, '/')
-    await page.getByRole('button', { name: 'More' }).click()
-    await page.getByRole('dialog', { name: 'More' }).getByRole('link', { name: 'Grocery' }).click()
+    const bar = page.getByRole('navigation', { name: 'Main' })
 
-    await expect(page.getByRole('dialog', { name: 'More' })).toHaveCount(0)
+    await bar.getByRole('link', { name: 'Plan' }).click()
+    const plan = page.getByRole('navigation', { name: 'Plan views' })
+    await expect(plan.getByRole('link', { name: 'Week' })).toHaveAttribute('aria-current', 'page')
+    await expect(bar.getByRole('link', { name: 'Plan' })).toHaveAttribute('aria-current', 'page')
+    await plan.getByRole('link', { name: 'Grocery' }).click()
     await expect(page.getByRole('heading', { name: 'Shopping list' })).toBeVisible()
+    await plan.getByRole('link', { name: 'Cooking' }).click()
+    await expect(plan.getByRole('link', { name: 'Cooking' })).toHaveAttribute('aria-current', 'page')
+
+    await bar.getByRole('link', { name: 'Recipes' }).click()
+    const library = page.getByRole('navigation', { name: 'Library' })
+    await library.getByRole('link', { name: 'Foods' }).click()
+    await expect(library.getByRole('link', { name: 'Foods' })).toHaveAttribute('aria-current', 'page')
+
+    await bar.getByRole('link', { name: 'Progress' }).click()
+    const progress = page.getByRole('navigation', { name: 'Progress views' })
+    for (const tab of ['Overview', 'Movement', 'Summary']) {
+      await progress.getByRole('link', { name: tab }).click()
+      await expect(progress.getByRole('link', { name: tab })).toHaveAttribute('aria-current', 'page')
+    }
+
+    // And the back gesture walks back through the tabs, because each is a route.
+    await page.goBack()
+    await expect(progress.getByRole('link', { name: 'Movement' })).toHaveAttribute('aria-current', 'page')
   })
 
-  test('adding a meal stays on the bar, because it is not a screen', async ({ page }) => {
+  test('adding food stays on the bar, because it is not a screen', async ({ page }) => {
     // An action rather than a destination, and the thing this app is most
     // often opened to do. It has no business inside a list of screens.
-    await goto(page, '/analytics')
-    await page.getByRole('button', { name: 'Add a meal' }).click()
+    await goto(page, '/progress')
+    await page.getByRole('button', { name: 'Add to today' }).click()
     await expect(page.getByRole('heading', { name: /^Add to / })).toBeVisible()
   })
 
-  test('can be escaped, and gives focus back to the button that opened it', async ({ page }) => {
+  test('Settings is the gear on Today, with a way back and no bar', async ({ page }) => {
     await goto(page, '/')
-    const button = page.getByRole('button', { name: 'More' })
-    await button.click()
-    await expect(page.getByRole('dialog', { name: 'More' })).toBeVisible()
+    await page.getByRole('link', { name: 'Settings' }).click()
+    await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible()
+    await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0)
 
-    await page.keyboard.press('Escape')
-    await expect(page.getByRole('dialog', { name: 'More' })).toHaveCount(0)
-    await expect(button).toBeFocused()
+    await page.getByRole('link', { name: 'Back to Today' }).click()
+    await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Settings' })).toBeVisible()
+  })
+
+  test('shows the household on Today', async ({ page }) => {
+    await aHouseholdOfTwo(page)
+    await goto(page, '/')
+    const household = page.getByRole('list', { name: 'Household' })
+    await expect(household.getByRole('img', { name: 'Arany' })).toHaveText('A')
+    await expect(household.getByRole('img', { name: 'Oli' })).toHaveText('O')
+    // A gear to Settings, which left the bar.
+    await expect(page.getByRole('link', { name: 'Settings' })).toBeVisible()
+  })
+})
+
+/**
+ * The desktop's navigation: the same four places down the left, an add
+ * button, and the household with Settings at the foot.
+ */
+test.describe('the sidebar on a wide screen', () => {
+  test.beforeEach(({ }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'the sidebar is a wide-screen thing')
+  })
+
+  test('holds the four places, the household and Settings', async ({ page }) => {
+    await aHouseholdOfTwo(page)
+    await goto(page, '/plan/grocery')
+    const sidebar = page.getByRole('complementary', { name: 'Sidebar' })
+    const main = sidebar.getByRole('navigation', { name: 'Main' })
+    await expect(main.getByRole('link')).toHaveCount(4)
+    await expect(main.getByRole('link', { name: 'Plan' })).toHaveAttribute('aria-current', 'page')
+    await expect(sidebar.getByText('Arany · Oli')).toBeVisible()
+
+    await sidebar.getByRole('link', { name: 'Settings' }).click()
+    await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible()
+    await expect(sidebar.getByRole('link', { name: 'Settings' })).toHaveAttribute('aria-current', 'page')
+  })
+
+  test('Add food opens the add sheet on today', async ({ page }) => {
+    await goto(page, '/recipes')
+    await page.getByRole('button', { name: 'Add food' }).click()
+    await expect(page.getByRole('heading', { name: /^Add to / })).toBeVisible()
+  })
+})
+
+test.describe('old addresses', () => {
+  for (const [from, to] of OLD_ROUTES) {
+    test(`${from} lands on ${to}`, async ({ page }) => {
+      await goto(page, from)
+      await expect(page).toHaveURL(new RegExp(`#${to.replace(/\//g, '\\/')}$`))
+      await expect(page.locator('h1').first()).toBeVisible()
+    })
+  }
+
+  test('a redirect keeps its query string', async ({ page }) => {
+    await goto(page, '/grocery?tab=cupboard')
+    await expect(page).toHaveURL(/#\/plan\/grocery\?tab=cupboard$/)
   })
 })

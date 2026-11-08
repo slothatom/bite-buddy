@@ -92,10 +92,17 @@ and a day says how many of its entries are fully known: "3 of 5 entries fully kn
 **Mediterranean tiers** use a symbol and a word (`● Daily`, `◐ Weekly`, `○ Moderation`,
 `◇ Rarely`), quiet enough to sit on every food row at once.
 
-**Navigation.** Nine destinations (`src/components/layout/nav.ts`): Home, Planner, Recipes,
-Foods, Grocery, Schedule, Movement, Progress, Settings. A sidebar on desktop. On a phone a
-bottom tab bar, Home · Plan · **+** · Recipes · More, where the centre button opens the add
-sheet on today at the slot for the time of day, and More opens a sheet with the other six.
+**Navigation.** Four places (`src/components/layout/nav.ts`), each with its own tabs:
+**Today** (`/`); **Plan**, with Week (`/plan/week`), Grocery (`/plan/grocery`) and Cooking
+(`/plan/cooking`); **Recipes**, with Recipes (`/recipes`) and Foods (`/recipes/foods`); and
+**Progress**, with Overview (`/progress`), Movement (`/progress/movement`) and the Summary
+for your dietician (`/progress/summary`). Every tab is its own address, so links, reminders
+and the back gesture land on the right one, and every older address (`/grocery`,
+`/schedule`, `/analytics` and the rest) redirects to its new home. On a phone a bottom bar,
+Today · Plan · **+** · Recipes · Progress, where the centre button opens the add sheet on
+today at the slot for the time of day; Settings is the gear in Today's header and has a
+back arrow instead of the bar. On desktop a sidebar with the same four places, an Add food
+button, and the household with a Settings link at its foot.
 
 **Filters wrap, they don't scroll.** `ChipRow` wraps and collapses to the first few behind
 a `+N more`, with any active filter sorted to the front. A chip that is on shows a check
@@ -120,7 +127,7 @@ plans and always win.
 
 ## Features
 
-### Home
+### Today
 Where you land: today's meals against your calorie ring, the week as seven bars, who else
 is in the household and when they were last here, and whether your copy and theirs are in
 step. If you and someone else changed the same thing, it is listed here with **Use theirs**
@@ -132,7 +139,7 @@ tomorrow with ingredients not in the house, a shopping list that no longer match
 plan. The week ones are about balance against the Mediterranean guide. Four is a cap, not
 a target, and nothing scolds. `src/lib/kitchen.ts` sets out the rules.
 
-### Planner
+### Plan: Week
 A week, a fortnight or a month at a time, four slots a day (Breakfast, Lunch, Dinner,
 Snacks), each holding any number of entries, with live totals against your targets. On a
 phone the week is a list of days with every slot named in full. Every day row carries its
@@ -195,13 +202,13 @@ Nine of the fourteen quick filters are derived from the recipe; the other five (
 Leftovers, Fridge Clean-Out, Special Occasion, Budget Friendly) are judgements and are
 yours to apply.
 
-### Foods
+### Recipes: Foods
 148 foods with per-100 g nutrition, EN/RO/HU names and a Mediterranean tier. Editable and
 deletable on the same terms as recipes (**Settings → Deleted foods**). Add your own by
 hand, by USDA / Open Food Facts lookup, or by scanning a barcode. A lookup that fails says
 why: rate-limited, offline, or the service down.
 
-### Grocery list
+### Plan: Grocery
 Built from the planned week, resolving nested recipes down to what you buy, merged and
 grouped by category. Weights are raw. Anything covered by a portion in the fridge is left
 off. Amounts are counts where that is honest ("3 tomatoes", grams beside it). Share where
@@ -211,23 +218,23 @@ The **Cupboard** tab holds what you have now and what you always have. A staple 
 appears on a list again; an amount is optional, and blank means enough. "Have it" puts a
 line in the cupboard. Nothing is decremented automatically.
 
-### Schedule
+### Plan: Cooking
 Batch-cook sessions: date, time, dishes, and a weigh-out derived from each recipe. Ticking
 a session off asks what came out of the pan; those portions go in the fridge or freezer
 and are offered first the next time a slot needs filling. Leftovers work the same way.
 With push set up, a reminder arrives fifteen minutes before a session.
 
-### Progress
+### Progress: Overview
 The week's calories and macros, Mediterranean serving goals (counted in the state the food
 is in, with treats scored too), and body tracking: weight with an optional goal line, plus
 waist, hips, chest, arms and thighs, one person at a time. Body rows are personal: each
 carries whose it is, and still syncs so anyone can log from any phone.
 
-**Summary for your dietician** (Progress → `/analytics/summary`): pick a span and a person,
+**Summary for your dietician** (Progress → Summary, `/progress/summary`): pick a span and a person,
 read it, then **Download** one HTML file or **Print / Save as PDF**. It uses the app's own
 rules for what a day came to and which figures are floors (`src/lib/export/`).
 
-### Movement
+### Progress: Movement
 Exercise and sleep, one person at a time. Workouts from an exercise search, costed against
 that person's body weight, steps per day, and Garmin CSV import.
 
@@ -242,7 +249,8 @@ as one JSON file; a backup from a different `SCHEMA_VERSION` is refused), delete
 and foods, the weekly food check, and when signed in: account, **Household**, sync and
 notifications. A second tab holds the **Plan history**: every original plan, with its own
 wording, loadable into the planner, and the household's plan archive (an admin uploads it;
-everyone else sees what is loaded). Settings works signed out.
+everyone else sees what is loaded). Settings works signed out. It is reached from the gear
+in Today's header on a phone, or the foot of the sidebar on desktop.
 
 ---
 
@@ -348,7 +356,9 @@ An Edge Function, `supabase/functions/notify`, on a five-minute cron, sends **pu
 notifications only** (there is no email): fifteen minutes before a cook session, and when
 someone else has changed the week and then been still for ten minutes. Each person turns
 them on per device and picks which kinds under **Settings → Notifications**. The decisions
-live in `supabase/functions/_shared/notify.ts`, with fourteen tests.
+live in `supabase/functions/_shared/notify.ts`, with fourteen tests. Tapping one opens the screen it
+was about (`/#/plan/cooking` or `/#/plan/week`), and if the app is already open the
+service worker hands it the path and it navigates there.
 
 **On the current Supabase project this is not set up yet**: the function, its VAPID keys,
 the public key row and the cron job all need doing again. The steps, and the query to run

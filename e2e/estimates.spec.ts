@@ -22,12 +22,12 @@ test.describe('estimates, not medical advice', () => {
   })
 
   test('Progress says so under its heading', async ({ page }) => {
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     await expect(page.getByText(NOTE)).toBeVisible()
   })
 
   test('the note is a readable caption, not fine print', async ({ page }) => {
-    await goto(page, '/analytics')
+    await goto(page, '/progress')
     const size = await page.locator('[data-estimates-note]').evaluate(
       (el) => parseFloat(getComputedStyle(el).fontSize))
     expect(size).toBeGreaterThanOrEqual(12)
@@ -38,7 +38,7 @@ test.describe('estimates, not medical advice', () => {
     await goto(page, '/settings/history')
     await page.getByRole('button', { name: /^Load$/ }).first().click()
 
-    await goto(page, '/plan')
+    await goto(page, '/plan/week')
     await page.getByRole('tab', { name: '1 week' }).click()
     const row = page.locator('[data-day-row]')
       .filter({ has: page.locator('[data-planned]') })
