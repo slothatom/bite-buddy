@@ -38,18 +38,19 @@ const NOTE = "Calories are estimates worked out by Bite Buddy, not by your dieti
 test.describe('a summary for the dietician', () => {
   test('is reached from Progress and covers the week, the month or two dates', async ({ page }) => {
     await goto(page, '/progress')
-    await page.getByRole('link', { name: 'Summary for your dietician' }).click()
-    await expect(page.getByRole('heading', { name: 'For your dietician' })).toBeVisible()
+    // The Summary tab, which every Progress screen carries in its header.
+    await page.getByRole('navigation', { name: 'Progress views' }).getByRole('link', { name: 'Summary' }).click()
+    await expect(page).toHaveURL(/#\/progress\/summary$/)
 
     const summary = page.locator('[data-summary]')
     await expect(summary.locator('[data-summary-day]')).toHaveCount(7)
     await expect(summary.getByText(NOTE)).toBeVisible()
 
-    await page.getByRole('tab', { name: 'Last 4 weeks' }).click()
+    await page.getByRole('button', { name: 'Last 4 weeks' }).click()
     await expect(summary.locator('[data-summary-day]')).toHaveCount(28)
     await expect(summary.locator('[data-summary-week]')).toHaveCount(0)
 
-    await page.getByRole('tab', { name: 'Custom' }).click()
+    await page.getByRole('button', { name: 'Custom' }).click()
     await page.getByLabel('From', { exact: true }).fill('2026-03-02')
     await page.getByLabel('To', { exact: true }).fill('2026-03-04')
     await expect(summary.locator('[data-summary-day]')).toHaveCount(3)
@@ -78,7 +79,8 @@ test.describe('a summary for the dietician', () => {
 
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.getByRole('button', { name: 'Download' }).click(),
+      // Download on a phone, Export summary in the desktop header: the same file.
+      page.getByRole('button', { name: /^(Download|Export summary)$/ }).click(),
     ])
     expect(download.suggestedFilename()).toMatch(/^bite-buddy-summary-.+\.html$/)
     const html = await readFile((await download.path())!, 'utf8')
@@ -94,22 +96,22 @@ test.describe('a summary for the dietician', () => {
       (window as unknown as { printed: number }).printed = 0
       window.print = () => { (window as unknown as { printed: number }).printed++ }
     })
-    await page.getByRole('button', { name: 'Print / Save as PDF' }).click()
+    await page.getByRole('button', { name: 'Print or save as PDF' }).click()
     expect(await page.evaluate(() => (window as unknown as { printed: number }).printed)).toBe(1)
 
     await page.emulateMedia({ media: 'print' })
     await expect(page.locator('[data-summary]')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Download' })).toBeHidden()
-    await expect(page.getByRole('heading', { name: 'For your dietician' })).toBeHidden()
+    await expect(page.getByRole('button', { name: /^(Download|Export summary)$/ })).toHaveCount(0)
+    await expect(page.getByRole('heading', { name: 'Progress', exact: true })).toBeHidden()
     for (const nav of await page.getByRole('navigation').all()) await expect(nav).toBeHidden()
   })
 
   test('is about the person you pick', async ({ page }) => {
     await aHouseholdOfTwo(page)
     await goto(page, '/progress/summary')
-    await page.getByRole('tab', { name: 'Oli' }).click()
+    await page.getByRole('button', { name: 'Oli', exact: true }).click()
     await expect(page.locator('[data-summary] h1')).toHaveText('Food summary for Oli')
-    await page.getByRole('tab', { name: 'Arany' }).click()
+    await page.getByRole('button', { name: 'Arany', exact: true }).click()
     await expect(page.locator('[data-summary] h1')).toHaveText('Food summary for Arany')
   })
 })
