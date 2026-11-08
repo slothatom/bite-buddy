@@ -11,15 +11,18 @@ dist-single/
 # Local Supabase credentials
 .env.local
 
-# The dietician's own documents.
+# The dietician's plans, in every form.
 #
-# `npm run data:build` reads these to produce the archive in
-# src/data/generated, and the archive is what the app ships, so the originals
-# are only ever needed on the machine doing the import. They are somebody's
-# named medical correspondence and this repository is public, so they stay out
-# of it. Drop them in data/source and rebuild; nothing here will offer to
-# commit them.
+# They are somebody's named medical correspondence and this repository is
+# public, so none of it is committed: not the original documents, not the
+# archive built from them, and not the generated TypeScript the app used to
+# ship them in. `npm run data:build` reads data/source and writes
+# data/archive.json, which an admin uploads in Settings; the household reads it
+# from Supabase behind the login. See docs/DEPLOY.md.
 data/source/
+data/archive.json
+data/*.archive.json
+src/data/generated/
 
 # design-sync: staged scripts, build output, machine state
 .ds-sync/

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { Fragment, lazy, Suspense, useEffect } from 'react'
 import { HashRouter, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import Sidebar from './components/layout/Sidebar'
@@ -11,6 +11,7 @@ import Planner from './pages/Planner'
 import SignIn from './pages/SignIn'
 import HouseholdSetup from './pages/HouseholdSetup'
 import { useHousehold } from './store/useHousehold'
+import { useArchive } from './store/useArchive'
 
 import { useAuthStore } from './store/useAuth'
 import { useSyncSession } from './store/useSync'
@@ -132,6 +133,21 @@ function useTheme() {
 }
 
 /**
+ * The household's plan archive, fetched once the household is known.
+ *
+ * The copy on this device is already in place (main.tsx restores it before
+ * the first render); this asks the database whether there is a newer one, and
+ * downloads it only if so.
+ */
+function useArchiveSync() {
+  const householdId = useHousehold((s) => (s.status === 'member' ? s.household?.id ?? null : null))
+
+  useEffect(() => {
+    if (isConfigured && householdId) void useArchive.getState().load(householdId)
+  }, [householdId])
+}
+
+/**
  * The app itself, once you are allowed to see it.
  *
  * Sync is started here rather than inside a screen, so it survives navigation
@@ -142,9 +158,14 @@ function Shell() {
   useCurrentWeek()
   useOtherTabs()
   useRouteTitle()
+  useArchiveSync()
+  // A new archive remounts every screen, so nothing keeps showing the recipes
+  // and plans it read before. Rare (an upload, or a newer one arriving after
+  // sign-in), and the stores and the route survive it.
+  const archiveVersion = useArchive((s) => s.version)
 
   return (
-    <>
+    <Fragment key={archiveVersion}>
       <StorageBanner />
       <div className="flex min-h-screen bg-cream-50">
         <Sidebar />
@@ -173,7 +194,7 @@ function Shell() {
         </main>
       </div>
       <UndoBar />
-    </>
+    </Fragment>
   )
 }
 

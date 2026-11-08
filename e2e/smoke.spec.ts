@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { pick } from './archive'
 
 /**
  * End-to-end checks for the paths that matter and the layout rules that are
@@ -232,9 +233,10 @@ test.describe('the main flow', () => {
 
     // 1. The archive offers every plan she has written. Thirty-six of them:
     //    fourteen were imported first, eleven more arrived as documents, and
-    //    eleven again once the importer could read a PDF.
+    //    eleven again once the importer could read a PDF. The made-up archive
+    //    the test build carries has four.
     await goto(page, '/settings/history')
-    await expect(page.getByRole('button', { name: /^Load$/ })).toHaveCount(36)
+    await expect(page.getByRole('button', { name: /^Load$/ })).toHaveCount(pick(36, 4))
 
     // 2. Loading one fills the planner. Into next week, so all seven days are
     // still ahead and the shopping list further down will offer all of them.

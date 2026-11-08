@@ -4,6 +4,7 @@ import type { ActivityLevel, Goal, Sex } from '../../types'
 import { useUserStore } from '../../store/useUserStore'
 import { useNutritionContext } from '../../store/useNutrition'
 import { SOURCE_PLANS } from '../../data'
+import { useArchiveVersion } from '../../store/useArchive'
 import {
   ACTIVITY_LABELS, averagePlanDay, explainTdee, fromPlans, fromTdee, totalDailyEnergy,
 } from '../../lib/targets'
@@ -18,8 +19,12 @@ export function TargetsSection() {
   const shown = profile.targets
   const ctx = useNutritionContext()
 
-  const planAverage = useMemo(() => averagePlanDay(SOURCE_PLANS, ctx), [ctx])
-  const planTargets = useMemo(() => fromPlans(SOURCE_PLANS, ctx), [ctx])
+  // SOURCE_PLANS is the household's archive, a live binding that can change.
+  const archiveVersion = useArchiveVersion()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const planAverage = useMemo(() => averagePlanDay(SOURCE_PLANS, ctx), [ctx, archiveVersion])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const planTargets = useMemo(() => fromPlans(SOURCE_PLANS, ctx), [ctx, archiveVersion])
   const tdeeTargets = fromTdee(profile.tdee)
   const tdee = totalDailyEnergy(profile.tdee)
   const working = explainTdee(profile.tdee)

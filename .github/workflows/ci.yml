@@ -38,11 +38,12 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      # Verifies every recipe component resolves, no recipe nests itself, all
-      # 481 plan lines map, names are unique, and each food's stated calories
-      # agree with its own macros.
+      # Verifies every recipe component resolves, no recipe nests itself,
+      # names are unique, and each food's stated calories agree with its own
+      # macros. The plans themselves are private and not in the repository, so
+      # here that means the foods, the dishes and the made-up test archive.
       - name: Data integrity
-        run: npm run data:check
+        run: npm run data:check && npm run data:check -- src/test/fixtures/archive.json
 
       - name: House style
         run: npm run text:check
@@ -58,6 +59,12 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # The dietician's plans are medical correspondence and this repository
+      # is public. Fails if the built site carries anything shaped like plan
+      # data, or if the plans are tracked in git again.
+      - name: The plans stay out of the bundle
+        run: npm run bundle:check
 
   # Drives the real app in a browser at desktop and phone sizes. Slower, so it
   # runs alongside rather than blocking the fast checks.

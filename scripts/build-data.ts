@@ -1,9 +1,9 @@
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { loadPlans } from './lib/plans.js'
-import { buildLibrary, rebuildFromArchive, renderFiles, type PlanInput } from './lib/library.js'
-import { SOURCE_PLANS } from '../src/data/generated/sourcePlans.js'
+import { buildLibrary, rebuildFromArchive, toArchive, type PlanInput } from './lib/library.js'
+import { ARCHIVE_PATH, readArchiveFile, writeArchiveFile } from './lib/archiveFile.js'
 import { FOODS } from '../src/data/foods.js'
 import { DISHES } from '../src/data/dishes.js'
 import { buildContext, componentsNutrients } from '../src/lib/nutrition.js'
@@ -13,18 +13,18 @@ import { buildContext, componentsNutrients } from '../src/lib/nutrition.js'
  *
  * Run:  npx tsx scripts/build-data.ts [source-dir]
  *
- * The output is committed, so the app has no build-time dependency on the source
- * documents; re-running only matters when a new plan is added or when a dish
- * definition changes.
+ * Writes `data/archive.json`, which is gitignored and never committed: the
+ * plans are private and this repository is public. An admin uploads the file
+ * in Settings, and the household reads it from Supabase behind the login.
+ * Re-running only matters when a new plan is added or when a dish definition
+ * or an import rule changes.
  *
- * Without the source documents it rebuilds from the committed archive instead,
- * which stores every meal line verbatim. That covers the second case, a dish
- * definition or an import rule changing, on a machine that has the repository
- * but not the fourteen .docx originals.
+ * Without the source documents it rebuilds from the existing archive instead,
+ * which stores every meal line verbatim. That covers the second case on a
+ * machine that has the archive but not the original documents.
  */
 
 const HERE = dirname(fileURLToPath(import.meta.url))
-const OUT_DIR = resolve(HERE, '../src/data/generated')
 const SOURCE_DIR = process.argv[2] ?? resolve(HERE, '../data/source')
 
 function fromDocuments(): PlanInput[] {
@@ -44,11 +44,17 @@ function fromDocuments(): PlanInput[] {
 }
 
 const haveSource = existsSync(SOURCE_DIR)
+const existing = haveSource ? null : readArchiveFile()
+if (!haveSource && !existing) {
+  console.log(`No source documents at ${SOURCE_DIR} and no archive at ${ARCHIVE_PATH}.`)
+  console.log('Put the dietician\'s documents in data/source (or pass a folder) and run this again.')
+  process.exit(1)
+}
 if (!haveSource) {
-  console.log(`no source documents at ${SOURCE_DIR}, rebuilding from the committed archive\n`)
+  console.log(`no source documents at ${SOURCE_DIR}, rebuilding from ${ARCHIVE_PATH}\n`)
 }
 
-const library = haveSource ? buildLibrary(fromDocuments()) : rebuildFromArchive(SOURCE_PLANS)
+const library = haveSource ? buildLibrary(fromDocuments()) : rebuildFromArchive(existing!.sourcePlans)
 const { plans, recipes, aliases, unresolved, lineCount, mappedLines } = library
 
 // ─── Report ───────────────────────────────────────────────────────────────────
@@ -86,11 +92,7 @@ if (unresolved.length) {
 
 // ─── Emit ─────────────────────────────────────────────────────────────────────
 
-mkdirSync(OUT_DIR, { recursive: true })
+writeArchiveFile(toArchive(library))
 
-const files = renderFiles(library)
-for (const [name, content] of Object.entries(files)) {
-  writeFileSync(resolve(OUT_DIR, name), content)
-}
-
-console.log(`\nwrote ${Object.keys(files).join(', ')} into ${OUT_DIR}`)
+console.log(`\nwrote ${ARCHIVE_PATH}`)
+console.log('It is private: never commit it. Upload it in Settings, Plan history, to share it with the household.')

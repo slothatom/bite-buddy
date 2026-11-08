@@ -109,6 +109,10 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: npm run build
 
+      # The same check CI runs, on the build that is actually published.
+      - name: The plans stay out of the bundle
+        run: npm run bundle:check
+
       - name: Fail if the deploy would have no backend
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}

@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import { defineConfig, devices } from '@playwright/test'
 
 /**
@@ -59,8 +60,19 @@ export default defineConfig({
   // ships rather than the dev server's output. The build is part of the server
   // command deliberately: `preview` serves whatever is in dist/, so without it
   // a local run happily passes against a bundle that predates your changes.
+  //
+  // The plan archive is private and is never in a normal build, so this one
+  // carries the made-up archive from src/test/fixtures (see vite.config.ts and
+  // src/main.tsx). `E2E_ARCHIVE=real` builds with data/archive.json instead,
+  // on a machine that has it, and runs the tests that are about the real
+  // plans too (e2e/archive.ts). Either way the result is a test build: never
+  // publish this dist/.
   webServer: {
     command: 'npm run build && npm run preview -- --port 4173 --strictPort',
+    env: {
+      VITE_E2E_ARCHIVE: '1',
+      ...(process.env.E2E_ARCHIVE === 'real' ? { E2E_ARCHIVE_PATH: resolve(import.meta.dirname, 'data/archive.json') } : {}),
+    },
     url: 'http://localhost:4173/',
     // Never reuse a server that is already up. Reusing it skips the build in
     // the command above, so the suite silently tests whatever was in dist/,

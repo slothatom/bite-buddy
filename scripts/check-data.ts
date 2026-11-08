@@ -1,16 +1,9 @@
-import { readFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { FOODS } from '../src/data/foods.js'
 import { DISHES } from '../src/data/dishes.js'
-import { MEAL_RECIPES } from '../src/data/generated/mealRecipes.js'
-import { SOURCE_PLANS } from '../src/data/generated/sourcePlans.js'
 import { atwaterCalories, buildContext, calorieDrift, calorieGap, recipePerServing } from '../src/lib/nutrition.js'
-import { RECIPE_CLASSIFICATION } from '../src/data/generated/classification.js'
 import { DISH_CATEGORIES, QUICK_FILTERS, HAND_APPLIED_FILTERS } from '../src/lib/dishCategories.js'
-import { RECIPE_ALIASES } from '../src/data/generated/recipeAliases.js'
-import { TIMES_PLANNED } from '../src/data/generated/reuse.js'
-import { componentSignature, rebuildFromArchive, renderFiles } from './lib/library.js'
+import { componentSignature, rebuildFromArchive, toArchive } from './lib/library.js'
+import { archiveText, noArchiveMessage, readArchiveFile } from './lib/archiveFile.js'
 import type { MealSlot, Recipe } from '../src/types/index.js'
 
 /**
@@ -22,7 +15,20 @@ import type { MealSlot, Recipe } from '../src/types/index.js'
  * pointing at a food that no longer exists, a recipe that nests itself, or a
  * mis-keyed nutrition value that makes a food's calories disagree with its own
  * macros. All of those produce plausible-looking numbers rather than crashes.
+ *
+ * The foods and the hand-written dishes are always checked. The plans and the
+ * meals made from them are private and live in `data/archive.json`, which is
+ * gitignored, so those checks run only where that file exists and the run
+ * says plainly when they were skipped. Pass a path to check another archive.
  */
+
+const archive = readArchiveFile(process.argv[2])
+if (!archive) console.log(`${noArchiveMessage('every check on the plans')}\n`)
+const SOURCE_PLANS = archive?.sourcePlans ?? []
+const MEAL_RECIPES = archive?.mealRecipes ?? []
+const RECIPE_CLASSIFICATION = archive?.classification ?? {}
+const RECIPE_ALIASES = archive?.recipeAliases ?? {}
+const TIMES_PLANNED = archive?.timesPlanned ?? {}
 
 const recipes: Recipe[] = [...DISHES, ...MEAL_RECIPES]
 const ctx = buildContext(FOODS, recipes)
@@ -233,7 +239,7 @@ for (const recipe of recipes) {
 const batchable = recipes.filter((r) =>
   r.components.length > 0
   && (r.servings >= 4 || (r.servings >= 2 && (TIMES_PLANNED[r.id] ?? 0) >= 2)))
-if (batchable.length < 5) {
+if (archive && batchable.length < 5) {
   problems.push(`only ${batchable.length} recipes are worth a batch, so that lens shows next to nothing`)
 }
 
@@ -241,28 +247,31 @@ for (const id of Object.keys(TIMES_PLANNED)) {
   if (!ctx.recipes.has(id)) problems.push(`${id}: counted in the plans but no longer in the library`)
 }
 
-// 10. The generated data is what the importer would produce today.
+// 10. The archive is what the importer would produce today.
 //
 // The archive keeps every meal line verbatim, so the whole library can be
-// rebuilt from it without the .docx originals. That makes this a drift check:
-// change a dish definition or an import rule and forget to re-run the build,
-// and the committed data no longer follows from the rules that produced it.
+// rebuilt from it without the original documents. That makes this a drift
+// check: change a dish definition or an import rule and forget to re-run the
+// build, and the archive no longer follows from the rules that produced it.
 // It is also the only way to catch a whole class of import bug, since a meal
 // that quietly counts its dish's olive oil twice looks perfectly plausible
-// sitting in the file.
-const GENERATED = resolve(dirname(fileURLToPath(import.meta.url)), '../src/data/generated')
-const rebuilt = renderFiles(rebuildFromArchive(SOURCE_PLANS))
-for (const [name, content] of Object.entries(rebuilt)) {
-  const onDisk = readFileSync(resolve(GENERATED, name), 'utf8')
-  if (onDisk !== content) {
-    problems.push(`src/data/generated/${name} is out of date, re-run: npm run data:build`)
+// sitting in the file. Remember to upload the rebuilt file in Settings too.
+if (archive) {
+  const rebuilt = toArchive(rebuildFromArchive(SOURCE_PLANS))
+  for (const key of Object.keys(rebuilt) as (keyof typeof rebuilt)[]) {
+    if (JSON.stringify(rebuilt[key]) !== JSON.stringify(archive[key])) {
+      problems.push(`the archive's ${key} is out of date, re-run: npm run data:build`)
+    }
+  }
+  if (archiveText(rebuilt) !== archiveText(archive)) {
+    notes.push('the archive is not written the way data:build writes it, re-run: npm run data:build')
   }
 }
 
 // 11. Every recipe knows what kind of food it is, and the file saying so is not
 //     stale, a category the classifier no longer produces would silently filter
 //     to nothing on the Recipes screen.
-for (const recipe of recipes) {
+for (const recipe of archive ? recipes : []) {
   const classified = RECIPE_CLASSIFICATION[recipe.id]
   if (!classified) {
     problems.push(`${recipe.id} (${recipe.name.en}): no category, re-run scripts/classify-recipes.ts`)
@@ -350,10 +359,10 @@ for (const plan of SOURCE_PLANS) {
 // 13. Every plan flies the flag of the language it is written in.
 //
 // The archive screen puts a flag beside each week, and the language behind it
-// used to be guessed from the file's name: "person-a-plan" then any character then a
-// "k". That matched `person-a-plan` and not
-// `[removed plan text]`, where the hyphen is one character too many, so
-// sixteen of the thirty-six weeks flew a Romanian flag over Hungarian food.
+// used to be guessed from the file's name, by a pattern written for one way
+// of spelling the client's name. A batch of files spelt it with a hyphen, the
+// pattern missed them, and sixteen of the thirty-six weeks flew a Romanian
+// flag over Hungarian food.
 //
 // It is read from the meal labels now, which cannot be renamed by a download.
 // This checks that against a different signal again, the words in the meals
@@ -375,6 +384,7 @@ for (const plan of SOURCE_PLANS) {
 }
 
 
+console.log(`archive        ${archive ? 'checked' : 'skipped, see above'}`)
 console.log(`foods          ${FOODS.length}`)
 console.log(`dishes         ${DISHES.length}`)
 console.log(`meal recipes   ${MEAL_RECIPES.length}`)

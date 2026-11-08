@@ -1,7 +1,6 @@
 import { FOODS } from '../src/data/foods.js'
 import { DISHES } from '../src/data/dishes.js'
-import { MEAL_RECIPES } from '../src/data/generated/mealRecipes.js'
-import { SOURCE_PLANS } from '../src/data/generated/sourcePlans.js'
+import { noArchiveMessage, readArchiveFile } from './lib/archiveFile.js'
 import { auditFoods, type Finding } from '../src/lib/foodAudit.js'
 import type { Component } from '../src/types/index.js'
 
@@ -21,6 +20,14 @@ import type { Component } from '../src/types/index.js'
  */
 
 const json = process.argv.includes('--json')
+
+// The plans say which foods are in use. They are private and not in the
+// repository, so on CI (and anywhere without data/archive.json) only the
+// hand-written dishes count, and the run says so.
+const archive = readArchiveFile()
+if (!archive && !json) console.log(`${noArchiveMessage('counting the plans\' foods as in use')}\n`)
+const MEAL_RECIPES = archive?.mealRecipes ?? []
+const SOURCE_PLANS = archive?.sourcePlans ?? []
 
 /** Foods anything actually refers to: a gap matters where it is used. */
 const inUse = new Set<string>()

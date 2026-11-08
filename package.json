@@ -20,7 +20,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "food:check": "tsx scripts/audit-foods.ts",
-    "verify": "npm run lint && npm run typecheck && npm run test && npm run data:check && npm run text:check && npm run check:contrast && npm run db:check && npm run function:check && npm run icons:check && npm run build",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run data:check && npm run text:check && npm run check:contrast && npm run db:check && npm run function:check && npm run icons:check && npm run build && npm run bundle:check",
     "build:single": "npm run build && tsx scripts/build-single.ts",
     "test:single": "npm run build:single && node scripts/check-single.mjs",
     "text:check": "tsx scripts/check-text.ts",
@@ -31,7 +31,9 @@
     "data:nutrients": "tsx scripts/fill-nutrients.ts",
     "data:translations": "tsx scripts/list-translations.ts",
     "icons:check": "tsx scripts/check-icons.ts",
-    "db:migrate": "tsx scripts/migrate.ts"
+    "db:migrate": "tsx scripts/migrate.ts",
+    "bundle:check": "tsx scripts/check-bundle.ts",
+    "data:fixture": "tsx scripts/build-fixture.ts"
   },
   "dependencies": {
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",

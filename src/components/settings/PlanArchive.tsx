@@ -9,7 +9,9 @@ import { offerUndo } from '../../store/useUndo'
 import WhenPicker from '../planner/WhenPicker'
 import { useUserStore } from '../../store/useUserStore'
 import { EMPTY_CONTEXT } from '../../lib/moments'
-import { SourceLine } from '../ui'
+import { EmptyState, SourceLine } from '../ui'
+import { useArchiveVersion } from '../../store/useArchive'
+import { ArchiveUploadPanel } from './ArchiveUploadPanel'
 import { useNutritionContext } from '../../store/useNutrition'
 import { componentsNutrients } from '../../lib/nutrition'
 
@@ -19,6 +21,10 @@ import { componentsNutrients } from '../../lib/nutrition'
  * The original Romanian and Hungarian wording is kept verbatim, it is the
  * record of what was actually prescribed, and the calorie figures beside it are
  * this app's interpretation, not the dietician's.
+ *
+ * The plans are not part of the app: they are the household's, uploaded by an
+ * admin and read from the database behind the login (see ArchiveUploadPanel).
+ * Until there are some, this says so and offers the upload.
  */
 export function PlanArchive() {
   /*
@@ -36,17 +42,29 @@ export function PlanArchive() {
   const { loadSourcePlan, weekDates } = useMealPlanStore()
   const notice = useUserStore((s) => s.notice)
 
+  // SOURCE_PLANS is a live binding into the household's archive; the version
+  // says when it changed.
+  const archiveVersion = useArchiveVersion()
   const plans = useMemo(
     () => [...SOURCE_PLANS].sort((a, b) => (b.issuedOn ?? '').localeCompare(a.issuedOn ?? '')),
-    [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [archiveVersion],
   )
 
   return (
     <div className="space-y-5">
-      <p className="text-sm text-ink-700">
-        {plans.length} weeks from your dietician, {plans.reduce((a, p) => a + p.days.length, 0)} days in all.
-        Drop any week straight into your planner.
-      </p>
+      <ArchiveUploadPanel />
+
+      {plans.length === 0 ? (
+        <EmptyState title="No plans yet">
+          Your dietician's weeks appear here once the plan archive is uploaded.
+        </EmptyState>
+      ) : (
+        <p className="text-sm text-ink-700">
+          {plans.length} weeks from your dietician, {plans.reduce((a, p) => a + p.days.length, 0)} days in all.
+          Drop any week straight into your planner.
+        </p>
+      )}
 
       <div className="space-y-3">
         {plans.map((plan) => (

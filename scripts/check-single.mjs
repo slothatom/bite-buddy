@@ -51,10 +51,12 @@ if (heading !== 'Your week') problems.push(`planner heading was ${JSON.stringify
 const font = await page.evaluate(() => getComputedStyle(document.querySelector('h1')).fontFamily)
 if (!font.startsWith('Bungee')) problems.push(`display font did not load: ${font}`)
 
-// Proves the bundled plan data came along rather than being fetched.
+// The dietician's plans are private and never bundled: a copy of the app
+// starts with none, and says so, until a plan archive is loaded on the device.
 await goto('#/history')
 const plans = await page.getByRole('button', { name: /^Load$/ }).count()
-if (plans !== 14) problems.push(`expected 14 plans in the archive, found ${plans}`)
+if (plans !== 0) problems.push(`expected no plans bundled, found ${plans}`)
+if (!(await page.getByText('No plans yet').count())) problems.push('Plan history does not say it has no plans')
 
 await goto('#/recipes')
 await page.screenshot({ path: 'dist-single/preview-phone.png' })
@@ -67,4 +69,4 @@ if (problems.length) {
   for (const p of problems) console.error(`  ${p}`)
   process.exit(1)
 }
-console.log(`Self-contained: ${plans} plans, fonts inlined, no external requests.`)
+console.log('Self-contained: no plans bundled, fonts inlined, no external requests.')
