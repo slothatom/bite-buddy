@@ -225,8 +225,40 @@ async function checkJoining() {
     grant execute on function auth.uid() to authenticated;
   `)
 
-  // Somebody who has an account and has never opened the app before.
+  // A stranger: the signup trigger was refused above, so in a real project with
+  // open signups they would have an account. They must get nothing.
+  const STRANGER = '44444444-4444-4444-8444-444444444444'
+  await fresh.query('insert into auth.users (id, email) values ($1, $2)', [STRANGER, 'stranger@example.com'])
+  await fresh.query(`select set_config('request.jwt.claim.sub', $1, false)`, [STRANGER])
+  await fresh.exec('set role authenticated')
+  try {
+    await fresh.query(
+      `insert into public.members (id, email, last_seen_at) values ($1, $2, now())
+       on conflict (id) do update set email = excluded.email, last_seen_at = excluded.last_seen_at`,
+      [STRANGER, 'stranger@example.com'],
+    )
+    check('an account not on the guest list cannot add itself', false, 'the insert was allowed')
+  } catch {
+    check('an account not on the guest list cannot add itself', true)
+  }
+  try {
+    await fresh.query('select public.join_household()')
+    check('nor join through join_household', false, 'join_household let them in')
+  } catch {
+    check('nor join through join_household', true)
+  }
+  await fresh.exec('reset role')
+  // Even with a members row put there by hand, they are not a member.
+  await fresh.query('insert into public.members (id, email) values ($1, $2) on conflict (id) do nothing',
+    [STRANGER, 'stranger@example.com'])
+  await fresh.exec('set role authenticated')
+  const stranger = await fresh.query<{ yes: boolean }>('select public.is_member() as yes')
+  check('and a members row alone does not make them a member', stranger.rows[0].yes === false)
+  await fresh.exec('reset role')
+
+  // Somebody on the guest list who has an account and has never opened the app before.
   const NEWCOMER = '33333333-3333-4333-8333-333333333333'
+  await fresh.query('insert into public.allowed_emails (email) values ($1) on conflict do nothing', ['new@example.com'])
   await fresh.query('insert into auth.users (id, email) values ($1, $2)', [NEWCOMER, 'new@example.com'])
   await fresh.query('delete from public.members where id = $1', [NEWCOMER])
 
@@ -345,15 +377,35 @@ function client() {
   return {
     from: (table: string) => ({
       select: () => {
-        const run = async (where = '', params: unknown[] = []) => {
-          try {
-            const r = await db.query(`select * from public.${table} ${where}`, params)
-            return { data: r.rows, error: null }
-          } catch (e) { return { data: null, error: { message: (e as Error).message } } }
+        // Only the filters the engine sends: gte, the keyset `or`, order, limit.
+        const where: string[] = []
+        const params: unknown[] = []
+        let limit = ''
+        const q = {
+          gte: (col: string, value: string) => {
+            params.push(value); where.push(`${col} >= $${params.length}`); return q
+          },
+          or: (filter: string) => {
+            const m = /^updated_at\.gt\.(".*?"),and\(updated_at\.eq\.".*?",id\.gt\.(".*?")\)$/.exec(filter)
+            if (!m) throw new Error(`unexpected filter ${filter}`)
+            params.push(JSON.parse(m[1]), JSON.parse(m[2]))
+            const at = `$${params.length - 1}::timestamptz`, id = `$${params.length}`
+            where.push(`(updated_at > ${at} or (updated_at = ${at} and id > ${id}))`)
+            return q
+          },
+          order: () => q,
+          limit: (n: number) => { limit = `limit ${n}`; return q },
+          then: (fn: (r: unknown) => unknown, reject?: (e: unknown) => unknown) =>
+            (async () => {
+              try {
+                const r = await db.query(
+                  `select * from public.${table} ${where.length ? `where ${where.join(' and ')}` : ''}
+                   order by updated_at, id ${limit}`, params)
+                return { data: r.rows, error: null }
+              } catch (e) { return { data: null, error: { message: (e as Error).message } } }
+            })().then(fn, reject),
         }
-        return Object.assign(run(), {
-          gt: (col: string, value: string) => run(`where ${col} > $1`, [value]),
-        })
+        return q
       },
       upsert: async (rows: Record<string, unknown>[]) => {
         try {

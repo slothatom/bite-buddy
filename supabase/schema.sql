@@ -85,9 +85,36 @@ create table if not exists public.members (
 
 alter table public.members enable row level security;
 
+-- Whether the signed-in account's email is on the guest list.
+--
+-- The trigger above is the first line of defence, but it is the one most
+-- likely to be missing: a project that refuses triggers on `auth.users` skips
+-- it with a notice, and from then on anybody who can sign up has an account.
+-- So the guest list is checked again here, at the point of access, against the
+-- email Supabase holds for the account (not `members.email`, which the account
+-- can edit itself).
+create or replace function public.is_allowed()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from auth.users u
+    join public.allowed_emails a on lower(a.email) = lower(u.email)
+    where u.id = auth.uid()
+  );
+$$;
+
 -- Membership is the definition of "allowed to see the household's data", so it
 -- is the one check every other policy is built on. Written as a function so
 -- Postgres does not recurse when the policy on `members` consults `members`.
+--
+-- A members row is not enough on its own: the email must still be on the guest
+-- list. That closes the gap when the signup trigger is missing, and taking an
+-- email off the list revokes access without having to find and delete its row.
 create or replace function public.is_member()
 returns boolean
 language sql
@@ -95,7 +122,8 @@ stable
 security definer
 set search_path = public
 as $$
-  select exists (select 1 from public.members where id = auth.uid());
+  select exists (select 1 from public.members where id = auth.uid())
+     and public.is_allowed();
 $$;
 
 -- The `or id = auth.uid()` is not a convenience, it is what makes joining
@@ -122,7 +150,7 @@ create policy "members are visible to the household"
 drop policy if exists "you may create your own member row" on public.members;
 create policy "you may create your own member row"
   on public.members for insert
-  with check (id = auth.uid());
+  with check (id = auth.uid() and public.is_allowed());
 
 drop policy if exists "you may edit your own member row" on public.members;
 create policy "you may edit your own member row"
@@ -151,7 +179,10 @@ set search_path = public
 as $$
 begin
   insert into public.members (id, email)
-  values (new.id, coalesce(new.email, ''))
+  select new.id, coalesce(new.email, '')
+  where exists (
+    select 1 from public.allowed_emails a where lower(a.email) = lower(new.email)
+  )
   on conflict (id) do nothing;
   return new;
 end;
@@ -169,9 +200,13 @@ exception
 end;
 $$;
 
--- Anyone who signed up before this existed, and was therefore never added.
+-- Anyone on the guest list who signed up before this existed, and was
+-- therefore never added.
 insert into public.members (id, email)
-select id, coalesce(email, '') from auth.users
+select u.id, coalesce(u.email, '') from auth.users u
+where exists (
+  select 1 from public.allowed_emails a where lower(a.email) = lower(u.email)
+)
 on conflict (id) do nothing;
 
 /**
@@ -183,8 +218,9 @@ on conflict (id) do nothing;
  * runs as its owner, so it needs none of them, and it can add exactly one row:
  * yours, for the account making the call.
  *
- * It cannot be used to add anybody else, or to see anything, and being signed
- * in at all already required being on the guest list.
+ * It cannot be used to add anybody else, or to see anything, and it refuses
+ * an account whose email is not on the guest list, so it stays safe even when
+ * the signup trigger could not be created.
  */
 create or replace function public.join_household()
 returns void
@@ -195,6 +231,10 @@ as $$
 begin
   if auth.uid() is null then
     raise exception 'Not signed in.' using errcode = 'insufficient_privilege';
+  end if;
+  if not public.is_allowed() then
+    raise exception 'This app is private. Your email is not on the guest list.'
+      using errcode = 'insufficient_privilege';
   end if;
 
   insert into public.members (id, email)

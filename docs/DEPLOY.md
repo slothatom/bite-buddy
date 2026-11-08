@@ -55,9 +55,22 @@ an address committed to it is an address published.
 the tables are created by everything above it. Running the last few lines on
 their own gives `relation "public.allowed_emails" does not exist`.
 
-That list is the whole security model for who gets in. Anyone not on it cannot
-create an account, even knowing the URL and the key, a database trigger
-rejects the signup itself.
+That list is the whole security model for who gets in, and it is checked in
+two places. A database trigger rejects a signup from anyone not on it, when
+the project lets that trigger be created (newer projects may not; the file
+carries on with a notice). And every read and write checks it again:
+`is_member()` requires the account's email to be on the list, so an account
+that got past signup still sees nothing, and removing an email from the list
+revokes access straight away.
+
+**Also turn off open signups:** Authentication → Sign In / Providers → untick
+"Allow new users to sign up", then invite the two of you from Authentication →
+Users. With that off, nobody else can create an account at all.
+
+If the database was set up before this check existed, paste
+`supabase/fix-membership.sql` into the SQL editor to apply it. Its last query
+lists every member with an `on_guest_list` column; anyone showing `false` has
+no access, and you can delete their account from Authentication → Users.
 
 > **If the editor shows a red error, read which statement it was.** Some of this
 > file touches `auth.users`, which belongs to Supabase rather than to you, and

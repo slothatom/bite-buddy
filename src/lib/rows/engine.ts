@@ -1,6 +1,6 @@
 import type { RealtimePostgresChangesPayload, SupabaseClient } from '@supabase/supabase-js'
 import type { RowTable, SyncRow } from './types'
-import { applyRemote, localChanges } from './diff'
+import { applyRemote, fingerprint, localChanges } from './diff'
 import { useSyncState } from './store'
 
 /**
@@ -69,6 +69,41 @@ const MASS_DELETE_SHARE = 0.5
  * compares differently depending on which side it came from, and the two
  * devices trade it back and forth for as long as they are both open.
  */
+/**
+ * Rows per request. Supabase answers at most 1,000 by default; asking for the
+ * same keeps every full page full, which is how the loop knows to go on.
+ */
+export const PULL_PAGE = 1000
+
+/**
+ * How far behind the watermark each pull starts.
+ *
+ * `updated_at` is stamped with the time a transaction started, not the time it
+ * committed. A slow write can therefore land with a stamp older than one this
+ * device has already seen, and a strict "newer than" would never return it.
+ * Re-reading the last minute catches it; rows already agreed are dropped
+ * before they are applied, so the overlap costs a few rows and nothing else.
+ */
+export const LOOK_BEHIND_MS = 60_000
+
+function lookBehind(watermark: string): string {
+  const at = Date.parse(watermark)
+  return Number.isNaN(at) ? watermark : new Date(at - LOOK_BEHIND_MS).toISOString()
+}
+
+/** PostgREST filter for "after this row" in (updated_at, id) order. */
+function keyAfter(row: SyncRow): string {
+  const at = JSON.stringify(row.updated_at ?? '')
+  const id = JSON.stringify(row.id)
+  return `updated_at.gt.${at},and(updated_at.eq.${at},id.gt.${id})`
+}
+
+/** Whether a row from the server says anything this device does not know. */
+function isNews(row: SyncRow, known: string | undefined, here: ReadonlySet<string>): boolean {
+  if (row.deleted_at) return known !== undefined || here.has(row.id)
+  return known !== fingerprint(row)
+}
+
 function asAppRow(row: SyncRow): SyncRow {
   const day = row.day as unknown
   if (day instanceof Date) return { ...row, day: day.toISOString().slice(0, 10) }
@@ -112,22 +147,63 @@ export class RowSync {
    */
   async pull(table: RowTable, pending: ReadonlySet<string> = new Set()): Promise<boolean> {
     const snapshot = useSyncState.getState().snapshotFor(table.table)
+    const since = snapshot.watermark ? lookBehind(snapshot.watermark) : undefined
 
-    let query = this.db.from(table.table).select('*')
-    if (snapshot.watermark) query = query.gt('updated_at', snapshot.watermark)
+    // Every page, in a fixed order, until the server has nothing more. The
+    // server answers at most PULL_PAGE rows a time and says nothing about the
+    // rest; the watermark then jumps past them and they are never asked for
+    // again. Paged by key (the last row's updated_at and id), not by offset: an
+    // offset shifts when a row changes mid-pull, and the row that slides across
+    // the page boundary is skipped.
+    const fetched: SyncRow[] = []
+    let after: SyncRow | undefined
+    for (;;) {
+      let query = this.db.from(table.table).select('*')
+      if (since) query = query.gte('updated_at', since)
+      if (after) query = query.or(keyAfter(after))
+      const { data, error } = await query
+        .order('updated_at', { ascending: true })
+        .order('id', { ascending: true })
+        .limit(PULL_PAGE)
+      if (error) {
+        this.hooks.onError?.(error.message)
+        return false
+      }
+      if (this.stopped) return true
 
-    const { data, error } = await query
-    if (error) {
-      this.hooks.onError?.(error.message)
-      return false
+      const page = (data ?? []) as SyncRow[]
+      fetched.push(...page)
+      if (page.length < PULL_PAGE) break
+      const last = page[page.length - 1]
+      // A cursor that did not move would ask for the same page forever.
+      if (after && last.id === after.id && String(last.updated_at) === String(after.updated_at)) break
+      after = last
     }
-    if (this.stopped) return true
 
-    const remote = ((data ?? []) as SyncRow[]).map(asAppRow)
-    if (!remote.length) return true
-
+    // The look-behind re-reads rows this device already has; only news counts.
     const local = table.read()
-    const { rows, watermark, agreed, contested } = applyRemote(local, remote, snapshot, pending)
+    const here = new Set(local.map((row) => row.id))
+    // One row per id, the latest: pages can overlap at their edges.
+    const latest = new Map<string, SyncRow>()
+    for (const row of fetched) latest.set(row.id, row)
+    const remote = [...latest.values()].map(asAppRow).filter((row) => isNews(row, snapshot.rows[row.id], here))
+
+    // Advanced over everything read, news or not. Otherwise a device that only
+    // ever reads back its own writes never moves its watermark, and each pull
+    // re-reads more of them.
+    let watermark = snapshot.watermark
+    for (const row of fetched) {
+      if (row.updated_at && (!watermark || row.updated_at > watermark)) watermark = row.updated_at
+    }
+
+    if (!remote.length) {
+      if (watermark !== snapshot.watermark) {
+        useSyncState.getState().remember(table.table, { ...snapshot, watermark })
+      }
+      return true
+    }
+
+    const { rows, agreed, contested } = applyRemote(local, remote, snapshot, pending)
 
     table.apply(rows)
     if (contested.length) this.hooks.onContested?.(table.table, contested)
@@ -226,12 +302,16 @@ export class RowSync {
 
             const snapshot = useSyncState.getState().snapshotFor(table.table)
             const owed = localChanges(table.read(), snapshot, new Date().toISOString())
-            const { rows, watermark, agreed, contested } = applyRemote(
+            const { rows, agreed, contested } = applyRemote(
               table.read(), [row], snapshot, new Set(owed.send.map((r) => r.id)),
             )
             table.apply(rows)
             if (contested.length) this.hooks.onContested?.(table.table, contested)
-            useSyncState.getState().remember(table.table, { rows: agreed, watermark })
+            // The watermark is left where the last pull put it. A live change
+            // says nothing about the rows written while this device was not
+            // listening, and moving the watermark past them would mean they
+            // are never asked for.
+            useSyncState.getState().remember(table.table, { rows: agreed, watermark: snapshot.watermark })
             this.hooks.onApplied?.(table.table, 1)
           },
         )

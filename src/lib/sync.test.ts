@@ -17,8 +17,19 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
 const upsert = vi.fn()
 const select = vi.fn()
-const gt = vi.fn()
 const on = vi.fn()
+
+/** A query that answers with these rows, whatever filters the engine adds. */
+function answer(data: unknown[]) {
+  const q = {
+    gte: () => q,
+    or: () => q,
+    order: () => q,
+    limit: () => q,
+    then: (fn: (r: unknown) => unknown) => Promise.resolve(fn({ data, error: null })),
+  }
+  return q
+}
 const subscribe = vi.fn()
 const removeChannel = vi.fn()
 
@@ -82,11 +93,7 @@ beforeEach(() => {
   vi.clearAllMocks()
 
   upsert.mockResolvedValue({ error: null })
-  gt.mockResolvedValue({ data: [], error: null })
-  select.mockReturnValue({
-    gt,
-    then: (fn: (r: unknown) => unknown) => Promise.resolve(fn({ data: [], error: null })),
-  })
+  select.mockReturnValue(answer([]))
   on.mockImplementation(() => ({ subscribe }))
   subscribe.mockReturnValue({})
 
@@ -99,19 +106,13 @@ afterEach(() => { vi.useRealTimers() })
 
 describe('joining a household', () => {
   it('takes what is already there', async () => {
-    select.mockReturnValue({
-      gt,
-      then: (fn: (r: unknown) => unknown) => Promise.resolve(fn({
-        data: [{
-          id: 'theirs',
-          day: '2026-08-18',
-          data: weight('theirs', 61),
-          member_id: 'oli',
-          updated_at: '2026-08-20T10:00:00.000Z',
-        }],
-        error: null,
-      })),
-    })
+    select.mockReturnValue(answer([{
+      id: 'theirs',
+      day: '2026-08-18',
+      data: weight('theirs', 61),
+      member_id: 'oli',
+      updated_at: '2026-08-20T10:00:00.000Z',
+    }]))
 
     const stop = startSync('me')
     await settle()
