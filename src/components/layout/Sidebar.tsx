@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { Wordmark } from '../brand/Mascot'
+import Logo from '../brand/Logo'
 import { NAV, isCurrent } from './nav'
 
 export default function Sidebar() {
@@ -8,7 +8,7 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex w-56 min-h-screen bg-cream-50 border-r border-border-200 flex-col shrink-0">
       <div className="px-4 py-4 border-b border-border-200">
-        <Wordmark />
+        <Logo size={28} />
       </div>
 
       <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">

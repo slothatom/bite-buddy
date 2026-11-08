@@ -63,10 +63,10 @@ export default defineConfig({
         start_url: './',
         scope: './',
         // Named by `npm run icons`, each with a hash of its own contents, so a
-        // redrawn mascot arrives at an address no phone has seen before. The
-        // maskable one is its own file, inset to the safe zone: this used to
-        // offer the full-bleed icon for both, and a phone that draws round
-        // icons cut the mascot's ears off.
+        // redrawn logo arrives at an address no phone has seen before. The
+        // maskable one is its own master (brand/app-icon-maskable.svg), with
+        // the mark inside the safe zone: this used to offer the full-bleed
+        // icon for both, and a phone that draws round icons cropped it.
         icons: ICONS,
       },
       // What to precache. The runtime caching that used to live beside this

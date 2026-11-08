@@ -4,7 +4,7 @@ import { Menu, Plus, X } from 'lucide-react'
 import { useDialog } from '../../lib/useDialog'
 import { useUiStore } from '../../store/useUiStore'
 import { today } from '../../store/useMealPlanStore'
-import { Wordmark } from '../brand/Mascot'
+import Logo from '../brand/Logo'
 import { NAV, isCurrent } from './nav'
 
 /**
@@ -60,8 +60,8 @@ export default function MobileNav() {
           </button>
         </nav>
 
-        <div className="flex-1 min-w-0">
-          <Wordmark />
+        <div className="flex-1 min-w-0 flex items-center">
+          <Logo size={24} className="max-w-full h-auto" />
         </div>
 
         <button
@@ -110,7 +110,7 @@ function Drawer({ onClose, pathname }: { onClose: () => void; pathname: string }
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-2 px-4 h-14 border-b border-border-200">
-          <Wordmark />
+          <Logo size={26} />
           <button className="btn-ghost btn-icon text-ink-500" onClick={onClose} aria-label="Close">
             <X size={18} />
           </button>

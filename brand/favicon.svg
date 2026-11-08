@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8.5 3.5 54 54" role="img">
+  <title>Bite Buddy</title>
+  <style>.b{fill:#0f766e}.c{fill:#eab53f}@media (prefers-color-scheme:dark){.b{fill:#2dd4bf}.c{fill:#ffd166}}</style>
+  <path class="b" fill-rule="evenodd" d="M15.5 7.5 H36.469 A4.5 4.5 0 0 0 40.29 9.995 A7 7 0 0 0 47.606 14.974 A5 5 0 0 0 48.961 19.532 A14 13 0 0 1 44.626 29.94 A15 14 0 0 1 38 56.5 H15.5 A3 3 0 0 1 12.5 53.5 V10.5 A3 3 0 0 1 15.5 7.5 Z M26.5 16 H29.5 A4.5 4.5 0 0 1 29.5 25 H26.5 A4.5 4.5 0 0 1 26.5 16 Z M27.5 37 H31.5 A5.5 5.5 0 0 1 31.5 48 H27.5 A5.5 5.5 0 0 1 27.5 37 Z"/>
+  <path class="c" d="M54.9 6.6 A2.6 2.6 0 1 0 60.1 6.6 A2.6 2.6 0 1 0 54.9 6.6 Z"/>
+</svg>

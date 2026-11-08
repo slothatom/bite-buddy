@@ -6,8 +6,10 @@
  * what you are eating, and that is the character an app about food wants
  * standing next to it.
  *
- * Drawn inline as SVG so he inherits theme colours and stays crisp from 26px
- * in the menu to 96px in an empty state.
+ * Drawn inline as SVG so he inherits theme colours and stays crisp from 44px
+ * beside a moment to 96px in an empty state. He is not the logo: the header,
+ * the menu and the app icon carry the Bitten B from Logo.tsx, and Bandit is
+ * the character who lives inside.
  *
  * Bandit appears in onboarding, empty states, errors and moments of delight.
  * He does *not* appear on every card, in dense food tables or beside every
@@ -234,20 +236,5 @@ export default function Zig({
         </g>
       )}
     </svg>
-  )
-}
-
-/** The wordmark: Bandit plus the name, used in the menu and on brand moments. */
-export function Wordmark({ size = 38 }: { size?: number }) {
-  return (
-    <span className="flex items-center gap-2.5">
-      <Zig size={size} />
-      <span className="leading-none">
-        <span className="block display text-base text-ink-900 leading-none">Bite Buddy</span>
-        <span className="block text-[10px] text-ink-500 font-bold mt-1 tracking-wide">
-          fuel good
-        </span>
-      </span>
-    </span>
   )
 }
