@@ -102,6 +102,15 @@ function keyAfter(row: SyncRow): string {
   return `updated_at.gt.${at},and(updated_at.eq.${at},id.gt.${id})`
 }
 
+/**
+ * A live change that only repeats what this device already has: its own write
+ * coming back, possibly before the push that sent it has been recorded.
+ */
+export function isEcho(row: SyncRow, mine: SyncRow | undefined): boolean {
+  if (row.deleted_at) return !mine
+  return mine !== undefined && fingerprint(mine) === fingerprint(row)
+}
+
 /** Whether a row from the server says anything this device does not know. */
 function isNews(row: SyncRow, known: string | undefined, here: ReadonlySet<string>): boolean {
   if (row.deleted_at) return known !== undefined || here.has(row.id)
@@ -285,12 +294,17 @@ export class RowSync {
   }
 
   /**
-   * Listens for the other phone.
+   * Listens for the other phone, and for your own other devices.
    *
    * A row arriving is applied through exactly the same path as a pull, so
    * there is one set of rules about what wins rather than two that drift.
-   * Rows this device wrote are ignored: applying your own echo is how two
-   * open phones end up talking to each other forever.
+   *
+   * Echoes of this device's own writes are skipped by content, not by author.
+   * Filtering on `updated_by` also dropped every change made by the same
+   * account on a second device, so a laptop never saw the phone's edits until
+   * its next full round. A row identical to what this device already holds,
+   * or a deletion of something it no longer has, is an echo whoever wrote it;
+   * anything else is news, even from yourself.
    */
   watch(): () => void {
     const channels = this.tables.map((table) =>
@@ -301,10 +315,13 @@ export class RowSync {
           { event: '*', schema: 'public', table: table.table },
           (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
             const raw = payload.new as SyncRow & { updated_by?: string }
-            if (!raw?.id || raw.updated_by === this.userId || this.stopped) return
+            if (!raw?.id || this.stopped) return
             const row = asAppRow(raw)
 
             const snapshot = useSyncState.getState().snapshotFor(table.table)
+            const mine = table.read().find((r) => r.id === row.id)
+            if (isEcho(row, mine)) return
+            if (!isNews(row, snapshot.rows[row.id], new Set(mine ? [mine.id] : []))) return
             const owed = localChanges(table.read(), snapshot, new Date().toISOString())
             const { rows, agreed, contested } = applyRemote(
               table.read(), [row], snapshot, new Set(owed.send.map((r) => r.id)),

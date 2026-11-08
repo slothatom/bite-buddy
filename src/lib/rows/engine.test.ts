@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { RowSync } from './engine'
 import { useSyncState } from './store'
+import { snapshotOf } from './diff'
 import type { RowTable, SyncRow } from './types'
 
 /**
@@ -346,5 +347,65 @@ describe('a device that has lost its own storage', () => {
     await sync.round()
 
     expect(server.get('r11')?.deleted_at).toBeTruthy()
+  })
+})
+
+describe('live changes', () => {
+  /** A database whose realtime channel can be fired by hand. */
+  function liveDb() {
+    let handler: ((payload: { new: SyncRow }) => void) | undefined
+    const db = {
+      ...fakeDb(new Map()),
+      channel: () => ({
+        on: (_e: string, _f: unknown, fn: (payload: { new: SyncRow }) => void) => {
+          handler = fn
+          return { subscribe: () => ({}) }
+        },
+      }),
+    }
+    return { db, fire: (row: SyncRow) => handler?.({ new: row }) }
+  }
+
+  it("arrive from your own other device, not only from the other person's", async () => {
+    const state = { rows: [{ id: 'a', data: { v: 1 } }] as SyncRow[] }
+    useSyncState.getState().remember('t', snapshotOf(state.rows))
+    const { db, fire } = liveDb()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sync = new RowSync(db as any, [fakeTable('t', state)], 'me')
+    sync.watch()
+
+    // Same account, written on the laptop.
+    fire({ id: 'a', data: { v: 2 }, updated_by: 'me', updated_at: '2026-11-08T10:00:00Z' })
+    expect(state.rows[0].data).toEqual({ v: 2 })
+  })
+
+  it('skip an echo of what this device already holds, even before its push is recorded', async () => {
+    // Edited here; the push has gone out but has not been remembered yet.
+    const state = { rows: [{ id: 'a', data: { v: 2 } }] as SyncRow[] }
+    useSyncState.getState().remember('t', snapshotOf([{ id: 'a', data: { v: 1 } }]))
+    const contested = vi.fn()
+    const applied = vi.fn()
+    const { db, fire } = liveDb()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sync = new RowSync(db as any, [fakeTable('t', state)], 'me', { onContested: contested, onApplied: applied })
+    sync.watch()
+
+    fire({ id: 'a', data: { v: 2 }, updated_by: 'me', updated_at: '2026-11-08T10:00:00Z' })
+    expect(contested).not.toHaveBeenCalled()
+    expect(applied).not.toHaveBeenCalled()
+  })
+
+  it('skip the echo of a deletion made here', async () => {
+    const state = { rows: [] as SyncRow[] }
+    useSyncState.getState().remember('t', snapshotOf([{ id: 'a', data: { v: 1 } }]))
+    const contested = vi.fn()
+    const { db, fire } = liveDb()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sync = new RowSync(db as any, [fakeTable('t', state)], 'me', { onContested: contested })
+    sync.watch()
+
+    fire({ id: 'a', deleted_at: '2026-11-08T10:00:00Z', updated_by: 'me' })
+    expect(contested).not.toHaveBeenCalled()
+    expect(state.rows).toEqual([])
   })
 })
