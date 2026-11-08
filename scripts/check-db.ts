@@ -10,6 +10,7 @@ import { useMealPlanStore } from '../src/store/useMealPlanStore.js'
 import { useRecipeStore } from '../src/store/useRecipeStore.js'
 import { JOURNAL_SCHEMA, migrate, readMigrations, type MigrationDb } from './lib/migrations.js'
 import { as, checkEmptyProject, checkHouseholds } from './lib/check-households.js'
+import { checkPlanArchive } from './lib/check-plan-archive.js'
 
 /**
  * Runs the real schema, in a real Postgres, against the real sync code.
@@ -374,6 +375,7 @@ await checkPush()
 const ALL_MIGRATIONS = readMigrations(resolve(ROOT, 'supabase/migrations'))
 const live = await checkHouseholds(ALL_MIGRATIONS, check)
 await checkEmptyProject(ALL_MIGRATIONS, check)
+await checkPlanArchive(ALL_MIGRATIONS, check)
 
 // On the whole schema, every migration applied, since the function now reads
 // the households tables too.
