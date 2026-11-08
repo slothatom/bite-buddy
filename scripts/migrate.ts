@@ -15,13 +15,23 @@
 import { resolve } from 'node:path'
 import pg from 'pg'
 import { migrate, readMigrations } from './lib/migrations'
+import { parseDbUrl } from './lib/db-url'
 
-const url = process.env.SUPABASE_DB_URL
-if (!url) {
+const raw = process.env.SUPABASE_DB_URL
+if (!raw) {
   console.error('SUPABASE_DB_URL is not set. It is the Postgres connection string from')
-  console.error('Supabase: Project Settings, Database, Connection string (session pooler).')
+  console.error('Supabase: Connect, Direct, Session pooler.')
   process.exit(1)
 }
+
+const parsed = parseDbUrl(raw)
+for (const note of parsed.notes) console.log(`SUPABASE_DB_URL: ${note}`)
+if (!parsed.url) {
+  for (const problem of parsed.problems) console.error(`SUPABASE_DB_URL: ${problem}`)
+  console.error('Fix the secret under Settings, Secrets and variables, Actions, then re-run this job.')
+  process.exit(1)
+}
+const url = parsed.url
 
 const dryRun = process.argv.includes('--dry-run')
 const client = new pg.Client({
