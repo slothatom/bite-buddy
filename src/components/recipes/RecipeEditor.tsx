@@ -791,7 +791,7 @@ function NumberField({
  * Adding, replacing and removing a recipe's photograph.
  *
  * Absent entirely until storage answers that the bucket is there. The bucket is
- * a piece of setup somebody runs once in the SQL editor (supabase/photos.sql),
+ * a piece of setup somebody runs once in the SQL editor (supabase/migrations/20261108000400_photos/migration.sql),
  * and a file picker that always failed would be worse than no file picker: it
  * would look like the app was broken rather than like the feature was not set
  * up.

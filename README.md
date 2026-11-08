@@ -496,7 +496,7 @@ Rows are never removed, only marked deleted, which is also what keeps archived
 weeks resolving: a plan from 2022 names a recipe by id, and that id still finds
 something.
 
-`supabase/rows.sql` creates it all, and ends with a one-time import that reads
+`supabase/migrations/20261108000200_rows/migration.sql` creates it all, and ends with a one-time import that reads
 whatever the old `app_state` documents hold and writes them out as rows. The old
 table is left alone.
 
@@ -539,8 +539,8 @@ Postgres realtime pushes changes to the other screen as they happen. See
 change the same thing.
 
 Setup is five steps, all in [`docs/DEPLOY.md`](docs/DEPLOY.md): make the repo
-public, create the Supabase project, run `supabase/schema.sql` and then
-`supabase/rows.sql`, add two repository secrets. Every push then deploys
+public, create the Supabase project, run `supabase/migrations/20261108000100_schema/migration.sql` and then
+`supabase/migrations/20261108000200_rows/migration.sql`, add two repository secrets. Every push then deploys
 itself.
 
 ### Reminders and notifications
@@ -592,7 +592,7 @@ supabase secrets set VAPID_PRIVATE_KEY=...
 supabase secrets set VAPID_SUBJECT=https://your-site/
 ```
 
-Run `supabase/push.sql` in the SQL editor, then put the **public** half of the
+Run `supabase/migrations/20261108000300_push/migration.sql` in the SQL editor, then put the **public** half of the
 key where the app can read it:
 
 ```sql
@@ -607,7 +607,7 @@ table the app reads rather than in a repository secret and a rebuild. The
 private half never leaves the function's secrets.
 
 Then schedule it, by uncommenting the `cron.schedule` block at the bottom of
-`supabase/schema.sql` and filling in the project ref and the anon key. The
+`supabase/migrations/20261108000100_schema/migration.sql` and filling in the project ref and the anon key. The
 dashboard's Integrations > Cron can schedule an Edge Function too, but check
 what it wrote: **the Authorization header is not optional**, and a job without
 one is the one setup mistake that hides completely.
@@ -659,7 +659,7 @@ turn it off for both.
 
 ### Photos on recipes
 
-Run `supabase/photos.sql` in the SQL editor. It creates one storage bucket and
+Run `supabase/migrations/20261108000400_photos/migration.sql` in the SQL editor. It creates one storage bucket and
 four policies, all gated on `is_member()` like every other table.
 
 Until you run it the app does not offer to add a photo at all: the editor asks

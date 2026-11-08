@@ -10,7 +10,7 @@ import { supabase } from './supabase'
  * links to a database they no longer use.
  *
  * Everything here degrades to nothing when there is no account or the bucket
- * has not been created. See supabase/photos.sql, which somebody runs once.
+ * has not been created. See supabase/migrations/20261108000400_photos/migration.sql, which somebody runs once.
  */
 
 export const BUCKET = 'recipe-photos'

@@ -16,7 +16,7 @@
  * The anon key is public by design, it ships in the bundle and anyone can read
  * it. It grants nothing on its own: every table is protected by row-level
  * security that requires an authenticated session belonging to a household
- * member. See `supabase/schema.sql`.
+ * member. See `supabase/migrations/20261108000100_schema/migration.sql`.
  */
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 

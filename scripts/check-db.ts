@@ -8,6 +8,7 @@ import { useSyncState } from '../src/lib/rows/store.js'
 import { useBodyStore } from '../src/store/useBodyStore.js'
 import { useMealPlanStore } from '../src/store/useMealPlanStore.js'
 import { useRecipeStore } from '../src/store/useRecipeStore.js'
+import { JOURNAL_SCHEMA, migrate, readMigrations, type MigrationDb } from './lib/migrations.js'
 
 /**
  * Runs the real schema, in a real Postgres, against the real sync code.
@@ -81,14 +82,14 @@ async function checkPush() {
       select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
     create publication supabase_realtime;
   `)
-  await fresh.exec(readFileSync(resolve(ROOT, 'supabase/schema.sql'), 'utf8'))
+  await fresh.exec(readFileSync(resolve(ROOT, 'supabase/migrations/20261108000100_schema/migration.sql'), 'utf8'))
 
   // The row tables too, so this database is a whole project rather than half
   // of one: the scheduled function reads the plan and the cook sessions, which
   // live there, and a check that stopped at push.sql could not see them.
-  await fresh.exec(readFileSync(resolve(ROOT, 'supabase/rows.sql'), 'utf8'))
+  await fresh.exec(readFileSync(resolve(ROOT, 'supabase/migrations/20261108000200_rows/migration.sql'), 'utf8'))
 
-  const push = readFileSync(resolve(ROOT, 'supabase/push.sql'), 'utf8')
+  const push = readFileSync(resolve(ROOT, 'supabase/migrations/20261108000300_push/migration.sql'), 'utf8')
   try {
     await fresh.exec(push)
     // Pasting it twice is the most likely thing anybody does to a SQL file.
@@ -173,7 +174,7 @@ async function everyTableTheFunctionUses(db: PGlite) {
 async function checkJoining() {
   console.log('\njoining the household')
   const fresh = await new PGlite()
-  const schema = readFileSync(resolve(ROOT, 'supabase/schema.sql'), 'utf8')
+  const schema = readFileSync(resolve(ROOT, 'supabase/migrations/20261108000100_schema/migration.sql'), 'utf8')
 
   await fresh.exec(`
     create schema auth;
@@ -297,6 +298,77 @@ async function checkJoining() {
   await fresh.close()
 }
 
+/** What Supabase provides around the migrations: auth, realtime and storage. */
+async function supabaseShaped() {
+  const db = await new PGlite()
+  await db.exec(`
+    create schema auth;
+    create table auth.users (id uuid primary key, email text);
+    create function auth.uid() returns uuid language sql stable as $$
+      select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
+    create publication supabase_realtime;
+    create schema storage;
+    create table storage.buckets (
+      id text primary key, name text, public boolean,
+      file_size_limit bigint, allowed_mime_types text[]
+    );
+    create table storage.objects (id uuid primary key, bucket_id text);
+    alter table storage.objects enable row level security;
+  `)
+  return db
+}
+
+const asMigrationDb = (db: PGlite): MigrationDb => ({
+  query: async (sql, params) => db.query(sql, params) as never,
+  exec: (sql) => db.exec(sql),
+})
+
+async function checkMigrations() {
+  console.log('\nmigrations')
+  const migrations = readMigrations(resolve(ROOT, 'supabase/migrations'))
+  const quiet = () => {}
+
+  const fresh = await supabaseShaped()
+  const first = await migrate(asMigrationDb(fresh), migrations, { log: quiet })
+  check('a fresh database takes every migration', first.applied.length === migrations.length,
+    `${first.applied.length}/${migrations.length}`)
+
+  const again = await migrate(asMigrationDb(fresh), migrations, { log: quiet })
+  check('and a second run applies nothing', again.applied.length === 0)
+
+  const visible = await fresh.query<{ n: number }>(
+    `select count(*)::int n from information_schema.tables where table_schema = 'public' and table_name like '%journal%'`)
+  check('the journal is kept out of the public API', visible.rows[0].n === 0)
+
+  const edited = migrations.map((m, i) => i === 0 ? { ...m, checksum: 'edited' } : m)
+  let refused = await migrate(asMigrationDb(fresh), edited, { log: quiet }).then(() => '', (e: Error) => e.message)
+  check('an applied migration that was edited is refused', refused.includes('edited after'), refused)
+
+  refused = await migrate(asMigrationDb(fresh), migrations.slice(0, -1), { log: quiet })
+    .then(() => '', (e: Error) => e.message)
+  check('an older checkout cannot deploy over a newer database', refused.includes('does not'), refused)
+
+  const broken = [...migrations, { name: '99999999999999_broken', sql: 'create table public.half_done (id int); select nope from nowhere;', checksum: 'x' }]
+  refused = await migrate(asMigrationDb(fresh), broken, { log: quiet }).then(() => '', (e: Error) => e.message)
+  const half = await fresh.query<{ n: number }>(
+    `select count(*)::int n from information_schema.tables where table_name = 'half_done'`)
+  const logged = await fresh.query<{ n: number }>(
+    `select count(*)::int n from ${JOURNAL_SCHEMA}.journal where name = '99999999999999_broken'`)
+  check('a failing migration is rolled back whole', refused.includes('rolled back') && half.rows[0].n === 0 && logged.rows[0].n === 0, refused)
+  await fresh.close()
+
+  // The live database was built by pasting these same files into the SQL
+  // editor, before there was a journal. The first deploy runs them all again
+  // on top of that, so they have to be safe to repeat.
+  const pasted = await supabaseShaped()
+  for (const m of migrations) await pasted.exec(m.sql)
+  const adopted = await migrate(asMigrationDb(pasted), migrations, { log: quiet })
+    .then((r) => r.applied.length === migrations.length, (e: Error) => e.message)
+  check('a database set up by hand adopts the migrations cleanly', adopted === true, String(adopted))
+  await pasted.close()
+}
+
+await checkMigrations()
 await checkJoining()
 await checkPush()
 
@@ -334,7 +406,7 @@ await db.query(
   ],
 )
 
-const sql = readFileSync(resolve(ROOT, 'supabase/rows.sql'), 'utf8')
+const sql = readFileSync(resolve(ROOT, 'supabase/migrations/20261108000200_rows/migration.sql'), 'utf8')
 
 console.log('\nthe schema')
 try {
