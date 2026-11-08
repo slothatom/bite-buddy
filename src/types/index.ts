@@ -88,7 +88,7 @@ export type MedTier = 'daily' | 'weekly' | 'moderate' | 'rare'
 
 /**
  * The dietician always weighs starches and meat BEFORE cooking
- * ("50 g bulgur nefiert", "100 g piept de pui crud"). 50 g of dry bulgur is
+ * ("60 g bulgur nefiert", "120 g piept de pui crud"). 50 g of dry bulgur is
  * roughly three times the calories of 50 g of cooked bulgur, so the state a
  * food is weighed in is part of its identity, not a display detail.
  */
@@ -369,7 +369,7 @@ export const SLOT_LABELS: Record<MealSlot, string> = {
 
 /**
  * A planned meal is a list of entries, not a single recipe reference. This is
- * what lets "[removed plan text]" be two food lines instead of a fabricated
+ * what lets "200 g pere, 15 g migdale" be two food lines instead of a fabricated
  * recipe, while a cooked lunch is a single nested recipe entry.
  */
 /**

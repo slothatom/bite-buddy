@@ -15,14 +15,15 @@ plan, and the published site is public either way.
 
 > **Settings → General → Danger Zone → Change repository visibility → Public**
 
-What becomes readable: the code, and the parsed dietician plans in
-`src/data/generated/`, which also ship inside the site's JavaScript. What does
-**not**: everything you enter from now on. Your weeks, weights, targets and
-shopping lists live in the database behind the login.
+What becomes readable: the code, the food database and the hand-written
+dishes. What does **not**: the dietician's plans, which are in neither the
+repository nor the site's JavaScript (they are uploaded to the database, see
+[8. The plan archive](#8-the-plan-archive)), and everything you enter from now
+on. Your weeks, weights, targets and shopping lists live in the database behind
+the login.
 
-(Whether the dietician plans should move out of the public bundle and the
-public repo, into Supabase behind the login, is an open decision. See "Not done
-yet" in the README.)
+CI fails a build that carries anything shaped like plan data, and refuses the
+plans being tracked in git again (`npm run bundle:check`).
 
 ## 2. Create the Supabase project
 
@@ -114,10 +115,11 @@ SUPABASE_DB_URL=postgres://... npm run db:migrate -- --dry-run   # what would ru
 SUPABASE_DB_URL=postgres://... npm run db:migrate                # apply
 ```
 
-Today there are five: `schema`, `rows`, `push`, `photos` (the four files that
+Today there are six: `schema`, `rows`, `push`, `photos` (the four files that
 used to be pasted by hand, safe to repeat, so a database set up the old way
-adopts them on the first deploy) and `households`. Nothing in them needs
-pasting into the SQL editor any more.
+adopts them on the first deploy), `households` and `plan_archive` (the table the
+dietician's plans are uploaded to). Nothing in them needs pasting into the SQL
+editor any more.
 
 ## 5. Sign-in settings
 
@@ -286,6 +288,28 @@ Notifications**, and chooses which of the two kinds they want. On Android it is
 more reliable once the app is on the home screen. Without any of this the
 toggle still saves and nothing is sent; nothing else depends on it.
 
+## 8. The plan archive
+
+The dietician's plans are private, so the app does not ship them. They are one
+file per household, uploaded by an admin and read back by everyone in it.
+
+1. **The table.** The `plan_archive` migration runs on deploy like the others.
+   One row per household; members read it, viewers included, and only admins
+   can upload, replace or remove it.
+2. **The file.** On the machine that has the plans, put the documents in
+   `data/source/` and run `npm run data:build`. It writes `data/archive.json`,
+   which is gitignored. Never commit it, and never put it in `public/`.
+3. **The upload.** Signed in as an admin, open **Settings, Plan history** and
+   choose **Upload plan archive**. The app checks the file, uploads it, and
+   shows how many plans, days and recipes it holds. Do this again whenever the
+   archive is rebuilt.
+
+Everyone else in the household gets it on their next open: the app keeps a
+copy on the device for offline use and downloads it again only when it has
+changed. Signing out removes that copy, so a shared or borrowed phone keeps
+none of it. Until an archive is uploaded the app works as normal, with the
+hand-written dishes and an empty Plan history.
+
 ---
 
 ## How the sharing works
@@ -319,7 +343,9 @@ npm install && npm run dev
 
 Without `VITE_SUPABASE_URL` set there is no sign-in screen and no sync; the app
 runs entirely on localStorage. That is also why the test suite doesn't need a
-database.
+database. With no database there is nothing to upload the plan archive to, so
+**Settings, Plan history** offers **Load plan archive** instead, and keeps the
+file on that device only.
 
 To test the real thing locally, put the two public values in `.env.local`:
 

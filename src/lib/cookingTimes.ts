@@ -88,7 +88,7 @@ const ASSEMBLY_CAP = 5
  *
  * A dish the meal contains brings its own hand-written times, which always beat
  * the estimate for its category. Where a meal is only raw food on a plate,
- * "[removed plan text]", the category is
+ * "170 g iaurt, 30 g fulgi de ovaz, 80 g fructe de padure", the category is
  * all there is, and three minutes with a bowl is about right.
  */
 export function deriveTimes(

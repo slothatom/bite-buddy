@@ -209,7 +209,7 @@ export function parseFragment(fragment: string): ParsedQuantity {
 /**
  * Words that join two foods rather than describing one.
  *
- * The dietician writes "150 g tofu cu o lingurita de ulei de masline", 150 g of
+ * The dietician writes lines like "130 g tofu cu o lingurita de ulei de masline", 130 g of
  * tofu with a teaspoon of olive oil. Split only on commas and plus signs, that
  * stayed one fragment carrying one weight, and the resolver then had to choose
  * a single food for it. It chose the oil, because "ulei de masline" is longer
@@ -248,8 +248,8 @@ function statesAnAmount(text: string): boolean {
 /**
  * A spoon measure that begins a second amount inside one fragment.
  *
- * Romanian writes "150 g tofu cu o lingurita de ulei", and `JOINERS` splits on
- * the "cu". Hungarian has no word to split on: "240 g spenót 1 tk.
+ * Romanian writes "130 g tofu cu o lingurita de ulei", and `JOINERS` splits on
+ * the "cu". Hungarian has no word to split on: "200 g spenót 1 tk.
  * Olivaolajjal" carries its "with" as a case ending on the noun itself. So the
  * fragment stayed whole, the 240 g attached to whichever food matched best,
  * and "olivaolajjal" beats "spenót", which stored 240 g of olive oil, lost the
@@ -335,7 +335,7 @@ export function splitComponents(line: string): string[] {
      * ingredient, and read as one fragment the 150 g attached to the quinoa in
      * the name rather than to the mushrooms, which made a 1,307 kcal salad out
      * of 290 g of dry quinoa. The same shape swallowed the weight in "salata
-     * cezar : 120 g piept de curcan" and "tigaie picanta: 120 g piept de pui",
+     * cezar : 110 g piept de curcan" and "tigaie picanta: 130 g piept de pui",
      * where the number she wrote was simply dropped and the dish's own figure
      * stood in fifty-eight fragments.
      *

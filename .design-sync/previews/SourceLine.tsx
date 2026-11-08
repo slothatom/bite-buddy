@@ -1,7 +1,7 @@
 import { SourceLine } from 'bite-buddy'
 
-const romanian = '[removed plan text]'
-const hungarian = '100 g marhahus lesutve (1 tk/ adag) + 200 g zeller pure (70% zeller, 30% krumpli) + vegyes salata'
+const romanian = '300 g ciorba de fasole verde (o lingurita de ulei de masline / portie), 30 g paine int, 1 rosie'
+const hungarian = '120 g csirkemell (1 tk/ adag) + 180 g karfiol pure (60% karfiol, 40% krumpli) + uborka'
 
 /** Plain foreign text, translated underneath. The English leads. */
 export function Translated() {

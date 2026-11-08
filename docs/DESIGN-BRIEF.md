@@ -32,8 +32,8 @@ Three properties of that source data shape the whole product, and therefore the 
 
 | Property | Consequence for design |
 |---|---|
-| The dietician wrote **weighed portion lines**, not recipes (`50 g paine int + 100 g humus, jumatate de farfurie de legume`) | A meal is a *list of entries*, not one recipe. A snack is two food lines. Rows must handle several entries. |
-| Weights are stated **uncooked** (`50 g bulgur nefiert`, `100 g piept de pui crud`) | Every food carries a state, raw / dry / cooked / as-sold, that sometimes needs surfacing |
+| The dietician wrote **weighed portion lines**, not recipes (a line like `40 g paine int + 80 g humus, castraveti`) | A meal is a *list of entries*, not one recipe. A snack is two food lines. Rows must handle several entries. |
+| Weights are stated **uncooked** (`60 g bulgur nefiert`, `120 g piept de pui crud`) | Every food carries a state, raw / dry / cooked / as-sold, that sometimes needs surfacing |
 | The plan weeks did not start on Monday | No calendar component may assume a fixed first day. The week start is a setting, any of the seven; Monday is the default, and loading an archived plan lines its days up by weekday. |
 
 The dietician never wrote a single calorie. Supplying them is what the app adds.
@@ -156,7 +156,7 @@ Real measurements from the shipped data. Regenerate with `npm run data:check`.
 
 | What | Figure | Why it matters |
 |---|---|---|
-| Recipes | **576** | 83 hand-written dishes plus 493 meals taken from the plans, grouped into fewer cards by variant |
+| Recipes | **576** | 83 hand-written dishes plus 493 meals taken from the plans, grouped into fewer cards by variant. Only the 83 dishes until a household's plan archive is uploaded |
 | Recipe names | Often long | A name says what makes that version different, so cards must handle two-line names |
 | Source lines | **up to about 200 chars** | Shown under the name; clamps on cards, wraps in detail |
 | Foods | **148** | Across 17 categories, each row carrying up to three language names |
@@ -164,7 +164,7 @@ Real measurements from the shipped data. Regenerate with `npm run data:check`.
 | Quick filters | **14** | 9 derived, 5 applied by hand; a chip row that wraps |
 | Meal times | **4** | Breakfast, Lunch, Dinner, Snack. A recipe can belong to several |
 | Meal slots | **4 x 7 = 28** a week | A slot can hold several entries |
-| Plan archive | **36 plans / 254 days** | All with the original text |
+| Plan archive | **36 plans / 254 days** | All with the original text. Private: uploaded per household, absent (an empty state) until it is |
 | People | **Per household** | One person key each; personal rows say whose they are |
 | Body measurements | **5** | Waist, hips, chest, arms, thighs, each with its own history and trend |
 
