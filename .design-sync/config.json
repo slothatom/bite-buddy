@@ -39,8 +39,7 @@
     "UndoBar": "src/components/layout/UndoBar.tsx",
     "WeekTemplates": "src/components/planner/WeekTemplates.tsx",
     "WhenPicker": "src/components/planner/WhenPicker.tsx",
-    "Wordmark": "src/components/brand/Mascot.tsx",
-    "Zig": "src/components/brand/Mascot.tsx"
+    "Logo": "src/components/brand/Logo.tsx"
   },
   "entry": ".design-sync/entry.tsx",
   "provider": {
@@ -139,10 +138,7 @@
       "cardMode": "single",
       "viewport": "1100x820"
     },
-    "Wordmark": {
-      "cardMode": "column"
-    },
-    "Zig": {
+    "Logo": {
       "cardMode": "column"
     }
   },

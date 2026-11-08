@@ -1,6 +1,6 @@
 import { EmptyState } from 'bite-buddy'
 
-/** A search that found nothing. The default mood, and the one seen most. */
+/** A search that found nothing. The one seen most. */
 export function SearchFoundNothing() {
   return (
     <div style={{ width: 460 }}>
@@ -20,7 +20,7 @@ export function SearchFoundNothing() {
 export function NothingOfYourOwnYet() {
   return (
     <div style={{ width: 460 }}>
-      <EmptyState title="Nothing of your own yet" mood="thinking">
+      <EmptyState title="Nothing of your own yet">
         <p>Every recipe here can be edited. Change one and your version lands on this shelf, with the original safe underneath.</p>
         <button className="btn-primary mt-4">Write one</button>
       </EmptyState>
@@ -28,11 +28,11 @@ export function NothingOfYourOwnYet() {
   )
 }
 
-/** The apologetic mood, for the case where the app is the one that failed. */
+/** For the case where the app is the one that failed. */
 export function ImportDidNotLand() {
   return (
     <div style={{ width: 460 }}>
-      <EmptyState title="That week did not import" mood="oops">
+      <EmptyState title="That week did not import">
         The file opened but nothing in it looked like a plan. Check it is the
         dietician's own document, then try again.
       </EmptyState>
@@ -44,7 +44,7 @@ export function ImportDidNotLand() {
 export function NoCookSessions() {
   return (
     <div style={{ width: 460 }}>
-      <EmptyState title="No cook sessions planned" mood="chef">
+      <EmptyState title="No cook sessions planned">
         Add one and pick the dishes you'll batch together.
       </EmptyState>
     </div>
@@ -55,23 +55,23 @@ export function NoCookSessions() {
  * Empty because the work is done, not because nothing has started.
  *
  * The gap filler lands here when every slot on the days ahead already has
- * something in it, so the mascot celebrates rather than shrugs.
+ * something in it, so the copy celebrates rather than shrugs.
  */
 export function NothingLeftToFill() {
   return (
     <div style={{ width: 460 }}>
-      <EmptyState title="Nothing to fill" mood="celebrate">
+      <EmptyState title="Nothing to fill">
         Every meal on the days still ahead already has something in it.
       </EmptyState>
     </div>
   )
 }
 
-/** The cheerful mood, for a list that is empty because the cupboard covers it. */
+/** A list that is empty because the cupboard covers it. */
 export function TheListIsClear() {
   return (
     <div style={{ width: 460 }}>
-      <EmptyState title="Nothing to buy this week" mood="happy">
+      <EmptyState title="Nothing to buy this week">
         Everything the plan asks for is already in the cupboard. Add a line above
         if you want something anyway.
       </EmptyState>

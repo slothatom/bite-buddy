@@ -62,8 +62,7 @@ There is no mascot. The mark (`<Logo variant="mark" />`) fills those places:
 empty states (`EmptyState`), the error screen, the start-up wait and first-run
 household setup, with a small mark on moment notes. The Home greeting has no
 illustration, and sign-in leads with the logo. Personality otherwise comes from
-colour, Bungee headings and the copy. (Bandit the raccoon, and before him a
-blob called Zig, were retired.)
+colour, Bungee headings and the copy.
 
 ---
 

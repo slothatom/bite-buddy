@@ -1,5 +1,8 @@
 # design-sync notes for bite-buddy
 
+> **Bandit was retired on 8 November 2026.** There is no mascot; the Bitten B
+> logo (`Logo`) replaced him everywhere. The mascot notes below are history.
+
 Repo-specific things a future sync should know. Read this before touching
 `.design-sync/config.json`.
 

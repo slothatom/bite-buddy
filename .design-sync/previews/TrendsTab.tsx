@@ -35,7 +35,7 @@ export function NothingToTrendYet() {
 /**
  * The same empty state on a phone, which is where this tab is mostly read.
  *
- * Worth its own cell because the card's 40px padding and the 84px mascot are
+ * Worth its own cell because the card's 40px padding and the 56px mark are
  * fixed while the column is not: at 360 the heading and the sentence under it
  * are what has to give, and they do it by wrapping rather than by shrinking.
  */

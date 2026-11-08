@@ -3,7 +3,7 @@
  *
  * The artwork's filenames carry a hash of their contents now, which fixes one
  * problem and creates another: a name that changes is a name that can be
- * wrong. Edit the mascot and forget `npm run icons` and the module still names
+ * wrong. Edit the logo and forget `npm run icons` and the module still names
  * last week's files, which is harmless. Run `npm run icons` and forget to
  * commit `public/` and the deployed page points at artwork that is not there,
  * which is a home screen with a blank square on it and no error anywhere.

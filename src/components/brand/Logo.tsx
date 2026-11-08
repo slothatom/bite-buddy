@@ -5,7 +5,7 @@
  * off where the teeth went. It is the brand mark: the header, the sidebar, the
  * sign-in screen, and (rendered to PNG by `npm run icons`) the app icon, the
  * tab icon and the iOS launch screens. The mark on its own also fills the
- * empty, error and loading states, where a mascot used to sit.
+ * empty, error and loading states.
  *
  * The paths are copied from the masters in `brand/` and inlined here rather
  * than loaded as an image, so the colours can come from the tokens in

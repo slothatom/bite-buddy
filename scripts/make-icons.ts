@@ -8,9 +8,6 @@
  * platform wants as PNG, and copies the favicon across as vector. Run
  * `npm run icons` after changing anything in `brand/`.
  *
- * (It used to draw Bandit's face from coordinates written out in this file.
- * He is still the mascot inside the app, but he is no longer the icon.)
- *
  * Every file it writes carries a hash of its own contents in its name, and
  * `src/generated/icons.ts` records what those names are. That is the fix for
  * a specific failure: `icon-192.png` has been three different pictures over

@@ -4,9 +4,9 @@
  * Bite Buddy is an application, not a published component library: there is no
  * `dist/` of components and no `.d.ts` tree for the converter to read a
  * component list from. This file is that list, written by hand so the names in
- * the design tool are the names the code actually uses. Two of them would
- * otherwise be wrong, because the file and the export disagree: `Mascot.tsx`
- * exports `Zig`, and `Chart.tsx` exports `DayChart`.
+ * the design tool are the names the code actually uses. One of them would
+ * otherwise be wrong, because the file and the export disagree: `Chart.tsx`
+ * exports `DayChart`.
  *
  * Add a component here and in `componentSrcMap` in config.json, and it appears
  * in the design system on the next sync.
@@ -20,7 +20,7 @@ export {
   SourceLine, EmptyState, SectionHeading, ChipRow,
 } from '../src/components/ui'
 
-export { default as Zig, Wordmark } from '../src/components/brand/Mascot'
+export { default as Logo } from '../src/components/brand/Logo'
 export { default as DayChart, Legend } from '../src/components/trends/Chart'
 
 export { default as BodyChart } from '../src/components/body/BodyChart'
