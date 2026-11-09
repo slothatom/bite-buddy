@@ -40,13 +40,9 @@ test.describe('estimates, not medical advice', () => {
 
     await goto(page, '/plan/week')
     await page.getByRole('tab', { name: '1 week' }).click()
-    const row = page.locator('[data-day-row]')
-      .filter({ has: page.locator('[data-planned]') })
-      .first()
-    if ((page.viewportSize()?.width ?? 0) >= 640) {
-      await row.getByRole('button', { name: /the full names/ }).click()
-    }
-    await row.getByRole('button', { name: /^Open / }).click()
+    // A row on a phone, a column heading on a wide screen: the day opens from its own button.
+    await page.locator('[data-day-row][data-has-food]').first()
+      .getByRole('button', { name: /^Open / }).click()
 
     const hint = page.locator('[data-completeness]')
     await expect(hint).toBeVisible()

@@ -2885,7 +2885,7 @@ test.describe('the small sharp edges', () => {
     await page.getByLabel('Weight', { exact: true }).fill('72')
     // Two Log buttons on this screen: weight and measurements. The first one
     // sits under the weight field.
-    await page.getByRole('button', { name: 'Log' }).first().click()
+    await page.getByRole('button', { name: 'Log', exact: true }).first().click()
 
     await page.getByLabel('Aiming for').fill('68')
     await expect(page.getByText(/to go\.|below your goal\.|At your goal\./)).toBeVisible()
@@ -3152,7 +3152,9 @@ test.describe('how it is going', () => {
     // Salmon is the only thing in it, so the fish filter keeps it and any
     // other filter does not. One food means one category, so no filter row
     // is drawn; the tally itself is the thing under test here.
-    await expect(page.getByText(/\d+ days/).first()).toBeVisible()
+    // Scoped to its own section: the week card above says "N of M days" too.
+    const most = page.locator('section', { has: page.getByText('What you eat most') })
+    await expect(most.getByText(/\d+ days/).first()).toBeVisible()
   })
 })
 
@@ -3201,8 +3203,8 @@ test.describe('weight and measurements over time', () => {
     // One reading is a reading, not a change of nought.
     await expect(page.getByText(/a reading rather than a change/)).toBeVisible()
 
-    await page.getByRole('button', { name: 'All' }).click()
-    await expect(page.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
+    await page.getByRole('button', { name: 'All', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'All', exact: true })).toHaveAttribute('aria-pressed', 'true')
   })
 
   test('a measurement chart is drawn for one measure at a time', async ({ page }) => {

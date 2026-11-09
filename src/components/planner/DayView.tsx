@@ -108,6 +108,8 @@ export function DayView({
           <span>{planned} of {MEAL_SLOTS.length} meals planned</span>
           {label && <><span aria-hidden="true">·</span><span>{label}</span></>}
         </div>
+        {/* Beside the totals, not inside the disclosure: it says how far to trust them. */}
+        <KnownHint known={known} total={total} />
         <details className="group">
           <summary className="min-h-11 flex items-center text-xs font-bold text-bite-700 cursor-pointer">
             Nutrients for the day
@@ -119,7 +121,6 @@ export function DayView({
               partial={dayReport.partial}
               unresolved={dayReport.unresolved}
             />
-            <KnownHint known={known} total={total} className="mt-2" />
           </div>
         </details>
       </section>
