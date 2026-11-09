@@ -239,7 +239,7 @@ The initial is always `on-brand`, which does not invert after dark.
 
 ### Brand and layout
 
-`Logo` in `src/components/brand/`; `Sidebar`, `BottomNav`, `SectionLayout`,
+`Logo` in `src/components/brand/`; `Sidebar`, `BottomNav`,
 `SectionTabs`, `TodayHeaderActions`, `StorageBanner`, `UndoBar` and
 `ErrorBoundary` in `src/components/layout/`.
 
@@ -261,9 +261,9 @@ old screen lives inside the place you would look for it, as a tab:
 | **Plan** | Week `/plan/week` · Grocery `/plan/grocery` · Cooking `/plan/cooking` |
 | **Recipes** | Recipes `/recipes` · Foods `/recipes/foods` |
 | **Progress** | Overview `/progress` · Movement `/progress/movement` · Summary `/progress/summary` |
-| Settings | `/settings`, plan archive at `/settings/history` |
+| Settings | `/settings`, then `/settings/household`, `targets`, `history`, `reminders`, `appearance`, `backups`, `account` |
 
-- **Section tabs** (`SectionTabs`, rendered by `SectionLayout`): a segmented
+- **Section tabs** (`SectionTabs`, drawn in each screen's own header): a segmented
   control at the top of Plan, Recipes and Progress. They are links, one route
   per tab, with `aria-current="page"`, so deep links and the back gesture work.
   Full width on a phone, as wide as their words from md up.
