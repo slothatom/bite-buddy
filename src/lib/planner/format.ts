@@ -39,3 +39,16 @@ export function formatRange(dates: string[]): string {
   const last = new Date(dates[dates.length - 1] + 'T12:00:00').toLocaleDateString('en-GB', opts)
   return `${first} to ${last}`
 }
+
+/**
+ * A stretch of days as short as it can be said: "9 to 15 Nov", or
+ * "28 Nov to 4 Dec" when it crosses a month.
+ */
+export function formatSpan(dates: string[]): string {
+  const first = new Date(dates[0] + 'T12:00:00')
+  const last = new Date(dates[dates.length - 1] + 'T12:00:00')
+  const month = (d: Date) => d.toLocaleDateString('en-GB', { month: 'short' })
+  return first.getMonth() === last.getMonth()
+    ? `${first.getDate()} to ${last.getDate()} ${month(last)}`
+    : `${first.getDate()} ${month(first)} to ${last.getDate()} ${month(last)}`
+}

@@ -43,11 +43,13 @@ function Name({
 }
 
 export function EntryLine({
-  entry, struck = false, onAmount,
+  entry, struck = false, onAmount, meta,
 }: {
   entry: Component
   struck?: boolean
   onAmount?: () => void
+  /** A few words after the amount, such as where a tub is kept. */
+  meta?: string
 }) {
   const ctx = useNutritionContext()
   const deleted = useDeletedIds()
@@ -86,86 +88,65 @@ export function EntryLine({
     ? formatAmount(entry.grams, ctx.foods.get(entry.foodId))
     : entry.servings === 1 ? '' : `${entry.servings}×`
 
-  // The names are long, 46 characters at the median, 77 at the longest, and in
-  // a three-column day on a laptop this row gets about 320px, which the tick,
-  // the two meal buttons, the amount and the calories take 250 of. The name
-  // was left with 70px and broke one word per line: "Eggplant / spread / with
-  // / wholemeal / bread & / mixed / vegetables", seven lines for one meal,
-  // which pushed Snack 2 and Dinner off the bottom of a 950px laptop.
-  //
-  // So the row wraps instead, and the two numbers travel together. The name
-  // takes its natural width and will not be squeezed below 7rem, so a short
-  // one keeps the numbers beside it and a long one sends them to a second
-  // line rather than shrinking to nothing. Two lines at worst, one whenever
-  // the column is wide enough, which is what a phone gives it.
-  return (
-    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm">
-      {/* The name in its own box, so it wraps against the row's edge rather
-          than against whatever sits beside it.
+  /*
+   * Two lines: the name, then what it is and how much.
+   *
+   * The amount is the control for changing it, so it reads as part of the
+   * description rather than as a fourth button on the row. The calories sit
+   * to the right on their own, where a column of them can be scanned.
+   */
+  const amount = detail || (entry.kind === 'food'
+    ? formatAmount(0, ctx.foods.get(entry.foodId))
+    : '1×')
 
-          A glyph used to lead every line: the recipe's own emoji, a tub for a
-          portion, and a bare interpunct for a weighed food, because foods have
-          no emoji of their own. That last case is why this went: three lines
-          of one meal read "🍲 soup, · bread, · mozzarella", so the column was
-          decorated on some rows and punctuated on others. Giving foods their
-          category's emoji instead would have made the column uniform and made
-          it lie, since a category emoji describes the food group rather than
-          the food: 🧀 for yogurt, 🍫 for banana bread. The names are what the
-          row is for, and they now start in one place. */}
-      <span className="flex-auto min-w-28 flex items-baseline gap-2">
-      {/* Through to the recipe, which the planner could not do at all. You
-          read "Cabbage soup with wholemeal bread" on Tuesday, wondered what
-          went in it, and had to go to Recipes and search for it by name. Only
-          the ones that are a recipe: a weighed food has no page to open, and
-          a link that sometimes goes nowhere is worse than no link. */}
-      <Name
-        to={opensTo}
-        title={full === label ? undefined : full}
-        className={`min-w-0 ${isDeleted || struck ? 'text-ink-500' : 'text-ink-900'} ${
-          struck ? 'line-through' : ''} ${opensTo ? 'hover:text-bite-700 hover:underline' : ''}`}
-      >
-        {label}
-        {entry.kind === 'portion' && (
-          <span className="ml-1.5 text-xs font-bold uppercase tracking-wide text-leaf-700">
-            {portion?.storage === 'freezer' ? 'freezer' : 'fridge'}
-          </span>
-        )}
-        {isDeleted && (
-          <span className="ml-1.5 text-xs font-bold uppercase tracking-wide text-ink-500">
-            deleted
-          </span>
-        )}
-        {/* Skipped in a word as well as struck through, so it is not carried
-            by a line and a grey alone. */}
-        {struck && (
-          <span className="inline-block ml-1.5 text-xs font-bold uppercase tracking-wide text-ink-500">
-            skipped
-          </span>
-        )}
-      </Name>
+  return (
+    <>
+      <span className="flex-1 min-w-0 flex flex-col">
+        {/* Through to the recipe, where there is one. A weighed food has no
+            page to open, and a link that sometimes goes nowhere is worse
+            than no link. */}
+        <Name
+          to={opensTo}
+          title={full === label ? undefined : full}
+          className={`min-w-0 text-[15px] leading-5 font-bold ${isDeleted || struck ? 'text-ink-700' : 'text-ink-900'} ${
+            struck ? 'line-through' : ''} ${opensTo ? 'hover:text-bite-700 hover:underline' : ''}`}
+        >
+          {label}
+          {entry.kind === 'portion' && (
+            <span className="ml-1.5 text-xs font-bold uppercase tracking-wide text-leaf-700">
+              {portion?.storage === 'freezer' ? 'freezer' : 'fridge'}
+            </span>
+          )}
+          {isDeleted && (
+            <span className="ml-1.5 text-xs font-bold uppercase tracking-wide text-ink-700">
+              deleted
+            </span>
+          )}
+          {/* Skipped in a word as well as struck through, so it is not
+              carried by a line and a grey alone. */}
+          {struck && (
+            <span className="inline-block ml-1.5 text-xs font-bold uppercase tracking-wide text-ink-700">
+              skipped
+            </span>
+          )}
+        </Name>
+        <span className="text-xs leading-4 text-ink-700">
+          {/* A thumb-sized hit area that costs no height: the padding makes
+              the box, the negative margin gives the space back. */}
+          <button
+            type="button"
+            className="tabular-nums py-3 -my-3 pr-2 hover:text-bite-700 underline decoration-dotted underline-offset-4"
+            onClick={onAmount}
+            aria-label={`Change how much: ${label}`}
+          >
+            {amount}
+          </button>
+          {meta && <span>{` · ${meta}`}</span>}
+        </span>
       </span>
-      {/* The amount is the control. Tapping the line's name would fight with
-          reading it, and a separate button would be a fourth thing in a row
-          that already has three. Kept in one box with the calories so the two
-          numbers wrap as a pair instead of stacking one above the other. */}
-      <span className="flex items-baseline gap-2 shrink-0 ml-auto">
-      <button
-        // A thumb-sized hit area that costs no height: the padding makes the
-        // box, the negative margin gives the space back to the layout. Sized
-        // to fill it instead pushed the fifth slot of a day below the fold.
-        className="text-xs text-ink-500 font-mono shrink-0 tabular-nums min-w-11 px-1 py-3 -my-3
-                   hover:text-bite-700 underline decoration-dotted underline-offset-4"
-        onClick={onAmount}
-        aria-label={`Change how much: ${label}`}
-      >
-        {detail || (entry.kind === 'food'
-          ? formatAmount(0, ctx.foods.get(entry.foodId))
-          : '1×')}
-      </button>
-      <span className="text-xs text-ink-700 font-mono shrink-0 tabular-nums w-10 sm:w-14 text-right">
+      <span className="shrink-0 text-sm font-extrabold text-ink-900 tabular-nums">
         {Math.round(kcal)}
       </span>
-      </span>
-    </div>
+    </>
   )
 }
