@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react'
-import { Plus, Check, Trash2, Bell, Minus, AlertTriangle } from 'lucide-react'
+import {
+  Plus, Check, Trash2, Bell, BellOff, Minus, AlertTriangle, Clock, Circle, Refrigerator,
+} from 'lucide-react'
 import type { CookSession, MealSlot } from '../types'
 import { useDialog } from '../lib/useDialog'
 import { offerUndo } from '../store/useUndo'
 import { useCookStore } from '../store/useCookStore'
 import { useRecipes } from '../store/useRecipeStore'
 import { useMealPlanStore } from '../store/useMealPlanStore'
+import { useThisWeek } from '../store/useThisWeek'
 import { EmptyState, SearchField } from '../components/ui'
+import { PlanHeader } from '../components/planner/PlanHeader'
 import { LEAD_MINUTES, overdue, reminderAt, reminderLabel } from '../lib/cookReminder'
 import { usePortionStore, useAvailablePortions } from '../store/usePortionStore'
 import {
@@ -21,6 +25,10 @@ import { today, addDays } from '../store/useMealPlanStore'
  * The dietician's plans repeat a dish across several days on purpose, one pot
  * of lentil stew covers Friday and Saturday, so the useful unit here is a
  * cooking session with several recipes attached, not one meal at a time.
+ *
+ * Today first, then what is coming, then what has gone. A session that is
+ * done says so in a word and a filled tick rather than by fading: a faded card
+ * took its own text under the contrast floor.
  */
 export default function Schedule() {
   const { sessions, addSession, toggleComplete, removeSession } = useCookStore()
@@ -33,12 +41,9 @@ export default function Schedule() {
    * Ticking a session off asks what came out of it.
    *
    * This is the moment the fridge fills up, and the only moment anybody knows
-   * how much: the pan is in front of you. Asking later means guessing, and not
-   * asking at all is what the app did before, which is why cooking once and
-   * eating three times had to be typed in three times.
-   *
-   * Only on the way to done, and only once. Unticking is a correction, and a
-   * session that already produced portions does not produce them again.
+   * how much: the pan is in front of you. Only on the way to done, and only
+   * once: unticking is a correction, and a session that already produced
+   * portions does not produce them again.
    */
   const complete = (session: CookSession) => {
     const already = portions.some((p) => p.sessionId === session.id)
@@ -46,96 +51,78 @@ export default function Schedule() {
     if (!session.completed && !already && session.recipeIds.length) setCooked(session)
   }
 
-  // Every recipe with ingredients can be batch-cooked. This used to require a
-  // written method, and since none of the imported meals carry one, the picker
-  // was always empty and no session could be built.
+  // Every recipe with ingredients can be batch-cooked.
   const batchable = recipes.filter((r) => r.components.length > 0)
+
+  const now = today()
+  const groups = useMemo(() => {
+    const sorted = [...sessions].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))
+    return [
+      { id: 'today', title: `Today, ${longDay(now)}`, sessions: sorted.filter((s) => s.date === now) },
+      { id: 'ahead', title: 'Coming up', sessions: sorted.filter((s) => s.date > now) },
+      { id: 'gone', title: 'Earlier', sessions: sorted.filter((s) => s.date < now).reverse() },
+    ].filter((g) => g.sessions.length)
+  }, [sessions, now])
+  /** The next thing to cook: the first that is neither done nor already gone. */
+  const next = useMemo(
+    () => [...sessions]
+      .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`))
+      .find((s) => !s.completed && !overdue(s) && s.date >= now),
+    [sessions, now],
+  )
+
+  const newSession = (
+    <button type="button" className="btn-primary min-h-11" onClick={() => setAdding(true)}>
+      <Plus size={16} aria-hidden="true" /> New cook session
+    </button>
+  )
 
   return (
     <div className="flex-1 overflow-y-auto pb-[calc(2rem+env(safe-area-inset-bottom))]">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-        <header className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="display text-xl sm:text-2xl text-ink-900">Cook schedule</h1>
-            <p className="text-sm text-ink-700">When you’re cooking, and what’s going in the pot.</p>
-          </div>
-          <button className="btn-primary shrink-0" onClick={() => setAdding(true)}>
-            <Plus size={16} /> Session
-          </button>
-        </header>
+      <PlanHeader
+        actions={(
+          <>
+            <span className="text-sm text-ink-700">When you are cooking, and what goes in the pot</span>
+            {newSession}
+          </>
+        )}
+      />
 
-        <FridgeList />
-
-        {sessions.length === 0 ? (
-          <EmptyState title="No cook sessions planned">
-            Add one and pick the dishes you'll batch together.
-          </EmptyState>
-        ) : (
-          <div className="space-y-2.5">
-            {sessions.map((s) => (
-              <div key={s.id} className={`card p-4 ${s.completed ? 'opacity-60' : ''} ${
-                overdue(s) ? 'border border-coral-300' : ''}`}>
-                <div className="flex items-start gap-3">
-                  <button
-                    onClick={() => complete(s)}
-                    className={`shrink-0 w-6 h-6 rounded-full border-2 grid place-items-center transition-colors ${
-                      s.completed ? 'bg-bite-500 border-bite-500 text-on-brand' : 'border-border-200 text-transparent'}`}
-                    aria-label={s.completed ? 'Mark as not done' : 'Mark as done'}
-                  >
-                    <Check size={13} />
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-semibold text-sm text-ink-900 ${s.completed ? 'line-through' : ''}`}>
-                      {s.label || 'Cook session'}
-                    </p>
-                    <p className="text-xs text-ink-500">
-                      {new Date(s.date + 'T12:00:00').toLocaleDateString('en-GB', {
-                        weekday: 'long', day: 'numeric', month: 'long' })} · {s.time}
-                    </p>
-                    {/* A reminder that can no longer fire, sitting in a list
-                        looking pending, is the app telling you it is going to
-                        do something it cannot. A session that has gone says so
-                        instead, and offers the two things you would want:
-                        record what came out of it, or move it. */}
-                    {s.remindAt && !s.completed && !overdue(s) && (
-                      <p className="text-xs text-ink-500 flex items-center gap-1 mt-1">
-                        {/* Not "both phones": the household is however many
-                            people have signed in, and the reminder goes to
-                            every device that has notifications turned on. */}
-                        <Bell size={12} /> A nudge at {reminderLabel(s.remindAt)}, on every phone
-                        signed in.
-                      </p>
-                    )}
-                    {overdue(s) && (
-                      <p className="text-xs text-coral-700 flex items-center gap-1 mt-1">
-                        <AlertTriangle size={12} />
-                        {s.remindAt
-                          ? 'That time has passed, so no reminder is coming.'
-                          : 'That time has passed.'}
-                      </p>
-                    )}
-                    {s.recipeIds.length > 0 && (
-                      <ul className="mt-2 flex flex-wrap gap-1.5">
-                        {s.recipeIds.map((id) => {
-                          const r = recipes.find((x) => x.id === id)
-                          return r ? <li key={id} className="tag">{r.emoji} {r.name.en}</li> : null
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                  <button className="btn-ghost btn-icon text-ink-300 hover:text-coral-600"
-                    onClick={() => {
+      <div className="max-w-6xl mx-auto px-4 md:px-8 pt-2.5 md:pt-4 flex flex-col md:flex-row md:items-start gap-4 md:gap-6">
+        <div role="region" aria-label="Cook sessions" className="flex-1 min-w-0 flex flex-col gap-2">
+          {sessions.length === 0 ? (
+            <EmptyState title="No cook sessions planned">
+              Add one and pick the dishes you'll batch together.
+            </EmptyState>
+          ) : groups.map((g) => (
+            <section key={g.id} aria-labelledby={`cook-${g.id}`} className="flex flex-col gap-1.5">
+              <h2 id={`cook-${g.id}`} className="mt-0.5 text-base leading-6 font-extrabold text-ink-900">{g.title}</h2>
+              <ul className="bg-paper border border-border-200 rounded-3xl overflow-hidden">
+                {g.sessions.map((s, i) => (
+                  <SessionRow
+                    key={s.id}
+                    session={s}
+                    first={i === 0}
+                    next={next?.id === s.id}
+                    made={portions.filter((p) => p.sessionId === s.id).reduce((n, p) => n + p.servings, 0)}
+                    onToggle={() => complete(s)}
+                    onRemove={() => {
                       removeSession(s.id)
                       offerUndo(`Removed ${s.label || 'the cook session'}`, () => addSession(s))
                     }}
-                    aria-label="Remove session">
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+                  />
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+
+        <div className="md:w-[360px] md:shrink-0 flex flex-col gap-4">
+          <AtTheStove sessions={sessions} />
+          <FridgeList />
+        </div>
+
+        <div className="md:hidden [&>button]:w-full [&>button]:min-h-12">{newSession}</div>
       </div>
 
       {cooked && (
@@ -153,6 +140,249 @@ export default function Schedule() {
         />
       )}
     </div>
+  )
+}
+
+/** "Sunday 8 Nov". */
+function longDay(date: string): string {
+  const d = new Date(date + 'T12:00:00')
+  return `${d.toLocaleDateString('en-GB', { weekday: 'long' })} ${d.getDate()} ${
+    d.toLocaleDateString('en-GB', { month: 'short' })}`
+}
+
+/**
+ * One session: when, what, how much it makes, whether anyone will be nudged,
+ * and a tick for when it is done.
+ *
+ * Its state is a word in a chip as well as a colour: done, up next, planned,
+ * or gone by without being ticked.
+ */
+function SessionRow({ session: s, first, next, made, onToggle, onRemove }: {
+  session: CookSession
+  first: boolean
+  next: boolean
+  /** Portions this session put in the fridge, once it has. */
+  made: number
+  onToggle: () => void
+  onRemove: () => void
+}) {
+  const ctx = useNutritionContext()
+  const d = new Date(s.date + 'T12:00:00')
+  const late = overdue(s)
+  const names = s.recipeIds
+    .map((id) => ctx.recipes.get(id))
+    .filter((r) => r != null)
+  const makes = useMemo(
+    () => portionsFromSession(s.recipeIds, ctx.recipes, s.date, s.id).reduce((n, p) => n + p.servings, 0),
+    [s.recipeIds, s.date, s.id, ctx.recipes],
+  )
+  const label = s.label || 'Cook session'
+
+  const chip = s.completed
+    ? { text: 'Done', tone: 'bg-leaf-50 text-leaf-700', icon: Check }
+    : late ? { text: 'Time passed', tone: 'bg-coral-50 text-coral-700', icon: AlertTriangle }
+      : next ? { text: 'Up next', tone: 'bg-bite-100 text-bite-700', icon: Clock }
+        : { text: 'Planned', tone: 'bg-border-100 text-ink-700', icon: Circle }
+
+  return (
+    <li className={`flex items-start gap-3 py-2 pl-3.5 pr-1.5 ${first ? '' : 'border-t border-border-100'} ${
+      next ? 'bg-bite-50' : ''}`}>
+      <div className="w-10 shrink-0 flex flex-col items-center pt-0.5">
+        <span className="text-xs font-bold text-ink-700">{d.toLocaleDateString('en-GB', { weekday: 'short' })}</span>
+        <span className="text-lg leading-[22px] font-extrabold text-ink-900">{d.getDate()}</span>
+        <span className="text-xs font-bold text-ink-700 tabular-nums">{s.time}</span>
+      </div>
+      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <h3 className="text-[15px] leading-5 font-extrabold text-ink-900">{label}</h3>
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold whitespace-nowrap ${chip.tone}`}>
+            <chip.icon size={12} aria-hidden="true" /> {chip.text}
+          </span>
+        </div>
+        {names.length > 0 && (
+          <p className="text-[13px] leading-[18px] text-ink-900">
+            {names.map((r) => `${r.emoji} ${r.name.en}`).join(', ')}
+          </p>
+        )}
+        {(s.completed ? made > 0 : makes > 0) && (
+          <p className="text-xs leading-4 text-ink-700">
+            {s.completed
+              ? `Made ${made} ${made === 1 ? 'portion' : 'portions'}`
+              : `Makes about ${makes} ${makes === 1 ? 'portion' : 'portions'}`}
+          </p>
+        )}
+        {/* A reminder that can no longer fire, sitting in a list looking
+            pending, is the app promising something it cannot do. A session
+            that has gone says so instead. */}
+        {s.remindAt && !s.completed && !late && (
+          <p className="text-xs leading-4 text-ink-700 flex items-center gap-1">
+            {/* Not "both phones": the household is however many people have
+                signed in, and it reaches every device that allows it. */}
+            <Bell size={12} aria-hidden="true" /> A nudge at {reminderLabel(s.remindAt)}, on every phone
+            signed in.
+          </p>
+        )}
+        {!s.remindAt && !s.completed && !late && (
+          <p className="text-xs leading-4 text-ink-700 flex items-center gap-1">
+            <BellOff size={12} aria-hidden="true" /> No reminder
+          </p>
+        )}
+        {late && (
+          <p className="text-xs leading-4 text-coral-700 flex items-center gap-1">
+            <AlertTriangle size={12} aria-hidden="true" />
+            {s.remindAt
+              ? 'That time has passed, so no reminder is coming.'
+              : 'That time has passed.'}
+          </p>
+        )}
+      </div>
+      <div className="shrink-0 flex flex-col items-center">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-pressed={s.completed}
+          aria-label={s.completed ? `Mark as not done: ${label}` : `Mark as done: ${label}`}
+          className="w-11 h-11 inline-flex items-center justify-center"
+        >
+          <span className={`w-[26px] h-[26px] rounded-full flex items-center justify-center ${
+            s.completed ? 'bg-leaf-500 text-white' : `bg-paper border-2 ${next ? 'border-bite-700' : 'border-ink-300'}`}`}>
+            {s.completed && <Check size={15} strokeWidth={3} aria-hidden="true" />}
+          </span>
+        </button>
+        <button
+          type="button"
+          className="w-11 h-11 inline-flex items-center justify-center rounded-xl text-ink-700 hover:text-coral-700"
+          onClick={onRemove}
+          aria-label="Remove session"
+        >
+          <Trash2 size={15} aria-hidden="true" />
+        </button>
+      </div>
+    </li>
+  )
+}
+
+/**
+ * The week at the stove: how many sessions, how many portions they make, and
+ * which days they fall on. A wide screen has the room; a phone has the list.
+ */
+function AtTheStove({ sessions }: { sessions: CookSession[] }) {
+  const ctx = useNutritionContext()
+  const week = useThisWeek()
+  const inWeek = sessions.filter((s) => week.includes(s.date))
+  const portions = inWeek.reduce(
+    (n, s) => n + portionsFromSession(s.recipeIds, ctx.recipes, s.date, s.id).reduce((m, p) => m + p.servings, 0), 0)
+  const most = Math.max(1, ...week.map((d) => inWeek.filter((s) => s.date === d).length))
+
+  return (
+    <section aria-labelledby="stove-h" className="hidden md:block bg-paper border border-border-200 rounded-3xl p-4">
+      <h2 id="stove-h" className="text-base font-extrabold text-ink-900">This week at the stove</h2>
+      <p className="mt-1 text-[13px] text-ink-700">
+        {inWeek.length} {inWeek.length === 1 ? 'session' : 'sessions'}
+        {portions > 0 && ` · about ${portions} ${portions === 1 ? 'portion' : 'portions'}`}. Cooks per day:
+      </p>
+      <ul className="mt-3 flex flex-col gap-1.5">
+        {week.map((date) => {
+          const n = inWeek.filter((s) => s.date === date).length
+          const d = new Date(date + 'T12:00:00')
+          return (
+            <li key={date} className="flex items-center gap-2 text-xs">
+              <span className="w-8 font-bold text-ink-700">{d.toLocaleDateString('en-GB', { weekday: 'short' })}</span>
+              <span className="w-5 font-extrabold text-ink-900 tabular-nums">{d.getDate()}</span>
+              <span className="flex-1 h-2 rounded-full bg-border-100 overflow-hidden">
+                <span className="block h-full bg-leaf-500 rounded-full" style={{ width: `${(n / most) * 100}%` }} />
+              </span>
+              <span className="w-10 text-right font-bold text-ink-700">{n ? n : 'None'}</span>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
+  )
+}
+
+/**
+ * What is cooked and waiting.
+ *
+ * On this screen rather than one of its own, because it answers the question
+ * this screen exists for: whether you need to cook. Counts are editable here,
+ * since the app cannot see the fridge and the number is a note to yourselves.
+ * A tub gets here by being cooked: tick a session off and its portions land.
+ */
+function FridgeList() {
+  const ctx = useNutritionContext()
+  const available = useAvailablePortions()
+  const { updatePortion, removePortion } = usePortionStore()
+
+  if (!available.length) {
+    return (
+      <div className="rounded-2xl bg-leaf-50 px-3.5 py-2.5 min-h-[52px] flex items-center gap-2.5">
+        <Refrigerator size={20} aria-hidden="true" className="shrink-0 text-leaf-700" />
+        <p className="flex-1 min-w-0 text-[13px] text-ink-900">
+          Nothing cooked and waiting. Tick a session off once you have cooked it and its
+          portions land here.
+        </p>
+      </div>
+    )
+  }
+
+  const total = available.reduce((n, p) => n + p.servings, 0)
+
+  return (
+    <section aria-labelledby="fridge-h" className="rounded-3xl bg-leaf-50 p-3.5">
+      <div className="flex items-center gap-2.5 mb-1">
+        <Refrigerator size={20} aria-hidden="true" className="shrink-0 text-leaf-700" />
+        <h2 id="fridge-h" className="text-sm font-extrabold text-ink-900">
+          In the fridge · {total} {total === 1 ? 'portion' : 'portions'}
+        </h2>
+      </div>
+
+      <ul>
+        {offerOrder(available).map((p) => (
+          <li key={p.id} className="flex items-center gap-2 py-1">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-ink-900 truncate">
+                {portionLabel(p, ctx.recipes)}
+              </p>
+              <p className="text-xs text-ink-700">
+                {p.storage === 'freezer' ? 'Freezer, ' : ''}{madeWhen(p)}
+                {p.source === 'leftover' ? ' · leftovers' : ''}
+              </p>
+            </div>
+            <div className="flex items-center shrink-0">
+              <button
+                type="button"
+                className="w-11 h-11 inline-flex items-center justify-center rounded-xl text-ink-700 hover:text-bite-700"
+                onClick={() => updatePortion(p.id, { servings: Math.max(0, p.servings - 0.5) })}
+                aria-label={`One fewer ${portionLabel(p, ctx.recipes)}`}
+              >
+                <Minus size={15} aria-hidden="true" />
+              </button>
+              <span className="text-sm font-extrabold text-ink-900 tabular-nums w-8 text-center">
+                {p.servings}
+              </span>
+              <button
+                type="button"
+                className="w-11 h-11 inline-flex items-center justify-center rounded-xl text-ink-700 hover:text-bite-700"
+                onClick={() => updatePortion(p.id, { servings: p.servings + 0.5 })}
+                aria-label={`One more ${portionLabel(p, ctx.recipes)}`}
+              >
+                <Plus size={15} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="w-11 h-11 inline-flex items-center justify-center rounded-xl text-ink-700 hover:text-coral-700"
+                onClick={() => removePortion(p.id)}
+                aria-label={`Remove ${portionLabel(p, ctx.recipes)}`}
+              >
+                <Trash2 size={15} aria-hidden="true" />
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-1 text-xs text-ink-700">Tick a session off and what it made lands here.</p>
+    </section>
   )
 }
 
@@ -311,97 +541,6 @@ function SessionDialog({
     </div>
   )
 }
-
-/**
- * What is cooked and waiting.
- *
- * On this screen rather than a screen of its own, because it answers the
- * question this screen exists for: whether you need to cook. A separate
- * destination for six tubs of stew would be a tab you look at once.
- *
- * Counts are editable here and nowhere else needs them to be right. The app
- * cannot see the fridge, so the number is a note to yourselves, and the
- * only thing that would make it worse is arguing with you about it.
- */
-function FridgeList() {
-  const ctx = useNutritionContext()
-  const available = useAvailablePortions()
-  const { updatePortion, removePortion } = usePortionStore()
-  /*
-   * Nothing is typed into the fridge by hand any more.
-   *
-   * A tub gets here by being cooked: you tick a session off and the portions
-   * it made appear. The "Leftovers" button was a second way in that asked you
-   * to describe food you had already made, name it, date it, say where it was
-   * and how many servings, which is a form for something the app was already
-   * watching you do. Two ways to the same shelf, and the one nobody used was
-   * the one with the typing.
-   */
-  if (!available.length) {
-    return (
-      <div className="card p-4 flex items-center gap-3">
-        <span className="text-xl">🥡</span>
-        <p className="flex-1 min-w-0 text-sm text-ink-700">
-          Nothing cooked and waiting. Tick a session off once you have cooked it and its
-          portions land here.
-        </p>
-      </div>
-    )
-  }
-
-  return (
-    <section>
-      <div className="flex items-center justify-between gap-3 mb-2">
-        <h2 className="text-xs font-bold uppercase tracking-wide text-ink-500">In the fridge</h2>
-      </div>
-
-      <div className="space-y-2">
-        {offerOrder(available).map((p) => (
-          <div key={p.id} className="card p-3 flex items-center gap-3">
-            <span className="text-xl shrink-0">{p.storage === 'freezer' ? '🧊' : '🥡'}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-ink-900 truncate">
-                {portionLabel(p, ctx.recipes)}
-              </p>
-              <p className="text-xs text-ink-500">
-                {madeWhen(p)}
-                {p.source === 'leftover' ? ' · leftovers' : ''}
-              </p>
-            </div>
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                className="btn-ghost btn-icon text-ink-500"
-                onClick={() => updatePortion(p.id, { servings: Math.max(0, p.servings - 0.5) })}
-                aria-label={`One fewer ${portionLabel(p, ctx.recipes)}`}
-              >
-                <Minus size={15} />
-              </button>
-              <span className="text-sm font-mono text-ink-900 tabular-nums w-8 text-center">
-                {p.servings}
-              </span>
-              <button
-                className="btn-ghost btn-icon text-ink-500"
-                onClick={() => updatePortion(p.id, { servings: p.servings + 0.5 })}
-                aria-label={`One more ${portionLabel(p, ctx.recipes)}`}
-              >
-                <Plus size={15} />
-              </button>
-              <button
-                className="btn-ghost btn-icon text-ink-300 hover:text-coral-600"
-                onClick={() => removePortion(p.id)}
-                aria-label={`Remove ${portionLabel(p, ctx.recipes)}`}
-              >
-                <Trash2 size={15} />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-    </section>
-  )
-}
-
 
 /**
  * What came out of the session, and where it went.

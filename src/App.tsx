@@ -223,7 +223,8 @@ function Shell() {
             <Routes>
               <Route path="/" element={<Home />} />
 
-              <Route path="/plan" element={<SectionLayout section="plan" />}>
+              {/* Plan draws its own title and tabs, inside each screen's header. */}
+              <Route path="/plan">
                 <Route index          element={<Redirect to="/plan/week" />} />
                 <Route path="week"    element={<Planner />} />
                 <Route path="grocery" element={<GroceryList />} />
